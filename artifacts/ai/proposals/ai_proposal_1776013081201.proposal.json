@@ -1,0 +1,47 @@
+{
+  "proposal_id": "ai_proposal_1776013081201",
+  "created_at": "2026-04-12T16:58:01.201Z",
+  "mode": "PROPOSAL",
+  "request": "create auth system and connect it to the api server",
+  "description": "Generated proposal based on AI analysis",
+  "impact": "LOW",
+  "execution_required": true,
+  "execution_approved": false,
+  "generation_strategy": "AUTH_SYSTEM_WITH_SERVER_INTEGRATION",
+  "target_file": "code/src/auth/authSystem.js",
+  "target_files": [
+    "code/src/auth/authSystem.js",
+    "code/src/workspace/apiServer.js"
+  ],
+  "operation_mode": "MULTI_FILE",
+  "selected_strategy": {
+    "strategy_id": "AUTH_SYSTEM_WITH_SERVER_INTEGRATION",
+    "title": "Create auth system and connect it to API server",
+    "score": 0.99,
+    "target_file": "MULTI_FILE",
+    "rationale": "The request clearly asks to create the auth system and connect it to the API server in one coordinated change."
+  },
+  "strategy_candidates": [
+    {
+      "strategy_id": "AUTH_SYSTEM_WITH_SERVER_INTEGRATION",
+      "title": "Create auth system and connect it to API server",
+      "score": 0.99,
+      "target_file": "MULTI_FILE",
+      "rationale": "The request clearly asks to create the auth system and connect it to the API server in one coordinated change."
+    },
+    {
+      "strategy_id": "USER_AUTH_SYSTEM",
+      "title": "Full user authentication system",
+      "score": 0.95,
+      "target_file": "code/src/auth/authSystem.js",
+      "rationale": "The request clearly asks for a user authentication system."
+    },
+    {
+      "strategy_id": "CONNECT_AUTH_TO_SERVER",
+      "title": "Connect auth system to API server",
+      "score": 0.9,
+      "target_file": "code/src/workspace/apiServer.js",
+      "rationale": "The request clearly asks to connect the authentication system to the API server."
+    }
+  ]
+}

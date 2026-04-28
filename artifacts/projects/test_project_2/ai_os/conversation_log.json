@@ -1,0 +1,85 @@
+[
+  {
+    "entry_type": "USER_MESSAGE",
+    "message": "عايز اعمل سيستم HR",
+    "created_at": "2026-04-27T12:55:02.971Z"
+  },
+  {
+    "entry_type": "USER_MESSAGE",
+    "message": "ايوه محتاج إدارة بيانات موظفين\nايوه حضور وانصراف ببصمة\nايوه نظام اجازات\nايوه الرواتب داخل النطاق\nالصلاحيات: HR + Admin\nتقارير: attendance + payroll",
+    "created_at": "2026-04-27T12:56:23.886Z"
+  },
+  {
+    "entry_type": "USER_MESSAGE",
+    "message": "عايز اعمل سيستم HR",
+    "created_at": "2026-04-28T11:13:18.901Z"
+  },
+  {
+    "entry_type": "CLARIFICATION_ANSWERS",
+    "answers": {
+      "raw_answer": "Main functions:\n- Employee management (profiles, contracts, documents)\n- Attendance and leave management\n- Payroll management\n- Recruitment and applicant tracking\n- Performance evaluation system\n\nPrimary users:\n- HR staff\n- Employees\n- Managers\n\nIntegrations:\n- Accounting system\n- Email system\n- Possibly ERP system later\n\nData security:\n- Role-based access control\n- Secure authentication\n- Data encryption for sensitive data\n\nCompliance:\n- Compliance with local labor laws\n- Data privacy regulations",
+      "answered_questions": [
+        "What are the main functions you want the HR system to perform? (e.g., payroll, attendance, recruitment, performance management)",
+        "Who will be the primary users of the system? (e.g., HR staff, employees, managers)",
+        "Do you require integration with other systems? If yes, which ones?",
+        "What are your data security and privacy requirements?",
+        "Are there any compliance or legal requirements the system must meet?"
+      ]
+    },
+    "created_at": "2026-04-28T11:18:55.081Z"
+  },
+  {
+    "entry_type": "CLARIFICATION_ANSWERS",
+    "answers": {
+      "raw_answer": "رد عليا بنفس اللغة اللي بستخدمها",
+      "answered_questions": [
+        "What specific local labor laws and data privacy regulations must the system comply with?",
+        "What are the expected volumes of employees and transactions to ensure scalability?",
+        "Are there any specific reporting or analytics requirements?",
+        "What platforms or devices should the system support (e.g., web, mobile)?",
+        "What is the preferred deployment environment (cloud, on-premises, hybrid)?",
+        "Are there any user interface or accessibility requirements?"
+      ]
+    },
+    "created_at": "2026-04-28T11:20:51.391Z"
+  },
+  {
+    "entry_type": "USER_MESSAGE",
+    "message": "عايز اعمل نظام HR",
+    "created_at": "2026-04-28T11:25:51.760Z"
+  },
+  {
+    "entry_type": "CLARIFICATION_ANSWERS",
+    "answers": {
+      "raw_answer": "أريد بناء نظام HR احترافي لشركة متوسطة.\n\nالوظائف المطلوبة:\n- إدارة بيانات الموظفين والعقود والمستندات\n- الحضور والانصراف\n- الإجازات\n- الرواتب\n- التوظيف\n- تقييم الأداء\n- تقارير للإدارة\n\nالمستخدمون:\n- HR\n- الموظفون\n- المديرون\n- الإدارة العليا\n\nالتكاملات:\n- البريد الإلكتروني\n- نظام المحاسبة لاحقًا\n- ERP لاحقًا\n\nالأمان:\n- صلاحيات حسب الدور\n- تسجيل دخول آمن\n- حماية بيانات الرواتب والمستندات\n\nالمنصات:\n- Web أولًا\n- Mobile لاحقًا\n\nبيئة التشغيل:\n- Cloud\n\nالمطلوب منك:\nحلل المتطلبات، واسألني فقط عن أي نقاط مؤثرة ناقصة.\nلو المعلومات كافية، اعرض عليّ 3 سيناريوهات احترافية للتنفيذ، مع مميزات وعيوب كل سيناريو، ثم اسألني أختار أي سيناريو.",
+      "answered_questions": [
+        "ما هي الوظائف الأساسية التي تريد أن يغطيها نظام الـ HR؟ مثل إدارة الموظفين، الرواتب، التوظيف، تقييم الأداء، أو غيرها.",
+        "من هم المستخدمون المتوقعون للنظام؟ هل هم موظفو الموارد البشرية فقط أم يشملون المديرين والموظفين؟",
+        "هل هناك أنظمة أخرى يجب أن يتكامل معها نظام الـ HR؟ مثل أنظمة الرواتب أو الحضور؟",
+        "ما هي متطلبات الأمان والخصوصية التي يجب أن يلتزم بها النظام؟",
+        "هل هناك متطلبات خاصة بإدارة البيانات مثل التقارير أو الأرشفة؟"
+      ]
+    },
+    "created_at": "2026-04-28T11:27:57.998Z"
+  },
+  {
+    "entry_type": "CLARIFICATION_ANSWERS",
+    "answers": {
+      "raw_answer": "المعلومات الحالية كافية.\n\nتوقف عن طرح الأسئلة.\n\nانتقل الآن إلى:\nاعرض 3 سيناريوهات احترافية لتنفيذ النظام (Architecture Options)، مع:\n- وصف كل سيناريو\n- المميزات\n- العيوب\n- متى يستخدم\n\nثم اطلب مني اختيار السيناريو المناسب.",
+      "answered_questions": [
+        "هل هناك متطلبات محددة لنظام الحضور والانصراف مثل استخدام أجهزة بصمة أو GPS؟",
+        "هل هناك سياسات محددة للإجازات يجب تطبيقها (أنواع الإجازات، الموافقات، التراكم)؟",
+        "هل تحتاج إلى دعم لغات متعددة في النظام؟",
+        "هل هناك متطلبات خاصة بتقارير الإدارة مثل أنواع التقارير، التكرار، أو إمكانية التخصيص؟",
+        "هل هناك متطلبات خاصة بالنسخ الاحتياطي واستعادة البيانات؟",
+        "هل هناك متطلبات خاصة بواجهة المستخدم أو تجربة المستخدم (مثل سهولة الاستخدام، دعم ذوي الاحتياجات الخاصة)؟"
+      ]
+    },
+    "created_at": "2026-04-28T11:29:31.116Z"
+  },
+  {
+    "entry_type": "USER_MESSAGE",
+    "message": "اعمل تصميم كامل لنظام HR مع تقسيم modules و workflow",
+    "created_at": "2026-04-28T11:39:00.293Z"
+  }
+]

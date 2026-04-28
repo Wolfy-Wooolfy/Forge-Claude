@@ -1,0 +1,29 @@
+{
+  "reset_type": "NEW_PROJECT_SCOPE_RESET",
+  "reset_at": "2026-04-05T18:37:41.901Z",
+  "archive_dir": "artifacts/archive/new_project_reset_2026-04-05T18-37-41-896Z",
+  "archived": {
+    "task_files": [
+      "TASK-047.execution.closure.md",
+      "TASK-048.execution.closure.md",
+      "TASK-050.execution.closure.md",
+      "TASK-051.execution.closure.md",
+      "TASK-052.execution.closure.md",
+      "TASK-053.execution.closure.md",
+      "TASK-054.execution.closure.md",
+      "TASK-055.execution.closure.md",
+      "TASK-061.execution.closure.md",
+      "TASK-066.execution.closure.md",
+      "TASK-067.execution.closure.md"
+    ],
+    "forge_state": true,
+    "orchestration_state": true,
+    "orchestration_report": true
+  },
+  "active_scope_after_reset": {
+    "tasks_dir": "artifacts/tasks",
+    "forge_state": "artifacts/forge/forge_state.json",
+    "orchestration_state": "artifacts/orchestration/orchestration_state.json"
+  },
+  "status": "READY_FOR_NEW_PROJECT"
+}

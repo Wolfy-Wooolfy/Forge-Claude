@@ -1,0 +1,9 @@
+{
+  "response_id": "RESP-a4d39b13-f1da-4718-b3ba-ee812bda0369",
+  "request_id": "TRACE-1775128096258",
+  "status": "SUCCESS",
+  "payload": {
+    "note": "Cognitive trace placeholder",
+    "coverage_hint": []
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "summary": "Updated artifacts/llm/outputs/test-write.txt with new content.",
+  "files": [
+    {
+      "path": "artifacts/llm/outputs/test-write.txt",
+      "content": "updated content from forge"
+    }
+  ]
+}

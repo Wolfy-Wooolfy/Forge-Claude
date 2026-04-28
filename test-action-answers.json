@@ -1,0 +1,15 @@
+{
+  "project_id": "action_game",
+  "answers": {
+    "game_type": "Action",
+    "target_audience": "General",
+    "mode": "Offline",
+    "progression": "Levels",
+    "score_system": "Yes",
+    "login": "No",
+    "platform": "Android",
+    "monetization": "Ads",
+    "reference_game": "Subway Surfers",
+    "scope": "MVP"
+  }
+}

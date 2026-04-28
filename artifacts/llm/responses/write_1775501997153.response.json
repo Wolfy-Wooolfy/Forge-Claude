@@ -1,0 +1,9 @@
+{
+  "summary": "Create a text file with a greeting in artifacts/llm/outputs/test-write.txt",
+  "files": [
+    {
+      "path": "artifacts/llm/outputs/test-write.txt",
+      "content": "hello from forge ai workspace"
+    }
+  ]
+}

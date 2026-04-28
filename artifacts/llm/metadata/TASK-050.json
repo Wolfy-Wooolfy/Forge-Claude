@@ -1,0 +1,23 @@
+{
+  "task_id": "TASK-050",
+  "request_id": "TRACE-1775414887833",
+  "response_id": "RESP-ffc77dbf-a219-4783-ac52-ddddcee99fef",
+  "module": "TRACE",
+  "task_category": "ANALYZER",
+  "status": "SUCCESS",
+  "started_at": "2026-04-05T18:48:07.833Z",
+  "completed_at": "2026-04-05T18:48:10.265Z",
+  "attempt_count": 1,
+  "attempt_number": 1,
+  "cognitive_engine_provider": "OPENAI",
+  "cognitive_engine_model_id": "gpt-4.1-mini",
+  "provider": "OPENAI",
+  "model": "gpt-4.1-mini",
+  "classification": "SUCCESS",
+  "template_id": "DIRECT_INPUT",
+  "template_version": "v1",
+  "template_hash": "b9bc64558339a59c590b32c24ef058d3ab30919450104cd86f82d75ed21462a2",
+  "request_artifact": "artifacts/llm/requests/TASK-050.1.json",
+  "response_artifact": "artifacts/llm/responses/TASK-050.1.json",
+  "legacy_cognitive_artifact_dir": "artifacts/cognitive/RESP-ffc77dbf-a219-4783-ac52-ddddcee99fef"
+}

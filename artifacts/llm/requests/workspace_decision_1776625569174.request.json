@@ -1,0 +1,15 @@
+{
+  "request": "edit this file to add logging",
+  "approver_role": "cto",
+  "required_roles": [
+    "tech_lead",
+    "cto"
+  ],
+  "approval_policy_version": "1.1",
+  "operation_mode": "SINGLE_FILE",
+  "file_count": 1,
+  "total_bytes": 46873,
+  "approved_at": "2026-04-19T19:06:09.175Z",
+  "workspace_id": "personal",
+  "project_id": "default_project"
+}

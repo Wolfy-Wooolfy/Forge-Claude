@@ -1,0 +1,15 @@
+{
+  "request": "Overwrite file code/test_workspace_integration.js with:\nconsole.log(\"Web UI → External API → Forge runtime test successful v4\");\nallow_overwrite = true",
+  "approver_role": "cto",
+  "required_roles": [
+    "tech_lead",
+    "cto"
+  ],
+  "approval_policy_version": "1.1",
+  "operation_mode": "SINGLE_FILE",
+  "file_count": 1,
+  "total_bytes": 76,
+  "approved_at": "2026-04-10T19:00:56.704Z",
+  "workspace_id": "personal",
+  "project_id": "forge-personal-autonomous-pipeline"
+}

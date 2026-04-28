@@ -1,0 +1,11 @@
+Build a practical MVP for an AI platform for small factories in Egypt.
+
+The MVP must be simple, fast to build, and capable of delivering visible value from the first use.
+
+The system should:
+- allow daily production data entry
+- detect abnormal waste patterns
+- alert managers when waste exceeds normal levels
+- provide simple recommendations to reduce waste
+
+Return the MVP as a business-and-product definition, not code.

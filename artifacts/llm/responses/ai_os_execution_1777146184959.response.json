@@ -1,0 +1,21 @@
+{
+  "execution_id": "ai_os_execution_1777146184959",
+  "source": "AI_OPERATING_SYSTEM",
+  "project_id": "action_game",
+  "created_at": "2026-04-25T19:43:04.959Z",
+  "summary": "AI OS execution handoff response artifact.",
+  "files": [
+    {
+      "path": "artifacts/projects/action_game/output/index.html",
+      "content": "<!doctype html>\n<html>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <title>Action Runner MVP</title>\n  <link rel=\"stylesheet\" href=\"style.css\">\n</head>\n<body>\n  <main class=\"game-shell\">\n    <h1>Action Runner MVP</h1>\n    <section class=\"hud\">\n      <div>Score: <span id=\"score\">0</span></div>\n      <div>Speed: <span id=\"speed\">1</span>x</div>\n    </section>\n    <canvas id=\"game\" width=\"420\" height=\"520\"></canvas>\n    <p id=\"status\" class=\"status\">Press Space or Tap to jump.</p>\n    <button id=\"restart\">Restart</button>\n  </main>\n  <script src=\"game.js\"></script>\n</body>\n</html>"
+    },
+    {
+      "path": "artifacts/projects/action_game/output/style.css",
+      "content": "body { margin: 0; font-family: Arial, sans-serif; background: #0f172a; color: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; }\n.game-shell { width: min(94vw, 460px); text-align: center; }\n.hud { display: flex; justify-content: space-between; margin: 12px 0; }\ncanvas { width: 100%; background: linear-gradient(#1e293b, #334155); border-radius: 14px; }\n.status { min-height: 24px; }\nbutton { padding: 10px 16px; border: 0; border-radius: 10px; cursor: pointer; }"
+    },
+    {
+      "path": "artifacts/projects/action_game/output/game.js",
+      "content": "const canvas = document.getElementById(\"game\");\nconst ctx = canvas.getContext(\"2d\");\nconst scoreElement = document.getElementById(\"score\");\nconst speedElement = document.getElementById(\"speed\");\nconst statusElement = document.getElementById(\"status\");\nconst restartButton = document.getElementById(\"restart\");\n\nconst groundY = 430;\nlet player;\nlet obstacles;\nlet score;\nlet speed;\nlet frame;\nlet running;\n\nfunction resetGame() {\n  player = { x: 70, y: groundY, w: 34, h: 44, vy: 0, jumping: false };\n  obstacles = [];\n  score = 0;\n  speed = 1;\n  frame = 0;\n  running = true;\n  statusElement.textContent = \"Press Space or Tap to jump.\";\n  requestAnimationFrame(loop);\n}\n\nfunction jump() {\n  if (!running) return;\n  if (!player.jumping) {\n    player.vy = -15;\n    player.jumping = true;\n  }\n}\n\nfunction spawnObstacle() {\n  obstacles.push({ x: canvas.width + 20, y: groundY + 8, w: 28, h: 36 });\n}\n\nfunction update() {\n  frame += 1;\n  score += 1;\n  speed = 1 + Math.floor(score / 500) * 0.25;\n\n  player.y += player.vy;\n  player.vy += 0.8;\n  if (player.y >= groundY) {\n    player.y = groundY;\n    player.vy = 0;\n    player.jumping = false;\n  }\n\n  if (frame % Math.max(45, Math.floor(100 / speed)) === 0) spawnObstacle();\n  obstacles.forEach((obstacle) => { obstacle.x -= 5 * speed; });\n  obstacles = obstacles.filter((obstacle) => obstacle.x + obstacle.w > 0);\n\n  if (obstacles.some(collides)) {\n    running = false;\n    statusElement.textContent = \"Game over. Press Restart.\";\n  }\n\n  scoreElement.textContent = score;\n  speedElement.textContent = speed.toFixed(2);\n}\n\nfunction collides(obstacle) {\n  return player.x < obstacle.x + obstacle.w &&\n    player.x + player.w > obstacle.x &&\n    player.y < obstacle.y + obstacle.h &&\n    player.y + player.h > obstacle.y;\n}\n\nfunction draw() {\n  ctx.clearRect(0, 0, canvas.width, canvas.height);\n  ctx.fillStyle = \"#22c55e\";\n  ctx.fillRect(0, groundY + 44, canvas.width, 8);\n  ctx.fillStyle = \"#38bdf8\";\n  ctx.fillRect(player.x, player.y, player.w, player.h);\n  ctx.fillStyle = \"#f97316\";\n  obstacles.forEach((obstacle) => ctx.fillRect(obstacle.x, obstacle.y, obstacle.w, obstacle.h));\n}\n\nfunction loop() {\n  if (!running) {\n    draw();\n    return;\n  }\n  update();\n  draw();\n  requestAnimationFrame(loop);\n}\n\nwindow.addEventListener(\"keydown\", (event) => { if (event.code === \"Space\") jump(); });\ncanvas.addEventListener(\"click\", jump);\nrestartButton.addEventListener(\"click\", resetGame);\nresetGame();"
+    }
+  ]
+}

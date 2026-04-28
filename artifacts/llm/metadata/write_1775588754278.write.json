@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "write_id": "write_1775588754278",
+  "written_files": [
+    "artifacts/llm/outputs/test-write.txt"
+  ],
+  "summary": "Update test-write.txt with new content for preview gate enforcement test.",
+  "diffs": [
+    {
+      "path": "artifacts/llm/outputs/test-write.txt",
+      "diff": "----- OLD -----\nfinal version with diff preview test\n----- NEW -----\npreview gate enforcement test"
+    }
+  ]
+}

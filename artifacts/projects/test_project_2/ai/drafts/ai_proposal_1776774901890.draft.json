@@ -1,0 +1,17 @@
+{
+  "draft_id": "ai_proposal_1776774901890",
+  "project_id": "test_project_2",
+  "created_at": "2026-04-21T12:35:01.890Z",
+  "mode": "PROPOSAL",
+  "files": [
+    {
+      "path": "web/index.html",
+      "content": "",
+      "operations": [],
+      "diff": "",
+      "allow_overwrite": true
+    }
+  ],
+  "approved": false,
+  "ready_for_decision": false
+}

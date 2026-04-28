@@ -1,0 +1,39 @@
+{
+  "proposal_id": "ai_proposal_1776345134251",
+  "created_at": "2026-04-16T13:12:14.251Z",
+  "mode": "PROPOSAL",
+  "request": "edit this file to add logging",
+  "description": "Generated proposal based on AI analysis",
+  "impact": "LOW",
+  "execution_required": true,
+  "execution_approved": false,
+  "generation_strategy": "EDIT_ADD_LOGGING_FILE_AWARE_FALLBACK",
+  "target_file": "code/test_workspace_integration.js",
+  "target_files": [
+    "code/test_workspace_integration.js"
+  ],
+  "operation_mode": "SINGLE_FILE",
+  "selected_strategy": {
+    "strategy_id": "EDIT_ADD_LOGGING_STRUCTURE_AWARE",
+    "title": "Inject logging into existing function structure",
+    "score": 0.92,
+    "target_file": "code/test_workspace_integration.js",
+    "rationale": "The request asks to modify the current file by adding logging safely."
+  },
+  "strategy_candidates": [
+    {
+      "strategy_id": "EDIT_ADD_LOGGING_STRUCTURE_AWARE",
+      "title": "Inject logging into existing function structure",
+      "score": 0.92,
+      "target_file": "code/test_workspace_integration.js",
+      "rationale": "The request asks to modify the current file by adding logging safely."
+    },
+    {
+      "strategy_id": "EDIT_ADD_LOGGING_FILE_AWARE_FALLBACK",
+      "title": "Prepend logging to file",
+      "score": 0.55,
+      "target_file": "code/test_workspace_integration.js",
+      "rationale": "Fallback strategy in case no function structure is available."
+    }
+  ]
+}

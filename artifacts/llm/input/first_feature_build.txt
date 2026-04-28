@@ -1,0 +1,16 @@
+Define the simplest possible implementation plan for the first feature:
+
+"Daily production data entry and waste alert system for small factories"
+
+The system must:
+- work via WhatsApp or very simple interface
+- require zero technical skills
+- allow entering daily production and waste numbers
+- detect abnormal waste using simple logic (not AI)
+- send alert when waste exceeds normal threshold
+
+Return:
+- exact system flow
+- components required
+- step-by-step implementation plan
+- what should be built first (Day 1)

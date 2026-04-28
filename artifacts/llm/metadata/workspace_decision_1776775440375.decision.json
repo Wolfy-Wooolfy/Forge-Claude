@@ -1,0 +1,34 @@
+{
+  "ok": true,
+  "entry_type": "DECISION_PACKET",
+  "decision_packet_id": "workspace_decision_1776775440375",
+  "project_id": "test_project_3",
+  "approver_role": "cto",
+  "required_roles": [
+    "tech_lead",
+    "cto"
+  ],
+  "approval_policy_version": "1.1",
+  "operation_mode": "SINGLE_FILE",
+  "file_count": 1,
+  "total_bytes": 51438,
+  "decision_packet_paths": [
+    "artifacts/projects/test_project_3/decisions/decision_packet.json",
+    "artifacts/projects/test_project_3/decisions/decision_packet.md"
+  ],
+  "execution_package_paths": [
+    "artifacts/projects/test_project_3/execute/execution_package.json"
+  ],
+  "queued_files": [
+    "web/index.html"
+  ],
+  "summary": "Generated proposal based on AI analysis",
+  "request": "add a button to the UI",
+  "diffs": [
+    {
+      "path": "web/index.html",
+      "diff": "+   <button id=\"newButton\">Click Me</button>",
+      "sha256": "821e477d898d6f0e4987040620ee6b4ddeeb09fd467af66241f72ab4155e3faf"
+    }
+  ]
+}

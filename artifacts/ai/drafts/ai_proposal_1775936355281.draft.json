@@ -1,0 +1,14 @@
+{
+  "draft_id": "ai_proposal_1775936355281",
+  "created_at": "2026-04-11T19:39:15.281Z",
+  "mode": "PROPOSAL",
+  "files": [
+    {
+      "path": "web/index.html",
+      "content": "<button id=\"newButton\">Click Me</button>",
+      "allow_overwrite": true
+    }
+  ],
+  "approved": false,
+  "ready_for_decision": false
+}

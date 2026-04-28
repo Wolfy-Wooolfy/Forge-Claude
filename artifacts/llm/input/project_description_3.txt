@@ -1,0 +1,1 @@
+A system for residential compounds and property developers in Egypt that uses AI to predict customer complaints, detect service delays, and help management improve resident satisfaction. It analyzes maintenance tickets, call center logs, and service response times to identify patterns and recommend actions.

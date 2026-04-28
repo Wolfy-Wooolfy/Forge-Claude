@@ -1,0 +1,84 @@
+{
+  "response_id": "RESP-0cb02de7-42c6-4fea-8b8e-c1dd916e52b5",
+  "request_id": "TRACE-1775327361856",
+  "status": "SUCCESS",
+  "payload": {
+    "output": "It looks like you’ve provided some counts related to a project or dataset:  \n- Requirements count: 579  \n- Code units count: 23  \n- Artifacts count: 80  \n\nHow can I assist you with this information? Would you like me to help analyze, organize, generate reports, or do something else related to these numbers?",
+    "raw_provider_response": {
+      "id": "resp_04b6c1e5a5cc9d220069d15882cd508194a3cde2db732a64db",
+      "object": "response",
+      "created_at": 1775327362,
+      "status": "completed",
+      "background": false,
+      "billing": {
+        "payer": "developer"
+      },
+      "completed_at": 1775327364,
+      "error": null,
+      "frequency_penalty": 0,
+      "incomplete_details": null,
+      "instructions": null,
+      "max_output_tokens": 1000,
+      "max_tool_calls": null,
+      "model": "gpt-4.1-mini-2025-04-14",
+      "output": [
+        {
+          "id": "msg_04b6c1e5a5cc9d220069d158838b3881948ba18bfbcdf630b8",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "It looks like you’ve provided some counts related to a project or dataset:  \n- Requirements count: 579  \n- Code units count: 23  \n- Artifacts count: 80  \n\nHow can I assist you with this information? Would you like me to help analyze, organize, generate reports, or do something else related to these numbers?"
+            }
+          ],
+          "role": "assistant"
+        }
+      ],
+      "parallel_tool_calls": true,
+      "presence_penalty": 0,
+      "previous_response_id": null,
+      "prompt_cache_key": null,
+      "prompt_cache_retention": null,
+      "reasoning": {
+        "effort": null,
+        "summary": null
+      },
+      "safety_identifier": null,
+      "service_tier": "default",
+      "store": true,
+      "temperature": 1,
+      "text": {
+        "format": {
+          "type": "text"
+        },
+        "verbosity": "medium"
+      },
+      "tool_choice": "auto",
+      "tools": [],
+      "top_logprobs": 0,
+      "top_p": 1,
+      "truncation": "disabled",
+      "usage": {
+        "input_tokens": 25,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 71,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 96
+      },
+      "user": null,
+      "metadata": {}
+    },
+    "token_usage": {
+      "input_tokens": 25,
+      "output_tokens": 71
+    },
+    "provider_latency_ms": 2579
+  }
+}

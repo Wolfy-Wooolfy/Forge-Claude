@@ -1,0 +1,18 @@
+{
+  "response_id": "RESP-d6323289-5f9f-4eae-b64b-35565b146a8c",
+  "request_id": "GAP-1775326735544",
+  "provider_metadata": {
+    "provider": "OPENAI",
+    "model": "gpt-4.1-mini",
+    "latency_ms": 1833
+  },
+  "output": {
+    "type": "text",
+    "content": "The completed sequence is:\n\n1, 1, 2, 3, 5, 8, 13, 21, 34\n\nThe missing numbers are 8 and 21."
+  },
+  "usage": {
+    "prompt_tokens": 13,
+    "completion_tokens": 42
+  },
+  "status": "SUCCESS"
+}

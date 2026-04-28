@@ -1,0 +1,59 @@
+{
+  "project_id": "test_project_2",
+  "project_name": "test_project_2",
+  "project_type": "UNCLASSIFIED",
+  "project_mode": "EXTEND_EXISTING",
+  "project_status": "ACTIVE",
+  "primary_language": "AR",
+  "current_phase": "DISCOVERY",
+  "active_runtime_state": "DISCOVERY_REQUIRED",
+  "documentation_state": "EMPTY",
+  "execution_package_state": "NOT_READY",
+  "execution_state": "NOT_STARTED",
+  "verification_state": "NOT_READY",
+  "delivery_state": "NOT_READY",
+  "memory_state": "ACTIVE",
+  "accepted_options": [],
+  "rejected_options": [],
+  "open_questions": [
+    "ما هي الوظائف الأساسية التي تريد تضمينها في نظام الموارد البشرية؟ (مثل التوظيف، إدارة الأداء، الرواتب، الحضور، التدريب، إلخ)",
+    "هل هناك متطلبات خاصة بخصوص التقارير أو التحليلات داخل النظام؟",
+    "هل النظام موجه لشركة صغيرة، متوسطة، أم كبيرة؟ وهل هناك متطلبات خاصة بالتوسع؟",
+    "هل تريد النظام أن يدعم تعدد اللغات أو التكامل مع أنظمة أخرى؟",
+    "هل هناك متطلبات أمان محددة أو سياسات خصوصية يجب الالتزام بها؟",
+    "هل تفضل نظامًا قائمًا على الويب، تطبيق سطح مكتب، أو تطبيق جوال؟"
+  ],
+  "pending_decisions": [],
+  "review_cycles_count": 0,
+  "artifact_registry": {
+    "project_root": "artifacts/projects/test_project_2",
+    "project_state": "artifacts/projects/test_project_2/project_state.json",
+    "decision_packet": "",
+    "execution_package": ""
+  },
+  "active_project_flag": true,
+  "last_updated_at": "2026-04-28T11:39:00.291Z",
+  "user_goal": "اعمل تصميم كامل لنظام HR مع تقسيم modules و workflow",
+  "business_goal": "",
+  "technical_goal": "add a button to the UI",
+  "workspace_path": "D:\\S\\Halo\\Tech\\forge-personal-autonomous-pipeline",
+  "source_of_truth": "ZIP_SNAPSHOT",
+  "selected_strategy": "HTML_BUTTON_CREATE",
+  "clarification_answers": {},
+  "requirement_domain": "Human Resources (HR) System",
+  "requirement_completeness": false,
+  "requirement_model": {
+    "modules": [],
+    "workflow": []
+  },
+  "requirement_reasoning_summary": "تم تحديد أن المشروع هو نظام موارد بشرية (HR) بناءً على طلب المستخدم. لم يتم توفير تفاصيل كافية حول الوظائف المطلوبة أو متطلبات النظام، لذلك تم إنشاء نموذج متطلبات فارغ مع قائمة أسئلة مفتوحة لجمع معلومات إضافية لضمان اكتمال المتطلبات.",
+  "provider_error": "PROVIDER_NOT_AVAILABLE",
+  "conversation_history": {
+    "proposal_count": 1,
+    "draft_count": 1
+  },
+  "decision_history": {
+    "has_decision_packet": false
+  },
+  "version_registry": []
+}

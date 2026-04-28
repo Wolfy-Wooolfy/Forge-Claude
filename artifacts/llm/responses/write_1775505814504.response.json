@@ -1,0 +1,9 @@
+{
+  "summary": "Update test-write.txt with final version content for diff preview test.",
+  "files": [
+    {
+      "path": "artifacts/llm/outputs/test-write.txt",
+      "content": "final version with diff preview test"
+    }
+  ]
+}

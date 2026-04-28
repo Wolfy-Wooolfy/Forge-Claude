@@ -1,0 +1,15 @@
+{
+  "request": "add a different small comment at the top of web/index.html saying Main web app shell",
+  "approver_role": "cto",
+  "required_roles": [
+    "tech_lead",
+    "cto"
+  ],
+  "approval_policy_version": "1.1",
+  "operation_mode": "SINGLE_FILE",
+  "file_count": 1,
+  "total_bytes": 49480,
+  "approved_at": "2026-04-18T11:18:18.722Z",
+  "workspace_id": "personal",
+  "project_id": "forge-personal-autonomous-pipeline"
+}

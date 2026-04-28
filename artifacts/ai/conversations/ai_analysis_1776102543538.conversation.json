@@ -1,0 +1,15 @@
+{
+  "session_id": "ai_analysis_1776102543538",
+  "created_at": "2026-04-13T17:49:03.538Z",
+  "mode": "ANALYSIS",
+  "messages": [
+    {
+      "role": "user",
+      "content": "create simple test file with message delta"
+    },
+    {
+      "role": "assistant",
+      "content": "Analysis completed in read-only mode with context and analysis artifacts generated."
+    }
+  ]
+}

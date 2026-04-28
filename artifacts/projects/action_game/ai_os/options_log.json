@@ -1,0 +1,23 @@
+[
+  {
+    "entry_type": "OPTIONS_PRESENTED",
+    "options": [
+      {
+        "option_id": "OPTION-1",
+        "title": "Endless Runner MVP",
+        "description": "Offline endless runner game with obstacles, score system, and increasing speed.",
+        "impact_level": "HIGH",
+        "risk_level": "LOW"
+      },
+      {
+        "option_id": "OPTION-2",
+        "title": "Basic Shooter Game",
+        "description": "Simple shooting game with enemies, bullets, and score system.",
+        "impact_level": "HIGH",
+        "risk_level": "MEDIUM"
+      }
+    ],
+    "recommendation": "Start with OPTION-1 for faster MVP execution.",
+    "created_at": "2026-04-25T18:42:56.237Z"
+  }
+]

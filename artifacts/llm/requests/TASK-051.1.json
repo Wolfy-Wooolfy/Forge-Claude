@@ -1,0 +1,26 @@
+{
+  "request_id": "GAP-1775414890298",
+  "task_id": "TASK-051",
+  "attempt_number": 1,
+  "timestamp": "2026-04-05T18:48:10.298Z",
+  "task_context": {
+    "task_id": "TASK-051",
+    "module": "GAP"
+  },
+  "input": {
+    "type": "structured",
+    "content": {
+      "gap_count": 0
+    }
+  },
+  "constraints": {
+    "deterministic": true,
+    "max_tokens": 1000,
+    "temperature": 0
+  },
+  "cognitive_engine_provider": "",
+  "cognitive_engine_model_id": "",
+  "template_id": "DIRECT_INPUT",
+  "template_version": "v1",
+  "template_hash": "6422480dd1463d72470938726c1950c2518833bc547fd226b3f4944def7978b3"
+}

@@ -1,0 +1,144 @@
+{
+  "generated_at": "2026-04-25T19:45:38.610Z",
+  "blocked": false,
+  "status": "PASS",
+  "outcome": "PASS",
+  "final_outcome": "PASS",
+  "summary": {
+    "total_checks": 24,
+    "failed_checks": 0
+  },
+  "closure_gate": {
+    "gap_count": 0,
+    "critical_violations": 0,
+    "orphan_code_units": 0,
+    "orphan_requirements": 0,
+    "orphan_artifacts": 0,
+    "deterministic_confirmation_ready": true,
+    "execute_artifacts_complete": true,
+    "decision_artifact_present": true,
+    "closure_contract_ready": true
+  },
+  "checks": [
+    {
+      "name": "artifacts_intake_intake_snapshot_json_valid_json",
+      "passed": true,
+      "detail": "artifacts/intake/intake_snapshot.json"
+    },
+    {
+      "name": "artifacts_audit_audit_findings_json_valid_json",
+      "passed": true,
+      "detail": "artifacts/audit/audit_findings.json"
+    },
+    {
+      "name": "artifacts_trace_trace_matrix_json_valid_json",
+      "passed": true,
+      "detail": "artifacts/trace/trace_matrix.json"
+    },
+    {
+      "name": "artifacts_gap_gap_actions_json_valid_json",
+      "passed": true,
+      "detail": "artifacts/gap/gap_actions.json"
+    },
+    {
+      "name": "artifacts_backfill_backfill_plan_json_valid_json",
+      "passed": true,
+      "detail": "artifacts/backfill/backfill_plan.json"
+    },
+    {
+      "name": "artifacts_execute_execute_plan_json_valid_json",
+      "passed": true,
+      "detail": "artifacts/execute/execute_plan.json"
+    },
+    {
+      "name": "artifacts_execute_execute_diff_md_exists",
+      "passed": true,
+      "detail": "artifacts/execute/execute_diff.md"
+    },
+    {
+      "name": "artifacts_execute_execute_log_md_exists",
+      "passed": true,
+      "detail": "artifacts/execute/execute_log.md"
+    },
+    {
+      "name": "decision_artifact_present",
+      "passed": true,
+      "detail": "artifacts/decisions/decision_packet.json, artifacts/decisions/module_flow_decision_gate.json"
+    },
+    {
+      "name": "execute_plan_matches_backfill_plan",
+      "passed": true,
+      "detail": "backfill_actions=3; execute_actions=3"
+    },
+    {
+      "name": "decision_gate_matches_backfill_plan",
+      "passed": true,
+      "detail": "decision_actions=3; backfill_actions=3"
+    },
+    {
+      "name": "workspace_runtime_execution_id_consistent",
+      "passed": true,
+      "detail": "decision=ai_os_execution_1777146184959; backfill=ai_os_execution_1777146184959; execute=ai_os_execution_1777146184959"
+    },
+    {
+      "name": "workspace_runtime_matches_current_execution_package",
+      "passed": true,
+      "detail": "No current workspace execution_package.json"
+    },
+    {
+      "name": "workspace_execution_package_identity_consistent",
+      "passed": true,
+      "detail": "decision_package_id=ai_os_package_1777146184959; backfill_package_id=ai_os_package_1777146184959; execute_package_id=ai_os_package_1777146184959; decision_package_path=artifacts/projects/action_game/execute/execution_package.json; backfill_package_path=artifacts/projects/action_game/execute/execution_package.json; execute_package_path=artifacts/projects/action_game/execute/execution_package.json"
+    },
+    {
+      "name": "workspace_execution_package_matches_current_artifact",
+      "passed": true,
+      "detail": "No current workspace execution_package.json"
+    },
+    {
+      "name": "workspace_runtime_write_applied",
+      "passed": true,
+      "detail": "execute_actions=3; wrote_content_all=true"
+    },
+    {
+      "name": "gap_count_zero",
+      "passed": true,
+      "detail": "gap_count=0"
+    },
+    {
+      "name": "critical_violations_zero",
+      "passed": true,
+      "detail": "critical_violations=0"
+    },
+    {
+      "name": "orphan_code_units_zero",
+      "passed": true,
+      "detail": "orphan_code_units=0"
+    },
+    {
+      "name": "orphan_requirements_zero",
+      "passed": true,
+      "detail": "orphan_requirements=0"
+    },
+    {
+      "name": "orphan_artifacts_zero",
+      "passed": true,
+      "detail": "orphan_artifacts=0"
+    },
+    {
+      "name": "audit_not_blocked",
+      "passed": true,
+      "detail": "audit_blocked=false"
+    },
+    {
+      "name": "trace_mappings_present",
+      "passed": true,
+      "detail": "mappings=579"
+    },
+    {
+      "name": "intake_snapshot_locked",
+      "passed": true,
+      "detail": "locked_snapshot_flag=true"
+    }
+  ]
+}

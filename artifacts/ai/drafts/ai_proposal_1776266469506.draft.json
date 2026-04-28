@@ -1,0 +1,14 @@
+{
+  "draft_id": "ai_proposal_1776266469506",
+  "created_at": "2026-04-15T15:21:09.506Z",
+  "mode": "PROPOSAL",
+  "files": [
+    {
+      "path": "code/test_workspace_integration.js",
+      "content": "function printHelloWorld() {\n  console.log(\"hello world\");\n}",
+      "allow_overwrite": true
+    }
+  ],
+  "approved": false,
+  "ready_for_decision": false
+}

@@ -1,0 +1,15 @@
+{
+  "project_id": "mobile_game",
+  "answers": {
+    "game_type": "Casual Puzzle",
+    "target_audience": "General",
+    "mode": "Offline",
+    "progression": "Levels",
+    "score_system": "Yes",
+    "login": "No",
+    "platform": "Android",
+    "monetization": "Ads",
+    "reference_game": "Candy Crush",
+    "scope": "MVP"
+  }
+}

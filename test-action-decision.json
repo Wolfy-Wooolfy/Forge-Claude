@@ -1,0 +1,6 @@
+{
+  "project_id": "action_game",
+  "selected_option_id": "OPTION-1",
+  "decision_owner": "CTO",
+  "rationale": "Start with Endless Runner MVP because it matches the Action game direction and enables faster playable validation."
+}

@@ -1,0 +1,3 @@
+A platform that analyzes football player performance using AI from mobile-recorded videos. 
+It extracts movement data, evaluates skills like speed, agility, and decision-making, and connects players with clubs, scouts, and agents globally. 
+The platform includes player profiles, market value estimation, and performance reports.

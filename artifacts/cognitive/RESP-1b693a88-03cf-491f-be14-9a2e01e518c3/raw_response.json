@@ -1,0 +1,84 @@
+{
+  "response_id": "RESP-1b693a88-03cf-491f-be14-9a2e01e518c3",
+  "request_id": "TRACE-1775326731659",
+  "status": "SUCCESS",
+  "payload": {
+    "output": "It looks like you shared some counts related to a project or dataset, specifically:\n\n- Requirements count: 579\n- Code units count: 23\n- Artifacts count: 61\n\nHow can I assist you with this information? Are you looking for analysis, report generation, or help with organizing or processing these items? Please provide more details or context.",
+    "raw_provider_response": {
+      "id": "resp_0e035e5b6f6028a20069d1560c85d88196b56e7f99cc6963cb",
+      "object": "response",
+      "created_at": 1775326732,
+      "status": "completed",
+      "background": false,
+      "billing": {
+        "payer": "developer"
+      },
+      "completed_at": 1775326735,
+      "error": null,
+      "frequency_penalty": 0,
+      "incomplete_details": null,
+      "instructions": null,
+      "max_output_tokens": 1000,
+      "max_tool_calls": null,
+      "model": "gpt-4.1-mini-2025-04-14",
+      "output": [
+        {
+          "id": "msg_0e035e5b6f6028a20069d1560e9ac48196812c4f51cf34ecca",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "It looks like you shared some counts related to a project or dataset, specifically:\n\n- Requirements count: 579\n- Code units count: 23\n- Artifacts count: 61\n\nHow can I assist you with this information? Are you looking for analysis, report generation, or help with organizing or processing these items? Please provide more details or context."
+            }
+          ],
+          "role": "assistant"
+        }
+      ],
+      "parallel_tool_calls": true,
+      "presence_penalty": 0,
+      "previous_response_id": null,
+      "prompt_cache_key": null,
+      "prompt_cache_retention": null,
+      "reasoning": {
+        "effort": null,
+        "summary": null
+      },
+      "safety_identifier": null,
+      "service_tier": "default",
+      "store": true,
+      "temperature": 1,
+      "text": {
+        "format": {
+          "type": "text"
+        },
+        "verbosity": "medium"
+      },
+      "tool_choice": "auto",
+      "tools": [],
+      "top_logprobs": 0,
+      "top_p": 1,
+      "truncation": "disabled",
+      "usage": {
+        "input_tokens": 25,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 74,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 99
+      },
+      "user": null,
+      "metadata": {}
+    },
+    "token_usage": {
+      "input_tokens": 25,
+      "output_tokens": 74
+    },
+    "provider_latency_ms": 3849
+  }
+}

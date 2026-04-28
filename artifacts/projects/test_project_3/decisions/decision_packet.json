@@ -1,0 +1,50 @@
+{
+  "execution_id": "workspace_decision_1776775440375",
+  "workspace_id": "personal",
+  "project_id": "test_project_3",
+  "source": "EXTERNAL_AI_WORKSPACE",
+  "operation": {
+    "mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 51438
+  },
+  "approval": {
+    "policy_version": "1.1",
+    "approved_by_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approved_at": "2026-04-21T12:44:00.376Z"
+  },
+  "question": "Approve the queued workspace draft for governed deterministic application?",
+  "context_summary": "add a button to the UI",
+  "options": [
+    {
+      "option_id": "OPTION-APPROVE-WORKSPACE-DRAFT",
+      "description": "Queue the workspace draft as a governed pending change set.",
+      "impact_scope": "EXTERNAL_WORKSPACE",
+      "risk_level": "MEDIUM",
+      "downstream_effects": [
+        "Apply candidate change to web/index.html"
+      ],
+      "cognitive_priority_hint": null
+    }
+  ],
+  "recommendation_reference": "artifacts/llm/metadata/workspace_decision_1776775440375.decision.json",
+  "confirmation_required_format": "OPTION-APPROVE-WORKSPACE-DRAFT",
+  "proposed_files": [
+    {
+      "path": "web/index.html",
+      "allow_overwrite": false,
+      "sha256": "821e477d898d6f0e4987040620ee6b4ddeeb09fd467af66241f72ab4155e3faf",
+      "diff": "+   <button id=\"newButton\">Click Me</button>",
+      "required_roles": [
+        "tech_lead",
+        "cto"
+      ],
+      "file_index": 1,
+      "file_count": 1
+    }
+  ]
+}

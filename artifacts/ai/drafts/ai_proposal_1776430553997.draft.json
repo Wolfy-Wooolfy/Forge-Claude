@@ -1,0 +1,14 @@
+{
+  "draft_id": "ai_proposal_1776430553997",
+  "created_at": "2026-04-17T12:55:53.997Z",
+  "mode": "PROPOSAL",
+  "files": [
+    {
+      "path": "web/index.html",
+      "content": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\" />\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n  <title>Forge AI Workspace</title>\n  <style>\n    * {\n      box-sizing: border-box;\n    }\n\n    body {\n      margin: 0;\n      font-family: Arial, sans-serif;\n      background: #0f172a;\n      color: #e2e8f0;\n    }\n\n    .app {\n      max-width: 1100px;\n      margin: 0 auto;\n      padding: 24px;\n    }\n\n    .header {\n      margin-bottom: 24px;\n    }\n\n    .test-banner {\n      margin-bottom: 18px;\n      border: 1px solid #facc15;\n      border-radius: 8px;\n      background: #422006;\n      color: #fef3c7;\n      padding: 12px 14px;\n      font-weight: 700;\n    }\n\n    .header h1 {\n      margin: 0 0 8px;\n      font-size: 28px;\n    }\n\n    .header p {\n      margin: 0;\n      color: #94a3b8;\n      line-height: 1.6;\n    }\n\n    .footer {\n      margin-top: 24px;\n      padding-top: 18px;\n      border-top: 1px solid #1f2937;\n      color: #94a3b8;\n      font-size: 14px;\n      text-align: center;\n    }\n\n    .footer p {\n      margin: 0;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"app\">\n    <div class=\"test-banner\">Test banner</div>\n\n    <div class=\"header\">\n      <h1>Forge AI Workspace</h1>\n      <p>اكتب طلبك بالعربي أو بالإنجليزي. النظام هيجهز Draft للملفات المقترحة، وبعد مراجعتك وموافقتك يتم إنشاء Decision Packet governed بدل الكتابة المباشرة.</p>\n    </div>\n\n    <footer class=\"footer\">\n      <p>&copy; 2026 Forge AI Workspace. All rights reserved.</p>\n    </footer>\n  </div>\n</body>\n</html>\n",
+      "allow_overwrite": true
+    }
+  ],
+  "approved": false,
+  "ready_for_decision": false
+}

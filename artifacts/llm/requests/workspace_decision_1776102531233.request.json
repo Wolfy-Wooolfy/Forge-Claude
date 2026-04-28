@@ -1,0 +1,15 @@
+{
+  "request": "create simple test file with message delta",
+  "approver_role": "cto",
+  "required_roles": [
+    "tech_lead",
+    "cto"
+  ],
+  "approval_policy_version": "1.1",
+  "operation_mode": "SINGLE_FILE",
+  "file_count": 1,
+  "total_bytes": 132,
+  "approved_at": "2026-04-13T17:48:51.233Z",
+  "workspace_id": "personal",
+  "project_id": "forge-personal-autonomous-pipeline"
+}

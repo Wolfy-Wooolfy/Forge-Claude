@@ -1,0 +1,15 @@
+{
+    "code/src/orchestrator/stage_transitions.js":  "c677d6f55cb6cd70c5812ce90b18227094f0ad13328f66ec7c3b33aad8ee74d1",
+    "code/src/orchestrator/status_writer.js":  "17a6e09591c907358c35606ecc0b2dfcee33b24081646412ffe86b8f60d66ec0",
+    "code/src/orchestrator/runner.js":  "f8a4ab537910377c67aa6c81f58397b9e29e8810a1a6bf68bb4d7d7e3cf2ebb9",
+    "bin/halo-run.js":  "590c6d0b74d068fb80ecd4da28c39f4c917eb588375af7ec9faf50440b20ed7c",
+    "verify/smoke/stage_transitions_smoke.js":  "79ad969f3c6bcbe4c4842f6241a2bc60e1a853ebf4da52c9b3d37335016c7cec",
+    "verify/smoke/status_writer_smoke.js":  "94957c69b2a8912f4d363f72d963aac69da76f51c9daeef8fa6c69a18f71795f",
+    "verify/smoke/runner_smoke.js":  "d7510cdf896c0edc3bdb3ab859a5ddcd65bc172b381ddcacb3e0de80dee710d1",
+    "artifacts/stage_B/orchestrator_stage_transitions.md":  "63924d6bf41910cbe733c861351b0df5e6c4fd95f67931d4d27da1c9e6121376",
+    "artifacts/stage_B/orchestrator_status_writer.md":  "d97802f06af998d528eadfcd0bce6870d5a74fdebb4d3dd2e35ff7490269f413",
+    "artifacts/stage_B/orchestrator_runner.spec.md":  "9b5c18814dfa09736df80db05b63deb100d7adbe41620a04adb808bb8e99885d",
+    "artifacts/stage_C/core_runtime.closure.md":  "1676f02cacc77fea7d1e0134d7a0b74639cfe6ac984fa25c83c34d526108a25d",
+    "artifacts/stage_C/runtime_runbook.md":  "3dea6d9b33fcad2412dcdaf34b64feca6f3ac547817cd5fb8d7aee2586e92f29",
+    "artifacts/release/RELEASE_1.0.0.manifest.md":  "90a8290abae5311cd0aad0ecba5c9ecc7c0422ca9c93774272e4d0b01b37d4c7"
+}

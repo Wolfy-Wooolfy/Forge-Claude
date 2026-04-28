@@ -1,0 +1,2085 @@
+<!-- Forge AI Workspace entry page -->
+<!DOCTYPE html>
+<!-- Main web app shell. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forge AI Workspace</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      overflow: hidden;
+    }
+
+    .app {
+      max-width: 1500px;
+      height: 100vh;
+      margin: 0 auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .header {
+      margin-bottom: 24px;
+    }
+
+    .test-banner {
+      margin-bottom: 18px;
+      border: 1px solid #facc15;
+      border-radius: 8px;
+      background: #422006;
+      color: #fef3c7;
+      padding: 12px 14px;
+      font-weight: 700;
+    }
+
+    .header h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+
+    .header p {
+      margin: 0;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 20px;
+    }
+
+    .panel {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    .panel h2 {
+      margin-top: 0;
+      margin-bottom: 16px;
+      font-size: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #cbd5e1;
+    }
+
+    textarea,
+    select {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid #334155;
+      background: #0b1220;
+      color: #e2e8f0;
+      padding: 14px;
+      font-size: 15px;
+      line-height: 1.6;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 260px;
+      resize: vertical;
+    }
+
+    textarea:focus,
+    select:focus {
+      border-color: #38bdf8;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: #38bdf8;
+      color: #082f49;
+    }
+
+    .secondary {
+      background: #1e293b;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+    }
+
+    .danger {
+      background: #3f1d1d;
+      color: #fecaca;
+      border: 1px solid #7f1d1d;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .status {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: #0b1220;
+      border: 1px solid #1e293b;
+      color: #cbd5e1;
+      min-height: 46px;
+      white-space: pre-wrap;
+    }
+
+    .section {
+      margin-top: 18px;
+    }
+
+    .output-box {
+      background: #0b1220;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 14px;
+      min-height: 180px;
+      white-space: pre-wrap;
+      overflow: auto;
+      line-height: 1.6;
+    }
+
+    .file-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .file-card {
+      background: #0b1220;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .file-path {
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #7dd3fc;
+      word-break: break-word;
+    }
+
+    .file-preview {
+      color: #cbd5e1;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.6;
+    }
+
+    .empty {
+      color: #94a3b8;
+    }
+
+    .workspace-shell {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(340px, 1fr);
+      gap: 24px;
+      align-items: stretch;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .chat-panel {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 24px;
+      padding: 0;
+      min-height: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+    }
+
+    .chat-stream {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 20px 40px;
+      scroll-behavior: smooth;
+      align-items: center;
+    }
+
+    .chat-message {
+      border: 1px solid #1e293b;
+      border-radius: 20px;
+      padding: 16px 18px;
+      background: #0b1220;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+      width: 100%;
+      max-width: none;
+    }
+
+    .chat-message[dir="rtl"] {
+      direction: rtl;
+      text-align: right;
+    }
+
+    .chat-message[dir="ltr"] {
+      direction: ltr;
+      text-align: left;
+    }
+
+    .chat-message.user {
+      margin-left: auto;
+      text-align: right;
+    }
+
+    .chat-message.assistant {
+      margin-right: auto;
+    }
+
+    .chat-message.user {
+      background: linear-gradient(180deg, #0a3550 0%, #082f49 100%);
+      border-color: #0ea5e9;
+      align-self: flex-end;
+    }
+
+    .chat-message.assistant {
+      background: #111827;
+      align-self: flex-start;
+    }
+
+    .message-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .message-title {
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
+
+    .composer-message {
+      border-top: 1px solid #1f2937;
+      background: #0f172a;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .composer-input-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+    }
+
+    .composer-message textarea {
+      min-height: 44px;
+      max-height: 120px;
+      resize: none;
+      border-radius: 18px;
+      padding: 12px 14px;
+      font-size: 14px;
+      flex: 1;
+    }
+
+    .send-icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      padding: 0;
+      font-size: 20px;
+      line-height: 1;
+      background: #38bdf8;
+      color: #082f49;
+    }
+
+    .status-inline {
+      font-size: 12px;
+      color: #64748b;
+      padding-left: 4px;
+    }
+
+    .assistant-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .workspace-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-height: 0;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .sidebar-card {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+    }
+
+    .sidebar-card h2 {
+      margin: 0 0 14px;
+      font-size: 16px;
+    }
+
+    .compact-box {
+      min-height: 96px;
+    }
+
+    .auth-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .auth-fields textarea {
+      min-height: 60px;
+    }
+
+    .approval-actions {
+      margin-top: 14px;
+    }
+
+    .hidden-state {
+      display: none;
+    }
+
+    .strategy-choice-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .strategy-choice-btn {
+      width: 100%;
+      text-align: left;
+      background: #0b1220;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 12px 14px;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .strategy-choice-btn:hover {
+      border-color: #38bdf8;
+      background: #0f172a;
+    }
+
+    .strategy-choice-btn strong {
+      display: block;
+      color: #7dd3fc;
+      margin-bottom: 6px;
+    }
+
+    .footer {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid #1f2937;
+      color: #94a3b8;
+      font-size: 14px;
+      text-align: center;
+      flex: 0 0 auto;
+    }
+
+    .footer p {
+      margin: 0;
+    }
+
+    @media (max-width: 900px) {
+      .workspace-shell {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+
+    <div class="header">
+      <h1>Forge AI Workspace</h1>
+      <p>اكتب طلبك بالعربي أو بالإنجليزي. النظام هيجهز Draft للملفات المقترحة، وبعد مراجعتك وموافقتك يتم إنشاء Decision Packet governed بدل الكتابة المباشرة.</p>
+    </div>
+
+    <div class="workspace-shell">
+      <div class="chat-panel">
+        <div class="chat-stream">
+
+          <div class="hidden-state" aria-hidden="true">
+            <div id="responseBox" class="output-box empty">No response yet.</div>
+
+            <div id="filesBox" class="file-list">
+              <div class="file-card empty">No files proposed yet.</div>
+            </div>
+
+            <div id="previewBox" class="file-list">
+              <div class="file-card empty">No diff preview yet.</div>
+            </div>
+
+            <div id="analysisBox" class="output-box empty">No operation analysis yet.</div>
+          </div>
+        </div>
+          <div class="composer-message">
+            <div class="composer-input-row">
+              <textarea id="requestInput" placeholder="اكتب رسالتك هنا..."></textarea>
+              <button id="chatSendBtn" class="send-icon-btn" title="Send">➜</button>
+            </div>
+            <div id="statusBox" class="status-inline">Ready.</div>
+          </div>
+      </div>
+
+      <div class="workspace-sidebar">
+        <div class="sidebar-card">
+          <h2>Project Context</h2>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px;">
+            <label for="projectSelect" style="margin-bottom:0;">Active project</label>
+            <button id="newProjectBtn" type="button" class="secondary">New Project</button>
+          </div>
+
+          <select id="projectSelect"></select>
+
+          <div id="projectStateBox" class="status">Loading project state...</div>
+        </div>
+        <div class="sidebar-card">
+          <h2>Decision Control</h2>
+
+          <label for="approverRoleSelect">Approver role</label>
+          <select id="approverRoleSelect">
+            <option value="cto">cto</option>
+          </select>
+
+          <div class="assistant-stack">
+            <div id="approvalInfoBox" class="output-box compact-box empty">Approval policy not loaded yet.</div>
+            <div id="operationInfoBox" class="output-box compact-box empty">Operation summary not loaded yet.</div>
+          </div>
+
+          <div class="actions approval-actions">
+            <button id="approveBtn" class="primary" disabled>Approve & Queue Decision</button>
+            <button id="rejectBtn" class="danger" disabled>Reject</button>
+          </div>
+        </div>
+        <div class="sidebar-card">
+          <h2>Project Activity</h2>
+          <div id="historyBox" class="file-list">
+            <div class="file-card empty">No write history yet.</div>
+          </div>
+        </div>
+
+        <div class="sidebar-card">
+          <h2>Conversation Memory</h2>
+          <div id="conversationHistoryBox" class="file-list">
+            <div class="file-card empty">No conversation turns yet.</div>
+          </div>
+        </div>
+
+        <div class="sidebar-card">
+          <h2>Workspace Access</h2>
+
+          <div class="auth-fields">
+            <label for="authUsernameInput">Username</label>
+            <textarea id="authUsernameInput">test</textarea>
+
+            <label for="authPasswordInput">Password</label>
+            <textarea id="authPasswordInput">1234</textarea>
+          </div>
+
+          <div class="actions">
+            <button id="authRegisterBtn" class="secondary">Register</button>
+            <button id="authLoginBtn" class="secondary">Login</button>
+          </div>
+
+          <div id="authResultBox" class="output-box compact-box empty">No auth response yet.</div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <p>&copy; 2026 Forge AI Workspace. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <script>
+    const requestInput = document.getElementById("requestInput");
+    const projectSelect = document.getElementById("projectSelect");
+    const newProjectBtn = document.getElementById("newProjectBtn");
+    const projectStateBox = document.getElementById("projectStateBox");
+    const chatSendBtn = document.getElementById("chatSendBtn");
+    const approveBtn = document.getElementById("approveBtn");
+    const rejectBtn = document.getElementById("rejectBtn");
+    const approverRoleSelect = document.getElementById("approverRoleSelect");
+    const statusBox = document.getElementById("statusBox");
+    const responseBox = document.getElementById("responseBox");
+    const filesBox = document.getElementById("filesBox");
+    const historyBox = document.getElementById("historyBox");
+    const conversationHistoryBox = document.getElementById("conversationHistoryBox");
+    const previewBox = document.getElementById("previewBox");
+    const analysisBox = document.getElementById("analysisBox");
+    const approvalInfoBox = document.getElementById("approvalInfoBox");
+    const operationInfoBox = document.getElementById("operationInfoBox");
+
+    const authUsernameInput = document.getElementById("authUsernameInput");
+    const authPasswordInput = document.getElementById("authPasswordInput");
+    const authRegisterBtn = document.getElementById("authRegisterBtn");
+    const authLoginBtn = document.getElementById("authLoginBtn");
+    const authResultBox = document.getElementById("authResultBox");
+
+    const chatStream = document.querySelector(".chat-stream");
+
+    const composerMessage = requestInput.closest(".chat-message");
+
+    let currentProjectState = null;
+
+    function appendMessage(type, title, contentHtml) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "chat-message " + (type === "user" ? "user" : "assistant");
+      wrapper.setAttribute("dir", detectUserLanguage(contentHtml || "") === "ar" ? "rtl" : "ltr");
+
+      wrapper.innerHTML = `
+        <div class="message-label">${type === "user" ? "You" : "AI Workspace"}</div>
+        <h2 class="message-title">${title}</h2>
+        <div>${contentHtml}</div>
+      `;
+
+      chatStream.appendChild(wrapper);
+      chatStream.scrollTop = chatStream.scrollHeight;
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function formatMessageText(value) {
+      let text = String(value || "");
+
+      text = text.replace(/Fallback echo generation/gi, "");
+      text = text.replace(/No stronger strategy matched the request\.?/gi, "");
+      text = text.replace(/The next step will prepare a governed draft and diff preview\.?/gi, "");
+      text = text.replace(/No execution will happen\.?/gi, "");
+      text = text.replace(/\n{3,}/g, "\n\n").trim();
+
+      return escapeHtml(text).replace(/\n/g, "<br>");
+    }
+
+    function detectUserLanguage(value) {
+      return /[\u0600-\u06FF]/.test(String(value || "")) ? "ar" : "en";
+    }
+
+    function getRuntimeStateLabel(stateValue, lang) {
+      const state = String(stateValue || "").trim().toUpperCase();
+
+      const labels = {
+        DISCUSSION: {
+          ar: "نناقش الفكرة ونفهم المطلوب",
+          en: "We are discussing the idea and understanding the request"
+        },
+        DOCUMENTATION: {
+          ar: "نجهز تصور منظم للمطلوب",
+          en: "We are preparing a structured draft"
+        },
+        EXECUTION_PREPARATION: {
+          ar: "المطلوب جاهز كتسليم منظم للتنفيذ عبر Forge",
+          en: "The work is prepared for governed handoff to Forge"
+        }
+      };
+
+      if (labels[state] && labels[state][lang]) {
+        return labels[state][lang];
+      }
+
+      return lang === "ar"
+        ? "هناك خطوة حالية نشطة في المشروع"
+        : "There is an active runtime step in this project";
+    }
+
+    function buildCompanionCheckpointMessage(stageLabel, requestText, summaryLines = []) {
+      const lang = detectUserLanguage(requestText);
+      const projectName =
+        currentProjectState && (currentProjectState.project_name || currentProjectState.project_id)
+          ? (currentProjectState.project_name || currentProjectState.project_id)
+          : getActiveProjectId();
+
+      const runtimeLabel = getRuntimeStateLabel(
+        currentProjectState && currentProjectState.active_runtime_state
+          ? currentProjectState.active_runtime_state
+          : stageLabel,
+        lang
+      );
+
+      if (lang === "ar") {
+        const lines = [
+          `أنا فهمت طلبك الحالي كالتالي: ${requestText}`,
+          `المشروع الحالي: ${projectName}`,
+          `الحالة الحالية: ${runtimeLabel}`
+        ];
+
+        if (Array.isArray(summaryLines) && summaryLines.length > 0) {
+          lines.push("");
+          lines.push(...summaryLines);
+        }
+
+        lines.push("");
+        lines.push("الخطوة التالية لو وافقت: سأجهز لك مسودة منظمة ومراجعة للتغييرات فقط، بدون أي تنفيذ مباشر.");
+        lines.push("لو تريدني أكمل في نفس الطلب اكتب: كمل");
+        lines.push("ولو تريد إيقاف الطلب الحالي أو تغييره اكتب: وقف");
+
+        return lines.join("\n");
+      }
+
+      const lines = [
+        `Here is my understanding of your current request: ${requestText}`,
+        `Current project: ${projectName}`,
+        `Current state: ${runtimeLabel}`
+      ];
+
+      if (Array.isArray(summaryLines) && summaryLines.length > 0) {
+        lines.push("");
+        lines.push(...summaryLines);
+      }
+
+      lines.push("");
+      lines.push("If you want me to continue, I will prepare a governed draft and change review only, with no direct execution.");
+      lines.push("Reply with: continue");
+      lines.push("Or reply with: stop");
+
+      return lines.join("\n");
+    }
+
+    function buildCheckpointReminderMessage(requestText) {
+      const lang = detectUserLanguage(requestText);
+
+      if (lang === "ar") {
+        return [
+          "ما زال عندنا طلب مفتوح لم يتم حسمه بعد.",
+          "أحتاج أولاً تأكيدًا منك قبل أن أفتح اتجاهًا جديدًا.",
+          "اكتب: كمل",
+          "أو اكتب: وقف"
+        ].join("\n");
+      }
+
+      return [
+        "There is still an open request waiting for your decision.",
+        "I need your confirmation first before opening a new direction.",
+        "Reply with: continue",
+        "Or reply with: stop"
+      ].join("\n");
+    }
+
+    function buildAiOsClarificationAnswersPayload(answerText, discoveryState) {
+      return {
+        raw_answer: String(answerText || "").trim(),
+        answered_questions: Array.isArray(discoveryState.questions) ? discoveryState.questions : []
+      };
+    }
+
+    function getCheckpointUserMessageTitle(userText, sourceRequestText) {
+      if (isPositiveConfirmation(userText)) {
+        return detectUserLanguage(sourceRequestText) === "ar" ? "تأكيد المتابعة" : "Continue Confirmation";
+      }
+
+      if (isNegativeConfirmation(userText)) {
+        return detectUserLanguage(sourceRequestText) === "ar" ? "إيقاف الطلب الحالي" : "Stop Current Request";
+      }
+
+      return detectUserLanguage(userText) === "ar" ? "رسالة جديدة" : "New Message";
+    }
+
+    function buildFriendlyOptionsMessage(items, requestText) {
+      const lang = detectUserLanguage(requestText);
+      const list = Array.isArray(items) ? items : [];
+
+      if (lang === "ar") {
+        const lines = ["وجدت أكثر من مسار ممكن لتنفيذ طلبك."];
+        list.forEach((item, index) => {
+          lines.push("");
+          lines.push(`الخيار ${index + 1}: ${item.title || "مسار مقترح"}`);
+          lines.push(`${item.rationale || "هذا مسار مناسب لطلبك."}`);
+        });
+        lines.push("");
+        lines.push("اختر المسار الأنسب لك.");
+        return lines.join("\n");
+      }
+
+      const lines = ["I found more than one reasonable path for your request."];
+      list.forEach((item, index) => {
+        lines.push("");
+        lines.push(`Option ${index + 1}: ${item.title || "Suggested path"}`);
+        lines.push(`${item.rationale || "This is a possible path for your request."}`);
+      });
+      lines.push("");
+      lines.push("Choose the path that fits you best.");
+      return lines.join("\n");
+    }
+
+    function buildFriendlySelectedStrategyMessage(selected, requestText) {
+      const lang = detectUserLanguage(requestText);
+
+      if (lang === "ar") {
+        return [
+          `أقرب مسار مناسب لطلبك هو: ${selected.title || "مسار مقترح"}`,
+          `${selected.rationale || "هذا هو المسار الأنسب بناءً على طلبك الحالي."}`
+        ].join("\n");
+      }
+
+      return [
+        `The best fit for your request is: ${selected.title || "Suggested path"}`,
+        `${selected.rationale || "This is the most suitable path based on your current request."}`
+      ].join("\n");
+    }
+
+    function pushMessage(type, title, contentHtml) {
+      activeTurn.messages.push({
+        type,
+        title,
+        content: contentHtml
+      });
+
+      appendMessage(type, title, contentHtml);
+    }
+
+    function buildStrategyChoiceHtml(items) {
+      const list = Array.isArray(items) ? items : [];
+
+      if (list.length === 0) {
+        return `<div class="file-preview">${formatMessageText("No options available.")}</div>`;
+      }
+
+      return `
+        <div class="strategy-choice-list">
+          ${list.map((item, index) => `
+            <button
+              type="button"
+              class="strategy-choice-btn"
+              data-strategy-choice="${index + 1}"
+            >
+              <strong>Option ${index + 1}: ${escapeHtml(item.title || "Suggested path")}</strong>
+              <div>${escapeHtml(item.rationale || "This is a possible path for your request.")}</div>
+            </button>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function createEmptyTurnState() {
+      return {
+        draft: null,
+        request: "",
+        projectId: "default_project",
+        proposalId: "",
+        preview: [],
+        requiredRoles: [],
+        approvalPolicyVersion: "",
+        operationMode: "",
+        fileCount: 0,
+        totalBytes: 0,
+        fileRoleRequirements: [],
+        operationType: "UNKNOWN",
+        messages: []
+      };
+    }
+
+    let activeTurn = createEmptyTurnState();
+
+    const conversationTurnsByProject = new Map();
+
+    function getConversationStore(projectIdInput = "") {
+      const projectId = projectIdInput && projectIdInput.trim() !== ""
+        ? projectIdInput.trim()
+        : getActiveProjectId();
+
+      if (!conversationTurnsByProject.has(projectId)) {
+        conversationTurnsByProject.set(projectId, []);
+      }
+
+      return conversationTurnsByProject.get(projectId);
+    }
+
+    let currentStrategyCandidates = [];
+    let currentRequestText = "";
+    let pendingConversationCheckpoint = null;
+    let pendingAiOsDiscovery = null;
+
+    function snapshotTurn(turn) {
+      return {
+        request: turn.request,
+        projectId: turn.projectId,
+        proposalId: turn.proposalId,
+        draft: turn.draft ? JSON.parse(JSON.stringify(turn.draft)) : null,
+        preview: Array.isArray(turn.preview) ? JSON.parse(JSON.stringify(turn.preview)) : [],
+        requiredRoles: Array.isArray(turn.requiredRoles) ? [...turn.requiredRoles] : [],
+        approvalPolicyVersion: turn.approvalPolicyVersion,
+        operationMode: turn.operationMode,
+        fileCount: turn.fileCount,
+        totalBytes: turn.totalBytes,
+        fileRoleRequirements: Array.isArray(turn.fileRoleRequirements)
+          ? JSON.parse(JSON.stringify(turn.fileRoleRequirements))
+          : [],
+        operationType: turn.operationType,
+        messages: Array.isArray(turn.messages)
+          ? JSON.parse(JSON.stringify(turn.messages))
+          : []
+      };
+    }
+
+    function finalizeActiveTurn(extra = {}) {
+      if (!activeTurn.request) {
+        return;
+      }
+
+      const conversationTurns = getConversationStore(activeTurn.projectId || getActiveProjectId());
+
+      conversationTurns.push({
+        ...snapshotTurn(activeTurn),
+        ...extra
+      });
+
+      renderConversationTurns(conversationTurns);
+    }
+
+    function renderConversationTurns(items) {
+      conversationHistoryBox.innerHTML = "";
+
+      if (!Array.isArray(items) || items.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "file-card empty";
+        empty.textContent = "No conversation turns yet.";
+        conversationHistoryBox.appendChild(empty);
+        return;
+      }
+
+      [...items].reverse().forEach((item, index) => {
+        const card = document.createElement("div");
+        card.className = "file-card";
+
+        const titleEl = document.createElement("div");
+        titleEl.className = "file-path";
+        titleEl.textContent = `Turn ${items.length - index}`;
+
+        const summaryEl = document.createElement("div");
+        summaryEl.className = "file-preview";
+        summaryEl.textContent =
+          `Request: ${item.request || ""}\n` +
+          `Proposal ID: ${item.proposalId || "n/a"}\n` +
+          `Operation Type: ${item.operationType || "UNKNOWN"}\n` +
+          `Final Status: ${item.finalStatus || "IN_PROGRESS"}\n` +
+          `Decision Packet ID: ${item.decisionPacketId || "n/a"}\n` +
+          `File Count: ${item.fileCount || 0}`;
+
+        card.appendChild(titleEl);
+        card.appendChild(summaryEl);
+        conversationHistoryBox.appendChild(card);
+      });
+    }
+
+    function setStatus(text) {
+      statusBox.textContent = text;
+    }
+
+    function renderResponse(data) {
+      if (!data) {
+        responseBox.textContent = "No response yet.";
+        responseBox.classList.add("empty");
+        return;
+      }
+
+      responseBox.textContent = JSON.stringify(data, null, 2);
+      responseBox.classList.remove("empty");
+    }
+
+    function renderFiles(files) {
+      filesBox.innerHTML = "";
+
+      if (!Array.isArray(files) || files.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "file-card empty";
+        empty.textContent = "No files proposed yet.";
+        filesBox.appendChild(empty);
+        return;
+      }
+
+      files.forEach((file) => {
+        const card = document.createElement("div");
+        card.className = "file-card";
+
+        const pathEl = document.createElement("div");
+        pathEl.className = "file-path";
+        pathEl.textContent = file.path || "Unknown path";
+
+        const previewEl = document.createElement("div");
+        previewEl.className = "file-preview";
+        previewEl.textContent = file.content || "";
+
+        card.appendChild(pathEl);
+        card.appendChild(previewEl);
+        filesBox.appendChild(card);
+      });
+    }
+
+        function renderApprovalInfo(requiredRoles, policyVersion) {
+      const roles = Array.isArray(requiredRoles) ? requiredRoles : [];
+      const selectedRole = String(approverRoleSelect.value || "").trim();
+
+      approvalInfoBox.textContent =
+        `Policy version: ${policyVersion || "unknown"}\n` +
+        `Required roles: ${roles.join(", ") || "none"}\n` +
+        `Selected role: ${selectedRole || "none"}`;
+
+      approvalInfoBox.classList.remove("empty");
+    }
+
+    function renderOperationInfo(operationMode, fileCount, totalBytes, fileRoleRequirements) {
+      const rows = Array.isArray(fileRoleRequirements) ? fileRoleRequirements : [];
+
+      const lines = [
+        `Operation mode: ${operationMode || "unknown"}`,
+        `File count: ${fileCount || 0}`,
+        `Total bytes: ${totalBytes || 0}`
+      ];
+
+      if (rows.length > 0) {
+        lines.push("");
+        lines.push("Per-file roles:");
+        rows.forEach((row) => {
+          lines.push(`- ${row.path}: ${(row.required_roles || []).join(", ") || "none"}`);
+        });
+      }
+
+      operationInfoBox.textContent = lines.join("\n");
+      operationInfoBox.classList.remove("empty");
+    }
+
+    function populateApproverRoles(roles) {
+      const normalized = Array.isArray(roles) && roles.length > 0 ? roles : ["cto"];
+      const previousValue = approverRoleSelect.value;
+
+      approverRoleSelect.innerHTML = "";
+
+      normalized.forEach((role) => {
+        const option = document.createElement("option");
+        option.value = role;
+        option.textContent = role;
+        approverRoleSelect.appendChild(option);
+      });
+
+      if (normalized.includes(previousValue)) {
+        approverRoleSelect.value = previousValue;
+      }
+    }
+
+    function renderHistory(items) {
+      historyBox.innerHTML = "";
+
+      if (!Array.isArray(items) || items.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "file-card empty";
+        empty.textContent = "No write history yet.";
+        historyBox.appendChild(empty);
+        return;
+      }
+
+      items.forEach((item) => {
+        const card = document.createElement("div");
+        card.className = "file-card";
+
+        const idEl = document.createElement("div");
+        idEl.className = "file-path";
+        idEl.textContent = item.decision_packet_id || item.write_id || "Unknown activity id";
+
+        const files = Array.isArray(item.queued_files) && item.queued_files.length > 0
+        ? item.queued_files
+        : (Array.isArray(item.written_files) ? item.written_files : []);
+
+        const summaryEl = document.createElement("div");
+        summaryEl.className = "file-preview";
+        summaryEl.textContent =
+        `Type: ${item.entry_type || "UNKNOWN"}\n` +
+        `Time: ${item.logged_at || ""}\n` +
+        `Approver role: ${item.approver_role || "n/a"}\n` +
+        `Required roles: ${(item.required_roles || []).join(", ") || "n/a"}\n` +
+        `Operation mode: ${item.operation_mode || "n/a"}\n` +
+        `File count: ${item.file_count || 0}\n` +
+        `Files: ${files.join(", ") || "None"}\n` +
+        `Summary: ${item.summary || ""}`;
+
+        card.appendChild(idEl);
+        card.appendChild(summaryEl);
+        historyBox.appendChild(card);
+      });
+    }
+
+    function getActiveProjectId() {
+      return projectSelect.value && projectSelect.value.trim() !== ""
+        ? projectSelect.value.trim()
+        : "default_project";
+    }
+
+    function renderProjectState(project) {
+      if (!project || typeof project !== "object") {
+        projectStateBox.textContent = "No project state loaded.";
+        return;
+      }
+
+      currentProjectState = project;
+
+      const pending = Array.isArray(project.pending_decisions) ? project.pending_decisions : [];
+
+      projectStateBox.textContent =
+        `Project: ${project.project_name || project.project_id || "Unknown"}\n` +
+        `Runtime: ${project.active_runtime_state || "UNKNOWN"}\n` +
+        `Phase: ${project.current_phase || "UNKNOWN"}\n` +
+        `Docs: ${project.documentation_state || "UNKNOWN"}\n` +
+        `Execution package: ${project.execution_package_state || "UNKNOWN"}\n` +
+        `Execution: ${project.execution_state || "UNKNOWN"}\n` +
+        `Pending decisions: ${pending.join(", ") || "None"}`;
+    }
+
+    async function loadProjects(preferredProjectId = "") {
+      const data = await requestAPI("/api/projects", {}, "GET");
+      const items = Array.isArray(data.items) ? data.items : [];
+      const activeProjectId =
+        preferredProjectId && preferredProjectId.trim() !== ""
+          ? preferredProjectId.trim()
+          : (typeof data.active_project_id === "string" && data.active_project_id.trim() !== ""
+              ? data.active_project_id.trim()
+              : "default_project");
+
+      projectSelect.innerHTML = "";
+
+      items.forEach((project) => {
+        const option = document.createElement("option");
+        option.value = project.project_id || "default_project";
+        option.textContent = project.project_name || project.project_id || "default_project";
+        projectSelect.appendChild(option);
+      });
+
+      if (projectSelect.options.length === 0) {
+        const option = document.createElement("option");
+        option.value = "default_project";
+        option.textContent = "default_project";
+        projectSelect.appendChild(option);
+      }
+
+      projectSelect.value = activeProjectId;
+
+      const activeProject =
+        items.find((item) => item.project_id === projectSelect.value) ||
+        items[0] ||
+        null;
+
+      renderProjectState(activeProject);
+      renderConversationTurns(getConversationStore(projectSelect.value));
+      await loadHistory();
+      chatStream.scrollTop = chatStream.scrollHeight;
+    }
+
+    async function activateProject(projectId) {
+      const data = await requestAPI("/api/projects/activate", {
+        project_id: projectId
+      });
+
+      if (data && data.project) {
+        renderProjectState(data.project);
+      }
+
+      await loadProjects(projectId);
+    }
+
+    function renderPreview(items) {
+      previewBox.innerHTML = "";
+
+      if (!Array.isArray(items) || items.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "file-card empty";
+        empty.textContent = "No diff preview yet.";
+        previewBox.appendChild(empty);
+        return;
+      }
+
+      items.forEach((item) => {
+        const card = document.createElement("div");
+        card.className = "file-card";
+
+        const pathEl = document.createElement("div");
+        pathEl.className = "file-path";
+        pathEl.textContent = item.path || "Unknown path";
+
+        const diffEl = document.createElement("div");
+        diffEl.className = "file-preview";
+        const raw = item.diff || "No changes";
+
+        const colored = raw
+          .split("\n")
+          .map(line => {
+            if (line.startsWith("+")) {
+              return `<span style="color:#22c55e;">${line}</span>`;
+            }
+            if (line.startsWith("-")) {
+              return `<span style="color:#ef4444;">${line}</span>`;
+            }
+            return `<span>${line}</span>`;
+          })
+          .join("<br>");
+
+        diffEl.innerHTML = colored;
+
+        card.appendChild(pathEl);
+        card.appendChild(diffEl);
+        previewBox.appendChild(card);
+      });
+    }
+
+    function renderOperationAnalysis(operationType, oldContent, newContent) {
+      if (!operationType && !oldContent && !newContent) {
+        analysisBox.textContent = "No operation analysis yet.";
+        analysisBox.classList.add("empty");
+        return;
+      }
+
+      analysisBox.textContent =
+        `Operation Type: ${operationType || "UNKNOWN"}\n\n` +
+        `OLD CONTENT:\n${oldContent || ""}\n\n` +
+        `NEW CONTENT:\n${newContent || ""}`;
+
+      analysisBox.classList.remove("empty");
+    }
+
+    async function loadPreview(draft) {
+      const res = await fetch("http://localhost:3100/api/ai/preview", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ draft })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Preview failed.");
+      }
+
+      activeTurn.preview = Array.isArray(data.diffs) ? data.diffs : [];
+      activeTurn.requiredRoles = Array.isArray(data.required_roles) ? data.required_roles : [];
+      activeTurn.approvalPolicyVersion = typeof data.approval_policy_version === "string" ? data.approval_policy_version : "";
+      activeTurn.operationMode = typeof data.operation_mode === "string" ? data.operation_mode : "";
+      activeTurn.fileCount = Number.isInteger(data.file_count) ? data.file_count : 0;
+      activeTurn.totalBytes = Number.isInteger(data.total_bytes) ? data.total_bytes : 0;
+      activeTurn.fileRoleRequirements = Array.isArray(data.file_role_requirements) ? data.file_role_requirements : [];
+      populateApproverRoles(Array.isArray(data.available_roles) ? data.available_roles : ["cto"]);
+      renderPreview(activeTurn.preview);
+      renderApprovalInfo(activeTurn.requiredRoles, activeTurn.approvalPolicyVersion);
+      renderOperationInfo(activeTurn.operationMode, activeTurn.fileCount, activeTurn.totalBytes, activeTurn.fileRoleRequirements);
+    }
+
+    async function loadApprovalPolicy() {
+      try {
+        const res = await fetch("http://localhost:3100/api/ai/approval-policy");
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || "Failed to load approval policy.");
+        }
+
+        populateApproverRoles(Array.isArray(data.available_roles) ? data.available_roles : ["cto"]);
+
+        if (!activeTurn.requiredRoles || activeTurn.requiredRoles.length === 0) {
+          renderApprovalInfo(
+            Array.isArray(data.default_required_roles) ? data.default_required_roles : [],
+            typeof data.version === "string" ? data.version : ""
+          );
+        }
+
+        if (!activeTurn.operationMode) {
+          renderOperationInfo("", 0, 0, []);
+        }
+      } catch (err) {
+        populateApproverRoles(["cto"]);
+        renderApprovalInfo([], "");
+      }
+    }
+
+    async function loadHistory() {
+      try {
+        const projectId = getActiveProjectId();
+        const apiBase = window.location.origin.replace(":3000", ":3100");
+        const res = await fetch(`${apiBase}/api/ai/history?project_id=${encodeURIComponent(projectId)}`);
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || "Failed to load history.");
+        }
+
+        renderHistory(data.items || []);
+      } catch (err) {
+        renderHistory([]);
+      }
+    }
+
+    function resetDraft() {
+      activeTurn = createEmptyTurnState();
+      currentStrategyCandidates = [];
+      currentRequestText = "";
+      approveBtn.disabled = true;
+      rejectBtn.disabled = true;
+      renderResponse(null);
+      renderFiles([]);
+      renderPreview([]);
+      renderOperationAnalysis("", "", "");
+      renderApprovalInfo([], "");
+      renderOperationInfo("", 0, 0, []);
+      setStatus("Ready.");
+    }
+
+    function isPositiveConfirmation(value) {
+      const normalized = String(value || "").trim().toLowerCase();
+      return normalized === "yes" || normalized === "continue" || normalized === "كمل";
+    }
+
+    function isNegativeConfirmation(value) {
+      const normalized = String(value || "").trim().toLowerCase();
+      return normalized === "no" || normalized === "stop" || normalized === "وقف";
+    }
+
+    function askConversationCheckpoint(stageLabel, requestText, summaryLines = []) {
+      pendingConversationCheckpoint = {
+        stage: stageLabel,
+        request: requestText,
+        projectId: getActiveProjectId()
+      };
+
+      pushMessage(
+        "assistant",
+        detectUserLanguage(requestText) === "ar" ? "تأكيد قبل الانتقال" : "Confirmation Before Progression",
+        `<div class="file-preview">${formatMessageText(
+          buildCompanionCheckpointMessage(stageLabel, requestText, summaryLines)
+        )}</div>`
+      );
+
+      setStatus(
+        detectUserLanguage(requestText) === "ar"
+          ? "بانتظار قرارك على الطلب الحالي."
+          : "Waiting for your decision on the current request."
+      );
+    }
+
+    async function prepareDraftFromConfirmedRequest(request, projectId) {
+      activeTurn = createEmptyTurnState();
+      activeTurn.request = request;
+      activeTurn.projectId = projectId;
+
+      approveBtn.disabled = true;
+      rejectBtn.disabled = true;
+
+      setStatus(
+        detectUserLanguage(request) === "ar"
+          ? "أجهز الآن مسودة منظمة ومراجعة للتغييرات."
+          : "Preparing a governed draft and change review."
+      );
+
+      await requestAPI("/api/ai/analyze", { request });
+
+      const proposal = await requestAPI("/api/ai/propose", {
+        request,
+        project_id: activeTurn.projectId
+      });
+
+      if (!proposal.ok) {
+        renderResponse(proposal);
+        pushMessage("assistant", "Response", `<div class="file-preview">${formatMessageText(JSON.stringify(proposal, null, 2))}</div>`);
+
+        if (proposal.mode === "DUPLICATE_HISTORY") {
+          setStatus("This request was already executed before.");
+        } else if (proposal.mode === "DUPLICATE") {
+          setStatus("This request already exists in the file.");
+        } else {
+          setStatus(proposal.message || "Request blocked.");
+        }
+
+        return;
+      }
+
+      const draftRes = await fetch(proposal.draft_path);
+      const draft = await draftRes.json();
+
+      activeTurn.proposalId = proposal.proposal_id || "";
+      activeTurn.draft = {
+        ...draft,
+        project_id: activeTurn.projectId
+      };
+
+      renderFiles(draft.files || []);
+
+      await loadPreview(draft);
+
+      if (draft.files && draft.files.length > 0) {
+        const filePath = draft.files[0].path;
+
+        try {
+          const existing = await requestAPI("/api/ai/read-file", {
+            path: filePath
+          }, "POST");
+
+          const oldContent = existing.content || "";
+          const newContent = draft.files[0].content || "";
+
+          activeTurn.operationType = "UNKNOWN";
+
+          if (!oldContent) {
+            activeTurn.operationType = "CREATE";
+          } else if (oldContent.includes(newContent.trim())) {
+            activeTurn.operationType = "DUPLICATE";
+          } else if (newContent.includes(oldContent)) {
+            activeTurn.operationType = "EXPAND";
+          } else {
+            activeTurn.operationType = "MODIFY";
+          }
+
+          renderOperationAnalysis(activeTurn.operationType, oldContent, newContent);
+
+          pushMessage("assistant", "Operation Analysis", `<div class="file-preview">${formatMessageText(analysisBox.textContent)}</div>`);
+
+          if (activeTurn.operationType === "DUPLICATE") {
+            approveBtn.disabled = true;
+            rejectBtn.disabled = false;
+            setStatus("Duplicate detected. Approval is disabled.");
+          }
+        } catch (err) {
+          activeTurn.operationType = "UNKNOWN";
+          renderOperationAnalysis("UNKNOWN", "", "");
+        }
+      }
+
+      pushMessage("assistant", "Draft Files", filesBox.innerHTML);
+      pushMessage(
+        "assistant",
+        "Diff Preview",
+        (proposal.provider && proposal.provider.patch)
+          ? `<div class="file-preview">${escapeHtml(proposal.provider.patch)}</div>`
+          : previewBox.innerHTML
+      );
+
+      if (activeTurn.operationType !== "DUPLICATE") {
+        approveBtn.disabled = false;
+        setStatus(
+          detectUserLanguage(request) === "ar"
+            ? "المسودة أصبحت جاهزة للمراجعة واتخاذ القرار."
+            : "The draft is ready for review and decision."
+        );
+      }
+
+      rejectBtn.disabled = false;
+    }
+
+    approveBtn.addEventListener("click", async () => {
+      if (!activeTurn.draft) {
+        setStatus("No draft available to approve.");
+        return;
+      }
+
+      if (!activeTurn.preview || activeTurn.preview.length === 0) {
+        setStatus("You must preview changes before approving.");
+        return;
+      }
+
+      if (activeTurn.operationType === "DUPLICATE") {
+        setStatus("Skipped: duplicate request.");
+        return;
+      }
+
+      approveBtn.disabled = true;
+      rejectBtn.disabled = true;
+      setStatus("Creating governed decision packet...");
+
+      try {
+        const res = await fetch("http://localhost:3100/api/ai/decision", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            request: activeTurn.request,
+            draft: activeTurn.draft,
+            approver_role: approverRoleSelect.value,
+            proposal_id: activeTurn.proposalId || ""
+          })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || "Write failed.");
+        }
+
+        renderResponse(data);
+        setStatus(`Decision packet created successfully.\nPacket ID: ${data.decision_packet_id}\nApprover role: ${data.approver_role || "n/a"}\nOperation mode: ${data.operation_mode || "n/a"}\nFiles queued: ${data.file_count || (data.queued_files || []).length}`);
+        await loadHistory();
+        approveBtn.disabled = true;
+        rejectBtn.disabled = true;
+
+        finalizeActiveTurn({
+          finalStatus: "DECISION_CREATED_PENDING_FORGE",
+          decisionPacketId: data.decision_packet_id
+        });
+
+        setStatus(
+          `Decision packet created successfully.\nPacket ID: ${data.decision_packet_id}\nExecution handoff to Forge is required before any file changes are applied.`
+        );
+      } catch (err) {
+        setStatus(`Write failed: ${err.message}`);
+        approveBtn.disabled = false;
+        rejectBtn.disabled = false;
+      } finally {
+      }
+    });
+
+    rejectBtn.addEventListener("click", () => {
+      finalizeActiveTurn({
+        finalStatus: "REJECTED"
+      });
+      requestInput.value = "";
+      resetDraft();
+      setStatus("Draft cleared.");
+    });
+    function renderAuthResult(data) {
+      if (!data) {
+        authResultBox.textContent = "No auth response yet.";
+        authResultBox.classList.add("empty");
+        return;
+      }
+
+      authResultBox.textContent = JSON.stringify(data, null, 2);
+      authResultBox.classList.remove("empty");
+    }
+
+    async function requestAPI(endpoint, payload = {}, method = "POST") {
+      if (!endpoint) {
+        throw new Error("API endpoint is required.");
+      }
+
+      const API_BASE = window.location.origin.replace(":3000", ":3100");
+
+      const requestOptions = {
+        method,
+        headers: {
+          "Content-Type": "application/json"
+        }
+      };
+
+      if (method !== "GET") {
+        requestOptions.body = JSON.stringify(payload);
+      }
+
+      const res = await fetch(`${API_BASE}${endpoint}`, requestOptions);
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(
+          data.error ||
+          data.reason ||
+          data.message ||
+          (Array.isArray(data.blocking_questions) ? data.blocking_questions.join("\n") : "") ||
+          "Request failed."
+        );
+      }
+
+      return data;
+    }
+
+    async function callAPI(endpoint, payload = {}, method = "POST") {
+      authRegisterBtn.disabled = true;
+      authLoginBtn.disabled = true;
+      setStatus(`Sending request to ${method} ${endpoint} ...`);
+
+      try {
+        const data = await requestAPI(endpoint, payload, method);
+        renderAuthResult(data);
+        setStatus(`Request succeeded: ${method} ${endpoint}`);
+        return data;
+      } catch (err) {
+        renderAuthResult({ error: err.message });
+        setStatus(`Request failed: ${method} ${endpoint} - ${err.message}`);
+        throw err;
+      } finally {
+        authRegisterBtn.disabled = false;
+        authLoginBtn.disabled = false;
+      }
+    }
+
+    authRegisterBtn.addEventListener("click", async () => {
+      await callAPI("/api/auth/register", {
+        username: authUsernameInput.value.trim(),
+        password: authPasswordInput.value.trim()
+      });
+    });
+
+    authLoginBtn.addEventListener("click", async () => {
+      await callAPI("/api/auth/login", {
+        username: authUsernameInput.value.trim(),
+        password: authPasswordInput.value.trim()
+      });
+    });
+
+    newProjectBtn.addEventListener("click", async () => {
+      const projectName = window.prompt("Enter project name");
+
+      if (!projectName || projectName.trim() === "") {
+        setStatus("Project creation cancelled.");
+        return;
+      }
+
+      try {
+        const data = await requestAPI("/api/projects/create", {
+          project_name: projectName.trim()
+        });
+
+        resetDraft();
+        currentStrategyCandidates = [];
+        currentRequestText = "";
+        pendingConversationCheckpoint = null;
+
+        await loadProjects(data.active_project_id);
+
+        pushMessage(
+          "assistant",
+          "Project Created",
+          `<div class="file-preview">${formatMessageText(
+            `Project created successfully.\nProject: ${data.project.project_name}\nProject ID: ${data.project.project_id}`
+          )}</div>`
+        );
+
+        setStatus(`Project created: ${data.project.project_name}`);
+      } catch (err) {
+        setStatus(`Project creation failed: ${err.message}`);
+      }
+    });
+
+    chatSendBtn.addEventListener("click", async () => {
+      const request = requestInput.value.trim();
+
+      if (!request) {
+        setStatus("Please enter a message.");
+        return;
+      }
+
+      if (pendingAiOsDiscovery) {
+        const discoveryState = { ...pendingAiOsDiscovery };
+
+        pushMessage("user", "Discovery Answer", `<div class="file-preview">${formatMessageText(request)}</div>`);
+        requestInput.value = "";
+        chatSendBtn.disabled = true;
+        setStatus("Continuing AI OS discovery...");
+
+        try {
+          const answerResult = await requestAPI("/api/ai-os/clarification/answer", {
+            project_id: discoveryState.projectId,
+            project_name: discoveryState.projectName,
+            answers: buildAiOsClarificationAnswersPayload(request, discoveryState)
+          });
+
+          if (answerResult.project) {
+            renderProjectState(answerResult.project);
+          }
+
+          if (answerResult.mode === "CLARIFICATION_REQUIRED") {
+            const questions = Array.isArray(answerResult.blocking_questions)
+              ? answerResult.blocking_questions
+              : [];
+
+            pendingAiOsDiscovery = {
+              projectId: discoveryState.projectId,
+              projectName: discoveryState.projectName,
+              originalRequest: discoveryState.originalRequest,
+              questions
+            };
+
+            pushMessage(
+              "assistant",
+              detectUserLanguage(request) === "ar" ? "استكمال التحليل" : "Discovery Follow-up",
+              `<div class="file-preview">${formatMessageText(questions.join("\n"))}</div>`
+            );
+
+            setStatus("AI OS discovery requires more information.");
+            return;
+          }
+
+          if (answerResult.mode === "IDEATION_READY") {
+            pendingAiOsDiscovery = null;
+
+            pushMessage(
+              "assistant",
+              detectUserLanguage(request) === "ar" ? "اكتمل التحليل" : "Discovery Complete",
+              `<div class="file-preview">${formatMessageText("Discovery is complete. The project is ready for the next governed step.")}</div>`
+            );
+
+            askConversationCheckpoint(
+              "DISCUSSION_READY_FOR_DOCUMENTATION",
+              discoveryState.originalRequest || activeTurn.request || request,
+              []
+            );
+
+            setStatus("AI OS discovery completed.");
+            return;
+          }
+
+          pendingAiOsDiscovery = null;
+          renderResponse(answerResult);
+          pushMessage("assistant", "AI OS Response", `<div class="file-preview">${formatMessageText(JSON.stringify(answerResult, null, 2))}</div>`);
+          setStatus("AI OS discovery returned a non-standard state.");
+        } catch (err) {
+          renderResponse({ error: err.message });
+          pushMessage("assistant", "Error", `<div class="file-preview">${formatMessageText(err.message)}</div>`);
+          setStatus(`Error: ${err.message}`);
+        } finally {
+          chatSendBtn.disabled = false;
+        }
+
+        return;
+      }
+
+      if (pendingConversationCheckpoint) {
+        const checkpointRequest = pendingConversationCheckpoint.request;
+
+        if (isPositiveConfirmation(request)) {
+          pushMessage(
+            "user",
+            getCheckpointUserMessageTitle(request, checkpointRequest),
+            `<div class="file-preview">${formatMessageText(request)}</div>`
+          );
+          requestInput.value = "";
+
+          const checkpoint = { ...pendingConversationCheckpoint };
+          pendingConversationCheckpoint = null;
+
+          chatSendBtn.disabled = true;
+          setStatus(
+            detectUserLanguage(checkpoint.request) === "ar"
+              ? "تم تأكيد المتابعة. أجهز الآن المسودة المنظمة."
+              : "Continuation confirmed. Preparing the governed draft."
+          );
+
+          try {
+            await prepareDraftFromConfirmedRequest(checkpoint.request, checkpoint.projectId);
+          } catch (err) {
+            renderResponse({ error: err.message });
+            pushMessage("assistant", "Error", `<div class="file-preview">${formatMessageText(err.message)}</div>`);
+            setStatus(`Error: ${err.message}`);
+          } finally {
+            chatSendBtn.disabled = false;
+          }
+
+          return;
+        }
+
+        if (isNegativeConfirmation(request)) {
+          pushMessage(
+            "user",
+            getCheckpointUserMessageTitle(request, checkpointRequest),
+            `<div class="file-preview">${formatMessageText(request)}</div>`
+          );
+          requestInput.value = "";
+
+          pendingConversationCheckpoint = null;
+
+          finalizeActiveTurn({
+            finalStatus: "CHECKPOINT_DECLINED"
+          });
+
+          pushMessage(
+            "assistant",
+            detectUserLanguage(checkpointRequest) === "ar" ? "تم إيقاف الطلب الحالي" : "Current Request Stopped",
+            `<div class="file-preview">${formatMessageText(
+              detectUserLanguage(checkpointRequest) === "ar"
+                ? "تم إيقاف الطلب الحالي. لن أجهز مسودة لهذا الطلب."
+                : "The current request was stopped. No draft will be prepared for it."
+            )}</div>`
+          );
+
+          setStatus(
+            detectUserLanguage(checkpointRequest) === "ar"
+              ? "تم إيقاف الطلب الحالي."
+              : "The current request was stopped."
+          );
+          return;
+        }
+
+        pushMessage(
+          "user",
+          getCheckpointUserMessageTitle(request, checkpointRequest),
+          `<div class="file-preview">${formatMessageText(request)}</div>`
+        );
+        requestInput.value = "";
+
+        pushMessage(
+          "assistant",
+          detectUserLanguage(checkpointRequest) === "ar"
+            ? "لا يمكن بدء طلب جديد الآن"
+            : "Cannot Start a New Request Now",
+          `<div class="file-preview">${formatMessageText(
+            buildCheckpointReminderMessage(checkpointRequest)
+          )}</div>`
+        );
+
+        setStatus(
+          detectUserLanguage(checkpointRequest) === "ar"
+            ? "يجب حسم الطلب الحالي أولاً."
+            : "You must resolve the current request first."
+        );
+        return;
+      }
+
+      if (/^\d+$/.test(request) && currentStrategyCandidates && currentStrategyCandidates.length > 0) {
+        const selectedIndex = parseInt(request, 10) - 1;
+        const selected = currentStrategyCandidates[selectedIndex];
+
+        pushMessage("user", "Strategy Selection", `<div class="file-preview">${formatMessageText(request)}</div>`);
+        requestInput.value = "";
+
+        if (!selected) {
+          pushMessage(
+            "assistant",
+            "Invalid Choice",
+            `<div class="file-preview">${formatMessageText("Invalid selection. Please choose a valid option.")}</div>`
+          );
+          setStatus("Invalid strategy selection.");
+          return;
+        }
+
+        chatSendBtn.disabled = true;
+        setStatus(`Confirming strategy: ${selected.strategy_id}`);
+
+        try {
+          const strategyConfirmation = await requestAPI("/api/ai/confirm-strategy", {
+            request: selected.original_request || currentRequestText,
+            selected_strategy_id: selected.strategy_id
+          });
+
+          if (!strategyConfirmation.ok || strategyConfirmation.mode !== "STRATEGY_CONFIRMED" || !strategyConfirmation.selected_strategy) {
+            throw new Error("Strategy confirmation failed.");
+          }
+
+          const confirmed = strategyConfirmation.selected_strategy;
+          const confirmedText = buildFriendlySelectedStrategyMessage(
+            confirmed,
+            selected.original_request || currentRequestText || activeTurn.request || ""
+          );
+
+          const effectiveRequest = selected.original_request || currentRequestText || activeTurn.request || "";
+
+          activeTurn = createEmptyTurnState();
+          activeTurn.request = effectiveRequest;
+          activeTurn.projectId = getActiveProjectId();
+
+          currentStrategyCandidates = [];
+          currentRequestText = "";
+
+          askConversationCheckpoint(
+            "DISCUSSION_READY_FOR_DOCUMENTATION",
+            effectiveRequest,
+            [
+              confirmedText,
+              "",
+              "The next step will prepare a governed draft and diff preview.",
+              "No execution will happen."
+            ]
+          );
+        } catch (err) {
+          renderResponse({ error: err.message });
+          pushMessage("assistant", "Error", `<div class="file-preview">${formatMessageText(err.message)}</div>`);
+          setStatus(`Error: ${err.message}`);
+        } finally {
+          chatSendBtn.disabled = false;
+        }
+
+        return;
+      }
+
+      activeTurn = createEmptyTurnState();
+      activeTurn.request = request;
+      activeTurn.projectId = getActiveProjectId();
+      currentStrategyCandidates = [];
+      currentRequestText = "";
+
+      pushMessage("user", "Request", `<div class="file-preview">${formatMessageText(request)}</div>`);
+      requestInput.value = "";
+
+      chatSendBtn.disabled = true;
+      setStatus("Thinking...");
+
+      try {
+        const clarification = await requestAPI("/api/ai/clarify", { request });
+
+        const intake = await requestAPI("/api/ai-os/intake", {
+          message: request,
+          project_id: activeTurn.projectId,
+          project_name: currentProjectState && currentProjectState.project_name
+            ? currentProjectState.project_name
+            : activeTurn.projectId
+        });
+
+        if (intake.project) {
+          renderProjectState(intake.project);
+        }
+
+        if (intake.mode === "CLARIFICATION_REQUIRED") {
+          const questions = Array.isArray(intake.blocking_questions)
+            ? intake.blocking_questions
+            : [];
+
+          pendingAiOsDiscovery = {
+            projectId: activeTurn.projectId,
+            projectName: currentProjectState && currentProjectState.project_name
+              ? currentProjectState.project_name
+              : activeTurn.projectId,
+            originalRequest: request,
+            questions
+          };
+
+          pushMessage(
+            "assistant",
+            detectUserLanguage(request) === "ar" ? "أسئلة التحليل" : "Discovery Questions",
+            `<div class="file-preview">${formatMessageText(questions.join("\n"))}</div>`
+          );
+
+          setStatus("AI OS discovery is waiting for your answers.");
+          return;
+        }
+
+        if (intake.ok === false) {
+          pendingAiOsDiscovery = null;
+          renderResponse(intake);
+          pushMessage(
+            "assistant",
+            "AI OS Blocked",
+            `<div class="file-preview">${formatMessageText(intake.reason || intake.error || "AI OS intake blocked.")}</div>`
+          );
+          setStatus(intake.reason || intake.error || "AI OS intake blocked.");
+          return;
+        }
+
+        if (intake.mode === "IDEATION_READY") {
+          pushMessage(
+            "assistant",
+            detectUserLanguage(request) === "ar" ? "اكتمل التحليل" : "Discovery Complete",
+            `<div class="file-preview">${formatMessageText("Discovery is complete. The project is ready for the next governed step.")}</div>`
+          );
+
+          setStatus("AI OS discovery completed.");
+          return;
+        }
+
+        const options = await requestAPI("/api/ai/options", {
+          request,
+          project_id: activeTurn.projectId
+        });
+
+        if (options.ok === false && options.reason === "CLARIFICATION_REQUIRED") {
+          pushMessage(
+            "assistant",
+            "Clarification",
+            `<div class="file-preview">${formatMessageText(
+              options.clarification_question || "What do you want to do?"
+            )}</div>`
+          );
+
+          finalizeActiveTurn({
+            finalStatus: "CLARIFICATION_REQUIRED",
+            clarificationQuestion: options.clarification_question || "What do you want to do?"
+          });
+
+          setStatus("Clarification required.");
+          return;
+        }
+
+        const strategySelection = await requestAPI("/api/ai/select-strategy", {
+          request,
+          project_id: activeTurn.projectId
+        });
+
+        if (strategySelection.ok === false && strategySelection.reason === "CLARIFICATION_REQUIRED") {
+          pushMessage(
+            "assistant",
+            "Clarification",
+            `<div class="file-preview">${formatMessageText(
+              strategySelection.clarification_question || "What do you want to do?"
+            )}</div>`
+          );
+
+          finalizeActiveTurn({
+            finalStatus: "CLARIFICATION_REQUIRED",
+            clarificationQuestion: strategySelection.clarification_question || "What do you want to do?"
+          });
+
+          setStatus("Clarification required.");
+          return;
+        }
+
+        if (strategySelection.ok === true && strategySelection.mode === "STRATEGY_SELECTION_REQUIRED") {
+          currentStrategyCandidates = (
+            Array.isArray(strategySelection.strategy_candidates)
+              ? strategySelection.strategy_candidates
+              : []
+          ).map((s) => ({
+            ...s,
+            original_request: request
+          }));
+          currentRequestText = request;
+
+          const selectionTitle = buildFriendlyOptionsMessage(currentStrategyCandidates, request);
+
+          pushMessage(
+            "assistant",
+            detectUserLanguage(request) === "ar" ? "اختيار المسار" : "Choose a Path",
+            `
+              <div class="file-preview" style="margin-bottom:12px;">${formatMessageText(selectionTitle)}</div>
+              ${buildStrategyChoiceHtml(currentStrategyCandidates)}
+            `
+          );
+
+          finalizeActiveTurn({
+            finalStatus: "STRATEGY_SELECTION_REQUIRED",
+            selectionQuestion: strategySelection.selection_question || "Multiple strategies are available. Which one do you want to use?"
+          });
+
+          setStatus("Strategy selection required.");
+          return;
+        }
+
+        if (strategySelection.ok === true && strategySelection.mode === "STRATEGY_SELECTED" && strategySelection.selected_strategy) {
+          const selected = strategySelection.selected_strategy;
+          const selectedText = buildFriendlySelectedStrategyMessage(selected, request);
+
+          askConversationCheckpoint(
+            "DISCUSSION_READY_FOR_DOCUMENTATION",
+            request,
+            [
+              selectedText,
+              "",
+              "The next step will prepare a governed draft and diff preview.",
+              "No execution will happen."
+            ]
+          );
+
+          setStatus("Waiting for explicit confirmation before draft preparation.");
+          return;
+        }
+
+        askConversationCheckpoint(
+          "DISCUSSION_READY_FOR_DOCUMENTATION",
+          request,
+          [
+            "The next step will prepare a governed draft and diff preview.",
+            "No execution will happen."
+          ]
+        );
+
+        setStatus("Waiting for explicit confirmation before draft preparation.");
+      } catch (err) {
+        renderResponse({ error: err.message });
+        pushMessage("assistant", "Error", `<div class="file-preview">${formatMessageText(err.message)}</div>`);
+        setStatus(`Error: ${err.message}`);
+      } finally {
+        chatSendBtn.disabled = false;
+      }
+    });
+
+    chatStream.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-strategy-choice]");
+
+      if (!button) {
+        return;
+      }
+
+      const choiceValue = button.getAttribute("data-strategy-choice");
+
+      if (!choiceValue || button.disabled) {
+        return;
+      }
+
+      const allChoiceButtons = chatStream.querySelectorAll("[data-strategy-choice]");
+      allChoiceButtons.forEach((btn) => {
+        btn.disabled = true;
+        btn.style.opacity = "0.6";
+        btn.style.cursor = "not-allowed";
+      });
+
+      requestInput.value = choiceValue;
+      chatSendBtn.click();
+    });
+
+    requestInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        chatSendBtn.click();
+      }
+    });
+
+    renderFiles([]);
+    renderPreview([]);
+    renderConversationTurns(getConversationStore("default_project"));
+    approverRoleSelect.addEventListener("change", () => {
+      renderApprovalInfo(activeTurn.requiredRoles, activeTurn.approvalPolicyVersion);
+    });
+
+    projectSelect.addEventListener("change", async () => {
+      await activateProject(projectSelect.value);
+      resetDraft();
+      currentStrategyCandidates = [];
+      currentRequestText = "";
+      pendingConversationCheckpoint = null;
+      renderConversationTurns(getConversationStore(projectSelect.value));
+      chatStream.scrollTop = chatStream.scrollHeight;
+    });
+
+    loadApprovalPolicy();
+    loadProjects();
+  </script>
+<!-- Workspace footer marker -->
+</body>
+</html>

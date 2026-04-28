@@ -1,0 +1,18 @@
+{
+  "response_id": "RESP-e1f66b4d-798b-4b29-8323-cc209219e04a",
+  "request_id": "GAP-1775414890298",
+  "provider_metadata": {
+    "provider": "OPENAI",
+    "model": "gpt-4.1-mini",
+    "latency_ms": 884
+  },
+  "output": {
+    "type": "text",
+    "content": "The answer is 252."
+  },
+  "usage": {
+    "prompt_tokens": 13,
+    "completion_tokens": 7
+  },
+  "status": "SUCCESS"
+}

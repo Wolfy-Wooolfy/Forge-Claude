@@ -1,0 +1,14 @@
+{
+  "draft_id": "ai_proposal_1776429347986",
+  "created_at": "2026-04-17T12:35:47.986Z",
+  "mode": "PROPOSAL",
+  "files": [
+    {
+      "path": "web/index.html",
+      "content": "Add this CSS inside the existing <style> block after the .app rule:\n\n.test-banner {\n  margin-bottom: 18px;\n  border: 1px solid #facc15;\n  border-radius: 8px;\n  background: #422006;\n  color: #fef3c7;\n  padding: 12px 14px;\n  font-weight: 700;\n}\n\nAdd this HTML immediately inside <div class=\"app\"> before <div class=\"header\">:\n\n<div class=\"test-banner\" role=\"status\">Test banner active</div>",
+      "allow_overwrite": true
+    }
+  ],
+  "approved": false,
+  "ready_for_decision": false
+}

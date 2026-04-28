@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Vision Coverage Matrix Schema v1",
+  "type": "object",
+  "required": [
+    "timestamp_utc",
+    "vision_requirements_count",
+    "mapped_documents_count",
+    "unmapped_vision_requirements",
+    "mapping"
+  ],
+  "properties": {
+    "timestamp_utc": {
+      "type": "string"
+    },
+    "vision_requirements_count": {
+      "type": "integer"
+    },
+    "mapped_documents_count": {
+      "type": "integer"
+    },
+    "unmapped_vision_requirements": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "mapping": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "vision_clause_id",
+          "source_section",
+          "mapped_document_id"
+        ],
+        "properties": {
+          "vision_clause_id": { "type": "string" },
+          "source_section": { "type": "string" },
+          "mapped_document_id": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

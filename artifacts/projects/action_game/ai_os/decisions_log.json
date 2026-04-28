@@ -1,0 +1,9 @@
+[
+  {
+    "entry_type": "OPTION_DECISION",
+    "selected_option_id": "OPTION-1",
+    "decision_owner": "CTO",
+    "rationale": "Start with Endless Runner MVP because it matches the Action game direction and enables faster playable validation.",
+    "created_at": "2026-04-25T18:44:40.470Z"
+  }
+]

@@ -1,0 +1,46 @@
+{
+  "version": "1.1",
+  "available_roles": [
+    "viewer",
+    "developer",
+    "tech_lead",
+    "cto"
+  ],
+  "default_required_roles": [
+    "cto"
+  ],
+  "max_files_per_decision": 10,
+  "max_total_bytes_per_decision": 200000,
+  "path_rules": [
+    {
+      "match_prefix": "artifacts/llm/",
+      "required_roles": [
+        "developer",
+        "tech_lead",
+        "cto"
+      ]
+    },
+    {
+      "match_prefix": "code/tools/",
+      "required_roles": [
+        "developer",
+        "tech_lead",
+        "cto"
+      ]
+    },
+    {
+      "match_prefix": "web/",
+      "required_roles": [
+        "tech_lead",
+        "cto"
+      ]
+    },
+    {
+      "match_prefix": "code/",
+      "required_roles": [
+        "tech_lead",
+        "cto"
+      ]
+    }
+  ]
+}

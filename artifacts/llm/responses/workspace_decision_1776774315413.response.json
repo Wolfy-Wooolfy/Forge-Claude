@@ -1,0 +1,9 @@
+{
+  "summary": "Generated proposal based on AI analysis",
+  "files": [
+    {
+      "path": "web/index.html",
+      "content": "<button id=\"newButton\">Click Me</button>"
+    }
+  ]
+}

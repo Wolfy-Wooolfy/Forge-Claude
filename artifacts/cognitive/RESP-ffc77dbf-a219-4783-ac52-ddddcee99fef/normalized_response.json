@@ -1,0 +1,18 @@
+{
+  "response_id": "RESP-ffc77dbf-a219-4783-ac52-ddddcee99fef",
+  "request_id": "TRACE-1775414887833",
+  "provider_metadata": {
+    "provider": "OPENAI",
+    "model": "gpt-4.1-mini",
+    "latency_ms": 2416
+  },
+  "output": {
+    "type": "text",
+    "content": "You seem to have provided some numbers related to a project or system:\n\n- requirements_count: 579\n- code_units_count: 23\n- artifacts_count: 69\n\nCould you please clarify what you'd like me to do with this information? For example, are you asking for a summary, analysis, visualization, or something else?"
+  },
+  "usage": {
+    "prompt_tokens": 25,
+    "completion_tokens": 69
+  },
+  "status": "SUCCESS"
+}

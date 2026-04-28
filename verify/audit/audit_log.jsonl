@@ -1,0 +1,1 @@
+{"ts":"2026-02-23T09:19:58.270Z","type":"TEST_AUDIT_EVENT","payload":{"argv":["TEST_AUDIT_EVENT","999"],"cwd":"D:\\S\\Halo\\Tech\\halo-personal-autonomous-pipeline","node":"v22.17.1","script":"verify/audit/audit_logger.js","env":{"HALO_AUTONOMY":"","HALO_MAX_STEPS":""}}}

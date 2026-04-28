@@ -1,0 +1,620 @@
+[
+  {
+    "timestamp": "2026-04-06T12:28:55.182Z",
+    "input": "A platform that analyzes football player performance using AI from mobile-recorded videos. \r\nIt extracts movement data, evaluates skills like speed, agility, and decision-making, and connects players with clubs, scouts, and agents globally. \r\nThe platform includes player profiles, market value estimation, and performance reports.",
+    "decision": {
+      "project_summary": "An AI-powered platform that analyzes football player performance from mobile-recorded videos, extracting movement and skill data, evaluating abilities, and connecting players with clubs, scouts, and agents. Features include player profiles, market value estimation, and performance reports.",
+      "should_build_now": true,
+      "confidence": 82,
+      "first_mvp_scope": [
+        "Mobile video upload and processing for extracting basic movement and skill metrics (speed, agility)",
+        "Player profile creation with shareable performance reports"
+      ],
+      "core_value_proposition": "Democratizes access to professional football scouting by enabling players worldwide to showcase their skills objectively through AI-analyzed video, bridging the gap between undiscovered talent and recruiters.",
+      "biggest_risk": "Achieving reliable and accurate AI analysis from diverse, low-quality mobile videos across different environments.",
+      "fastest_path_to_money": "Charge players a fee for premium performance reports and direct exposure to scouts/agents; offer clubs/scouts a subscription for access to the talent database.",
+      "recommended_target_user": "Aspiring football players aged 14-22 in regions with limited scouting infrastructure (e.g., Africa, South America, Southeast Asia).",
+      "execution_difficulty": "HIGH",
+      "killer_insight": "Partnering early with local football academies and leagues can provide a steady stream of structured video data, improving AI accuracy and building initial trust in the platform."
+    }
+  },
+  {
+    "timestamp": "2026-04-06T12:31:20.376Z",
+    "input": "A platform that helps small factories in Egypt reduce waste and production losses using AI. It collects simple daily production data, detects abnormal waste patterns, predicts machine downtime, and gives managers actionable recommendations to improve efficiency and reduce cost.",
+    "decision": {
+      "project_summary": "An AI-driven platform aimed at small factories in Egypt to minimize waste and production losses by collecting daily production data, detecting abnormal waste, predicting machine downtime, and providing actionable recommendations to managers.",
+      "should_build_now": true,
+      "confidence": 85,
+      "first_mvp_scope": [
+        "Simple daily production data entry interface for factory staff",
+        "Automated detection and alerting of abnormal waste patterns"
+      ],
+      "core_value_proposition": "Empowers small factories to quickly identify and address inefficiencies, reducing costs and improving productivity through accessible AI insights.",
+      "biggest_risk": "Low data quality or inconsistent data entry from factory staff may limit AI effectiveness and actionable insights.",
+      "fastest_path_to_money": "Offer a subscription-based SaaS model with a free trial, targeting factory owners and managers with immediate cost-saving insights.",
+      "recommended_target_user": "Owners and production managers of small to medium-sized factories in Egypt's manufacturing sector.",
+      "execution_difficulty": "MEDIUM",
+      "killer_insight": "Partnering with local industrial consultants or equipment suppliers can accelerate trust and adoption, overcoming initial skepticism about AI solutions in traditional factories."
+    }
+  },
+  {
+    "timestamp": "2026-04-06T12:35:41.043Z",
+    "input": "A system for residential compounds and property developers in Egypt that uses AI to predict customer complaints, detect service delays, and help management improve resident satisfaction. It analyzes maintenance tickets, call center logs, and service response times to identify patterns and recommend actions.",
+    "decision": {
+      "project_summary": "An AI-driven platform for residential compounds and property developers in Egypt that analyzes maintenance tickets, call center logs, and service response times to predict customer complaints, detect service delays, and recommend management actions to improve resident satisfaction.",
+      "should_build_now": true,
+      "confidence": 82,
+      "first_mvp_scope": [
+        "Automated analysis of maintenance tickets to detect recurring issues and service delays",
+        "Dashboard for management with actionable recommendations to improve response times and resident satisfaction"
+      ],
+      "core_value_proposition": "Enables property managers to proactively address resident issues, reduce service delays, and boost satisfaction by leveraging AI-driven insights from operational data.",
+      "biggest_risk": "Limited access to high-quality, structured historical data from property developers and compounds, which may hinder AI model accuracy and adoption.",
+      "fastest_path_to_money": "Offer the platform as a SaaS solution to mid-to-large residential compounds and property developers, charging a monthly subscription fee for analytics and actionable insights.",
+      "recommended_target_user": "Operations and facility managers at mid-to-large residential compounds and property development companies in Egypt.",
+      "execution_difficulty": "MEDIUM",
+      "killer_insight": "Partnering early with a few flagship compounds to co-develop and validate the system can unlock both data access and rapid credibility in the market."
+    }
+  },
+  {
+    "timestamp": "2026-04-06T12:38:48.026Z",
+    "input": "Build a practical MVP for an AI platform for small factories in Egypt.\r\n\r\nThe MVP must be simple, fast to build, and capable of delivering visible value from the first use.\r\n\r\nThe system should:\r\n- allow daily production data entry\r\n- detect abnormal waste patterns\r\n- alert managers when waste exceeds normal levels\r\n- provide simple recommendations to reduce waste\r\n\r\nReturn the MVP as a business-and-product definition, not code.",
+    "decision": {
+      "project_summary": "An AI-powered platform tailored for small factories in Egypt, enabling daily production data entry, automatic detection of abnormal waste patterns, real-time alerts for excessive waste, and actionable recommendations to reduce waste. The MVP focuses on simplicity, rapid deployment, and immediate value delivery.",
+      "should_build_now": true,
+      "confidence": 85,
+      "first_mvp_scope": [
+        "Daily production and waste data entry interface (web/mobile)",
+        "Automated detection of abnormal waste patterns with threshold-based alerts",
+        "Manager notification system (SMS/WhatsApp/email) for waste anomalies",
+        "Basic recommendation engine suggesting top 3 actions to reduce waste"
+      ],
+      "core_value_proposition": "Immediate reduction of production waste and cost through real-time monitoring, actionable insights, and easy-to-use tools designed for non-technical factory managers.",
+      "biggest_risk": "Low data quality or inconsistent data entry by factory staff, which can undermine AI accuracy and perceived value.",
+      "fastest_path_to_money": "Offer a free trial with rapid onboarding, then charge a monthly subscription per factory for continued access to alerts and recommendations.",
+      "recommended_target_user": "Owners and managers of small manufacturing factories in Egypt with limited technical resources and high sensitivity to operational costs.",
+      "execution_difficulty": "MEDIUM",
+      "killer_insight": "Embedding the data entry and alert system into WhatsApp (already widely used in Egypt) can dramatically increase adoption and data consistency, bypassing the need for complex onboarding or training."
+    }
+  },
+  {
+    "timestamp": "2026-04-09T11:06:50.876Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1775732810861",
+    "workspace_id": "personal",
+    "project_id": "forge-personal-autonomous-pipeline",
+    "request": "Create a new file at code/test_workspace_integration.js with simple content:\nconsole.log(\"Workspace → Forge integration test successful\");\nallow_overwrite = true",
+    "queued_files": [
+      "code/test_workspace_integration.js"
+    ]
+  },
+  {
+    "timestamp": "2026-04-09T13:31:11.500Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1775741471468",
+    "workspace_id": "personal",
+    "project_id": "forge-personal-autonomous-pipeline",
+    "request": "Overwrite file code/test_workspace_integration.js with:\nconsole.log(\"Workspace → Forge integration test successful v2\");\nallow_overwrite = true",
+    "queued_files": [
+      "code/test_workspace_integration.js"
+    ]
+  },
+  {
+    "timestamp": "2026-04-10T16:51:28.109Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1775839888108",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.0",
+    "workspace_id": "personal",
+    "project_id": "forge-personal-autonomous-pipeline",
+    "request": "Overwrite file code/test_workspace_integration.js with:\nconsole.log(\"Workspace → Forge role-based approval test successful v3\");\nallow_overwrite = true",
+    "queued_files": [
+      "code/test_workspace_integration.js"
+    ]
+  },
+  {
+    "timestamp": "2026-04-10T17:15:23.036Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1775841323000",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "MULTI_FILE",
+    "file_count": 2,
+    "total_bytes": 56,
+    "workspace_id": "personal",
+    "project_id": "forge-personal-autonomous-pipeline",
+    "request": "Create two new files:\n1) code/test_multi_file_a.js with:\nconsole.log(\"Multi-file A\");\n2) code/test_multi_file_b.js with:\nconsole.log(\"Multi-file B\");\nallow_overwrite = true",
+    "queued_files": [
+      "code/test_multi_file_a.js",
+      "code/test_multi_file_b.js"
+    ]
+  },
+  {
+    "timestamp": "2026-04-10T19:00:56.705Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1775847656703",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 76,
+    "workspace_id": "personal",
+    "project_id": "forge-personal-autonomous-pipeline",
+    "request": "Overwrite file code/test_workspace_integration.js with:\nconsole.log(\"Web UI → External API → Forge runtime test successful v4\");\nallow_overwrite = true",
+    "queued_files": [
+      "code/test_workspace_integration.js"
+    ]
+  },
+  {
+    "timestamp": "2026-04-11T13:57:35.602Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1775915855601",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 43,
+    "workspace_id": "personal",
+    "project_id": "forge-personal-autonomous-pipeline",
+    "request": "create a simple test modification",
+    "queued_files": [
+      "code/test_workspace_integration.js"
+    ]
+  },
+  {
+    "timestamp": "2026-04-11T16:33:49.974Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1775925229972",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 43,
+    "workspace_id": "personal",
+    "project_id": "forge-personal-autonomous-pipeline",
+    "request": "create a simple test modification",
+    "queued_files": [
+      "code/test_workspace_integration.js"
+    ]
+  },
+  {
+    "timestamp": "2026-04-13T12:14:49.208Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1776082489173",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 94,
+    "workspace_id": "personal",
+    "project_id": "forge-personal-autonomous-pipeline",
+    "request": "create simple test file",
+    "queued_files": [
+      "code/test_workspace_integration.js"
+    ]
+  },
+  {
+    "timestamp": "2026-04-13T12:18:17.286Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1776082697285",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 94,
+    "workspace_id": "personal",
+    "project_id": "forge-personal-autonomous-pipeline",
+    "request": "create simple test file",
+    "queued_files": [
+      "code/test_workspace_integration.js"
+    ]
+  },
+  {
+    "timestamp": "2026-04-13T12:20:21.944Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1776082821942",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 94,
+    "workspace_id": "personal",
+    "project_id": "forge-personal-autonomous-pipeline",
+    "request": "create simple test file",
+    "queued_files": [
+      "code/test_workspace_integration.js"
+    ]
+  },
+  {
+    "timestamp": "2026-04-13T12:34:43.351Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1776083683350",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 94,
+    "workspace_id": "personal",
+    "project_id": "forge-personal-autonomous-pipeline",
+    "request": "create simple test file",
+    "queued_files": [
+      "code/test_workspace_integration.js"
+    ]
+  },
+  {
+    "timestamp": "2026-04-13T12:36:45.415Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1776083805414",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 94,
+    "workspace_id": "personal",
+    "project_id": "forge-personal-autonomous-pipeline",
+    "request": "create simple test file",
+    "queued_files": [
+      "code/test_workspace_integration.js"
+    ]
+  },
+  {
+    "timestamp": "2026-04-13T12:38:59.623Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1776083939622",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 94,
+    "workspace_id": "personal",
+    "project_id": "forge-personal-autonomous-pipeline",
+    "request": "create simple test file",
+    "queued_files": [
+      "code/test_workspace_integration.js"
+    ]
+  },
+  {
+    "timestamp": "2026-04-13T12:43:31.820Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1776084211819",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 94,
+    "workspace_id": "personal",
+    "project_id": "forge-personal-autonomous-pipeline",
+    "request": "create simple test file",
+    "queued_files": [
+      "code/test_workspace_integration.js"
+    ]
+  },
+  {
+    "timestamp": "2026-04-13T12:47:30.476Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1776084450474",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 94,
+    "workspace_id": "personal",
+    "project_id": "forge-personal-autonomous-pipeline",
+    "request": "create simple test file",
+    "queued_files": [
+      "code/test_workspace_integration.js"
+    ]
+  },
+  {
+    "timestamp": "2026-04-13T13:21:24.967Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1776086484965",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 132,
+    "workspace_id": "personal",
+    "project_id": "forge-personal-autonomous-pipeline",
+    "request": "create simple test file with message alpha",
+    "queued_files": [
+      "code/test_workspace_integration.js"
+    ]
+  },
+  {
+    "timestamp": "2026-04-13T13:32:40.873Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1776087160871",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 130,
+    "workspace_id": "personal",
+    "project_id": "forge-personal-autonomous-pipeline",
+    "request": "create simple test file with message beta",
+    "queued_files": [
+      "code/test_workspace_integration.js"
+    ]
+  },
+  {
+    "timestamp": "2026-04-13T13:46:14.094Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1776087974091",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 132,
+    "workspace_id": "personal",
+    "project_id": "forge-personal-autonomous-pipeline",
+    "request": "create simple test file with message gamma",
+    "queued_files": [
+      "code/test_workspace_integration.js"
+    ]
+  },
+  {
+    "timestamp": "2026-04-13T17:48:51.234Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1776102531233",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 132,
+    "workspace_id": "personal",
+    "project_id": "forge-personal-autonomous-pipeline",
+    "request": "create simple test file with message delta",
+    "queued_files": [
+      "code/test_workspace_integration.js"
+    ]
+  },
+  {
+    "timestamp": "2026-04-17T15:35:08.283Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1776440108278",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 51042,
+    "workspace_id": "personal",
+    "project_id": "forge-personal-autonomous-pipeline",
+    "request": "add a small comment at the top of web/index.html",
+    "queued_files": [
+      "web/index.html"
+    ]
+  },
+  {
+    "timestamp": "2026-04-17T15:35:40.462Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1776440140459",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 51042,
+    "workspace_id": "personal",
+    "project_id": "forge-personal-autonomous-pipeline",
+    "request": "add a small comment at the top of web/index.html",
+    "queued_files": [
+      "web/index.html"
+    ]
+  },
+  {
+    "timestamp": "2026-04-18T11:08:32.044Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1776510512040",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 49480,
+    "workspace_id": "personal",
+    "project_id": "forge-personal-autonomous-pipeline",
+    "request": "add a different small comment at the top of web/index.html saying Main web app shell",
+    "queued_files": [
+      "web/index.html"
+    ]
+  },
+  {
+    "timestamp": "2026-04-18T11:09:05.385Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1776510545382",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 49480,
+    "workspace_id": "personal",
+    "project_id": "forge-personal-autonomous-pipeline",
+    "request": "add a different small comment at the top of web/index.html saying Main web app shell",
+    "queued_files": [
+      "web/index.html"
+    ]
+  },
+  {
+    "timestamp": "2026-04-18T11:18:18.726Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1776511098722",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 49480,
+    "workspace_id": "personal",
+    "project_id": "forge-personal-autonomous-pipeline",
+    "request": "add a different small comment at the top of web/index.html saying Main web app shell",
+    "queued_files": [
+      "web/index.html"
+    ]
+  },
+  {
+    "timestamp": "2026-04-18T11:34:01.082Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1776512041080",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 47878,
+    "workspace_id": "personal",
+    "project_id": "forge-personal-autonomous-pipeline",
+    "request": "add a small comment just before the closing </body> tag in web/index.html saying Workspace footer marker",
+    "queued_files": [
+      "web/index.html"
+    ]
+  },
+  {
+    "timestamp": "2026-04-19T19:06:09.189Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1776625569174",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 46873,
+    "workspace_id": "personal",
+    "project_id": "default_project",
+    "request": "edit this file to add logging",
+    "queued_files": [
+      "web/index.html"
+    ]
+  },
+  {
+    "timestamp": "2026-04-21T12:25:15.449Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1776774315413",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 40,
+    "workspace_id": "personal",
+    "project_id": "test_project",
+    "request": "add a button to the UI",
+    "queued_files": [
+      "web/index.html"
+    ]
+  },
+  {
+    "timestamp": "2026-04-21T12:44:00.411Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1776775440375",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 51438,
+    "workspace_id": "personal",
+    "project_id": "test_project_3",
+    "request": "add a button to the UI",
+    "queued_files": [
+      "web/index.html"
+    ]
+  }
+]

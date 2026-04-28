@@ -1,0 +1,15 @@
+{
+  "session_id": "ai_analysis_1776430396411",
+  "created_at": "2026-04-17T12:53:16.411Z",
+  "mode": "ANALYSIS",
+  "messages": [
+    {
+      "role": "user",
+      "content": "add a footer section with copyright text to web/index.html"
+    },
+    {
+      "role": "assistant",
+      "content": "Analysis completed in read-only mode with context and analysis artifacts generated."
+    }
+  ]
+}

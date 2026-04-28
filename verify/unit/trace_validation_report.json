@@ -1,0 +1,17 @@
+{
+  "report_id": "TRACE_VALIDATION_REPORT_v1",
+  "generated_at": "2026-02-22T12:16:35.829Z",
+  "input_artifact": "artifacts/stage_C/code_trace_matrix.md",
+  "output_artifact": "verify/unit/trace_validation_report.json",
+  "summary": {
+    "total_rows": 26,
+    "code_ref_entries": 26,
+    "code_files_checked": 26,
+    "missing_code_files": 0,
+    "must_issues": 0,
+    "should_issues": 0,
+    "info_issues": 0
+  },
+  "issues": [],
+  "missing_code_files": []
+}

@@ -1,0 +1,84 @@
+{
+  "response_id": "RESP-ffc77dbf-a219-4783-ac52-ddddcee99fef",
+  "request_id": "TRACE-1775414887833",
+  "status": "SUCCESS",
+  "payload": {
+    "output": "You seem to have provided some numbers related to a project or system:\n\n- requirements_count: 579\n- code_units_count: 23\n- artifacts_count: 69\n\nCould you please clarify what you'd like me to do with this information? For example, are you asking for a summary, analysis, visualization, or something else?",
+    "raw_provider_response": {
+      "id": "resp_050c9d259507a2ec0069d2ae68ca2881968332f6700a76d11c",
+      "object": "response",
+      "created_at": 1775414888,
+      "status": "completed",
+      "background": false,
+      "billing": {
+        "payer": "developer"
+      },
+      "completed_at": 1775414890,
+      "error": null,
+      "frequency_penalty": 0,
+      "incomplete_details": null,
+      "instructions": null,
+      "max_output_tokens": 1000,
+      "max_tool_calls": null,
+      "model": "gpt-4.1-mini-2025-04-14",
+      "output": [
+        {
+          "id": "msg_050c9d259507a2ec0069d2ae699c2c8196b4809be088eb0a48",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "You seem to have provided some numbers related to a project or system:\n\n- requirements_count: 579\n- code_units_count: 23\n- artifacts_count: 69\n\nCould you please clarify what you'd like me to do with this information? For example, are you asking for a summary, analysis, visualization, or something else?"
+            }
+          ],
+          "role": "assistant"
+        }
+      ],
+      "parallel_tool_calls": true,
+      "presence_penalty": 0,
+      "previous_response_id": null,
+      "prompt_cache_key": null,
+      "prompt_cache_retention": null,
+      "reasoning": {
+        "effort": null,
+        "summary": null
+      },
+      "safety_identifier": null,
+      "service_tier": "default",
+      "store": true,
+      "temperature": 1,
+      "text": {
+        "format": {
+          "type": "text"
+        },
+        "verbosity": "medium"
+      },
+      "tool_choice": "auto",
+      "tools": [],
+      "top_logprobs": 0,
+      "top_p": 1,
+      "truncation": "disabled",
+      "usage": {
+        "input_tokens": 25,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 69,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 94
+      },
+      "user": null,
+      "metadata": {}
+    },
+    "token_usage": {
+      "input_tokens": 25,
+      "output_tokens": 69
+    },
+    "provider_latency_ms": 2416
+  }
+}

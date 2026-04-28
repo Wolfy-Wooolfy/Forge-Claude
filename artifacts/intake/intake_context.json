@@ -1,0 +1,12 @@
+{
+  "operating_mode": "IMPROVE",
+  "repository_state": "MIXED",
+  "docs_present": true,
+  "code_present": true,
+  "artifacts_present": true,
+  "request_present": false,
+  "blocked": false,
+  "classification_reasoning": [
+    "existing code or docs detected"
+  ]
+}

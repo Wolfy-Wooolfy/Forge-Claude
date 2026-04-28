@@ -1,0 +1,4 @@
+{
+  "project_id": "mobile_game",
+  "content": "# Mobile Game MVP\n\n## Overview\nThis project is a simple mobile game MVP designed to validate gameplay mechanics.\n\n## Core Features\n- Basic player movement\n- Simple level system\n- Score tracking\n\n## Goal\nValidate engagement and gameplay before scaling."
+}

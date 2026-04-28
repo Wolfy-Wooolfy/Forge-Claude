@@ -1,0 +1,127 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Forge - Verification Evidence Schema v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "verification_id",
+    "generated_at",
+    "environment",
+    "commands",
+    "results",
+    "artifacts",
+    "status"
+  ],
+  "properties": {
+    "verification_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "generated_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "os",
+        "node_version",
+        "package_manager",
+        "working_directory"
+      ],
+      "properties": {
+        "os": { "type": "string", "minLength": 1 },
+        "node_version": { "type": "string", "minLength": 1 },
+        "package_manager": { "type": "string", "minLength": 1 },
+        "working_directory": { "type": "string", "minLength": 1 }
+      }
+    },
+    "commands": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["cwd", "command", "args"],
+        "properties": {
+          "cwd": { "type": "string", "minLength": 1 },
+          "command": { "type": "string", "minLength": 1 },
+          "args": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "results": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "build",
+        "tests",
+        "lint",
+        "runtime_smoke"
+      ],
+      "properties": {
+        "build": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["ran", "passed"],
+          "properties": {
+            "ran": { "type": "boolean" },
+            "passed": { "type": "boolean" },
+            "output_ref": { "type": "string", "pattern": "^artifacts/.*" }
+          }
+        },
+        "tests": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["ran", "passed"],
+          "properties": {
+            "ran": { "type": "boolean" },
+            "passed": { "type": "boolean" },
+            "total": { "type": "integer", "minimum": 0 },
+            "passed_count": { "type": "integer", "minimum": 0 },
+            "failed_count": { "type": "integer", "minimum": 0 },
+            "output_ref": { "type": "string", "pattern": "^artifacts/.*" }
+          }
+        },
+        "lint": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["ran", "passed"],
+          "properties": {
+            "ran": { "type": "boolean" },
+            "passed": { "type": "boolean" },
+            "output_ref": { "type": "string", "pattern": "^artifacts/.*" }
+          }
+        },
+        "runtime_smoke": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["ran", "passed"],
+          "properties": {
+            "ran": { "type": "boolean" },
+            "passed": { "type": "boolean" },
+            "output_ref": { "type": "string", "pattern": "^artifacts/.*" }
+          }
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^artifacts/.*"
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["PASS", "FAIL", "BLOCKED"]
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}

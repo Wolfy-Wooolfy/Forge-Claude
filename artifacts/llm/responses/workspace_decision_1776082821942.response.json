@@ -1,0 +1,9 @@
+{
+  "summary": "Decision packet created successfully.",
+  "files": [
+    {
+      "path": "code/test_workspace_integration.js",
+      "content": "// Generated from request:\n// create simple test file\n\nconsole.log(\"create simple test file\");"
+    }
+  ]
+}

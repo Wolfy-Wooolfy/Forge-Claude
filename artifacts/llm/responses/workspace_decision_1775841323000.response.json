@@ -1,0 +1,13 @@
+{
+  "summary": "Created two new files: test_multi_file_a.js and test_multi_file_b.js in the code directory.",
+  "files": [
+    {
+      "path": "code/test_multi_file_a.js",
+      "content": "console.log(\"Multi-file A\");"
+    },
+    {
+      "path": "code/test_multi_file_b.js",
+      "content": "console.log(\"Multi-file B\");"
+    }
+  ]
+}

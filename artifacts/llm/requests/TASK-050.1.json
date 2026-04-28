@@ -1,0 +1,28 @@
+{
+  "request_id": "TRACE-1775414887833",
+  "task_id": "TASK-050",
+  "attempt_number": 1,
+  "timestamp": "2026-04-05T18:48:07.833Z",
+  "task_context": {
+    "task_id": "TASK-050",
+    "module": "TRACE"
+  },
+  "input": {
+    "type": "structured",
+    "content": {
+      "requirements_count": 579,
+      "code_units_count": 23,
+      "artifacts_count": 69
+    }
+  },
+  "constraints": {
+    "deterministic": true,
+    "max_tokens": 1000,
+    "temperature": 0
+  },
+  "cognitive_engine_provider": "",
+  "cognitive_engine_model_id": "",
+  "template_id": "DIRECT_INPUT",
+  "template_version": "v1",
+  "template_hash": "b9bc64558339a59c590b32c24ef058d3ab30919450104cd86f82d75ed21462a2"
+}

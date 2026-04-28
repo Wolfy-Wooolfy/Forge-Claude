@@ -1,0 +1,84 @@
+{
+  "response_id": "RESP-e1f66b4d-798b-4b29-8323-cc209219e04a",
+  "request_id": "GAP-1775414890298",
+  "status": "SUCCESS",
+  "payload": {
+    "output": "The answer is 252.",
+    "raw_provider_response": {
+      "id": "resp_0fcd078a65b24f3f0069d2ae6a9d0881979325fbad2dbd0d95",
+      "object": "response",
+      "created_at": 1775414890,
+      "status": "completed",
+      "background": false,
+      "billing": {
+        "payer": "developer"
+      },
+      "completed_at": 1775414891,
+      "error": null,
+      "frequency_penalty": 0,
+      "incomplete_details": null,
+      "instructions": null,
+      "max_output_tokens": 1000,
+      "max_tool_calls": null,
+      "model": "gpt-4.1-mini-2025-04-14",
+      "output": [
+        {
+          "id": "msg_0fcd078a65b24f3f0069d2ae6b01148197afa7441ed5a80dcc",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "The answer is 252."
+            }
+          ],
+          "role": "assistant"
+        }
+      ],
+      "parallel_tool_calls": true,
+      "presence_penalty": 0,
+      "previous_response_id": null,
+      "prompt_cache_key": null,
+      "prompt_cache_retention": null,
+      "reasoning": {
+        "effort": null,
+        "summary": null
+      },
+      "safety_identifier": null,
+      "service_tier": "default",
+      "store": true,
+      "temperature": 1,
+      "text": {
+        "format": {
+          "type": "text"
+        },
+        "verbosity": "medium"
+      },
+      "tool_choice": "auto",
+      "tools": [],
+      "top_logprobs": 0,
+      "top_p": 1,
+      "truncation": "disabled",
+      "usage": {
+        "input_tokens": 13,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 7,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 20
+      },
+      "user": null,
+      "metadata": {}
+    },
+    "token_usage": {
+      "input_tokens": 13,
+      "output_tokens": 7
+    },
+    "provider_latency_ms": 884
+  }
+}

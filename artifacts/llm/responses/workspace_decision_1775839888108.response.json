@@ -1,0 +1,9 @@
+{
+  "summary": "Overwrite test_workspace_integration.js with updated console log for role-based approval test.",
+  "files": [
+    {
+      "path": "code/test_workspace_integration.js",
+      "content": "console.log(\"Workspace → Forge role-based approval test successful v3\");"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "proposal_id": "ai_proposal_1776774901890",
+  "project_id": "test_project_2",
+  "created_at": "2026-04-21T12:35:01.890Z",
+  "mode": "PROPOSAL",
+  "request": "add a button to the UI",
+  "description": "Generated proposal based on AI analysis",
+  "impact": "LOW",
+  "execution_required": true,
+  "execution_approved": false,
+  "generation_strategy": "HTML_BUTTON_CREATE",
+  "target_file": "web/index.html",
+  "target_files": [
+    "web/index.html"
+  ],
+  "operation_mode": "SINGLE_FILE",
+  "selected_strategy": {
+    "strategy_id": "HTML_BUTTON_CREATE",
+    "title": "Add HTML button",
+    "score": 0.9,
+    "target_file": "web/index.html",
+    "rationale": "The request targets the UI and explicitly mentions a button."
+  },
+  "strategy_candidates": [
+    {
+      "strategy_id": "HTML_BUTTON_CREATE",
+      "title": "Add HTML button",
+      "score": 0.9,
+      "target_file": "web/index.html",
+      "rationale": "The request targets the UI and explicitly mentions a button."
+    }
+  ]
+}

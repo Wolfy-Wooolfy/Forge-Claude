@@ -1,0 +1,20 @@
+{
+  "project_id": "mobile_game",
+  "options": [
+    {
+      "option_id": "OPTION-1",
+      "title": "Casual Puzzle MVP",
+      "description": "Offline Android casual puzzle MVP with levels, score system, ads monetization, and no login.",
+      "impact_level": "HIGH",
+      "risk_level": "LOW"
+    },
+    {
+      "option_id": "OPTION-2",
+      "title": "Advanced Puzzle Game",
+      "description": "More advanced puzzle game with online features, login, progression, and expandable monetization.",
+      "impact_level": "HIGH",
+      "risk_level": "MEDIUM"
+    }
+  ],
+  "recommendation": "Start with OPTION-1 because it matches the clarification answers and reduces execution risk."
+}

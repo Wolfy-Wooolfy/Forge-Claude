@@ -1,0 +1,98 @@
+{
+  "decision_id": "MODULE_FLOW_DECISION_GATE",
+  "timestamp": "2026-04-25T19:45:38.597Z",
+  "task": "TASK-052",
+  "policy": "AUTONOMOUS_BY_DEFAULT_FAIL_CLOSED_ON_RISK",
+  "operating_mode": "IMPROVE",
+  "repository_state": "MIXED",
+  "override_mode": "UNSPECIFIED",
+  "override_source": "NONE",
+  "override_raw": "",
+  "source": {
+    "source_type": "EXECUTION_PACKAGE",
+    "execution_package_path": "artifacts/projects/action_game/execute/execution_package.json",
+    "execution_package_id": "ai_os_package_1777146184959",
+    "execution_package_execution_id": "ai_os_execution_1777146184959",
+    "execution_package_sha256": "c548555366600ca78dfcaf80377158d100b8868e1004c4446ffee9db35fd76b8",
+    "workspace_response_path": "artifacts/llm/responses/ai_os_execution_1777146184959.response.json",
+    "intake_context_path": "artifacts/intake/intake_context.json",
+    "intake_context_sha256": "eb7d916b8d4f116e100ab3b98461c00b9ac7e178fa844804e887416356b2bf84"
+  },
+  "summary": {
+    "total_actions": 3,
+    "approved_count": 3,
+    "review_required_count": 0,
+    "rejected_count": 0
+  },
+  "approved_actions": [
+    {
+      "gap_id": "WORKSPACE_CHANGE_REQUEST",
+      "category": "WORKSPACE_CHANGE_REQUEST",
+      "severity": "MEDIUM",
+      "affected_entities": [
+        "artifacts/projects/action_game/output/index.html"
+      ],
+      "action_id": "WORKSPACE_ACTION_1",
+      "description": "Apply governed workspace execution package to artifacts/projects/action_game/output/index.html",
+      "impact_scope": "CODE_WRITE",
+      "requires_decision": false,
+      "cognitive_priority_hint": null,
+      "reason": "governed workspace decision packet approved",
+      "workspace_source": "EXTERNAL_AI_WORKSPACE",
+      "workspace_execution_id": "ai_os_execution_1777146184959",
+      "workspace_execution_package_id": "ai_os_package_1777146184959",
+      "workspace_execution_package_path": "artifacts/projects/action_game/execute/execution_package.json",
+      "workspace_response_path": "artifacts/llm/responses/ai_os_execution_1777146184959.response.json",
+      "workspace_allow_overwrite": false,
+      "workspace_expected_sha256": "e79c4875e22fcf6ec36e9a5442f5bb9fca0d51a94c74a52f7fd8d7c08de1566a",
+      "workspace_target_path": "artifacts/projects/action_game/output/index.html"
+    },
+    {
+      "gap_id": "WORKSPACE_CHANGE_REQUEST",
+      "category": "WORKSPACE_CHANGE_REQUEST",
+      "severity": "MEDIUM",
+      "affected_entities": [
+        "artifacts/projects/action_game/output/style.css"
+      ],
+      "action_id": "WORKSPACE_ACTION_2",
+      "description": "Apply governed workspace execution package to artifacts/projects/action_game/output/style.css",
+      "impact_scope": "CODE_WRITE",
+      "requires_decision": false,
+      "cognitive_priority_hint": null,
+      "reason": "governed workspace decision packet approved",
+      "workspace_source": "EXTERNAL_AI_WORKSPACE",
+      "workspace_execution_id": "ai_os_execution_1777146184959",
+      "workspace_execution_package_id": "ai_os_package_1777146184959",
+      "workspace_execution_package_path": "artifacts/projects/action_game/execute/execution_package.json",
+      "workspace_response_path": "artifacts/llm/responses/ai_os_execution_1777146184959.response.json",
+      "workspace_allow_overwrite": false,
+      "workspace_expected_sha256": "602012d26652a7d5a7c3260176167619e7bfe477a771b38560e4f70b19b08176",
+      "workspace_target_path": "artifacts/projects/action_game/output/style.css"
+    },
+    {
+      "gap_id": "WORKSPACE_CHANGE_REQUEST",
+      "category": "WORKSPACE_CHANGE_REQUEST",
+      "severity": "MEDIUM",
+      "affected_entities": [
+        "artifacts/projects/action_game/output/game.js"
+      ],
+      "action_id": "WORKSPACE_ACTION_3",
+      "description": "Apply governed workspace execution package to artifacts/projects/action_game/output/game.js",
+      "impact_scope": "CODE_WRITE",
+      "requires_decision": false,
+      "cognitive_priority_hint": null,
+      "reason": "governed workspace decision packet approved",
+      "workspace_source": "EXTERNAL_AI_WORKSPACE",
+      "workspace_execution_id": "ai_os_execution_1777146184959",
+      "workspace_execution_package_id": "ai_os_package_1777146184959",
+      "workspace_execution_package_path": "artifacts/projects/action_game/execute/execution_package.json",
+      "workspace_response_path": "artifacts/llm/responses/ai_os_execution_1777146184959.response.json",
+      "workspace_allow_overwrite": false,
+      "workspace_expected_sha256": "50251acf3b7e1ccec8b3b765880856fb773671106ae26af7b153269240016b7c",
+      "workspace_target_path": "artifacts/projects/action_game/output/game.js"
+    }
+  ],
+  "review_required_actions": [],
+  "rejected_actions": [],
+  "blocked": false
+}

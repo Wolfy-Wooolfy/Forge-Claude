@@ -1,0 +1,50 @@
+{
+  "execution_id": "workspace_decision_1776512041080",
+  "workspace_id": "personal",
+  "project_id": "forge-personal-autonomous-pipeline",
+  "source": "EXTERNAL_AI_WORKSPACE",
+  "operation": {
+    "mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 47878
+  },
+  "approval": {
+    "policy_version": "1.1",
+    "approved_by_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approved_at": "2026-04-18T11:34:01.080Z"
+  },
+  "question": "Approve the queued workspace draft for governed deterministic application?",
+  "context_summary": "add a small comment just before the closing </body> tag in web/index.html saying Workspace footer marker",
+  "options": [
+    {
+      "option_id": "OPTION-APPROVE-WORKSPACE-DRAFT",
+      "description": "Queue the workspace draft as a governed pending change set.",
+      "impact_scope": "EXTERNAL_WORKSPACE",
+      "risk_level": "MEDIUM",
+      "downstream_effects": [
+        "Apply candidate change to web/index.html"
+      ],
+      "cognitive_priority_hint": null
+    }
+  ],
+  "recommendation_reference": "artifacts/llm/metadata/workspace_decision_1776512041080.decision.json",
+  "confirmation_required_format": "OPTION-APPROVE-WORKSPACE-DRAFT",
+  "proposed_files": [
+    {
+      "path": "web/index.html",
+      "allow_overwrite": true,
+      "sha256": "0d9083e5f2e27a8ea801d2d85b96da2763f44b3f4b6a335b92e41180ef91637a",
+      "diff": "+ <!-- Workspace footer marker -->",
+      "required_roles": [
+        "tech_lead",
+        "cto"
+      ],
+      "file_index": 1,
+      "file_count": 1
+    }
+  ]
+}

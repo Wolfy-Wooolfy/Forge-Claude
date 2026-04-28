@@ -1,0 +1,84 @@
+{
+  "response_id": "RESP-d6323289-5f9f-4eae-b64b-35565b146a8c",
+  "request_id": "GAP-1775326735544",
+  "status": "SUCCESS",
+  "payload": {
+    "output": "The completed sequence is:\n\n1, 1, 2, 3, 5, 8, 13, 21, 34\n\nThe missing numbers are 8 and 21.",
+    "raw_provider_response": {
+      "id": "resp_0d42433ca802dce50069d1561010dc81909477001a6acec312",
+      "object": "response",
+      "created_at": 1775326736,
+      "status": "completed",
+      "background": false,
+      "billing": {
+        "payer": "developer"
+      },
+      "completed_at": 1775326737,
+      "error": null,
+      "frequency_penalty": 0,
+      "incomplete_details": null,
+      "instructions": null,
+      "max_output_tokens": 1000,
+      "max_tool_calls": null,
+      "model": "gpt-4.1-mini-2025-04-14",
+      "output": [
+        {
+          "id": "msg_0d42433ca802dce50069d15610d9e08190961f1fd4d751088d",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "The completed sequence is:\n\n1, 1, 2, 3, 5, 8, 13, 21, 34\n\nThe missing numbers are 8 and 21."
+            }
+          ],
+          "role": "assistant"
+        }
+      ],
+      "parallel_tool_calls": true,
+      "presence_penalty": 0,
+      "previous_response_id": null,
+      "prompt_cache_key": null,
+      "prompt_cache_retention": null,
+      "reasoning": {
+        "effort": null,
+        "summary": null
+      },
+      "safety_identifier": null,
+      "service_tier": "default",
+      "store": true,
+      "temperature": 1,
+      "text": {
+        "format": {
+          "type": "text"
+        },
+        "verbosity": "medium"
+      },
+      "tool_choice": "auto",
+      "tools": [],
+      "top_logprobs": 0,
+      "top_p": 1,
+      "truncation": "disabled",
+      "usage": {
+        "input_tokens": 13,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 42,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 55
+      },
+      "user": null,
+      "metadata": {}
+    },
+    "token_usage": {
+      "input_tokens": 13,
+      "output_tokens": 42
+    },
+    "provider_latency_ms": 1833
+  }
+}

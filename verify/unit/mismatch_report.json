@@ -1,0 +1,14 @@
+{
+  "mismatch_report_id": "MISMATCH_REPORT_v1",
+  "generated_at": "2026-02-23T10:48:25.423Z",
+  "trace_matrix_ref": "artifacts/stage_C/code_trace_matrix.md",
+  "summary": {
+    "must_missing_count": 0,
+    "must_undocumented_count": 0,
+    "should_missing_count": 0,
+    "should_undocumented_count": 0,
+    "unresolved_total": 0,
+    "blocking": false
+  },
+  "mismatches": []
+}

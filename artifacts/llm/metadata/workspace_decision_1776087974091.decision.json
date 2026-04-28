@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "entry_type": "DECISION_PACKET",
+  "decision_packet_id": "workspace_decision_1776087974091",
+  "approver_role": "cto",
+  "required_roles": [
+    "tech_lead",
+    "cto"
+  ],
+  "approval_policy_version": "1.1",
+  "operation_mode": "SINGLE_FILE",
+  "file_count": 1,
+  "total_bytes": 132,
+  "decision_packet_paths": [
+    "artifacts/decisions/decision_packet.json",
+    "artifacts/decisions/decision_packet.md"
+  ],
+  "queued_files": [
+    "code/test_workspace_integration.js"
+  ],
+  "summary": "Decision packet created successfully.",
+  "diffs": [
+    {
+      "path": "code/test_workspace_integration.js",
+      "diff": "- console.log('AI Proposal Draft Execution');\n+ // Generated from request:\n- \n+ // create simple test file with message gamma\n- // ===== AI GENERATED ADDITION =====\n+ \n- \n+ console.log(\"create simple test file with message gamma\");\n- // Generated from request:\n- // create simple test file\n- \n- console.log(\"create simple test file\");\n- \n- // ===== AI GENERATED ADDITION =====\n- \n- // Generated from request:\n- // create simple test file\n- \n- console.log(\"create simple test file\");\n- \n- // ===== AI GENERATED ADDITION =====\n- \n- // Generated from request:\n- // create simple test file with message alpha\n- \n- console.log(\"create simple test file with message alpha\");\n- \n- // ==== AI MERGED ADDITION ====\n- \n- // Generated from request:\n- // create simple test file with message beta\n- \n- console.log(\"create simple test file with message beta\");",
+      "sha256": "db0cc5d2f6db74cb763163d253ee4705d33f000d61aa5b0b2c13b568bfe993a9"
+    }
+  ]
+}

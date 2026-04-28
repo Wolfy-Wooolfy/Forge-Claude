@@ -1,0 +1,14 @@
+{
+  "draft_id": "ai_proposal_1776428844994",
+  "created_at": "2026-04-17T12:27:24.994Z",
+  "mode": "PROPOSAL",
+  "files": [
+    {
+      "path": "web/index.html",
+      "content": "Add a visible test banner near the top of the page:\n\n<style>\n  .test-banner {\n    margin-bottom: 16px;\n    padding: 12px 16px;\n    border: 1px solid #facc15;\n    border-radius: 8px;\n    background: #422006;\n    color: #fef3c7;\n    font-weight: 700;\n    text-align: center;\n  }\n</style>\n\n<div class=\"test-banner\" role=\"status\">Test banner</div>",
+      "allow_overwrite": true
+    }
+  ],
+  "approved": false,
+  "ready_for_decision": false
+}

@@ -1,0 +1,15 @@
+{
+  "request": "Create two new files:\n1) code/test_multi_file_a.js with:\nconsole.log(\"Multi-file A\");\n2) code/test_multi_file_b.js with:\nconsole.log(\"Multi-file B\");\nallow_overwrite = true",
+  "approver_role": "cto",
+  "required_roles": [
+    "tech_lead",
+    "cto"
+  ],
+  "approval_policy_version": "1.1",
+  "operation_mode": "MULTI_FILE",
+  "file_count": 2,
+  "total_bytes": 56,
+  "approved_at": "2026-04-10T17:15:23.000Z",
+  "workspace_id": "personal",
+  "project_id": "forge-personal-autonomous-pipeline"
+}

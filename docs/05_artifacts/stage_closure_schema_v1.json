@@ -1,0 +1,97 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Forge - Stage Closure Artifact Schema v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "stage_id",
+    "closure_type",
+    "contract_clauses_satisfied",
+    "artifact_outputs",
+    "preconditions",
+    "stop_conditions",
+    "closure_conditions",
+    "loop_closure_evidence",
+    "execution_result",
+    "status"
+  ],
+  "properties": {
+    "stage_id": {
+      "type": "string",
+      "enum": ["A", "B", "C", "D"]
+    },
+    "closure_type": {
+      "type": "string",
+      "enum": ["CLOSURE", "RECLOSURE", "ROLLBACK"]
+    },
+    "contract_clauses_satisfied": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" }
+    },
+    "artifact_outputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^artifacts/.*"
+      }
+    },
+    "preconditions": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "stop_conditions": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "closure_conditions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" }
+    },
+    "loop_closure_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["loops_required", "loops_satisfied", "evidence_artifacts"],
+      "properties": {
+        "loops_required": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": ["LOOP_1", "LOOP_2", "LOOP_3"]
+          }
+        },
+        "loops_satisfied": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["LOOP_1", "LOOP_2", "LOOP_3"]
+          }
+        },
+        "evidence_artifacts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^artifacts/.*"
+          }
+        }
+      }
+    },
+    "execution_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["success", "artifacts_verified"],
+      "properties": {
+        "success": { "type": "boolean" },
+        "artifacts_verified": { "type": "boolean" },
+        "notes": { "type": "string" }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["CLOSED", "BLOCKED", "FAILED"]
+    }
+  }
+}

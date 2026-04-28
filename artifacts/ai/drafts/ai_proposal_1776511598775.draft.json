@@ -1,0 +1,24 @@
+{
+  "draft_id": "ai_proposal_1776511598775",
+  "created_at": "2026-04-18T11:26:38.775Z",
+  "mode": "PROPOSAL",
+  "files": [
+    {
+      "path": "web/index.html",
+      "content": "",
+      "operations": [
+        {
+          "type": "insert_before",
+          "find": "</body>\n</html>\n<html lang=\"en\">",
+          "replace": "",
+          "anchor": "",
+          "content": ""
+        }
+      ],
+      "diff": "--- a/web/index.html\n+++ b/web/index.html\n@@ -36,6 +36,7 @@\n     loadApprovalPolicy();\n     loadHistory();\n   </script>\n+  <!-- Workspace footer marker -->\n </body>\n </html>\n <html lang=\"en\">",
+      "allow_overwrite": true
+    }
+  ],
+  "approved": false,
+  "ready_for_decision": false
+}

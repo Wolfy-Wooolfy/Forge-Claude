@@ -1,0 +1,6 @@
+body { margin: 0; font-family: Arial, sans-serif; background: #0f172a; color: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+.game-shell { width: min(94vw, 460px); text-align: center; }
+.hud { display: flex; justify-content: space-between; margin: 12px 0; }
+canvas { width: 100%; background: linear-gradient(#1e293b, #334155); border-radius: 14px; }
+.status { min-height: 24px; }
+button { padding: 10px 16px; border: 0; border-radius: 10px; cursor: pointer; }

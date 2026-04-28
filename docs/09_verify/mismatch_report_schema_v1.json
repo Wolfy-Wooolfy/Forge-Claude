@@ -1,0 +1,136 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Forge - Mismatch Report Schema v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "mismatch_report_id",
+    "generated_at",
+    "trace_matrix_ref",
+    "summary",
+    "mismatches"
+  ],
+  "properties": {
+    "mismatch_report_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "generated_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "trace_matrix_ref": {
+      "type": "string",
+      "pattern": "^artifacts/.*"
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "must_missing_count",
+        "must_undocumented_count",
+        "should_missing_count",
+        "should_undocumented_count",
+        "unresolved_total",
+        "blocking"
+      ],
+      "properties": {
+        "must_missing_count": { "type": "integer", "minimum": 0 },
+        "must_undocumented_count": { "type": "integer", "minimum": 0 },
+        "should_missing_count": { "type": "integer", "minimum": 0 },
+        "should_undocumented_count": { "type": "integer", "minimum": 0 },
+        "unresolved_total": { "type": "integer", "minimum": 0 },
+        "blocking": { "type": "boolean" }
+      }
+    },
+    "mismatches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "mismatch_id",
+          "mismatch_type",
+          "severity",
+          "requirement_level",
+          "description",
+          "doc_refs",
+          "code_refs",
+          "status"
+        ],
+        "properties": {
+          "mismatch_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "mismatch_type": {
+            "type": "string",
+            "enum": [
+              "MISSING_IMPLEMENTATION",
+              "UNDOCUMENTED_BEHAVIOR",
+              "CONTRADICTORY_SPEC",
+              "TRACE_GAP",
+              "VERIFICATION_GAP"
+            ]
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["MUST", "SHOULD", "OPTIONAL"]
+          },
+          "requirement_level": {
+            "type": "string",
+            "enum": ["MUST", "SHOULD", "OPTIONAL"]
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "doc_refs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["path", "anchor"],
+              "properties": {
+                "path": { "type": "string", "pattern": "^docs/.*\\.(md|json)$" },
+                "anchor": { "type": "string", "minLength": 1 }
+              }
+            }
+          },
+          "code_refs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["path", "symbol", "lines"],
+              "properties": {
+                "path": { "type": "string", "minLength": 1 },
+                "symbol": { "type": "string", "minLength": 1 },
+                "lines": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["start", "end"],
+                  "properties": {
+                    "start": { "type": "integer", "minimum": 1 },
+                    "end": { "type": "integer", "minimum": 1 }
+                  }
+                }
+              }
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": ["OPEN", "RESOLVED", "WAIVED"]
+          },
+          "resolution_ref": {
+            "type": "string",
+            "pattern": "^artifacts/.*"
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

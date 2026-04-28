@@ -1,0 +1,13 @@
+{
+  "execution_id": "ai_os_execution_1777124853854",
+  "source": "AI_OPERATING_SYSTEM",
+  "project_id": "mobile_game",
+  "created_at": "2026-04-25T13:47:33.854Z",
+  "summary": "Create first generated project artifact from AI OS handoff.",
+  "files": [
+    {
+      "path": "artifacts/projects/mobile_game/output/index.html",
+      "content": "<!doctype html>\n<html>\n<head><meta charset=\"utf-8\"><title>Mobile Game MVP</title></head>\n<body><h1>Mobile Game MVP</h1><p>Generated through AI OS handoff to Forge.</p></body>\n</html>"
+    }
+  ]
+}

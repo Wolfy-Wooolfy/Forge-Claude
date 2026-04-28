@@ -1,0 +1,21 @@
+{
+  "response_id": "RESP-19000307-c4a0-499e-a6bb-37c5d98bedc6",
+  "request_id": "TRACE-1775122893923",
+  "provider_metadata": {
+    "provider": "NONE",
+    "model": "NONE",
+    "latency_ms": 743
+  },
+  "output": {
+    "type": "structured",
+    "content": {
+      "note": "Cognitive trace placeholder",
+      "coverage_hint": []
+    }
+  },
+  "usage": {
+    "prompt_tokens": 0,
+    "completion_tokens": 0
+  },
+  "status": "SUCCESS"
+}

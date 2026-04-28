@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Forge - Status Schema v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "current_stage",
+    "current_task",
+    "stage_progress_percent",
+    "overall_progress_percent",
+    "last_completed_artifact",
+    "blocking_questions",
+    "issues",
+    "next_step"
+  ],
+  "properties": {
+    "current_stage": {
+      "type": "string",
+      "enum": ["A", "B", "C", "D"]
+    },
+    "current_task": {
+      "type": "string",
+      "minLength": 1
+    },
+    "stage_progress_percent": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "overall_progress_percent": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "last_completed_artifact": {
+      "type": "string",
+      "pattern": "^artifacts/.*"
+    },
+    "blocking_questions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 1
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "next_step": {
+      "type": "string"
+    }
+  }
+}

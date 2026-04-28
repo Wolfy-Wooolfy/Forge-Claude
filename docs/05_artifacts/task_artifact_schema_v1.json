@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Forge - Task Artifact Schema v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "task_id",
+    "stage_binding",
+    "contract_clauses_satisfied",
+    "artifact_outputs",
+    "preconditions",
+    "stop_conditions",
+    "closure_conditions",
+    "execution_result",
+    "status"
+  ],
+  "properties": {
+    "task_id": {
+      "type": "string",
+      "pattern": "^TASK-[0-9]{3}$"
+    },
+    "stage_binding": {
+      "type": "string",
+      "enum": ["A", "B", "C", "D"]
+    },
+    "contract_clauses_satisfied": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "artifact_outputs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^artifacts/.*"
+      },
+      "minItems": 1
+    },
+    "preconditions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "stop_conditions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "closure_conditions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "execution_result": {
+      "type": "object",
+      "required": [
+        "success",
+        "artifacts_verified"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "artifacts_verified": {
+          "type": "boolean"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["OPEN", "CLOSED", "BLOCKED", "FAILED"]
+    }
+  }
+}

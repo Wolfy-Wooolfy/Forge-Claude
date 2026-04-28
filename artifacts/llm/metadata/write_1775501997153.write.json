@@ -1,0 +1,8 @@
+{
+  "ok": true,
+  "write_id": "write_1775501997153",
+  "written_files": [
+    "artifacts/llm/outputs/test-write.txt"
+  ],
+  "summary": "Create a text file with a greeting in artifacts/llm/outputs/test-write.txt"
+}

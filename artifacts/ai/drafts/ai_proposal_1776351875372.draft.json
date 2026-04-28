@@ -1,0 +1,14 @@
+{
+  "draft_id": "ai_proposal_1776351875372",
+  "created_at": "2026-04-16T15:04:35.372Z",
+  "mode": "PROPOSAL",
+  "files": [
+    {
+      "path": "code/test_workspace_integration.js",
+      "content": "console.log(\"Logging enabled\");\n\nconsole.log('AI Proposal Draft Execution');\r\n\r\n// ===== AI GENERATED ADDITION =====\r\n\r\n// Generated from request:\r\n// create simple test file\r\n\r\nconsole.log(\"create simple test file\");\r\n\r\n// ===== AI GENERATED ADDITION =====\r\n\r\n// Generated from request:\r\n// create simple test file\r\n\r\nconsole.log(\"create simple test file\");\r\n\r\n// ===== AI GENERATED ADDITION =====\r\n\r\n// Generated from request:\r\n// create simple test file with message alpha\r\n\r\nconsole.log(\"create simple test file with message alpha\");\r\n\r\n// ==== AI MERGED ADDITION ====\r\n\r\n// Generated from request:\r\n// create simple test file with message delta\r\n\r\nconsole.log(\"create simple test file with message delta\");",
+      "allow_overwrite": true
+    }
+  ],
+  "approved": false,
+  "ready_for_decision": false
+}

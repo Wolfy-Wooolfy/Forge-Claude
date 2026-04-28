@@ -1,0 +1,14 @@
+{
+  "draft_id": "ai_proposal_1775938243200",
+  "created_at": "2026-04-11T20:10:43.200Z",
+  "mode": "PROPOSAL",
+  "files": [
+    {
+      "path": "code/test_workspace_integration.js",
+      "content": "const express = require(\"express\");\n\nfunction registerAuthRoutes(app) {\n  app.post(\"/api/auth/register\", (req, res) => {\n    const { username, password } = req.body;\n    res.json({ ok: true, message: \"User registered\", username });\n  });\n\n  app.post(\"/api/auth/login\", (req, res) => {\n    const { username } = req.body;\n    res.json({ ok: true, message: \"Login successful\", username });\n  });\n}\n\nmodule.exports = {\n  registerAuthRoutes\n};",
+      "allow_overwrite": true
+    }
+  ],
+  "approved": false,
+  "ready_for_decision": false
+}

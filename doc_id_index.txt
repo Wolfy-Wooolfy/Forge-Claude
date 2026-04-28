@@ -1,0 +1,58 @@
+docs\00_index\Documentation_Pack_Index_v1.md:2:**Document ID:** DOC-19  
+docs\00_index\Document_ID_Normalization_and_Mapping_Rule.md:1:# 📄 Document ID Normalization and Mapping Rule
+docs\00_index\Document_ID_Normalization_and_Mapping_Rule.md:2:**Document ID:** DOC-20  
+docs\00_index\Document_ID_Normalization_and_Mapping_Rule.md:12:This document defines the canonical Document ID system.
+docs\00_index\Document_ID_Normalization_and_Mapping_Rule.md:67:If a document does not declare a Document ID:
+docs\00_index\Document_ID_Normalization_and_Mapping_Rule.md:93:New Document IDs must:
+docs\01_system\00_Project_Identity_Contract.md:3:**Document ID:** DOC-00  
+docs\01_system\01_Idea_Admission_Contract.md:3:**Document ID:** DOC-01  
+docs\01_system\05_Cognitive_Adapter_Layer_Architecture_Contract.md:3:**Document ID:** DOC-01-ADAPTER  
+docs\01_system\06_Provider_Driver_Interface_Contract.md:3:**Document ID:** DOC-01-DRIVER  
+docs\01_system\07_Cognitive_Prompt_Construction_Contract.md:3:**Document ID:** DOC-01-PROMPT  
+docs\02_scope\02_Scope_and_Success_Contract.md:3:**Document ID:** DOC-02  
+docs\02_scope\03_Vision_Coverage_Matrix_Contract.md:2:**Document ID:** DOC-15  
+docs\02_scope\04_Vision_Gap_Detection_Specification.md:2:**Document ID:** DOC-16  
+docs\02_scope\PROJECT_OBJECTIVE_CONTRACT.md:3:**Document ID:** DOC-17  
+docs\03_pipeline\03_11_Idea_Evaluation_and_Finalization_Contract.md:10:**Document ID:** HALO-DOC-11
+docs\03_pipeline\03_12_Documentation_Gap_Detection_and_Refinement_Loop_Contract.md:3:**Document ID:** HALO-DOC-12  
+docs\03_pipeline\03_13_Code_to_Documentation_Trace_and_Consistency_Contract.md:3:**Document ID:** HALO-DOC-13  
+docs\03_pipeline\03_14_Final_Acceptance_and_Release_Gate_Contract.md:3:**Document ID:** HALO-DOC-14  
+docs\03_pipeline\03_15_Cognitive_Lifecycle_Orchestration_Specification.md:3:**Document ID:** HALO-DOC-15  
+docs\03_pipeline\03_16_Loop_Enforcement_Specification.md:10:**Document ID:** DOC-13  
+docs\03_pipeline\03_17_Stage_Contracts_Revision_v2.md:2:**Document ID:** DOC-14  
+docs\03_pipeline\03_20_AI_Cognitive_Loop_Execution_Contract.md:3:**Document ID:** HALO-DOC-20  
+docs\03_pipeline\03_21_Candidate_Transformation_and_Authority_Separation_Contract.md:3:**Document ID:** HALO-DOC-21  
+docs\03_pipeline\ARTIFACT_NAMESPACE_GOVERNANCE.md:3:**Document ID:** HALO-DOC-24  
+docs\03_pipeline\AUDIT_ENGINE_CONTRACT_v1.md:3:Document ID: DOC-31  
+docs\03_pipeline\BACKFILL_PROTOCOL_v1.md:3:Document ID: DOC-35  
+docs\03_pipeline\CLOSURE_AND_RELEASE_CONTRACT_v1.md:3:Document ID: DOC-37  
+docs\03_pipeline\DECISION_GATE_CONTRACT_v1.md:3:Document ID: DOC-34  
+docs\03_pipeline\DESIGN_EXPLORATION_PROTOCOL.md:3:**Document ID:** HALO-DOC-18  
+docs\03_pipeline\EXECUTE_MODULE_CONTRACT_v1.md:3:Document ID: DOC-36  
+docs\03_pipeline\GAP_ENGINE_CONTRACT_v1.md:3:Document ID: DOC-33  
+docs\03_pipeline\INTAKE_MODULE_CONTRACT_v1.md:3:Document ID: DOC-30  
+docs\03_pipeline\MODULE_ORCHESTRATION_GOVERNANCE_v1.md:2:Document ID: DOC-38  
+docs\03_pipeline\SELF_BUILDING_RUNTIME_ACTIVATION.md:3:**Document ID:** HALO-DOC-21  
+docs\03_pipeline\TRACE_ENGINE_CONTRACT_v1.md:3:Document ID: DOC-32  
+docs\03_pipeline\TRACE_ENGINE_CONTRACT_v1.md:69:- Document ID must be captured
+docs\04_autonomy\05_Artifact_Authority_Hierarchy_Specification.md:2:**Document ID:** DOC-11  
+docs\04_autonomy\06_Cognitive_Layer_Contract.md:2:**Document ID:** DOC-12  
+docs\04_autonomy\07_Cognitive_Engine_Interface_Contract.md:3:Document ID: DOC-CE-01  
+docs\05_artifacts\05_16_Cognitive_Artifacts_Definition_Specification.md:3:**Document ID:** HALO-DOC-16  
+docs\05_artifacts\05_17_Artifact_Schema_Revision_v2.md:2:**Document ID:** DOC-17  
+docs\05_artifacts\05_18_Artifact_Serialization_and_Embedded_JSON_Rule.md:2:**Document ID:** DOC-21  
+docs\06_progress\06_Progress_Contract_Revision_v2.md:2:**Document ID:** DOC-18  
+docs\07_decisions\DECISION_ARTIFACT_SCHEMA.md:3:**Document ID:** HALO-DOC-22  
+docs\07_decisions\DECISION_GATE_BEHAVIOR_SPEC.md:3:**Document ID:** HALO-DOC-21  
+docs\07_decisions\EXECUTION_FORK_DETECTION_PROTOCOL.md:3:**Document ID:** HALO-DOC-20  
+docs\07_decisions\EXECUTION_FORK_DETECTION_RULES.md:3:**Document ID:** HALO-DOC-20  
+docs\07_decisions\OPTION_EVALUATION_FRAMEWORK.md:3:**Document ID:** HALO-DOC-19  
+docs\07_decisions\RECOMMENDATION_ARTIFACT_SPECIFICATION.md:3:**Document ID:** HALO-DOC-23  
+docs\08_audit\08_10_Docs_to_Code_Coverage_Map_Core_Runtime.md:2:Document ID: DOC-AUD-08_10
+docs\08_audit\08_Forge_Boundary_Audit_Rules_Fail-Closed_Pack.md:3:**Document ID:** HALO-DOC-08  
+docs\09_verify\09_17_Cross_Document_Consistency_Review_Contract.md:3:**Document ID:** HALO-DOC-17  
+docs\09_verify\09_18_Code_to_Spec_Trace_Validator_Contract.md:3:**Document ID:** HALO-DOC-18  
+docs\09_verify\09_19_Docs_Gap_Analyzer_Validator_Contract.md:3:**Document ID:** HALO-DOC-19  
+docs\10_runtime\10_05_Cognitive_Engine_Selection_and_Routing_Policy.md:3:**Document ID:** DOC-10-CE-SEL  
+docs\10_runtime\10_10_Runtime_Entrypoints_and_Tooling.md:2:Document ID: DOC-RT-10_10
+docs\10_runtime\10_Tech_Assumptions_and_Local_Runtime_Setup.md:3:**Document ID:** DOC-10  

@@ -1,0 +1,18 @@
+{
+  "report_id": "CROSS_DOCUMENT_CONSISTENCY_REPORT_v1",
+  "generated_at": "2026-02-23T09:31:57.317Z",
+  "summary": {
+    "docs_scanned": 49,
+    "doc_id_found": 2,
+    "duplicate_doc_ids": 0,
+    "json_schema_files_scanned": 9,
+    "json_schema_parsed": 9,
+    "json_schema_parse_failures": 0,
+    "must_issues": 0,
+    "should_issues": 0,
+    "info_issues": 0
+  },
+  "issues": [],
+  "duplicates": [],
+  "json_schema_failures": []
+}

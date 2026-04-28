@@ -1,0 +1,12 @@
+{
+  "request": "Overwrite file code/test_workspace_integration.js with:\nconsole.log(\"Workspace → Forge role-based approval test successful v3\");\nallow_overwrite = true",
+  "approver_role": "cto",
+  "required_roles": [
+    "tech_lead",
+    "cto"
+  ],
+  "approval_policy_version": "1.0",
+  "approved_at": "2026-04-10T16:51:28.108Z",
+  "workspace_id": "personal",
+  "project_id": "forge-personal-autonomous-pipeline"
+}

@@ -1,0 +1,1 @@
+A platform that helps small factories in Egypt reduce waste and production losses using AI. It collects simple daily production data, detects abnormal waste patterns, predicts machine downtime, and gives managers actionable recommendations to improve efficiency and reduce cost.

@@ -1,0 +1,20 @@
+{
+  "response_id": "RESP-d627d160-3fdd-4cbe-80bc-677686bf5f99",
+  "request_id": "GAP-1775127555253",
+  "provider_metadata": {
+    "provider": "NONE",
+    "model": "NONE",
+    "latency_ms": 0
+  },
+  "output": {
+    "type": "structured",
+    "content": {
+      "priority_hints": []
+    }
+  },
+  "usage": {
+    "prompt_tokens": 0,
+    "completion_tokens": 0
+  },
+  "status": "SUCCESS"
+}

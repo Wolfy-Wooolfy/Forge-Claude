@@ -1,0 +1,47 @@
+{
+  "reset_type": "NEW_PROJECT_SCOPE_RESET",
+  "reset_at": "2026-04-04T14:18:50.512Z",
+  "archive_dir": "artifacts/archive/new_project_reset_2026-04-04T14-18-50-320Z",
+  "archived": {
+    "task_files": [
+      "TASK-047.execution.closure.md",
+      "TASK-047.stageA.module-flow-intake.md",
+      "TASK-048.execution.closure.md",
+      "TASK-048.stageA.module-flow-audit.md",
+      "TASK-050.execution.closure.md",
+      "TASK-050.stageA.module-flow-trace.md",
+      "TASK-051.execution.closure.md",
+      "TASK-051.stageA.module-flow-gap.md",
+      "TASK-052.execution.closure.md",
+      "TASK-052.stageA.module-flow-decision-gate.md",
+      "TASK-053.execution.closure.md",
+      "TASK-053.stageA.module-flow-backfill.md",
+      "TASK-054.execution.closure.md",
+      "TASK-054.stageA.module-flow-execute.md",
+      "TASK-055.execution.closure.md",
+      "TASK-055.stageA.module-flow-closure.md",
+      "TASK-061.execution.closure.md",
+      "TASK-061.stageA.verification-layer-contract.md",
+      "TASK-066.execution.closure.md",
+      "TASK-066.stageA.design-exploration-contract.md",
+      "TASK-067.execution.closure.md",
+      "TASK-067.stageA.approval.md",
+      "TASK-067.stageA.closure.md",
+      "TASK-067.stageA.final-spec.md",
+      "TASK-067.stageA.full-vision-runtime.md",
+      "TASK-067.stageA.idea-evaluation.md",
+      "TASK-067.stageB.closure.md",
+      "TASK-067.stageB.documentation-validation.md",
+      "TASK-067.stageC.closure.md"
+    ],
+    "forge_state": true,
+    "orchestration_state": true,
+    "orchestration_report": true
+  },
+  "active_scope_after_reset": {
+    "tasks_dir": "artifacts/tasks",
+    "forge_state": "artifacts/forge/forge_state.json",
+    "orchestration_state": "artifacts/orchestration/orchestration_state.json"
+  },
+  "status": "READY_FOR_NEW_PROJECT"
+}
