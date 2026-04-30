@@ -1,19 +1,46 @@
 {
-  "stage": "A",
-  "status": "CLOSED",
-  "closure_type": "REFERENCE",
-  "description": "Stage A closure wrapper referencing actual artifacts and task closures without duplicating data.",
-  "artifacts": [
+  "stage_id": "A",
+  "closure_type": "CLOSURE",
+  "contract_clauses_satisfied": [
+    "Stage A completed with approved idea definition",
+    "Stage A authoritative artifacts are present",
+    "Stage A task closure evidence is present"
+  ],
+  "artifact_outputs": [
     "artifacts/stage_A/task_plan.md",
     "artifacts/stage_A/validated_assumptions.md",
     "artifacts/stage_A/idea_final_spec.md",
-    "artifacts/stage_A/idea_approval_record.md"
-  ],
-  "task_closures": [
+    "artifacts/stage_A/idea_approval_record.md",
     "artifacts/tasks/TASK-047.execution.closure.md"
   ],
-  "notes": [
-    "This file exists for schema compatibility.",
-    "Actual source of truth remains in referenced artifacts and task closures."
-  ]
+  "preconditions": [
+    "Project admission artifact exists"
+  ],
+  "stop_conditions": [
+    "Missing approved idea specification",
+    "Missing Stage A closure evidence"
+  ],
+  "closure_conditions": [
+    "Stage A result is PASS",
+    "Referenced artifacts exist",
+    "No duplicate source of truth is created"
+  ],
+  "loop_closure_evidence": {
+    "loops_required": [
+      "LOOP_1"
+    ],
+    "loops_satisfied": [
+      "LOOP_1"
+    ],
+    "evidence_artifacts": [
+      "artifacts/stage_A/idea_final_spec.md",
+      "artifacts/stage_A/idea_approval_record.md",
+      "artifacts/tasks/TASK-047.execution.closure.md"
+    ]
+  },
+  "execution_result": {
+    "success": true,
+    "artifacts_verified": true
+  },
+  "status": "CLOSED"
 }

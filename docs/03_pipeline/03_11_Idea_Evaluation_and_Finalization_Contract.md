@@ -1,5 +1,18 @@
 # 📄 Document — Idea Evaluation & Finalization Contract
 
+## Supersession Notice
+
+Artifact naming in this document reflects an earlier schema version.
+
+In case of any conflict between artifact names or formats in this document and the current artifact schema, precedence is defined as follows:
+
+1. 05_17_Artifact_Schema_Revision_v2.md
+2. 05_Artifact_Schema_and_Repository_Layout_Standard.md
+
+All artifact naming, formats, and closure definitions in newer specifications override any conflicting definitions in this document.
+
+This document remains valid for process logic and conceptual flow only.
+
 > **Precondition Notice:**  
 > This contract operates only after a valid Admission-Ready Project Definition
 > has been produced per DOC-01 (Idea Structuring & Admission Layer Contract).

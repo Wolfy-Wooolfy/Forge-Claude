@@ -1,9 +1,12 @@
 {
-  "stage": "B",
-  "status": "CLOSED",
-  "closure_type": "REFERENCE",
-  "description": "Stage B closure wrapper referencing actual specification and documentation artifacts without duplicating data.",
-  "artifacts": [
+  "stage_id": "B",
+  "closure_type": "CLOSURE",
+  "contract_clauses_satisfied": [
+    "Stage B completed with specification and documentation coverage",
+    "Stage B authoritative artifacts are present",
+    "Stage B task closure evidence is present"
+  ],
+  "artifact_outputs": [
     "artifacts/stage_B/specifications.md",
     "artifacts/stage_B/spec_pack_manifest.md",
     "artifacts/stage_B/docs_coverage_matrix.md",
@@ -18,15 +21,42 @@
     "artifacts/stage_B/orchestrator_stage_transitions.md",
     "artifacts/stage_B/orchestrator_status_writer.md",
     "artifacts/stage_B/rollback_C_to_B.md",
-    "artifacts/stage_B/stage_B.reclosure.md"
-  ],
-  "task_closures": [
+    "artifacts/stage_B/stage_B.reclosure.md",
     "artifacts/tasks/TASK-067.stageB.closure.md",
     "artifacts/tasks/TASK-068.stageB.closure.md"
   ],
-  "notes": [
-    "This file exists for schema compatibility.",
-    "Actual source of truth remains in referenced artifacts and task closures.",
-    "This wrapper does not reopen Stage B or alter the project vision."
-  ]
+  "preconditions": [
+    "Stage A closure exists",
+    "Documentation coverage artifacts exist"
+  ],
+  "stop_conditions": [
+    "Missing Stage B specification artifacts",
+    "Missing documentation coverage evidence",
+    "Missing Stage B closure evidence"
+  ],
+  "closure_conditions": [
+    "Stage B result is PASS",
+    "Referenced artifacts exist",
+    "No duplicate source of truth is created"
+  ],
+  "loop_closure_evidence": {
+    "loops_required": [
+      "LOOP_2"
+    ],
+    "loops_satisfied": [
+      "LOOP_2"
+    ],
+    "evidence_artifacts": [
+      "artifacts/stage_B/specifications.md",
+      "artifacts/stage_B/docs_coverage_matrix.md",
+      "artifacts/stage_B/docs_gap_report.md",
+      "artifacts/tasks/TASK-067.stageB.closure.md",
+      "artifacts/tasks/TASK-068.stageB.closure.md"
+    ]
+  },
+  "execution_result": {
+    "success": true,
+    "artifacts_verified": true
+  },
+  "status": "CLOSED"
 }
