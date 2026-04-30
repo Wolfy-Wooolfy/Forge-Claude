@@ -35,6 +35,7 @@ Paths:
 - bin/halo-run.js
 - bin/halo-autonomy-step.js
 - bin/forge.js
+- bin/forge-build-state.js
 
 Purpose:
 - Provide bounded compatibility tooling around the older status-driven runtime path.
@@ -43,6 +44,9 @@ Purpose:
 Expected behavior:
 - They MUST NOT override governed runtime authority.
 - They are subordinate to `bin/forge-autonomous-run.js` for current autonomous execution claims.
+- `bin/forge-build-state.js` writes and exposes the current Forge state artifact (`artifacts/forge/forge_state.json`) via `code/src/forge/forge_state_writer.js`.
+- `bin/forge-build-state.js` is used for state inspection and pre-run readiness validation.
+- `bin/forge-build-state.js` exits non-zero on error.
 
 ### 2.2 Core Runtime Modules
 

@@ -105,8 +105,9 @@ No inference beyond structural presence.
 Intake MUST generate:
 
 1) artifacts/intake/intake_snapshot.json  
-2) artifacts/intake/entrypoint_classification.md  
-3) artifacts/intake/repository_inventory.json  
+2) artifacts/intake/intake_context.json  
+3) artifacts/intake/intake_report.md  
+4) artifacts/intake/repository_inventory.json  
 
 ---
 
@@ -141,7 +142,7 @@ Array MUST be sorted lexicographically by path.
 
 ---
 
-# 8. entrypoint_classification.md Content
+# 8. intake_report.md Content
 
 Must include:
 
@@ -214,6 +215,9 @@ Forge runtime MUST:
 
 - Prevent Audit from starting before Intake success
 - Validate existence of intake_snapshot.json
+- Validate existence of intake_context.json
+- Validate existence of intake_report.md
+- Validate existence of repository_inventory.json
 - Validate locked_snapshot_flag == true
 
 Failure results in execution halt.
@@ -224,7 +228,7 @@ Failure results in execution halt.
 
 Intake is considered COMPLETE only when:
 
-- All three mandatory artifacts exist
+- All four mandatory artifacts exist
 - No fail-closed condition triggered
 - Snapshot is locked
 - Classification is valid

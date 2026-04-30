@@ -69,6 +69,7 @@ Modules MUST execute strictly in this order:
 8. Execute
 9. Verify
 10. Closure
+11. Vision Compliance (terminal — executes only after Closure success)
 
 No module may skip forward.
 No module may execute out of order.
@@ -151,6 +152,31 @@ Verify MUST NOT:
 Verify is a validation-only module.
 
 Closure MUST NOT execute if Verify fails.
+
+---
+
+Vision Compliance Module Definition
+
+Vision Compliance is a terminal enforcement module that runs after Closure success.
+
+Its purpose is to:
+
+- validate full vision runtime coverage
+- confirm final release acceptance
+- enforce Stage A through Stage D completion evidence
+- confirm no open gaps remain after Closure
+
+Vision Compliance MUST NOT:
+
+- modify repository files
+- generate new code
+- alter governance documents
+- bypass Closure rules
+- reopen closed stages
+
+Vision Compliance is a terminal validation-only module.
+
+Pipeline completion MUST NOT be considered final unless Vision Compliance succeeds.
 
 ---
 

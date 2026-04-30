@@ -92,6 +92,20 @@ All conflicts MUST be resolved by DOC-11.
 ### Progress Contract (v2)
 - docs/06_progress/06_Progress_Contract_Revision_v2.md (DOC-18)
 
+### AI Layer
+- docs/11_ai_layer/01_AI_LAYER_SCOPE.md
+- docs/11_ai_layer/02_AI_LAYER_ARCHITECTURE.md
+- docs/11_ai_layer/03_AI_LAYER_GOVERNANCE.md
+- docs/11_ai_layer/04_AI_LAYER_ARTIFACTS.md
+- docs/11_ai_layer/05_AI_LAYER_RUNTIME_FLOW.md
+- docs/11_ai_layer/06_AI_RUNTIME_GOVERNANCE_CONTRACT.md
+- docs/11_ai_layer/06_CHAT_FIRST_WORKSPACE_SPEC.md
+- docs/11_ai_layer/07_TOOL_VS_CONVERSATION_CONTRACT.md
+- docs/11_ai_layer/08_CONVERSATION_EXECUTION_MODEL.md
+- docs/11_ai_layer/09_CONVERSATION_DEVIATION_PREVENTION_PROTOCOL.md
+- docs/11_ai_layer/09_WORKSPACE_RUNTIME_LANE.md
+- docs/11_ai_layer/10_CODEX_PROVIDER_CONTRACT.md
+
 ---
 
 ## 6. Machine-Verifiable Schemas (Canonical)

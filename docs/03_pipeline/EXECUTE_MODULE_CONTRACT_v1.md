@@ -102,8 +102,9 @@ If replacing code, replacement MUST be complete and reproducible.
 Execute MUST generate:
 
 1) artifacts/execute/execute_plan.json  
-2) artifacts/execute/execute_diff.md  
-3) artifacts/execute/execute_log.md  
+2) artifacts/execute/execute_report.md  
+3) artifacts/execute/execute_diff.md  
+4) artifacts/execute/execute_log.md  
 
 ---
 
@@ -214,6 +215,7 @@ If structural mapping changed → Trace must re-run.
 Execute is COMPLETE only when:
 
 - execute_plan.json exists
+- execute_report.md exists
 - execute_diff.md exists
 - execute_log.md exists
 - All approved code actions executed exactly once

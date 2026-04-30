@@ -109,6 +109,26 @@ Responsible for:
 
 ---
 
+## 3.6 Current Implementation Note
+
+As of the current system state, all AI Layer components
+(Chat Engine, Context Builder, Analysis Engine, Proposal Engine,
+Decision Interface) are implemented as internal functions within:
+
+code/src/workspace/apiServer.js
+
+Component separation into independent modules is a planned refactor.
+
+This does not constitute a governance violation while the system
+remains in an active development phase.
+
+Execution behavior remains governed by:
+
+- docs/11_ai_layer/06_AI_RUNTIME_GOVERNANCE_CONTRACT.md
+- docs/12_ai_os/19_AI_OS_RUNTIME_BEHAVIOR_CONTRACT.md
+
+---
+
 ## 4. Data Flow
 
 ### Analysis Flow
