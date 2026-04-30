@@ -1,0 +1,19 @@
+{
+  "stage": "A",
+  "status": "CLOSED",
+  "closure_type": "REFERENCE",
+  "description": "Stage A closure wrapper referencing actual artifacts and task closures without duplicating data.",
+  "artifacts": [
+    "artifacts/stage_A/task_plan.md",
+    "artifacts/stage_A/validated_assumptions.md",
+    "artifacts/stage_A/idea_final_spec.md",
+    "artifacts/stage_A/idea_approval_record.md"
+  ],
+  "task_closures": [
+    "artifacts/tasks/TASK-047.execution.closure.md"
+  ],
+  "notes": [
+    "This file exists for schema compatibility.",
+    "Actual source of truth remains in referenced artifacts and task closures."
+  ]
+}

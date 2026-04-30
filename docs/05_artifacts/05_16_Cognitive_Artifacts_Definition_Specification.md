@@ -7,6 +7,22 @@
 
 ---
 
+## Supersession Notice
+
+This document contains legacy artifact naming and structure definitions.
+
+In case of any conflict between this document and newer artifact specifications, the following precedence applies:
+
+1. 05_17_Artifact_Schema_Revision_v2.md
+2. 05_Artifact_Schema_and_Repository_Layout_Standard.md
+3. Pipeline stage specifications (03_Pipeline_Stages_*)
+
+All naming, structure, and closure conventions defined in newer specifications override any conflicting definitions in this document.
+
+This document remains valid for conceptual reference only and does not enforce artifact structure when conflicts arise.
+
+---
+
 ## 1. Purpose
 
 This document defines the mandatory artifact types
