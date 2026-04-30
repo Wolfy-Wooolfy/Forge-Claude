@@ -198,4 +198,13 @@ Failure to update:
 
 ---
 
+## 10. Decision Artifacts Registry
+
+Decision artifacts that govern structural changes to this repository
+MUST be listed here upon creation.
+
+- artifacts/decisions/DEC-20260430-001.md — FIX: Write required Stage A/B artifacts to IMMUTABLE-LEGACY namespaces (Option A selected; namespaces now READ-ONLY)
+
+---
+
 **END OF DOCUMENT**

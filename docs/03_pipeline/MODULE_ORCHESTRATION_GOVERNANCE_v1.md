@@ -69,7 +69,8 @@ Modules MUST execute strictly in this order:
 8. Execute
 9. Verify
 10. Closure
-11. Vision Compliance (terminal — executes only after Closure success)
+11. Vision Compliance (executes only after Closure success)
+12. AI System Alignment (terminal — executes only after Vision Compliance success)
 
 No module may skip forward.
 No module may execute out of order.
@@ -157,7 +158,8 @@ Closure MUST NOT execute if Verify fails.
 
 Vision Compliance Module Definition
 
-Vision Compliance is a terminal enforcement module that runs after Closure success.
+Vision Compliance is a pre-terminal enforcement module that runs after Closure success.
+It executes before AI System Alignment (module 12).
 
 Its purpose is to:
 
@@ -174,9 +176,51 @@ Vision Compliance MUST NOT:
 - bypass Closure rules
 - reopen closed stages
 
-Vision Compliance is a terminal validation-only module.
+Vision Compliance is a pre-terminal validation-only module.
 
-Pipeline completion MUST NOT be considered final unless Vision Compliance succeeds.
+Pipeline completion MUST NOT be considered final unless BOTH Vision Compliance AND AI System Alignment succeed.
+
+---
+
+# 3.1 AI System Alignment Module Definition
+
+AI System Alignment (module 12) is the true terminal module of the pipeline.
+
+**Task binding:** TASK-068: FULL SYSTEM ALIGNMENT WITH AI OS AND AI LAYER CONTRACTS
+**Required previous module:** VISION_COMPLIANCE
+**terminal_flag:** true
+
+## Purpose
+
+AI System Alignment enforces full alignment between:
+- Forge Core (execution authority)
+- AI Layer contracts (`docs/11_ai_layer/`)
+- AI Operating System contracts (`docs/12_ai_os/`)
+- Workspace Runtime behavior
+- Conversation-to-execution boundary governance
+
+## Activation Preconditions (Fail-Closed)
+
+MUST NOT execute unless ALL are true:
+- Vision Compliance completed with PASS
+- `artifacts/tasks/TASK-067.execution.closure.md` exists
+- No BLOCKED state active
+
+## Required Outputs
+
+- `artifacts/tasks/TASK-068.execution.closure.md`
+- All intermediate stage artifacts listed in TASK-068 closure chain
+
+## Terminal Behavior
+
+Upon PASS → pipeline reaches COMPLETE (`next_allowed_step: "COMPLETE"`)
+Upon FAIL → BLOCKED, human escalation required, no downstream module exists
+
+## Governing Documents
+
+- docs/11_ai_layer/ (full pack)
+- docs/12_ai_os/00_AI_OS_MASTER_SPEC.md through 20_REQUIREMENT_DISCOVERY_LOOP.md
+- docs/12_ai_os/19_AI_OS_RUNTIME_BEHAVIOR_CONTRACT.md
 
 ---
 

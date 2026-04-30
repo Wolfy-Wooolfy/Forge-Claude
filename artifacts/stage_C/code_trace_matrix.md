@@ -3,7 +3,7 @@
 ```json
 {
   "trace_matrix_id": "TRACE_MATRIX_STAGE_C_v1",
-  "generated_at": "2026-02-16T15:43:57.122Z",
+  "generated_at": "2026-04-30T00:00:00.000Z",
   "source_docs": [
     "docs/03_pipeline/03_Pipeline_Stages_Specification_A-D.md",
     "docs/05_artifacts/05_17_Artifact_Schema_Revision_v2.md",
@@ -14,8 +14,8 @@
   ],
   "codebase_root": "code/",
   "coverage_summary": {
-    "must_total": 26,
-    "must_covered": 26,
+    "must_total": 27,
+    "must_covered": 27,
     "must_coverage_percent": 100,
     "should_total": 0,
     "should_covered": 0,
@@ -686,6 +686,31 @@
       ],
       "verification_refs": [
         "artifacts/stage_C/code_trace_matrix.md"
+      ],
+      "status": "COVERED"
+    },
+    {
+      "requirement_id": "PIPELINE.MODULE.AI_SYSTEM_ALIGNMENT",
+      "requirement_level": "MUST",
+      "requirement_text": "Pipeline MUST include AI_SYSTEM_ALIGNMENT as module 12 with terminal_flag=true, executing after VISION_COMPLIANCE.",
+      "doc_refs": [
+        {
+          "path": "docs/03_pipeline/MODULE_ORCHESTRATION_GOVERNANCE_v1.md",
+          "anchor": "3.1 AI System Alignment Module Definition"
+        }
+      ],
+      "code_refs": [
+        {
+          "path": "code/src/orchestrator/pipeline_definition.js",
+          "symbol": "AI_SYSTEM_ALIGNMENT module entry",
+          "lines": {
+            "start": 80,
+            "end": 86
+          }
+        }
+      ],
+      "verification_refs": [
+        "artifacts/tasks/TASK-068.execution.closure.md"
       ],
       "status": "COVERED"
     }
