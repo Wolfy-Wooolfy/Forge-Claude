@@ -1,6 +1,6 @@
 # Code-to-Spec Trace Validator Contract
 
-**Document ID:** HALO-DOC-18  
+**Document ID:** HALO-DOC-29  
 **Stage:** C  
 **Status:** MANDATORY – ENFORCEMENT CONTRACT  
 **Scope:** Specification ↔ Code Compliance  

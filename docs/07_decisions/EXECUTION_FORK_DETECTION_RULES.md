@@ -1,6 +1,6 @@
 # Execution Fork Detection Rules
 
-**Document ID:** HALO-DOC-20  
+**Document ID:** HALO-DOC-28  
 **Status:** BINDING – EXECUTION CONTROL  
 **Scope:** Detection of Decision Forks During Execution  
 **Applies To:** Stage A, Stage B, Stage C  

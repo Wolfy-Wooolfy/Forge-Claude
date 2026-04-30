@@ -4,6 +4,7 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
+    "status_type",
     "current_stage",
     "current_task",
     "stage_progress_percent",
@@ -14,13 +15,17 @@
     "next_step"
   ],
   "properties": {
+    "status_type": {
+      "type": "string",
+      "enum": ["LIVE"]
+    },
     "current_stage": {
       "type": "string",
       "enum": ["A", "B", "C", "D"]
     },
     "current_task": {
       "type": "string",
-      "minLength": 1
+      "description": "Active task ID (TASK-XXX or SMOKE:*), or empty string when no task is running. Per DOC-18 §6: empty string is valid and required when no task is active."
     },
     "stage_progress_percent": {
       "type": "integer",

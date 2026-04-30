@@ -1,6 +1,6 @@
 # Documentation Gap Analyzer Validator Contract
 
-**Document ID:** HALO-DOC-19  
+**Document ID:** HALO-DOC-30  
 **Stage:** B  
 **Status:** MANDATORY – ENFORCEMENT CONTRACT  
 **Scope:** Stage A → Stage B Specification Integrity  

@@ -1,6 +1,6 @@
 # Project Objective Contract
 
-**Document ID:** DOC-17  
+**Document ID:** DOC-39  
 **Project:** Forge  
 **Document Type:** Binding Objective Authority Definition  
 **Status:** EXECUTION-BOUND  

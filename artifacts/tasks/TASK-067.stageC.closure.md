@@ -1,5 +1,32 @@
 # TASK-067 — Stage C Closure
 
+```json
+{
+  "task_id": "TASK-067",
+  "stage_binding": "C",
+  "contract_clauses_satisfied": [
+    "SCHEMA-02: task_artifact_schema_v1.json",
+    "DOC-21: embedded JSON rule"
+  ],
+  "artifact_outputs": [
+    "artifacts/tasks/TASK-067.stageC.closure.md"
+  ],
+  "preconditions": [],
+  "stop_conditions": [],
+  "closure_conditions": [
+    "Artifact content complete",
+    "Task execution confirmed"
+  ],
+  "execution_result": {
+    "success": true,
+    "artifacts_verified": true,
+    "notes": "Migrated to schema-compliant format per DOC-21 §7. Original narrative content preserved below."
+  },
+  "status": "CLOSED"
+}
+```
+
+
 ## Task Binding
 - Task ID: TASK-067
 - Task Name: ENFORCE FULL VISION RUNTIME

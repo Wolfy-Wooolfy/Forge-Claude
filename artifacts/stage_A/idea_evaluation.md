@@ -1,5 +1,38 @@
 # Stage A — Idea Evaluation
 
+```json
+{
+  "task_id": "TASK-067",
+  "stage_binding": "A",
+  "contract_clauses_satisfied": [
+    "DOC-3 §3.3 idea_evaluation.md required output",
+    "DOC-3 §3.3: scope boundaries, constraints, risks, unresolved ambiguities"
+  ],
+  "artifact_outputs": [
+    "artifacts/stage_A/idea_evaluation.md"
+  ],
+  "preconditions": [
+    "artifacts/stage_A/task_plan.md exists",
+    "artifacts/stage_A/validated_assumptions.md exists"
+  ],
+  "stop_conditions": [
+    "Scope cannot be bounded deterministically"
+  ],
+  "closure_conditions": [
+    "Evaluation result is deterministic",
+    "Decision options are explicit",
+    "No narrative ambiguity"
+  ],
+  "execution_result": {
+    "success": true,
+    "artifacts_verified": true,
+    "notes": "Evaluation result: CONDITIONALLY_BLOCKED → resolved to PROCEED via approval record."
+  },
+  "status": "CLOSED"
+}
+```
+
+
 ## Evaluation Target
 Forge Full Vision Runtime Completion
 

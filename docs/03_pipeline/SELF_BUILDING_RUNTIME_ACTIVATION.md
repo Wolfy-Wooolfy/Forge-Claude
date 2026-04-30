@@ -1,6 +1,6 @@
 # Self-Building Runtime Activation Protocol
 
-**Document ID:** HALO-DOC-21  
+**Document ID:** HALO-DOC-25  
 **Status:** BINDING – RUNTIME ACTIVATION AUTHORITY  
 **Scope:** Forge Self-Building System Runtime  
 **Applies To:** Entire Autonomous Pipeline  

@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Forge - Forge Build State Schema v1",
+  "description": "SCHEMA-07: Authoritative schema for artifacts/forge/forge_state.json. Governed by DOC-11 (Artifact Authority Hierarchy).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status_type",
+    "current_stage",
+    "current_task",
+    "last_completed_artifact",
+    "closed_tasks",
+    "open_tasks",
+    "pending_gaps",
+    "build_progress_percent",
+    "execution_integrity",
+    "next_allowed_step",
+    "derived_from",
+    "derived_at"
+  ],
+  "properties": {
+    "status_type": {
+      "type": "string",
+      "enum": ["FORGE_BUILD_STATE"]
+    },
+    "current_stage": {
+      "type": ["string", "null"],
+      "enum": ["A", "B", "C", "D", null]
+    },
+    "current_task": {
+      "type": "string",
+      "description": "Active task ID or empty string when idle."
+    },
+    "last_completed_artifact": {
+      "type": "string",
+      "pattern": "^artifacts/.*"
+    },
+    "closed_tasks": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^TASK-[0-9]+"
+      }
+    },
+    "open_tasks": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^TASK-[0-9]+"
+      }
+    },
+    "pending_gaps": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "build_progress_percent": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "execution_integrity": {
+      "type": "string",
+      "enum": ["CONSISTENT", "INCONSISTENT", "UNKNOWN"]
+    },
+    "next_allowed_step": {
+      "type": "string"
+    },
+    "derived_from": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["registry", "task_artifacts_directory", "closure_artifacts"],
+      "properties": {
+        "registry": { "type": "string" },
+        "task_artifacts_directory": { "type": "string" },
+        "closure_artifacts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^artifacts/.*"
+          }
+        }
+      }
+    },
+    "derived_at": {
+      "type": "string",
+      "minLength": 10
+    }
+  }
+}

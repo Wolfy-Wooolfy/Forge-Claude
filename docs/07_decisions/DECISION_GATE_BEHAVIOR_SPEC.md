@@ -1,6 +1,6 @@
 # Decision Gate Behavior Specification
 
-**Document ID:** HALO-DOC-21  
+**Document ID:** HALO-DOC-26  
 **Status:** EXECUTION-BOUND  
 **Scope:** Behavioral Specification for Decision Gate Module  
 **Applies To:** Forge Cognitive Layer  

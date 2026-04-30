@@ -1,4 +1,31 @@
 # TASK-067 — Stage A Artifact
+
+```json
+{
+  "task_id": "TASK-067",
+  "stage_binding": "A",
+  "contract_clauses_satisfied": [
+    "SCHEMA-02: task_artifact_schema_v1.json",
+    "DOC-21: embedded JSON rule"
+  ],
+  "artifact_outputs": [
+    "artifacts/tasks/TASK-067.stageA.final-spec.md"
+  ],
+  "preconditions": [],
+  "stop_conditions": [],
+  "closure_conditions": [
+    "Artifact content complete",
+    "Task execution confirmed"
+  ],
+  "execution_result": {
+    "success": true,
+    "artifacts_verified": true,
+    "notes": "Migrated to schema-compliant format per DOC-21 §7. Original narrative content preserved below."
+  },
+  "status": "CLOSED"
+}
+```
+
 ## Artifact
 final-spec
 

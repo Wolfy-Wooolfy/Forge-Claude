@@ -106,6 +106,29 @@ All conflicts MUST be resolved by DOC-11.
 - docs/11_ai_layer/09_WORKSPACE_RUNTIME_LANE.md
 - docs/11_ai_layer/10_CODEX_PROVIDER_CONTRACT.md
 
+### AI OS Layer
+- docs/12_ai_os/00_AI_OS_MASTER_SPEC.md
+- docs/12_ai_os/01_AI_OS_VISION.md
+- docs/12_ai_os/02_USER_EXPERIENCE_MODEL.md
+- docs/12_ai_os/03_CONVERSATION_LAYER_CONTRACT.md
+- docs/12_ai_os/04_PROJECT_OBJECT_MODEL.md
+- docs/12_ai_os/05_PROJECT_LIFECYCLE.md
+- docs/12_ai_os/06_DISCUSSION_AND_IDEATION_LOOP.md
+- docs/12_ai_os/07_OPTION_DECISION_CONTRACT.md
+- docs/12_ai_os/08_DOCUMENTATION_BUILD_LOOP.md
+- docs/12_ai_os/09_EXECUTION_HANDOFF_TO_FORGE.md
+- docs/12_ai_os/10_EXISTING_PROJECT_REVIEW_WORKFLOW.md
+- docs/12_ai_os/11_MULTI_PROJECT_ORCHESTRATION.md
+- docs/12_ai_os/12_DELIVERY_AND_RUNBOOK_CONTRACT.md
+- docs/12_ai_os/13_AI_PROVIDER_ROLE.md
+- docs/12_ai_os/14_VERIFICATION_LOOP.md
+- docs/12_ai_os/15_SEARCH_AND_EXTERNAL_RESEARCH.md
+- docs/12_ai_os/16_DECISION_OWNERSHIP_RULES.md
+- docs/12_ai_os/17_NON_TECHNICAL_USER_EXPERIENCE.md
+- docs/12_ai_os/18_INTERFACE_REQUIREMENTS.md
+- docs/12_ai_os/19_AI_OS_RUNTIME_BEHAVIOR_CONTRACT.md
+- docs/12_ai_os/20_REQUIREMENT_DISCOVERY_LOOP.md
+
 ---
 
 ## 6. Machine-Verifiable Schemas (Canonical)
@@ -124,6 +147,9 @@ All conflicts MUST be resolved by DOC-11.
 - docs/09_verify/mismatch_report_schema_v1.json (SCHEMA-04)
 - docs/09_verify/verification_evidence_schema_v1.json (SCHEMA-05)
 
+### Forge Self-Build State
+- docs/04_autonomy/forge_state_schema_v1.json (SCHEMA-07)
+
 ---
 
 ## 7. Supersession Map (v1 → v2)
@@ -137,6 +163,16 @@ All conflicts MUST be resolved by DOC-11.
 
 Where not explicitly superseded:
 v1 documents remain binding.
+
+### Newly Assigned IDs (Conflict Resolution)
+
+- DOC-39: docs/02_scope/PROJECT_OBJECTIVE_CONTRACT.md (was duplicate DOC-17; resolved 2026-04-30)
+- HALO-DOC-25: docs/03_pipeline/SELF_BUILDING_RUNTIME_ACTIVATION.md (was duplicate HALO-DOC-21; resolved 2026-04-30)
+- HALO-DOC-26: docs/07_decisions/DECISION_GATE_BEHAVIOR_SPEC.md (was duplicate HALO-DOC-21; resolved 2026-04-30)
+- HALO-DOC-27: docs/07_decisions/EXECUTION_FORK_DETECTION_PROTOCOL.md (was duplicate HALO-DOC-20; resolved 2026-04-30)
+- HALO-DOC-28: docs/07_decisions/EXECUTION_FORK_DETECTION_RULES.md (was duplicate HALO-DOC-20; resolved 2026-04-30)
+- HALO-DOC-29: docs/09_verify/09_18_Code_to_Spec_Trace_Validator_Contract.md (was duplicate HALO-DOC-18; resolved 2026-04-30)
+- HALO-DOC-30: docs/09_verify/09_19_Docs_Gap_Analyzer_Validator_Contract.md (was duplicate HALO-DOC-19; resolved 2026-04-30)
 
 ---
 

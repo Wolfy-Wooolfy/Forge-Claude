@@ -1,6 +1,6 @@
 # Execution Fork Detection Protocol
 
-**Document ID:** HALO-DOC-20  
+**Document ID:** HALO-DOC-27  
 **Status:** BINDING – EXECUTION FORK DETECTION AUTHORITY  
 **Scope:** Fork Detection Across Lifecycle Stages  
 **Applies To:** Stage A, Stage B, Stage C  

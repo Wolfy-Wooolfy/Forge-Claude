@@ -1,18 +1,18 @@
 # Stage C — Code Trace Matrix
 
-~~~json
+```json
 {
   "trace_matrix_id": "TRACE_MATRIX_STAGE_C_v1",
   "generated_at": "2026-02-16T15:43:57.122Z",
   "source_docs": [
     "docs/03_pipeline/03_Pipeline_Stages_Specification_A-D.md",
-    "docs/05_artifacts/Artifact_Schema_Revision_v2.md",
-    "docs/05_artifacts/Artifact_Serialization_and_Embedded_JSON_Rule.md",
+    "docs/05_artifacts/05_17_Artifact_Schema_Revision_v2.md",
+    "docs/05_artifacts/05_18_Artifact_Serialization_and_Embedded_JSON_Rule.md",
     "docs/09_verify/trace_matrix_schema_v1.json",
     "docs/09_verify/mismatch_report_schema_v1.json",
     "docs/09_verify/verification_evidence_schema_v1.json"
   ],
-  "codebase_root": "code",
+  "codebase_root": "code/",
   "coverage_summary": {
     "must_total": 26,
     "must_covered": 26,
@@ -33,7 +33,7 @@
           "anchor": "Stage C — Code Generation & Implementation"
         },
         {
-          "path": "docs/05_artifacts/Artifact_Schema_Revision_v2.md",
+          "path": "docs/05_artifacts/05_17_Artifact_Schema_Revision_v2.md",
           "anchor": "Stage C Verification Artifacts (Canonical Paths)"
         }
       ],
@@ -62,7 +62,7 @@
           "anchor": "Stage C — Code Generation & Implementation"
         },
         {
-          "path": "docs/05_artifacts/Artifact_Schema_Revision_v2.md",
+          "path": "docs/05_artifacts/05_17_Artifact_Schema_Revision_v2.md",
           "anchor": "Stage C Verification Artifacts (Canonical Paths)"
         }
       ],
@@ -91,11 +91,11 @@
           "anchor": "Stage C — Code Generation & Implementation"
         },
         {
-          "path": "docs/05_artifacts/Artifact_Schema_Revision_v2.md",
+          "path": "docs/05_artifacts/05_17_Artifact_Schema_Revision_v2.md",
           "anchor": "Stage C Verification Artifacts (Canonical Paths)"
         },
         {
-          "path": "docs/05_artifacts/Artifact_Serialization_and_Embedded_JSON_Rule.md",
+          "path": "docs/05_artifacts/05_18_Artifact_Serialization_and_Embedded_JSON_Rule.md",
           "anchor": "Embedded JSON"
         }
       ],
@@ -689,8 +689,6 @@
       ],
       "status": "COVERED"
     }
-  ],
-  "stage": "C",
-  "clause_level_rows_added": 23
+  ]
 }
-~~~
+```
