@@ -1,4 +1,4 @@
-const fs = require("fs");
+﻿const fs = require("fs");
 const { execSync } = require("child_process");
 
 function run(cmd) {
@@ -6,7 +6,7 @@ function run(cmd) {
 }
 
 function main() {
-  console.log("== HALO Pre-Run Check ==");
+  console.log("== Forge Pre-Run Check ==");
 
   run("node verify/smoke/stage_transitions_smoke.js");
   run("node verify/smoke/status_writer_smoke.js");

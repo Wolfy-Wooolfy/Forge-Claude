@@ -18,6 +18,7 @@ const CANONICAL_FIELDS = [
 ];
 
 const ALLOWED_STAGES = ["A", "B", "C", "D"];
+const ALLOWED_STATUS_TYPES = ["LIVE", "BLOCKED", "ABORTED"];
 
 function validatePayload(payload) {
   const payloadKeys = Object.keys(payload);
@@ -32,8 +33,18 @@ function validatePayload(payload) {
     }
   }
 
-  if (payload.status_type !== "LIVE") {
-    throw new Error("STATUS SCHEMA VIOLATION: status_type must be LIVE");
+  if (!ALLOWED_STATUS_TYPES.includes(payload.status_type)) {
+    throw new Error(`STATUS SCHEMA VIOLATION: status_type must be one of ${ALLOWED_STATUS_TYPES.join("|")}`);
+  }
+
+  // BLOCKED/ABORTED must have a blocking_question and empty next_step
+  if (payload.status_type === "BLOCKED" || payload.status_type === "ABORTED") {
+    if (!Array.isArray(payload.blocking_questions) || payload.blocking_questions.length === 0) {
+      throw new Error(`STATUS RULE VIOLATION: ${payload.status_type} requires at least one blocking_question`);
+    }
+    if (payload.next_step !== "") {
+      throw new Error(`STATUS RULE VIOLATION: ${payload.status_type} requires empty next_step`);
+    }
   }
 
   if (!ALLOWED_STAGES.includes(payload.current_stage)) {

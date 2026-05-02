@@ -1,4 +1,4 @@
-# 📄 Documentation Pack Index v1
+﻿# 📄 Documentation Pack Index v1
 **Document ID:** DOC-19  
 **Status:** EXECUTION-BOUND  
 **Scope:** Canonical Documentation Registry  
@@ -167,12 +167,12 @@ v1 documents remain binding.
 ### Newly Assigned IDs (Conflict Resolution)
 
 - DOC-39: docs/02_scope/PROJECT_OBJECTIVE_CONTRACT.md (was duplicate DOC-17; resolved 2026-04-30)
-- HALO-DOC-25: docs/03_pipeline/SELF_BUILDING_RUNTIME_ACTIVATION.md (was duplicate HALO-DOC-21; resolved 2026-04-30)
-- HALO-DOC-26: docs/07_decisions/DECISION_GATE_BEHAVIOR_SPEC.md (was duplicate HALO-DOC-21; resolved 2026-04-30)
-- HALO-DOC-27: docs/07_decisions/EXECUTION_FORK_DETECTION_PROTOCOL.md (was duplicate HALO-DOC-20; resolved 2026-04-30)
-- HALO-DOC-28: docs/07_decisions/EXECUTION_FORK_DETECTION_RULES.md (was duplicate HALO-DOC-20; resolved 2026-04-30)
-- HALO-DOC-29: docs/09_verify/09_18_Code_to_Spec_Trace_Validator_Contract.md (was duplicate HALO-DOC-18; resolved 2026-04-30)
-- HALO-DOC-30: docs/09_verify/09_19_Docs_Gap_Analyzer_Validator_Contract.md (was duplicate HALO-DOC-19; resolved 2026-04-30)
+- FORGE-DOC-25: docs/03_pipeline/SELF_BUILDING_RUNTIME_ACTIVATION.md (was duplicate FORGE-DOC-21; resolved 2026-04-30)
+- FORGE-DOC-26: docs/07_decisions/DECISION_GATE_BEHAVIOR_SPEC.md (was duplicate FORGE-DOC-21; resolved 2026-04-30)
+- FORGE-DOC-27: docs/07_decisions/EXECUTION_FORK_DETECTION_PROTOCOL.md (was duplicate FORGE-DOC-20; resolved 2026-04-30)
+- FORGE-DOC-28: docs/07_decisions/EXECUTION_FORK_DETECTION_RULES.md (was duplicate FORGE-DOC-20; resolved 2026-04-30)
+- FORGE-DOC-29: docs/09_verify/09_18_Code_to_Spec_Trace_Validator_Contract.md (was duplicate FORGE-DOC-18; resolved 2026-04-30)
+- FORGE-DOC-30: docs/09_verify/09_19_Docs_Gap_Analyzer_Validator_Contract.md (was duplicate FORGE-DOC-19; resolved 2026-04-30)
 
 ---
 

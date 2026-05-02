@@ -1,4 +1,4 @@
-# HALO Pipeline — Runtime Runbook (Stage C)
+﻿# Forge Pipeline — Runtime Runbook (Stage C)
 
 **Stage:** C  
 **Scope:** Core Orchestrator Runtime (Non-Autonomous)  
@@ -8,7 +8,7 @@
 
 ## 1. Purpose
 
-This runbook defines how to operate and verify the HALO
+This runbook defines how to operate and verify the Forge
 Personal Autonomous Pipeline **Core Runtime Skeleton**.
 
 It applies ONLY to:
@@ -105,7 +105,7 @@ Any of the following REQUIRE a new explicit directive:
 A minimal CLI entrypoint is provided for deterministic execution.
 
 From project root:
-- `node bin/halo-run.js`
+- `node bin/forge-run.js`
 
 
 Behavior is identical to invoking the runner directly.
@@ -129,7 +129,7 @@ Any mismatch MUST be treated as a release invalidation.
 ## Dry-Run Mode
 
 Run the pipeline without writing any state:
-- `HALO_DRY_RUN=true node bin/halo-run.js`
+- `FORGE_DRY_RUN=true node bin/forge-run.js`
 
 This validates transitions and logs intent only.
 

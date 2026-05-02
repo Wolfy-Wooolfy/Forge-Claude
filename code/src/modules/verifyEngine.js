@@ -1,10 +1,69 @@
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 
 const ROOT = path.resolve(__dirname, "../../..");
 
 function ensureDir(absDir) {
   fs.mkdirSync(absDir, { recursive: true });
+}
+
+// C-3: Local Command Log — per docs/09_verify §2.2
+function writeVerifyCommandLog(root, stage, checkName, stdout, stderr, exitCode) {
+  const smokeDir = path.join(root, "verify", "smoke");
+  const outputDir = path.join(smokeDir, "command_output");
+  ensureDir(outputDir);
+  const ts = new Date().toISOString().replace(/[-:T.Z]/g, "").slice(0, 15) + "Z";
+  const stdoutFile = `CMD-${ts}-${stage}-stdout.txt`;
+  const stderrFile = `CMD-${ts}-${stage}-stderr.txt`;
+  fs.writeFileSync(path.join(outputDir, stdoutFile), stdout || "", "utf-8");
+  fs.writeFileSync(path.join(outputDir, stderrFile), stderr || "", "utf-8");
+  const stdoutHash = crypto.createHash("sha256").update(stdout || "").digest("hex");
+  const stderrHash = crypto.createHash("sha256").update(stderr || "").digest("hex");
+  const logPath = path.join(smokeDir, "local_command_log.jsonl");
+  const entry = JSON.stringify({
+    timestamp_utc: new Date().toISOString(),
+    stage,
+    command: checkName,
+    exit_code: exitCode,
+    stdout_file: `verify/smoke/command_output/${stdoutFile}`,
+    stderr_file: `verify/smoke/command_output/${stderrFile}`,
+    stdout_sha256: stdoutHash,
+    stderr_sha256: stderrHash
+  });
+  fs.appendFileSync(logPath, entry + "\n", "utf-8");
+}
+
+// C-4: Loop Detection — writes LOCAL-LOOP-*.json when same failure repeats
+function detectVerifyLoop(root, failedChecks) {
+  const historyPath = path.join(root, "artifacts", "verify", "verify_loop_history.json");
+  const history = (() => {
+    try { return fs.existsSync(historyPath) ? JSON.parse(fs.readFileSync(historyPath, "utf-8")) : []; }
+    catch (_) { return []; }
+  })();
+
+  const fingerprint = failedChecks.map((c) => c.name).sort().join("|");
+  history.push({ timestamp_utc: new Date().toISOString(), failed_fingerprint: fingerprint, failed_count: failedChecks.length });
+  fs.mkdirSync(path.dirname(historyPath), { recursive: true });
+  fs.writeFileSync(historyPath, JSON.stringify(history, null, 2), "utf-8");
+
+  if (history.length >= 3) {
+    const lastThree = history.slice(-3).map((e) => e.failed_fingerprint);
+    const stuck = lastThree.every((fp) => fp === lastThree[0]) && lastThree[0] !== "";
+    if (stuck) {
+      const loopId = `LOCAL-LOOP-${Date.now()}`;
+      const loopPath = path.join(root, "artifacts", "verify", `${loopId}.json`);
+      fs.writeFileSync(loopPath, JSON.stringify({
+        loop_id: loopId,
+        detected_at: new Date().toISOString(),
+        repeated_failures: lastThree[0].split("|"),
+        iterations: 3,
+        verdict: "VERIFY_LOOP_DETECTED — same failure pattern repeated 3 times, manual intervention required"
+      }, null, 2), "utf-8");
+      return { loop_detected: true, loop_id: loopId, loop_artifact: `artifacts/verify/${loopId}.json` };
+    }
+  }
+  return { loop_detected: false };
 }
 
 function fileExists(rel) {
@@ -66,6 +125,57 @@ function getGapMetrics(gapJson) {
   };
 }
 
+function buildTestEvidence(executePlan, executeActions, verifyChecks) {
+  const actions = Array.isArray(executeActions) ? executeActions : [];
+  const checks = Array.isArray(verifyChecks) ? verifyChecks : [];
+
+  const evidence = actions.map((action, i) => {
+    const actionId = String(action.action_id || action.id || `ACT-${String(i + 1).padStart(3, "0")}`);
+    const description = String(action.description || action.action || action.target_path || action.path || "");
+    const wrote = action.wrote_content === true;
+    const targetPath = String(action.target_path || action.path || "");
+
+    const matchedCheck = checks.find((c) =>
+      c && String(c.detail || "").includes(targetPath)
+    );
+
+    return {
+      evidence_id: `EVD-${String(i + 1).padStart(3, "0")}`,
+      action_id: actionId,
+      description,
+      evidence_type: "EXECUTION_RESULT",
+      result: wrote ? "PASS" : "UNVERIFIED",
+      artifact_path: targetPath,
+      matched_verify_check: matchedCheck ? matchedCheck.name : null,
+      verified_at: new Date().toISOString()
+    };
+  });
+
+  const passCount = evidence.filter((e) => e.result === "PASS").length;
+  const failCount = evidence.filter((e) => e.result === "FAIL").length;
+  const unverifiedCount = evidence.filter((e) => e.result === "UNVERIFIED").length;
+
+  // Gather evidence from execution artifacts (plan-level)
+  const planMeta = executePlan
+    ? {
+        plan_id: executePlan.execution_id || executePlan.package_id || "",
+        source: (executePlan.source && executePlan.source_layer) ? executePlan.source_layer : "UNKNOWN",
+        file_count: Array.isArray(executePlan.proposed_files || executePlan.files) ? (executePlan.proposed_files || executePlan.files).length : actions.length
+      }
+    : null;
+
+  return {
+    generated_at: new Date().toISOString(),
+    evidence_count: evidence.length,
+    pass_count: passCount,
+    fail_count: failCount,
+    unverified_count: unverifiedCount,
+    collection_complete: evidence.length > 0 && failCount === 0,
+    plan_meta: planMeta,
+    evidence
+  };
+}
+
 function runVerify(context) {
   const verifyDir = path.resolve(ROOT, "artifacts/verify");
   ensureDir(verifyDir);
@@ -121,6 +231,7 @@ function runVerify(context) {
       deterministic_confirmation_ready: false,
       execute_artifacts_complete: false,
       decision_artifact_present: false,
+      test_evidence_present: false,
       closure_contract_ready: false
     },
     checks: []
@@ -462,10 +573,26 @@ function runVerify(context) {
     intakeSnapshot !== null &&
     intakeSnapshot.locked_snapshot_flag === true;
 
+  // Build and persist test evidence artifact
+  const testEvidencePath = path.resolve(ROOT, "artifacts/verify/test_evidence.json");
+  const testEvidence = buildTestEvidence(executePlan, executeActions, results.checks);
+  fs.writeFileSync(testEvidencePath, JSON.stringify(testEvidence, null, 2), { encoding: "utf8" });
+
+  results.closure_gate.test_evidence_present =
+    testEvidence.evidence_count > 0 &&
+    testEvidence.collection_complete === true;
+
+  addCheck(
+    "test_evidence_collected",
+    results.closure_gate.test_evidence_present,
+    `evidence_count=${testEvidence.evidence_count}; pass=${testEvidence.pass_count}; fail=${testEvidence.fail_count}; unverified=${testEvidence.unverified_count}`
+  );
+
   results.closure_gate.closure_contract_ready =
     results.closure_gate.execute_artifacts_complete === true &&
     results.closure_gate.decision_artifact_present === true &&
     results.closure_gate.deterministic_confirmation_ready === true &&
+    results.closure_gate.test_evidence_present === true &&
     results.closure_gate.gap_count === 0 &&
     results.closure_gate.critical_violations === 0 &&
     results.closure_gate.orphan_code_units === 0 &&
@@ -474,6 +601,21 @@ function runVerify(context) {
 
   results.summary.total_checks = results.checks.length;
   results.summary.failed_checks = results.checks.filter((c) => !c.passed).length;
+
+  // C-3: Log this verify run as a command entry
+  const failedNames = results.checks.filter((c) => !c.passed).map((c) => c.name);
+  const stdoutSummary = `total=${results.summary.total_checks} failed=${results.summary.failed_checks}`;
+  const stderrSummary = failedNames.join("\n");
+  writeVerifyCommandLog(ROOT, "VERIFY", "runVerify", stdoutSummary, stderrSummary, results.summary.failed_checks === 0 ? 0 : 1);
+
+  // C-4: Loop detection
+  const failedChecksForLoop = results.checks.filter((c) => !c.passed);
+  const loopResult = detectVerifyLoop(ROOT, failedChecksForLoop);
+  if (loopResult.loop_detected) {
+    results.blocked = true;
+    results.loop_detected = true;
+    results.loop_artifact = loopResult.loop_artifact;
+  }
 
   const md = [];
   md.push("# Verification Report");
@@ -490,6 +632,7 @@ function runVerify(context) {
   md.push(`- execute_artifacts_complete: ${results.closure_gate.execute_artifacts_complete ? "true" : "false"}`);
   md.push(`- decision_artifact_present: ${results.closure_gate.decision_artifact_present ? "true" : "false"}`);
   md.push(`- deterministic_confirmation_ready: ${results.closure_gate.deterministic_confirmation_ready ? "true" : "false"}`);
+  md.push(`- test_evidence_present: ${results.closure_gate.test_evidence_present ? "true" : "false"} (evidence_count=${testEvidence.evidence_count}; pass=${testEvidence.pass_count})`);
   md.push(`- closure_contract_ready: ${results.closure_gate.closure_contract_ready ? "true" : "false"}`);
   md.push("");
   md.push("## Checks");
@@ -514,7 +657,8 @@ function runVerify(context) {
       artifact: reportRel,
       outputs: {
         md: reportRel,
-        json: jsonRel
+        json: jsonRel,
+        test_evidence: "artifacts/verify/test_evidence.json"
       },
       status_patch: {
         blocking_questions: ["Verification failed — review artifacts/verify/verification_report.md"],
@@ -536,7 +680,8 @@ function runVerify(context) {
     artifact: reportRel,
     outputs: {
       md: reportRel,
-      json: jsonRel
+      json: jsonRel,
+      test_evidence: "artifacts/verify/test_evidence.json"
     },
     status_patch: {
       blocking_questions: [],

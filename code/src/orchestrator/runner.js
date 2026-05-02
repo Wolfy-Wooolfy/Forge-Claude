@@ -1,4 +1,4 @@
-const fs = require("fs");
+﻿const fs = require("fs");
 const path = require("path");
 
 const { resolveEntry } = require("./entry_resolver");
@@ -221,7 +221,7 @@ function isDryRun() {
   const v =
     process.env.FORGE_DRY_RUN !== undefined
       ? process.env.FORGE_DRY_RUN
-      : process.env.HALO_DRY_RUN;
+      : process.env.FORGE_DRY_RUN;
 
   return String(v || "").toLowerCase() === "true";
 }
@@ -251,6 +251,7 @@ function assertIdempotency(status) {
 }
 
 async function run(runContext = {}) {
+  try {
   const entry = resolveEntry();
   const status = {
     ...loadStatusReflection(entry),
@@ -302,6 +303,14 @@ async function run(runContext = {}) {
 
   if (!result || typeof result !== "object") {
     throw new Error("Task handler must return execution result object");
+  }
+
+  if (
+    result.status_patch &&
+    Array.isArray(result.status_patch.blocking_questions) &&
+    result.status_patch.blocking_questions.length > 1
+  ) {
+    result.status_patch.blocking_questions = [result.status_patch.blocking_questions[0]];
   }
 
   const patchHasBlockingQuestion =
@@ -364,6 +373,7 @@ async function run(runContext = {}) {
   if (result.blocked === true || hasBlockingQuestion) {
     updated = {
       ...updated,
+      status_type: "BLOCKED",
       overall_progress_percent: Math.min(
         Number(updated.overall_progress_percent || 0),
         99
@@ -399,6 +409,11 @@ async function run(runContext = {}) {
 
   writeStatus(statusPayload);
 
+  if (result.blocked === true || hasBlockingQuestion) {
+    const blockMsg = (updated.blocking_questions && updated.blocking_questions[0]) || 'Task blocked with no reason';
+    throw new Error(`[TASK BLOCKED] ${entry.next_task}: ${blockMsg}`);
+  }
+
   console.log(`[FORGE] ${entry.next_task} progressed stage to ${result.stage_progress_percent}%`);
 
   if (result.closure_artifact) {
@@ -409,6 +424,19 @@ async function run(runContext = {}) {
     ...result,
     updated_status: updated
   };
+  } catch (err) {
+    const emergencyPath = path.join(ROOT, 'artifacts', 'forge', 'emergency_report.md');
+    const report = [
+      '# Emergency Halt',
+      '',
+      `generated_at: ${new Date().toISOString()}`,
+      `reason: ${err.message}`,
+      '',
+      'corrective_recommendation: Inspect the reason above, resolve the blocking condition, then re-run.',
+    ].join('\n');
+    try { fs.writeFileSync(emergencyPath, report, 'utf-8'); } catch (_) {}
+    throw err;
+  }
 }
 
 module.exports = {

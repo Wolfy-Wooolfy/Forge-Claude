@@ -1,4 +1,4 @@
-# HALO Personal Autonomous Pipeline — Release Manifest
+﻿# Forge Personal Autonomous Pipeline — Release Manifest
 
 **Release:** 1.0.0  
 **Type:** CORE RUNTIME FREEZE  
@@ -8,7 +8,7 @@
 
 ## 1. Scope
 
-This release freezes the **Core Orchestrator Runtime** for the HALO
+This release freezes the **Core Orchestrator Runtime** for the Forge
 Personal Autonomous Pipeline.
 
 Included scope:
@@ -25,7 +25,7 @@ Included scope:
 - `code/src/orchestrator/stage_transitions.js`
 - `code/src/orchestrator/status_writer.js`
 - `code/src/orchestrator/runner.js`
-- `bin/halo-run.js`
+- `bin/forge-run.js`
 
 ### Verification
 - `verify/smoke/stage_transitions_smoke.js`

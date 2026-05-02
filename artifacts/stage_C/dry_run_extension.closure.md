@@ -1,4 +1,4 @@
-# Stage C Closure — Dry-Run Extension
+﻿# Stage C Closure — Dry-Run Extension
 
 **Stage:** C  
 **Release:** 1.1.0  
@@ -11,7 +11,7 @@
 Dry-Run mode for the Orchestrator Runner is hereby CLOSED.
 
 Included:
-- Spec-defined activation via HALO_DRY_RUN
+- Spec-defined activation via FORGE_DRY_RUN
 - Deterministic validation without state mutation
 - Dedicated smoke test coverage
 

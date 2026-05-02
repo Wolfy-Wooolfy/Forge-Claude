@@ -1,6 +1,6 @@
-# Cognitive Artifacts Definition Specification
+﻿# Cognitive Artifacts Definition Specification
 
-**Document ID:** HALO-DOC-16  
+**Document ID:** FORGE-DOC-16  
 **Status:** BINDING – ARTIFACT SCHEMA AUTHORITY  
 **Scope:** Stage A, B, C, D Cognitive Artifacts  
 **Enforcement:** Fail-Closed  

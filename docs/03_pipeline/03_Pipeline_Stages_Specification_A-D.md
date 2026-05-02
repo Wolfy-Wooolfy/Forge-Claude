@@ -1,4 +1,4 @@
-# 📄 Document 3 — Pipeline Stages Specification (A → D)
+﻿# 📄 Document 3 — Pipeline Stages Specification (A → D)
 
 **Project:** Forge  
 **Version:** 1.1  
@@ -78,7 +78,7 @@ This applies to:
 
 Audit invocation is mandatory and non-optional.
 It MUST occur at the contract-defined audit points
-as specified by the HALO Boundary Audit Rules.
+as specified by the Forge Boundary Audit Rules.
 
 Deferred, implicit, bypassed,
 or inferred audits are strictly forbidden.
@@ -324,7 +324,7 @@ No coding, no documents, no assumptions beyond what is explicitly inferable.
 ### 3.2 Inputs
 
 - User intent (free text or command)
-- Existing HALO documents (if referenced)
+- Existing Forge documents (if referenced)
 - Known constraints and rules
 - Project context (if any)
 
@@ -438,7 +438,7 @@ Stage B includes a deterministic refinement loop to eliminate specification gaps
 ### 4.2 Inputs
 
 - All Stage A artifacts (especially `idea_final_spec.md`)
-- HALO governance rules
+- Forge governance rules
 - Existing standards and templates (if allowed)
 
 ---

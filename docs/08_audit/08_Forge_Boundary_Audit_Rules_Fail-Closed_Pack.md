@@ -1,6 +1,6 @@
-# HALO Boundary Audit Rules (Fail-Closed Pack)
+﻿# Forge Boundary Audit Rules (Fail-Closed Pack)
 
-**Document ID:** HALO-DOC-08  
+**Document ID:** FORGE-DOC-08  
 **Status:** BINDING – NON-NEGOTIABLE  
 **Applies To:** All Pipeline Stages, Agents, Tools, and Outputs  
 **Enforcement Level:** System-Wide (Fail-Closed)
@@ -9,11 +9,11 @@
 
 ## 1. Purpose
 
-This document defines the **mandatory Boundary Audit Rules** governing HALO’s autonomous pipeline.
+This document defines the **mandatory Boundary Audit Rules** governing Forge’s autonomous pipeline.
 
 Its purpose is to ensure that:
 - No unsafe, unauthorized, or boundary-breaking output is ever finalized
-- All execution remains aligned with HALO’s core principles
+- All execution remains aligned with Forge’s core principles
 - Any ambiguity, leakage, or policy violation results in an immediate **Fail-Closed halt**
 
 This is not a quality check.  
@@ -74,7 +74,7 @@ a Boundary Audit outcome.
 
 ## 2. Core Principle: Fail-Closed by Default
 
-HALO operates under a **Fail-Closed** philosophy.
+Forge operates under a **Fail-Closed** philosophy.
 
 If the system is unsure whether an action is allowed:
 - The action is **blocked**
@@ -351,7 +351,7 @@ Missing or inferred consent → **Fail-Closed**
 
 ### 3.4 Client Vault Integrity Audit
 
-HALO MUST verify that:
+Forge MUST verify that:
 
 - All personal memory remains in the Client Vault
 - No sensitive data is copied, mirrored, or inferred server-side

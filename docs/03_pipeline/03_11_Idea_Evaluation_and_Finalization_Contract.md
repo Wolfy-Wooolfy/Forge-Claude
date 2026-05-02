@@ -1,4 +1,4 @@
-# 📄 Document — Idea Evaluation & Finalization Contract
+﻿# 📄 Document — Idea Evaluation & Finalization Contract
 
 ## Supersession Notice
 
@@ -20,7 +20,7 @@ This document remains valid for process logic and conceptual flow only.
 > This contract does not replace the Admission Layer
 > and must not be used as an entry point into the pipeline.
 
-**Document ID:** HALO-DOC-11
+**Document ID:** FORGE-DOC-11
 **Status:** BINDING — EXECUTION CONTRACT
 **Applies To:** Stage A — Idea Engine
 **Enforcement Level:** Fail-Closed

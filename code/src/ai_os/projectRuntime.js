@@ -4,6 +4,9 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 const OpenAiRequirementDiscoveryProvider = require("../providers/openAiRequirementDiscoveryProvider");
+const OpenAiOptionsProvider = require("../providers/openAiOptionsProvider");
+const OpenAiDocumentationProvider = require("../providers/openAiDocumentationProvider");
+const OpenAiExecutionFilesProvider = require("../providers/openAiExecutionFilesProvider");
 
 function createAiOsRuntime(options = {}) {
   const root = path.resolve(options.root || process.cwd());
@@ -169,26 +172,8 @@ function createAiOsRuntime(options = {}) {
     return finalState;
   }
 
-  function inferProjectType(text) {
-    const value = String(text || "").toLowerCase();
-
-    if (value.includes("game") || value.includes("لعبة")) {
-      return "SOFTWARE_APP";
-    }
-
-    if (value.includes("mobile") || value.includes("app") || value.includes("تطبيق")) {
-      return "SOFTWARE_APP";
-    }
-
-    if (value.includes("website") || value.includes("web")) {
-      return "WEB_APP";
-    }
-
-    return "UNCLASSIFIED";
-  }
-
   function detectPrimaryLanguage(text) {
-    return /[\u0600-\u06FF]/.test(String(text || "")) ? "AR" : "EN";
+    return /[؀-ۿ]/.test(String(text || "")) ? "AR" : "EN";
   }
 
   async function buildRequirementDiscoveryViaProvider(userInput, previousModel = null) {
@@ -267,6 +252,83 @@ function createAiOsRuntime(options = {}) {
     };
   }
 
+  async function buildOptionsViaProvider(requirementModel, domain, userGoal) {
+    const provider = new OpenAiOptionsProvider();
+
+    const providerResult = await provider.executeTask({
+      task_id: `options_generation_${Date.now()}`,
+      context: {
+        domain: String(domain || ""),
+        user_goal: String(userGoal || ""),
+        requirement_model: requirementModel || {}
+      }
+    });
+
+    if (
+      providerResult.status !== "SUCCESS" ||
+      !providerResult.output ||
+      !Array.isArray(providerResult.output.options) ||
+      providerResult.output.options.length === 0
+    ) {
+      return { ok: false, reason: providerResult.metadata && providerResult.metadata.reason ? providerResult.metadata.reason : "OPTIONS_PROVIDER_FAILED" };
+    }
+
+    return { ok: true, options: providerResult.output.options };
+  }
+
+  async function buildDocumentationViaProvider(state, selectedOption) {
+    const provider = new OpenAiDocumentationProvider();
+
+    const providerResult = await provider.executeTask({
+      task_id: `documentation_generation_${Date.now()}`,
+      context: {
+        domain: String(state.requirement_domain || ""),
+        user_goal: String(state.user_goal || ""),
+        selected_option: selectedOption || {},
+        requirement_model: state.requirement_model || {}
+      }
+    });
+
+    if (
+      providerResult.status !== "SUCCESS" ||
+      !providerResult.output ||
+      typeof providerResult.output.content !== "string" ||
+      !providerResult.output.content.trim()
+    ) {
+      return { ok: false, reason: providerResult.metadata && providerResult.metadata.reason ? providerResult.metadata.reason : "DOCUMENTATION_PROVIDER_FAILED" };
+    }
+
+    return { ok: true, content: providerResult.output.content };
+  }
+
+  async function buildExecutionFilesViaProvider(projectId, state, selectedOption, documentationContent) {
+    const provider = new OpenAiExecutionFilesProvider();
+    const outputBase = `artifacts/projects/${projectId}/output`;
+
+    const providerResult = await provider.executeTask({
+      task_id: `execution_files_generation_${Date.now()}`,
+      context: {
+        domain: String(state.requirement_domain || ""),
+        user_goal: String(state.user_goal || ""),
+        selected_option: selectedOption || {},
+        documentation: String(documentationContent || ""),
+        requirement_model: state.requirement_model || {},
+        output_base_path: outputBase
+      }
+    });
+
+    if (
+      providerResult.status !== "SUCCESS" ||
+      !providerResult.output ||
+      !Array.isArray(providerResult.output.files) ||
+      providerResult.output.files.length === 0
+    ) {
+      return { ok: false, reason: providerResult.metadata && providerResult.metadata.reason ? providerResult.metadata.reason : "EXECUTION_FILES_PROVIDER_FAILED" };
+    }
+
+    return { ok: true, files: providerResult.output.files };
+  }
+
   function assertRequirementDiscoveryComplete(state) {
     const openQuestions = Array.isArray(state.open_questions) ? state.open_questions : [];
 
@@ -305,7 +367,6 @@ function createAiOsRuntime(options = {}) {
       const blockedState = saveProjectState({
         ...state,
         project_name: projectName,
-        project_type: inferProjectType(message),
         primary_language: detectPrimaryLanguage(message),
         user_goal: message,
         current_phase: "DISCOVERY",
@@ -334,7 +395,6 @@ function createAiOsRuntime(options = {}) {
     const updatedState = saveProjectState({
       ...state,
       project_name: projectName,
-      project_type: inferProjectType(message),
       primary_language: detectPrimaryLanguage(message),
       user_goal: message,
       current_phase: "DISCOVERY",
@@ -359,7 +419,6 @@ function createAiOsRuntime(options = {}) {
     appendArrayJson(path.join(aiOsRoot(projectId), "ideation_log.json"), {
       entry_type: "IDEATION_INTAKE",
       message,
-      inferred_project_type: updatedState.project_type,
       needs_clarification: clarificationQuestions.length > 0,
       clarification_questions: clarificationQuestions,
       requirement_model: discovery.requirement_model,
@@ -476,32 +535,7 @@ function createAiOsRuntime(options = {}) {
     };
   }
 
-function generateOptionsFromAnswers(answers = {}) {
-  const gameType = answers.game_type || "Game";
-  const platform = answers.platform || "Mobile";
-  const mode = answers.mode || "Offline";
-  const monetization = answers.monetization || "Ads";
-  const scope = answers.scope || "MVP";
-
-  return [
-    {
-      option_id: "OPTION-1",
-      title: `${gameType} ${scope}`,
-      description: `${mode} ${platform} ${gameType} with ${monetization} monetization based on user requirements.`,
-      impact_level: "HIGH",
-      risk_level: "LOW"
-    },
-    {
-      option_id: "OPTION-2",
-      title: `Advanced ${gameType}`,
-      description: `Extended version with scalable features, future online support, and advanced monetization options.`,
-      impact_level: "HIGH",
-      risk_level: "MEDIUM"
-    }
-  ];
-}
-
-  function registerOptions(body = {}) {
+  async function registerOptions(body = {}) {
     const projectId = normalizeProjectId(body.project_id);
     const state = loadProjectState(projectId, body.project_name);
 
@@ -528,8 +562,22 @@ function generateOptionsFromAnswers(answers = {}) {
     let options = Array.isArray(body.options) ? body.options : [];
 
     if (options.length === 0) {
-      const answers = state.clarification_answers || {};
-      options = generateOptionsFromAnswers(answers);
+      const providerResult = await buildOptionsViaProvider(
+        state.requirement_model,
+        state.requirement_domain,
+        state.user_goal
+      );
+
+      if (!providerResult.ok) {
+        return {
+          ok: false,
+          mode: "BLOCKED",
+          reason: providerResult.reason || "OPTIONS_GENERATION_FAILED",
+          blocking_question: "فشل توليد الخيارات عبر المزود. تحقق من إعدادات OPENAI_API_KEY."
+        };
+      }
+
+      options = providerResult.options;
     }
 
     if (options.length === 0) {
@@ -639,600 +687,17 @@ function generateOptionsFromAnswers(answers = {}) {
     return optionsEntries[optionsEntries.length - 1].options;
   }
 
-function buildRequirementProfile(state, selectedOption = {}) {
-  const answers = state.clarification_answers || {};
-  const text = [
-    answers.game_type,
-    answers.reference_game,
-    answers.progression,
-    answers.mode,
-    selectedOption.title,
-    selectedOption.description
-  ].join(" ").toLowerCase();
-
-  const isRunner = text.includes("runner") || text.includes("subway");
-  const isMatch3 = text.includes("match-3") || text.includes("match 3") || text.includes("candy") || text.includes("puzzle");
-
-  if (isRunner) {
-    return {
-      archetype: "ENDLESS_RUNNER",
-      files: ["index.html", "style.css", "game.js"],
-      mechanics: [
-        "Player controls a runner character on a forward-moving track.",
-        "Player jumps to avoid incoming obstacles.",
-        "Obstacles spawn over time and move toward the player.",
-        "Game speed increases as score increases.",
-        "Collision ends the run."
-      ],
-      gameLoop: [
-        "1. Start run",
-        "2. Spawn player on ground lane",
-        "3. Spawn obstacles over time",
-        "4. Player jumps to avoid obstacles",
-        "5. Update obstacle movement and speed",
-        "6. Detect collisions",
-        "7. Increase score over time",
-        "8. End run on collision or continue"
-      ],
-      playerActions: [
-        "- Tap, click, or press Space to jump",
-        "- Restart run after game over"
-      ],
-      winLose: [
-        "- Win: MVP has no hard win state; success is measured by survival score",
-        "- Lose: Player collides with an obstacle"
-      ],
-      ui: [
-        "- Game Screen with canvas",
-        "- Score display",
-        "- Speed display",
-        "- Status message",
-        "- Restart button"
-      ],
-      technical: [
-        "- Frontend: HTML5 Canvas",
-        "- Game Logic: JavaScript animation loop",
-        "- State Management: In-memory runtime state",
-        "- Storage: None for MVP"
-      ]
-    };
-  }
-
-  if (isMatch3) {
-    return {
-      archetype: "MATCH_3_PUZZLE",
-      files: ["index.html", "style.css", "game.js"],
-      mechanics: [
-        "Player interacts with a match-3 style grid.",
-        "Player swaps adjacent tiles to form matches.",
-        "Matching 3+ tiles removes them from the board.",
-        "New tiles fall dynamically from the top.",
-        "Chain reactions increase score multiplier."
-      ],
-      gameLoop: [
-        "1. Load puzzle grid with random tiles",
-        "2. Player swaps two adjacent tiles",
-        "3. System checks for valid match (3+)",
-        "4. Matched tiles are removed",
-        "5. Tiles above fall down to fill gaps",
-        "6. New tiles spawn from top",
-        "7. Combo chains are evaluated",
-        "8. Score is updated",
-        "9. Check win/lose condition",
-        "10. Continue level or end"
-      ],
-      playerActions: [
-        "- Tap or click tiles to select",
-        "- Swap adjacent tiles",
-        "- Restart level"
-      ],
-      winLose: [
-        "- Win: Player reaches target score before running out of moves",
-        "- Lose: Player runs out of moves before achieving target",
-        "- Lose: No possible matches remain"
-      ],
-      ui: [
-        "- Main Menu",
-        "- Game Screen with grid",
-        "- Score, moves, and target display",
-        "- Result/status area",
-        "- Restart button"
-      ],
-      technical: [
-        "- Frontend: HTML/CSS/JavaScript",
-        "- Game Logic: JavaScript board loop",
-        "- State Management: In-memory board state",
-        "- Storage: None for MVP"
-      ]
-    };
-  }
-
-  return {
-    archetype: "GENERIC_INTERACTIVE_GAME",
-    files: ["index.html", "style.css", "game.js"],
-    mechanics: [
-      "Core mechanics are derived from the approved requirements.",
-      "Player performs actions that update game state.",
-      "System evaluates progress and feedback."
-    ],
-    gameLoop: [
-      "1. Start game",
-      "2. Player performs action",
-      "3. System updates state",
-      "4. System evaluates outcome",
-      "5. Continue or end game"
-    ],
-    playerActions: [
-      "- Perform primary game action",
-      "- Restart session"
-    ],
-    winLose: [
-      "- Win: Player achieves defined objective",
-      "- Lose: Player fails objective or reaches fail condition"
-    ],
-    ui: [
-      "- Game Screen",
-      "- Score/status display",
-      "- Restart control"
-    ],
-    technical: [
-      "- Frontend: HTML/CSS/JavaScript",
-      "- Game Logic: JavaScript runtime loop",
-      "- State Management: In-memory state"
-    ]
-  };
-}
-
-function generateExecutionFilesFromDesign(projectId, state) {
-  const answers = state.clarification_answers || {};
-  const profile = buildRequirementProfile(state);
-  const outputBase = `artifacts/projects/${projectId}/output`;
-
-  if (answers.game_type === "Action") {
-    return [
-      {
-        path: `${outputBase}/index.html`,
-        allow_overwrite: false,
-        content: [
-          "<!doctype html>",
-          "<html>",
-          "<head>",
-          "  <meta charset=\"utf-8\">",
-          "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">",
-          "  <title>Action Runner MVP</title>",
-          "  <link rel=\"stylesheet\" href=\"style.css\">",
-          "</head>",
-          "<body>",
-          "  <main class=\"game-shell\">",
-          "    <h1>Action Runner MVP</h1>",
-          "    <section class=\"hud\">",
-          "      <div>Score: <span id=\"score\">0</span></div>",
-          "      <div>Speed: <span id=\"speed\">1</span>x</div>",
-          "    </section>",
-          "    <canvas id=\"game\" width=\"420\" height=\"520\"></canvas>",
-          "    <p id=\"status\" class=\"status\">Press Space or Tap to jump.</p>",
-          "    <button id=\"restart\">Restart</button>",
-          "  </main>",
-          "  <script src=\"game.js\"></script>",
-          "</body>",
-          "</html>"
-        ].join("\n")
-      },
-      {
-        path: `${outputBase}/style.css`,
-        allow_overwrite: false,
-        content: [
-          "body { margin: 0; font-family: Arial, sans-serif; background: #0f172a; color: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; }",
-          ".game-shell { width: min(94vw, 460px); text-align: center; }",
-          ".hud { display: flex; justify-content: space-between; margin: 12px 0; }",
-          "canvas { width: 100%; background: linear-gradient(#1e293b, #334155); border-radius: 14px; }",
-          ".status { min-height: 24px; }",
-          "button { padding: 10px 16px; border: 0; border-radius: 10px; cursor: pointer; }"
-        ].join("\n")
-      },
-      {
-        path: `${outputBase}/game.js`,
-        allow_overwrite: false,
-        content: [
-          "const canvas = document.getElementById(\"game\");",
-          "const ctx = canvas.getContext(\"2d\");",
-          "const scoreElement = document.getElementById(\"score\");",
-          "const speedElement = document.getElementById(\"speed\");",
-          "const statusElement = document.getElementById(\"status\");",
-          "const restartButton = document.getElementById(\"restart\");",
-          "",
-          "const groundY = 430;",
-          "let player;",
-          "let obstacles;",
-          "let score;",
-          "let speed;",
-          "let frame;",
-          "let running;",
-          "",
-          "function resetGame() {",
-          "  player = { x: 70, y: groundY, w: 34, h: 44, vy: 0, jumping: false };",
-          "  obstacles = [];",
-          "  score = 0;",
-          "  speed = 1;",
-          "  frame = 0;",
-          "  running = true;",
-          "  statusElement.textContent = \"Press Space or Tap to jump.\";",
-          "  requestAnimationFrame(loop);",
-          "}",
-          "",
-          "function jump() {",
-          "  if (!running) return;",
-          "  if (!player.jumping) {",
-          "    player.vy = -15;",
-          "    player.jumping = true;",
-          "  }",
-          "}",
-          "",
-          "function spawnObstacle() {",
-          "  obstacles.push({ x: canvas.width + 20, y: groundY + 8, w: 28, h: 36 });",
-          "}",
-          "",
-          "function update() {",
-          "  frame += 1;",
-          "  score += 1;",
-          "  speed = 1 + Math.floor(score / 500) * 0.25;",
-          "",
-          "  player.y += player.vy;",
-          "  player.vy += 0.8;",
-          "  if (player.y >= groundY) {",
-          "    player.y = groundY;",
-          "    player.vy = 0;",
-          "    player.jumping = false;",
-          "  }",
-          "",
-          "  if (frame % Math.max(45, Math.floor(100 / speed)) === 0) spawnObstacle();",
-          "  obstacles.forEach((obstacle) => { obstacle.x -= 5 * speed; });",
-          "  obstacles = obstacles.filter((obstacle) => obstacle.x + obstacle.w > 0);",
-          "",
-          "  if (obstacles.some(collides)) {",
-          "    running = false;",
-          "    statusElement.textContent = \"Game over. Press Restart.\";",
-          "  }",
-          "",
-          "  scoreElement.textContent = score;",
-          "  speedElement.textContent = speed.toFixed(2);",
-          "}",
-          "",
-          "function collides(obstacle) {",
-          "  return player.x < obstacle.x + obstacle.w &&",
-          "    player.x + player.w > obstacle.x &&",
-          "    player.y < obstacle.y + obstacle.h &&",
-          "    player.y + player.h > obstacle.y;",
-          "}",
-          "",
-          "function draw() {",
-          "  ctx.clearRect(0, 0, canvas.width, canvas.height);",
-          "  ctx.fillStyle = \"#22c55e\";",
-          "  ctx.fillRect(0, groundY + 44, canvas.width, 8);",
-          "  ctx.fillStyle = \"#38bdf8\";",
-          "  ctx.fillRect(player.x, player.y, player.w, player.h);",
-          "  ctx.fillStyle = \"#f97316\";",
-          "  obstacles.forEach((obstacle) => ctx.fillRect(obstacle.x, obstacle.y, obstacle.w, obstacle.h));",
-          "}",
-          "",
-          "function loop() {",
-          "  if (!running) {",
-          "    draw();",
-          "    return;",
-          "  }",
-          "  update();",
-          "  draw();",
-          "  requestAnimationFrame(loop);",
-          "}",
-          "",
-          "window.addEventListener(\"keydown\", (event) => { if (event.code === \"Space\") jump(); });",
-          "canvas.addEventListener(\"click\", jump);",
-          "restartButton.addEventListener(\"click\", resetGame);",
-          "resetGame();"
-        ].join("\n")
-      }
-    ];
-  }
-
-  if (answers.game_type === "Casual Puzzle") {
-    return [
-      {
-        path: `${outputBase}/index.html`,
-        allow_overwrite: false,
-        content: [
-          "<!doctype html>",
-          "<html>",
-          "<head>",
-          "  <meta charset=\"utf-8\">",
-          "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">",
-          "  <title>Mobile Game MVP</title>",
-          "  <link rel=\"stylesheet\" href=\"style.css\">",
-          "</head>",
-          "<body>",
-          "  <main class=\"game-shell\">",
-          "    <h1>Mobile Game MVP</h1>",
-          "    <section class=\"hud\">",
-          "      <div>Score: <span id=\"score\">0</span></div>",
-          "      <div>Moves: <span id=\"moves\">20</span></div>",
-          "      <div>Target: <span id=\"target\">1000</span></div>",
-          "    </section>",
-          "    <section id=\"board\" class=\"board\" aria-label=\"Match 3 board\"></section>",
-          "    <p id=\"status\" class=\"status\">Swap adjacent tiles to create matches.</p>",
-          "    <button id=\"restart\">Restart Level</button>",
-          "  </main>",
-          "  <script src=\"game.js\"></script>",
-          "</body>",
-          "</html>"
-        ].join("\n")
-      },
-      {
-        path: `${outputBase}/style.css`,
-        allow_overwrite: false,
-        content: [
-          "body {",
-          "  margin: 0;",
-          "  font-family: Arial, sans-serif;",
-          "  background: #111827;",
-          "  color: #f9fafb;",
-          "  display: flex;",
-          "  justify-content: center;",
-          "  align-items: center;",
-          "  min-height: 100vh;",
-          "}",
-          "",
-          ".game-shell {",
-          "  width: min(92vw, 460px);",
-          "  text-align: center;",
-          "}",
-          "",
-          ".hud {",
-          "  display: flex;",
-          "  justify-content: space-between;",
-          "  gap: 8px;",
-          "  margin: 16px 0;",
-          "}",
-          "",
-          ".board {",
-          "  display: grid;",
-          "  grid-template-columns: repeat(8, 1fr);",
-          "  gap: 6px;",
-          "}",
-          "",
-          ".tile {",
-          "  aspect-ratio: 1;",
-          "  border: 0;",
-          "  border-radius: 12px;",
-          "  font-size: 22px;",
-          "  cursor: pointer;",
-          "}",
-          "",
-          ".tile.selected {",
-          "  outline: 3px solid #facc15;",
-          "}",
-          "",
-          ".status {",
-          "  min-height: 24px;",
-          "}",
-          "",
-          "button {",
-          "  padding: 10px 16px;",
-          "  border: 0;",
-          "  border-radius: 10px;",
-          "  cursor: pointer;",
-          "}"
-        ].join("\n")
-      },
-      {
-        path: `${outputBase}/game.js`,
-        allow_overwrite: false,
-        content: [
-          "const boardElement = document.getElementById(\"board\");",
-          "const scoreElement = document.getElementById(\"score\");",
-          "const movesElement = document.getElementById(\"moves\");",
-          "const targetElement = document.getElementById(\"target\");",
-          "const statusElement = document.getElementById(\"status\");",
-          "const restartButton = document.getElementById(\"restart\");",
-          "",
-          "const size = 8;",
-          "const targetScore = 1000;",
-          "const tileTypes = [\"🍒\", \"🍋\", \"🍇\", \"💎\", \"⭐\"];",
-          "let board = [];",
-          "let selectedIndex = null;",
-          "let score = 0;",
-          "let moves = 20;",
-          "",
-          "function randomTile() {",
-          "  return tileTypes[Math.floor(Math.random() * tileTypes.length)];",
-          "}",
-          "",
-          "function createBoard() {",
-          "  board = Array.from({ length: size * size }, randomTile);",
-          "  score = 0;",
-          "  moves = 20;",
-          "  selectedIndex = null;",
-          "  render();",
-          "}",
-          "",
-          "function render() {",
-          "  boardElement.innerHTML = \"\";",
-          "  scoreElement.textContent = score;",
-          "  movesElement.textContent = moves;",
-          "  targetElement.textContent = targetScore;",
-          "",
-          "  board.forEach((tile, index) => {",
-          "    const button = document.createElement(\"button\");",
-          "    button.className = `tile${selectedIndex === index ? \" selected\" : \"\"}`;",
-          "    button.textContent = tile;",
-          "    button.addEventListener(\"click\", () => selectTile(index));",
-          "    boardElement.appendChild(button);",
-          "  });",
-          "}",
-          "",
-          "function selectTile(index) {",
-          "  if (moves <= 0 || score >= targetScore) return;",
-          "",
-          "  if (selectedIndex === null) {",
-          "    selectedIndex = index;",
-          "    render();",
-          "    return;",
-          "  }",
-          "",
-          "  if (!areAdjacent(selectedIndex, index)) {",
-          "    selectedIndex = index;",
-          "    render();",
-          "    return;",
-          "  }",
-          "",
-          "  swap(selectedIndex, index);",
-          "  selectedIndex = null;",
-          "  moves -= 1;",
-          "",
-          "  const matches = findMatches();",
-          "  if (matches.size === 0) {",
-          "    swap(index, selectedIndex);",
-          "    statusElement.textContent = \"No match. Try another swap.\";",
-          "  } else {",
-          "    resolveMatches(matches);",
-          "  }",
-          "",
-          "  checkResult();",
-          "  render();",
-          "}",
-          "",
-          "function areAdjacent(a, b) {",
-          "  const ax = a % size;",
-          "  const ay = Math.floor(a / size);",
-          "  const bx = b % size;",
-          "  const by = Math.floor(b / size);",
-          "  return Math.abs(ax - bx) + Math.abs(ay - by) === 1;",
-          "}",
-          "",
-          "function swap(a, b) {",
-          "  const temp = board[a];",
-          "  board[a] = board[b];",
-          "  board[b] = temp;",
-          "}",
-          "",
-          "function findMatches() {",
-          "  const matches = new Set();",
-          "",
-          "  for (let y = 0; y < size; y += 1) {",
-          "    for (let x = 0; x < size - 2; x += 1) {",
-          "      const i = y * size + x;",
-          "      if (board[i] === board[i + 1] && board[i] === board[i + 2]) {",
-          "        matches.add(i);",
-          "        matches.add(i + 1);",
-          "        matches.add(i + 2);",
-          "      }",
-          "    }",
-          "  }",
-          "",
-          "  for (let x = 0; x < size; x += 1) {",
-          "    for (let y = 0; y < size - 2; y += 1) {",
-          "      const i = y * size + x;",
-          "      if (board[i] === board[i + size] && board[i] === board[i + size * 2]) {",
-          "        matches.add(i);",
-          "        matches.add(i + size);",
-          "        matches.add(i + size * 2);",
-          "      }",
-          "    }",
-          "  }",
-          "",
-          "  return matches;",
-          "}",
-          "",
-          "function resolveMatches(matches) {",
-          "  score += matches.size * 50;",
-          "  matches.forEach((index) => {",
-          "    board[index] = randomTile();",
-          "  });",
-          "  statusElement.textContent = `Matched ${matches.size} tiles!`;",
-          "}",
-          "",
-          "function checkResult() {",
-          "  if (score >= targetScore) {",
-          "    statusElement.textContent = \"You win!\";",
-          "  } else if (moves <= 0) {",
-          "    statusElement.textContent = \"No moves left. Try again.\";",
-          "  }",
-          "}",
-          "",
-          "restartButton.addEventListener(\"click\", createBoard);",
-          "createBoard();"
-        ].join("\n")
-      }
-    ];
-  }
-
-  return [
-    {
-      path: `${outputBase}/index.html`,
-      allow_overwrite: false,
-      content: "<!doctype html><html><body><h1>Generated Project</h1></body></html>"
+  function getDocumentationContent(projectId) {
+    const draftPath = path.join(aiOsRoot(projectId), "documentation", "draft.md");
+    if (!fs.existsSync(draftPath)) return "";
+    try {
+      return fs.readFileSync(draftPath, "utf8");
+    } catch (err) {
+      return "";
     }
-  ];
-}
+  }
 
-function generateDocumentationDraftContent(state, selectedOption) {
-  const answers = state.clarification_answers || {};
-  const profile = buildRequirementProfile(state, selectedOption);
-
-  return [
-    `# ${state.project_name || "Project"} Documentation Draft`,
-    "",
-    "## Overview",
-    String(state.user_goal || ""),
-    "",
-    "## Discovery Summary",
-    `- Game Type: ${answers.game_type || "Not specified"}`,
-    `- Target Audience: ${answers.target_audience || "Not specified"}`,
-    `- Mode: ${answers.mode || "Not specified"}`,
-    `- Progression: ${answers.progression || "Not specified"}`,
-    `- Score System: ${answers.score_system || "Not specified"}`,
-    `- Login: ${answers.login || "Not specified"}`,
-    `- Platform: ${answers.platform || "Not specified"}`,
-    `- Monetization: ${answers.monetization || "Not specified"}`,
-    `- Reference Game: ${answers.reference_game || "Not specified"}`,
-    `- Scope: ${answers.scope || "Not specified"}`,
-    "",
-    "## Selected Option",
-    `- Option ID: ${selectedOption.option_id || "Not specified"}`,
-    `- Title: ${selectedOption.title || "Not specified"}`,
-    `- Description: ${selectedOption.description || "Not specified"}`,
-    "",
-    "## Core Gameplay Mechanics",
-    ...profile.mechanics,
-    "",
-    "## Game Loop",
-    ...profile.gameLoop,
-    "",
-    "## Player Actions",
-    ...profile.playerActions,
-    "",
-    "## Win / Lose Conditions",
-    ...profile.winLose,
-    "",
-    "## UI Structure",
-    ...profile.ui,
-    "",
-    "## Technical Structure (MVP)",
-    ...profile.technical,
-    "",
-    "## MVP Scope",
-    "- Single gameplay mode",
-    "- Limited levels or controlled MVP session",
-    "- Basic UI",
-    "- Ads integration placeholder",
-    "",
-    "## Files To Generate",
-    ...profile.files.map((file) => `- ${file}`),
-    "",
-    "## Execution Boundary",
-    "No direct execution is allowed from AI OS. Execution must be handed off to Forge Core only."
-  ].join("\n");
-}
-
-  function saveDocumentationDraft(body = {}) {
+  async function saveDocumentationDraft(body = {}) {
     const projectId = normalizeProjectId(body.project_id);
     const state = loadProjectState(projectId, body.project_name);
     const discoveryGate = assertRequirementDiscoveryComplete(state);
@@ -1240,6 +705,7 @@ function generateDocumentationDraftContent(state, selectedOption) {
     if (!discoveryGate.ok) {
       return discoveryGate;
     }
+
     let content = String(body.content || "").trim();
 
     if (!content) {
@@ -1261,8 +727,20 @@ function generateDocumentationDraftContent(state, selectedOption) {
         };
       }
 
-      content = generateDocumentationDraftContent(state, selectedOption);
+      const providerResult = await buildDocumentationViaProvider(state, selectedOption);
+
+      if (!providerResult.ok) {
+        return {
+          ok: false,
+          mode: "BLOCKED",
+          reason: providerResult.reason || "DOCUMENTATION_GENERATION_FAILED",
+          blocking_question: "فشل توليد الوثائق عبر المزود. تحقق من إعدادات OPENAI_API_KEY."
+        };
+      }
+
+      content = providerResult.content;
     }
+
     const docsDir = path.join(aiOsRoot(projectId), "documentation");
     const draftPath = path.join(docsDir, "draft.md");
 
@@ -1323,7 +801,7 @@ function generateDocumentationDraftContent(state, selectedOption) {
     };
   }
 
-  function createExecutionHandoff(body = {}) {
+  async function createExecutionHandoff(body = {}) {
     const projectId = normalizeProjectId(body.project_id);
     const state = loadProjectState(projectId, body.project_name);
 
@@ -1351,7 +829,33 @@ function generateDocumentationDraftContent(state, selectedOption) {
     let files = Array.isArray(body.files) ? body.files : [];
 
     if (files.length === 0) {
-      files = generateExecutionFilesFromDesign(projectId, state);
+      const latestOptions = getLatestOptions(projectId);
+      const selectedOptionId = Array.isArray(state.accepted_options)
+        ? state.accepted_options[state.accepted_options.length - 1]
+        : "";
+      const selectedOption = latestOptions.find((option) => {
+        return String(option.option_id || "") === String(selectedOptionId || "");
+      }) || null;
+
+      const documentationContent = getDocumentationContent(projectId);
+
+      const providerResult = await buildExecutionFilesViaProvider(
+        projectId,
+        state,
+        selectedOption,
+        documentationContent
+      );
+
+      if (!providerResult.ok) {
+        return {
+          ok: false,
+          mode: "BLOCKED",
+          reason: providerResult.reason || "EXECUTION_FILES_GENERATION_FAILED",
+          blocking_question: "فشل توليد ملفات التنفيذ عبر المزود. تحقق من إعدادات OPENAI_API_KEY."
+        };
+      }
+
+      files = providerResult.files;
     }
 
     if (files.length === 0) {
@@ -1486,6 +990,107 @@ function generateDocumentationDraftContent(state, selectedOption) {
     };
   }
 
+  function setPendingOperation(projectId, operation, bodySnapshot) {
+    const state = loadProjectState(projectId);
+    const confirmationKey = crypto.randomBytes(8).toString("hex");
+    const expires_at = new Date(Date.now() + 30 * 60 * 1000).toISOString();
+    const pending = {
+      operation,
+      body_snapshot: bodySnapshot,
+      confirmation_key: confirmationKey,
+      created_at: nowIso(),
+      expires_at
+    };
+    saveProjectState({ ...state, pending_confirmation: pending });
+    return { confirmationKey, expires_at };
+  }
+
+  async function confirmPendingOperation(body = {}) {
+    const projectId = normalizeProjectId(body.project_id || "");
+    const state = loadProjectState(projectId);
+
+    if (!state) return { ok: false, mode: "BLOCKED", reason: "PROJECT_NOT_FOUND" };
+
+    const pending = state.pending_confirmation;
+    if (!pending) return { ok: false, mode: "BLOCKED", reason: "NO_PENDING_OPERATION" };
+
+    if (pending.expires_at && new Date() > new Date(pending.expires_at)) {
+      const cleaned = { ...state };
+      delete cleaned.pending_confirmation;
+      saveProjectState(cleaned);
+      return { ok: false, mode: "BLOCKED", reason: "CONFIRMATION_EXPIRED" };
+    }
+
+    if (body.confirmation_key && body.confirmation_key !== pending.confirmation_key) {
+      return { ok: false, mode: "BLOCKED", reason: "INVALID_CONFIRMATION_KEY" };
+    }
+
+    // Clear the pending confirmation before re-executing so we don't loop
+    const resumeState = { ...state };
+    delete resumeState.pending_confirmation;
+    saveProjectState(resumeState);
+
+    const resumeBody = { ...pending.body_snapshot, _confirmed: true };
+
+    const operationMap = {
+      saveDocumentationDraft,
+      approveDocumentation,
+      createExecutionHandoff
+    };
+
+    const fn = operationMap[pending.operation];
+    if (!fn) return { ok: false, mode: "BLOCKED", reason: "UNKNOWN_PENDING_OPERATION" };
+
+    const result = await fn(resumeBody);
+    return { ...result, confirmed_operation: pending.operation };
+  }
+
+  // Wrap saveDocumentationDraft to gate on confirmation for the DOCUMENTATION→REVIEW transition
+  const _saveDocumentationDraft = saveDocumentationDraft;
+  async function saveDocumentationDraftGated(body = {}) {
+    if (body._confirmed) return _saveDocumentationDraft(body);
+    const projectId = normalizeProjectId(body.project_id || "");
+    const state = loadProjectState(projectId);
+    // Only gate when auto-generating (no content supplied); if content is supplied it's explicit
+    if (!String(body.content || "").trim()) {
+      const { confirmationKey, expires_at } = setPendingOperation(projectId, "saveDocumentationDraft", body);
+      const lang = String(state.user_language || "ar").toLowerCase();
+      const message = lang.startsWith("en")
+        ? "I'm ready to generate the project documentation. This will move us to the review phase. Confirm to proceed."
+        : "جاهز لتوليد وثائق المشروع تلقائيًا والانتقال لمرحلة المراجعة. أكد للمتابعة.";
+      return {
+        ok: true,
+        mode: "PENDING_CONFIRMATION",
+        message,
+        confirmation_key: confirmationKey,
+        expires_at,
+        project_id: projectId
+      };
+    }
+    return _saveDocumentationDraft(body);
+  }
+
+  // Wrap createExecutionHandoff — always requires explicit confirmation
+  const _createExecutionHandoff = createExecutionHandoff;
+  async function createExecutionHandoffGated(body = {}) {
+    if (body._confirmed) return _createExecutionHandoff(body);
+    const projectId = normalizeProjectId(body.project_id || "");
+    const state = loadProjectState(projectId);
+    const { confirmationKey, expires_at } = setPendingOperation(projectId, "createExecutionHandoff", body);
+    const lang = String(state.user_language || "ar").toLowerCase();
+    const message = lang.startsWith("en")
+      ? "This will create a final execution handoff package and send it to Forge Core. This action cannot be undone. Confirm to proceed."
+      : "سيتم إنشاء حزمة handoff النهائية وإرسالها إلى Forge Core. هذه العملية لا يمكن التراجع عنها. أكد للمتابعة.";
+    return {
+      ok: true,
+      mode: "PENDING_CONFIRMATION",
+      message,
+      confirmation_key: confirmationKey,
+      expires_at,
+      project_id: projectId
+    };
+  }
+
   function getProject(body = {}) {
     const projectId = normalizeProjectId(body.project_id);
     return {
@@ -1499,9 +1104,10 @@ function generateDocumentationDraftContent(state, selectedOption) {
     answerClarification,
     registerOptions,
     decideOption,
-    saveDocumentationDraft,
+    saveDocumentationDraft: saveDocumentationDraftGated,
     approveDocumentation,
-    createExecutionHandoff,
+    createExecutionHandoff: createExecutionHandoffGated,
+    confirmPendingOperation,
     getProject
   };
 }

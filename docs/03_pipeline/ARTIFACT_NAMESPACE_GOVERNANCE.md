@@ -1,6 +1,6 @@
-# Artifact Namespace Governance
+﻿# Artifact Namespace Governance
 
-**Document ID:** HALO-DOC-24  
+**Document ID:** FORGE-DOC-24  
 **Status:** BINDING – ARTIFACT NAMESPACE GOVERNANCE  
 **Scope:** Artifact Storage and Namespace Enforcement  
 **Applies To:** Entire Forge Autonomous Pipeline  
@@ -66,7 +66,7 @@ artifacts/intake/
 artifacts/audit/
 artifacts/trace/
 artifacts/gap/
-artifacts/analysis/
+artifacts/ai/analysis/
 artifacts/decisions/
 artifacts/backfill/
 artifacts/execute/
@@ -91,7 +91,7 @@ Audit | artifacts/audit |
 Trace | artifacts/trace |
 Gap | artifacts/gap |
 Design Exploration | artifacts/exploration |
-Option Evaluation | artifacts/analysis |
+Option Evaluation | artifacts/ai/analysis |
 Decision Gate | artifacts/decisions |
 Backfill | artifacts/backfill |
 Execute | artifacts/execute |
@@ -146,6 +146,30 @@ artifacts/archive/ is permitted ONLY for system-level reset operations
 
 It is NOT considered a runtime module namespace
 and MUST NOT be written to by pipeline modules.
+
+---
+
+# 6.1 System-Governed Namespaces
+
+The following namespaces are SYSTEM-GOVERNED
+and may be written to ONLY by their designated system component.
+
+| Namespace | Owner | Governing Document |
+|---|---|---|
+| artifacts/forge/ | forge_state_resolver only | DOC-31, SCHEMA-07 |
+| artifacts/orchestration/ | orchestrator only | docs/10_runtime/10_Tech_Assumptions_and_Local_Runtime_Setup.md |
+| artifacts/tasks/ | task_registry / orchestrator only | MODULE_ORCHESTRATION_GOVERNANCE_v1 §11 |
+| artifacts/cognitive/ | cognitive_adapter only | FORGE-DOC-16, DOC-05 §4.6 |
+| artifacts/llm/ | cognitive_adapter only | DOC-10-CE-SEL §5 |
+| artifacts/ai/ | AI Layer modules only | docs/11_ai_layer/04_AI_LAYER_ARTIFACTS.md |
+| artifacts/coverage/ | Vision Compliance module only | DOC-15, DOC-16 |
+| artifacts/verify/ | Boundary Audit layer only | FORGE-DOC-08 §2.2.1, §2.2.2 |
+| artifacts/archive/ | forge-reset-new-project.js only | FORGE-DOC-24 §6 |
+| artifacts/projects/ | intake module only | docs/03_pipeline/INTAKE_MODULE_CONTRACT_v1.md |
+| artifacts/admission/ | Idea Structuring Layer only | DOC-01 §5 |
+
+No other component may write to SYSTEM-GOVERNED namespaces.
+Any violation is a CRITICAL fault and MUST halt execution.
 
 ---
 

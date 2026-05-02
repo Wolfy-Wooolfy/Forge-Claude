@@ -1,4 +1,4 @@
-# TASK-026 — Stage C Single-Step Autonomy Verification (Non-Executable)
+﻿# TASK-026 — Stage C Single-Step Autonomy Verification (Non-Executable)
 
 ## Verification Objective
 Confirm that single-step autonomy executes AT MOST ONE pipeline advancement
@@ -12,7 +12,7 @@ and cannot run autonomously beyond explicit manual invocation.
 - No retries
 
 2) Manual Trigger Enforcement
-- HALO_AUTONOMY=1 is mandatory
+- FORGE_AUTONOMY=1 is mandatory
 - CLI invocation required
 - No auto-run paths
 

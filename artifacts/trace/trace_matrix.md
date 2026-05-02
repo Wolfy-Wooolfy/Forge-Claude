@@ -1,4 +1,4 @@
-# Trace Matrix
+﻿# Trace Matrix
 
 ~~~json
 {
@@ -5176,7 +5176,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-11::R001",
+      "requirement_id": "FORGE-DOC-11::R001",
       "document": "docs/03_pipeline/03_11_Idea_Evaluation_and_Finalization_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5197,7 +5197,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-11::R002",
+      "requirement_id": "FORGE-DOC-11::R002",
       "document": "docs/03_pipeline/03_11_Idea_Evaluation_and_Finalization_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5218,7 +5218,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-11::R003",
+      "requirement_id": "FORGE-DOC-11::R003",
       "document": "docs/03_pipeline/03_11_Idea_Evaluation_and_Finalization_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5239,7 +5239,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-11::R004",
+      "requirement_id": "FORGE-DOC-11::R004",
       "document": "docs/03_pipeline/03_11_Idea_Evaluation_and_Finalization_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5260,7 +5260,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-11::R005",
+      "requirement_id": "FORGE-DOC-11::R005",
       "document": "docs/03_pipeline/03_11_Idea_Evaluation_and_Finalization_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5281,7 +5281,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-11::R006",
+      "requirement_id": "FORGE-DOC-11::R006",
       "document": "docs/03_pipeline/03_11_Idea_Evaluation_and_Finalization_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5302,7 +5302,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-11::R007",
+      "requirement_id": "FORGE-DOC-11::R007",
       "document": "docs/03_pipeline/03_11_Idea_Evaluation_and_Finalization_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5323,7 +5323,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-11::R008",
+      "requirement_id": "FORGE-DOC-11::R008",
       "document": "docs/03_pipeline/03_11_Idea_Evaluation_and_Finalization_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5344,7 +5344,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-11::R009",
+      "requirement_id": "FORGE-DOC-11::R009",
       "document": "docs/03_pipeline/03_11_Idea_Evaluation_and_Finalization_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5365,7 +5365,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-11::R010",
+      "requirement_id": "FORGE-DOC-11::R010",
       "document": "docs/03_pipeline/03_11_Idea_Evaluation_and_Finalization_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5386,7 +5386,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-11::R011",
+      "requirement_id": "FORGE-DOC-11::R011",
       "document": "docs/03_pipeline/03_11_Idea_Evaluation_and_Finalization_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5407,7 +5407,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-11::R012",
+      "requirement_id": "FORGE-DOC-11::R012",
       "document": "docs/03_pipeline/03_11_Idea_Evaluation_and_Finalization_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5428,7 +5428,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-11::R013",
+      "requirement_id": "FORGE-DOC-11::R013",
       "document": "docs/03_pipeline/03_11_Idea_Evaluation_and_Finalization_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5449,7 +5449,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-12::R001",
+      "requirement_id": "FORGE-DOC-12::R001",
       "document": "docs/03_pipeline/03_12_Documentation_Gap_Detection_and_Refinement_Loop_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5471,7 +5471,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-12::R002",
+      "requirement_id": "FORGE-DOC-12::R002",
       "document": "docs/03_pipeline/03_12_Documentation_Gap_Detection_and_Refinement_Loop_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5493,7 +5493,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-12::R003",
+      "requirement_id": "FORGE-DOC-12::R003",
       "document": "docs/03_pipeline/03_12_Documentation_Gap_Detection_and_Refinement_Loop_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5515,7 +5515,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-12::R004",
+      "requirement_id": "FORGE-DOC-12::R004",
       "document": "docs/03_pipeline/03_12_Documentation_Gap_Detection_and_Refinement_Loop_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5537,7 +5537,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-12::R005",
+      "requirement_id": "FORGE-DOC-12::R005",
       "document": "docs/03_pipeline/03_12_Documentation_Gap_Detection_and_Refinement_Loop_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5559,7 +5559,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-12::R006",
+      "requirement_id": "FORGE-DOC-12::R006",
       "document": "docs/03_pipeline/03_12_Documentation_Gap_Detection_and_Refinement_Loop_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5581,7 +5581,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-12::R007",
+      "requirement_id": "FORGE-DOC-12::R007",
       "document": "docs/03_pipeline/03_12_Documentation_Gap_Detection_and_Refinement_Loop_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5603,7 +5603,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-12::R008",
+      "requirement_id": "FORGE-DOC-12::R008",
       "document": "docs/03_pipeline/03_12_Documentation_Gap_Detection_and_Refinement_Loop_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5625,7 +5625,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-12::R009",
+      "requirement_id": "FORGE-DOC-12::R009",
       "document": "docs/03_pipeline/03_12_Documentation_Gap_Detection_and_Refinement_Loop_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5647,7 +5647,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-12::R010",
+      "requirement_id": "FORGE-DOC-12::R010",
       "document": "docs/03_pipeline/03_12_Documentation_Gap_Detection_and_Refinement_Loop_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5671,7 +5671,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-12::R011",
+      "requirement_id": "FORGE-DOC-12::R011",
       "document": "docs/03_pipeline/03_12_Documentation_Gap_Detection_and_Refinement_Loop_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5693,7 +5693,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-12::R012",
+      "requirement_id": "FORGE-DOC-12::R012",
       "document": "docs/03_pipeline/03_12_Documentation_Gap_Detection_and_Refinement_Loop_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5715,7 +5715,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-12::R013",
+      "requirement_id": "FORGE-DOC-12::R013",
       "document": "docs/03_pipeline/03_12_Documentation_Gap_Detection_and_Refinement_Loop_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5737,7 +5737,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-13::R001",
+      "requirement_id": "FORGE-DOC-13::R001",
       "document": "docs/03_pipeline/03_13_Code_to_Documentation_Trace_and_Consistency_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5759,7 +5759,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-13::R002",
+      "requirement_id": "FORGE-DOC-13::R002",
       "document": "docs/03_pipeline/03_13_Code_to_Documentation_Trace_and_Consistency_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5781,7 +5781,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-13::R003",
+      "requirement_id": "FORGE-DOC-13::R003",
       "document": "docs/03_pipeline/03_13_Code_to_Documentation_Trace_and_Consistency_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5803,7 +5803,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-13::R004",
+      "requirement_id": "FORGE-DOC-13::R004",
       "document": "docs/03_pipeline/03_13_Code_to_Documentation_Trace_and_Consistency_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5825,7 +5825,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-13::R005",
+      "requirement_id": "FORGE-DOC-13::R005",
       "document": "docs/03_pipeline/03_13_Code_to_Documentation_Trace_and_Consistency_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5847,7 +5847,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-13::R006",
+      "requirement_id": "FORGE-DOC-13::R006",
       "document": "docs/03_pipeline/03_13_Code_to_Documentation_Trace_and_Consistency_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5869,7 +5869,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-13::R007",
+      "requirement_id": "FORGE-DOC-13::R007",
       "document": "docs/03_pipeline/03_13_Code_to_Documentation_Trace_and_Consistency_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5892,7 +5892,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-13::R008",
+      "requirement_id": "FORGE-DOC-13::R008",
       "document": "docs/03_pipeline/03_13_Code_to_Documentation_Trace_and_Consistency_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5914,7 +5914,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-13::R009",
+      "requirement_id": "FORGE-DOC-13::R009",
       "document": "docs/03_pipeline/03_13_Code_to_Documentation_Trace_and_Consistency_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5938,7 +5938,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-13::R010",
+      "requirement_id": "FORGE-DOC-13::R010",
       "document": "docs/03_pipeline/03_13_Code_to_Documentation_Trace_and_Consistency_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5960,7 +5960,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-14::R001",
+      "requirement_id": "FORGE-DOC-14::R001",
       "document": "docs/03_pipeline/03_14_Final_Acceptance_and_Release_Gate_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -5982,7 +5982,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-14::R002",
+      "requirement_id": "FORGE-DOC-14::R002",
       "document": "docs/03_pipeline/03_14_Final_Acceptance_and_Release_Gate_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -6004,7 +6004,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-14::R003",
+      "requirement_id": "FORGE-DOC-14::R003",
       "document": "docs/03_pipeline/03_14_Final_Acceptance_and_Release_Gate_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -6026,7 +6026,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-14::R004",
+      "requirement_id": "FORGE-DOC-14::R004",
       "document": "docs/03_pipeline/03_14_Final_Acceptance_and_Release_Gate_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -6048,7 +6048,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-14::R005",
+      "requirement_id": "FORGE-DOC-14::R005",
       "document": "docs/03_pipeline/03_14_Final_Acceptance_and_Release_Gate_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -6070,7 +6070,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-14::R006",
+      "requirement_id": "FORGE-DOC-14::R006",
       "document": "docs/03_pipeline/03_14_Final_Acceptance_and_Release_Gate_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -6092,7 +6092,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-14::R007",
+      "requirement_id": "FORGE-DOC-14::R007",
       "document": "docs/03_pipeline/03_14_Final_Acceptance_and_Release_Gate_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -6114,7 +6114,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-14::R008",
+      "requirement_id": "FORGE-DOC-14::R008",
       "document": "docs/03_pipeline/03_14_Final_Acceptance_and_Release_Gate_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -6139,7 +6139,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-14::R009",
+      "requirement_id": "FORGE-DOC-14::R009",
       "document": "docs/03_pipeline/03_14_Final_Acceptance_and_Release_Gate_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -6161,7 +6161,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-14::R010",
+      "requirement_id": "FORGE-DOC-14::R010",
       "document": "docs/03_pipeline/03_14_Final_Acceptance_and_Release_Gate_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -6183,7 +6183,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-14::R011",
+      "requirement_id": "FORGE-DOC-14::R011",
       "document": "docs/03_pipeline/03_14_Final_Acceptance_and_Release_Gate_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -6205,7 +6205,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-14::R012",
+      "requirement_id": "FORGE-DOC-14::R012",
       "document": "docs/03_pipeline/03_14_Final_Acceptance_and_Release_Gate_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -6227,7 +6227,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-15::R001",
+      "requirement_id": "FORGE-DOC-15::R001",
       "document": "docs/03_pipeline/03_15_Cognitive_Lifecycle_Orchestration_Specification.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -6308,7 +6308,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-15::R002",
+      "requirement_id": "FORGE-DOC-15::R002",
       "document": "docs/03_pipeline/03_15_Cognitive_Lifecycle_Orchestration_Specification.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -6389,7 +6389,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-15::R003",
+      "requirement_id": "FORGE-DOC-15::R003",
       "document": "docs/03_pipeline/03_15_Cognitive_Lifecycle_Orchestration_Specification.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -6470,7 +6470,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-15::R004",
+      "requirement_id": "FORGE-DOC-15::R004",
       "document": "docs/03_pipeline/03_15_Cognitive_Lifecycle_Orchestration_Specification.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -6551,7 +6551,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-15::R005",
+      "requirement_id": "FORGE-DOC-15::R005",
       "document": "docs/03_pipeline/03_15_Cognitive_Lifecycle_Orchestration_Specification.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -6632,7 +6632,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-15::R006",
+      "requirement_id": "FORGE-DOC-15::R006",
       "document": "docs/03_pipeline/03_15_Cognitive_Lifecycle_Orchestration_Specification.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -6713,7 +6713,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-15::R007",
+      "requirement_id": "FORGE-DOC-15::R007",
       "document": "docs/03_pipeline/03_15_Cognitive_Lifecycle_Orchestration_Specification.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -6795,7 +6795,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-15::R008",
+      "requirement_id": "FORGE-DOC-15::R008",
       "document": "docs/03_pipeline/03_15_Cognitive_Lifecycle_Orchestration_Specification.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -6876,7 +6876,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-15::R009",
+      "requirement_id": "FORGE-DOC-15::R009",
       "document": "docs/03_pipeline/03_15_Cognitive_Lifecycle_Orchestration_Specification.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -6957,7 +6957,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-15::R010",
+      "requirement_id": "FORGE-DOC-15::R010",
       "document": "docs/03_pipeline/03_15_Cognitive_Lifecycle_Orchestration_Specification.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -7038,7 +7038,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-15::R011",
+      "requirement_id": "FORGE-DOC-15::R011",
       "document": "docs/03_pipeline/03_15_Cognitive_Lifecycle_Orchestration_Specification.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -7119,7 +7119,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-15::R012",
+      "requirement_id": "FORGE-DOC-15::R012",
       "document": "docs/03_pipeline/03_15_Cognitive_Lifecycle_Orchestration_Specification.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -7200,7 +7200,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-15::R013",
+      "requirement_id": "FORGE-DOC-15::R013",
       "document": "docs/03_pipeline/03_15_Cognitive_Lifecycle_Orchestration_Specification.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -7281,7 +7281,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-15::R014",
+      "requirement_id": "FORGE-DOC-15::R014",
       "document": "docs/03_pipeline/03_15_Cognitive_Lifecycle_Orchestration_Specification.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -8027,7 +8027,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-20::R001",
+      "requirement_id": "FORGE-DOC-20::R001",
       "document": "docs/03_pipeline/03_20_AI_Cognitive_Loop_Execution_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -8108,7 +8108,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-20::R002",
+      "requirement_id": "FORGE-DOC-20::R002",
       "document": "docs/03_pipeline/03_20_AI_Cognitive_Loop_Execution_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -8189,7 +8189,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-20::R003",
+      "requirement_id": "FORGE-DOC-20::R003",
       "document": "docs/03_pipeline/03_20_AI_Cognitive_Loop_Execution_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -8270,7 +8270,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-20::R004",
+      "requirement_id": "FORGE-DOC-20::R004",
       "document": "docs/03_pipeline/03_20_AI_Cognitive_Loop_Execution_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -8351,7 +8351,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-20::R005",
+      "requirement_id": "FORGE-DOC-20::R005",
       "document": "docs/03_pipeline/03_20_AI_Cognitive_Loop_Execution_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -8432,7 +8432,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-20::R006",
+      "requirement_id": "FORGE-DOC-20::R006",
       "document": "docs/03_pipeline/03_20_AI_Cognitive_Loop_Execution_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -8513,7 +8513,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-20::R007",
+      "requirement_id": "FORGE-DOC-20::R007",
       "document": "docs/03_pipeline/03_20_AI_Cognitive_Loop_Execution_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -8594,7 +8594,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-20::R008",
+      "requirement_id": "FORGE-DOC-20::R008",
       "document": "docs/03_pipeline/03_20_AI_Cognitive_Loop_Execution_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -8675,7 +8675,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-20::R009",
+      "requirement_id": "FORGE-DOC-20::R009",
       "document": "docs/03_pipeline/03_20_AI_Cognitive_Loop_Execution_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -8756,7 +8756,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-20::R010",
+      "requirement_id": "FORGE-DOC-20::R010",
       "document": "docs/03_pipeline/03_20_AI_Cognitive_Loop_Execution_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -8837,7 +8837,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-20::R011",
+      "requirement_id": "FORGE-DOC-20::R011",
       "document": "docs/03_pipeline/03_20_AI_Cognitive_Loop_Execution_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -8919,7 +8919,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-20::R012",
+      "requirement_id": "FORGE-DOC-20::R012",
       "document": "docs/03_pipeline/03_20_AI_Cognitive_Loop_Execution_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -9000,7 +9000,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-20::R013",
+      "requirement_id": "FORGE-DOC-20::R013",
       "document": "docs/03_pipeline/03_20_AI_Cognitive_Loop_Execution_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -9081,7 +9081,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__03_21_Candidate_Transformation_and_Authority_Separation_Contract::R001",
+      "requirement_id": "FORGE-DOC-21__03_21_Candidate_Transformation_and_Authority_Separation_Contract::R001",
       "document": "docs/03_pipeline/03_21_Candidate_Transformation_and_Authority_Separation_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -9102,7 +9102,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__03_21_Candidate_Transformation_and_Authority_Separation_Contract::R002",
+      "requirement_id": "FORGE-DOC-21__03_21_Candidate_Transformation_and_Authority_Separation_Contract::R002",
       "document": "docs/03_pipeline/03_21_Candidate_Transformation_and_Authority_Separation_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -9123,7 +9123,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__03_21_Candidate_Transformation_and_Authority_Separation_Contract::R003",
+      "requirement_id": "FORGE-DOC-21__03_21_Candidate_Transformation_and_Authority_Separation_Contract::R003",
       "document": "docs/03_pipeline/03_21_Candidate_Transformation_and_Authority_Separation_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -9144,7 +9144,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__03_21_Candidate_Transformation_and_Authority_Separation_Contract::R004",
+      "requirement_id": "FORGE-DOC-21__03_21_Candidate_Transformation_and_Authority_Separation_Contract::R004",
       "document": "docs/03_pipeline/03_21_Candidate_Transformation_and_Authority_Separation_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -9165,7 +9165,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__03_21_Candidate_Transformation_and_Authority_Separation_Contract::R005",
+      "requirement_id": "FORGE-DOC-21__03_21_Candidate_Transformation_and_Authority_Separation_Contract::R005",
       "document": "docs/03_pipeline/03_21_Candidate_Transformation_and_Authority_Separation_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -9186,7 +9186,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__03_21_Candidate_Transformation_and_Authority_Separation_Contract::R006",
+      "requirement_id": "FORGE-DOC-21__03_21_Candidate_Transformation_and_Authority_Separation_Contract::R006",
       "document": "docs/03_pipeline/03_21_Candidate_Transformation_and_Authority_Separation_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -9207,7 +9207,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__03_21_Candidate_Transformation_and_Authority_Separation_Contract::R007",
+      "requirement_id": "FORGE-DOC-21__03_21_Candidate_Transformation_and_Authority_Separation_Contract::R007",
       "document": "docs/03_pipeline/03_21_Candidate_Transformation_and_Authority_Separation_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -9228,7 +9228,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__03_21_Candidate_Transformation_and_Authority_Separation_Contract::R008",
+      "requirement_id": "FORGE-DOC-21__03_21_Candidate_Transformation_and_Authority_Separation_Contract::R008",
       "document": "docs/03_pipeline/03_21_Candidate_Transformation_and_Authority_Separation_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -9249,7 +9249,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__03_21_Candidate_Transformation_and_Authority_Separation_Contract::R009",
+      "requirement_id": "FORGE-DOC-21__03_21_Candidate_Transformation_and_Authority_Separation_Contract::R009",
       "document": "docs/03_pipeline/03_21_Candidate_Transformation_and_Authority_Separation_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -9270,7 +9270,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__03_21_Candidate_Transformation_and_Authority_Separation_Contract::R010",
+      "requirement_id": "FORGE-DOC-21__03_21_Candidate_Transformation_and_Authority_Separation_Contract::R010",
       "document": "docs/03_pipeline/03_21_Candidate_Transformation_and_Authority_Separation_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -9291,7 +9291,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__03_21_Candidate_Transformation_and_Authority_Separation_Contract::R011",
+      "requirement_id": "FORGE-DOC-21__03_21_Candidate_Transformation_and_Authority_Separation_Contract::R011",
       "document": "docs/03_pipeline/03_21_Candidate_Transformation_and_Authority_Separation_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/cognitive/cognitive_adapter.js::FILE",
@@ -9372,7 +9372,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__03_21_Candidate_Transformation_and_Authority_Separation_Contract::R012",
+      "requirement_id": "FORGE-DOC-21__03_21_Candidate_Transformation_and_Authority_Separation_Contract::R012",
       "document": "docs/03_pipeline/03_21_Candidate_Transformation_and_Authority_Separation_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -9393,7 +9393,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__03_21_Candidate_Transformation_and_Authority_Separation_Contract::R013",
+      "requirement_id": "FORGE-DOC-21__03_21_Candidate_Transformation_and_Authority_Separation_Contract::R013",
       "document": "docs/03_pipeline/03_21_Candidate_Transformation_and_Authority_Separation_Contract.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -10573,7 +10573,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-24::R001",
+      "requirement_id": "FORGE-DOC-24::R001",
       "document": "docs/03_pipeline/ARTIFACT_NAMESPACE_GOVERNANCE.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -10594,7 +10594,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-24::R002",
+      "requirement_id": "FORGE-DOC-24::R002",
       "document": "docs/03_pipeline/ARTIFACT_NAMESPACE_GOVERNANCE.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -10615,7 +10615,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-24::R003",
+      "requirement_id": "FORGE-DOC-24::R003",
       "document": "docs/03_pipeline/ARTIFACT_NAMESPACE_GOVERNANCE.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -10636,7 +10636,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-24::R004",
+      "requirement_id": "FORGE-DOC-24::R004",
       "document": "docs/03_pipeline/ARTIFACT_NAMESPACE_GOVERNANCE.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -10657,7 +10657,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-24::R005",
+      "requirement_id": "FORGE-DOC-24::R005",
       "document": "docs/03_pipeline/ARTIFACT_NAMESPACE_GOVERNANCE.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -10678,7 +10678,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-24::R006",
+      "requirement_id": "FORGE-DOC-24::R006",
       "document": "docs/03_pipeline/ARTIFACT_NAMESPACE_GOVERNANCE.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -10699,7 +10699,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-24::R007",
+      "requirement_id": "FORGE-DOC-24::R007",
       "document": "docs/03_pipeline/ARTIFACT_NAMESPACE_GOVERNANCE.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -10720,7 +10720,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-24::R008",
+      "requirement_id": "FORGE-DOC-24::R008",
       "document": "docs/03_pipeline/ARTIFACT_NAMESPACE_GOVERNANCE.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -10741,7 +10741,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-24::R009",
+      "requirement_id": "FORGE-DOC-24::R009",
       "document": "docs/03_pipeline/ARTIFACT_NAMESPACE_GOVERNANCE.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -10762,7 +10762,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-24::R010",
+      "requirement_id": "FORGE-DOC-24::R010",
       "document": "docs/03_pipeline/ARTIFACT_NAMESPACE_GOVERNANCE.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -10783,7 +10783,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-24::R011",
+      "requirement_id": "FORGE-DOC-24::R011",
       "document": "docs/03_pipeline/ARTIFACT_NAMESPACE_GOVERNANCE.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -10804,7 +10804,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-24::R012",
+      "requirement_id": "FORGE-DOC-24::R012",
       "document": "docs/03_pipeline/ARTIFACT_NAMESPACE_GOVERNANCE.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -10825,7 +10825,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-24::R013",
+      "requirement_id": "FORGE-DOC-24::R013",
       "document": "docs/03_pipeline/ARTIFACT_NAMESPACE_GOVERNANCE.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -10846,7 +10846,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-24::R014",
+      "requirement_id": "FORGE-DOC-24::R014",
       "document": "docs/03_pipeline/ARTIFACT_NAMESPACE_GOVERNANCE.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -12282,7 +12282,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-18::R001",
+      "requirement_id": "FORGE-DOC-18::R001",
       "document": "docs/03_pipeline/DESIGN_EXPLORATION_PROTOCOL.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -12304,7 +12304,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-18::R002",
+      "requirement_id": "FORGE-DOC-18::R002",
       "document": "docs/03_pipeline/DESIGN_EXPLORATION_PROTOCOL.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -12326,7 +12326,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-18::R003",
+      "requirement_id": "FORGE-DOC-18::R003",
       "document": "docs/03_pipeline/DESIGN_EXPLORATION_PROTOCOL.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -12348,7 +12348,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-18::R004",
+      "requirement_id": "FORGE-DOC-18::R004",
       "document": "docs/03_pipeline/DESIGN_EXPLORATION_PROTOCOL.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -12370,7 +12370,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-18::R005",
+      "requirement_id": "FORGE-DOC-18::R005",
       "document": "docs/03_pipeline/DESIGN_EXPLORATION_PROTOCOL.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -12392,7 +12392,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-18::R006",
+      "requirement_id": "FORGE-DOC-18::R006",
       "document": "docs/03_pipeline/DESIGN_EXPLORATION_PROTOCOL.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -12414,7 +12414,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-18::R007",
+      "requirement_id": "FORGE-DOC-18::R007",
       "document": "docs/03_pipeline/DESIGN_EXPLORATION_PROTOCOL.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -12436,7 +12436,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-18::R008",
+      "requirement_id": "FORGE-DOC-18::R008",
       "document": "docs/03_pipeline/DESIGN_EXPLORATION_PROTOCOL.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -12458,7 +12458,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-18::R009",
+      "requirement_id": "FORGE-DOC-18::R009",
       "document": "docs/03_pipeline/DESIGN_EXPLORATION_PROTOCOL.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -12480,96 +12480,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-18::R010",
-      "document": "docs/03_pipeline/DESIGN_EXPLORATION_PROTOCOL.md",
-      "mapped_code_units": [
-        "CODE::code/src/execution/task_executor.js::FILE",
-        "CODE::code/src/execution/task_registry.js::getTaskHandler",
-        "CODE::code/src/forge/forge_state_resolver.js::FILE",
-        "CODE::code/src/forge/forge_state_writer.js::FILE",
-        "CODE::code/src/modules/decisionGate.js::FILE",
-        "CODE::code/src/modules/designExplorationEngine.js::FILE",
-        "CODE::code/src/modules/verifyEngine.js::FILE",
-        "CODE::code/src/orchestrator/autonomous_runner.js::FILE",
-        "CODE::code/src/orchestrator/entry_resolver.js::FILE",
-        "CODE::code/src/orchestrator/pipeline_definition.js::FILE",
-        "CODE::code/src/orchestrator/runner.js::runTaskByName",
-        "CODE::code/src/orchestrator/stage_transitions.js::FILE",
-        "CODE::code/src/orchestrator/status_writer.js::FILE"
-      ],
-      "mapped_artifacts": [
-        "artifacts/verify/verification_results.json"
-      ],
-      "coverage_status": "FULL"
-    },
-    {
-      "requirement_id": "HALO-DOC-18::R011",
-      "document": "docs/03_pipeline/DESIGN_EXPLORATION_PROTOCOL.md",
-      "mapped_code_units": [
-        "CODE::code/src/execution/task_executor.js::FILE",
-        "CODE::code/src/execution/task_registry.js::getTaskHandler",
-        "CODE::code/src/forge/forge_state_resolver.js::FILE",
-        "CODE::code/src/forge/forge_state_writer.js::FILE",
-        "CODE::code/src/modules/designExplorationEngine.js::FILE",
-        "CODE::code/src/modules/verifyEngine.js::FILE",
-        "CODE::code/src/orchestrator/autonomous_runner.js::FILE",
-        "CODE::code/src/orchestrator/entry_resolver.js::FILE",
-        "CODE::code/src/orchestrator/pipeline_definition.js::FILE",
-        "CODE::code/src/orchestrator/runner.js::runTaskByName",
-        "CODE::code/src/orchestrator/stage_transitions.js::FILE",
-        "CODE::code/src/orchestrator/status_writer.js::FILE"
-      ],
-      "mapped_artifacts": [
-        "artifacts/verify/verification_results.json"
-      ],
-      "coverage_status": "FULL"
-    },
-    {
-      "requirement_id": "HALO-DOC-18::R012",
-      "document": "docs/03_pipeline/DESIGN_EXPLORATION_PROTOCOL.md",
-      "mapped_code_units": [
-        "CODE::code/src/execution/task_executor.js::FILE",
-        "CODE::code/src/execution/task_registry.js::getTaskHandler",
-        "CODE::code/src/forge/forge_state_resolver.js::FILE",
-        "CODE::code/src/forge/forge_state_writer.js::FILE",
-        "CODE::code/src/modules/designExplorationEngine.js::FILE",
-        "CODE::code/src/modules/verifyEngine.js::FILE",
-        "CODE::code/src/orchestrator/autonomous_runner.js::FILE",
-        "CODE::code/src/orchestrator/entry_resolver.js::FILE",
-        "CODE::code/src/orchestrator/pipeline_definition.js::FILE",
-        "CODE::code/src/orchestrator/runner.js::runTaskByName",
-        "CODE::code/src/orchestrator/stage_transitions.js::FILE",
-        "CODE::code/src/orchestrator/status_writer.js::FILE"
-      ],
-      "mapped_artifacts": [
-        "artifacts/verify/verification_results.json"
-      ],
-      "coverage_status": "FULL"
-    },
-    {
-      "requirement_id": "HALO-DOC-18::R013",
-      "document": "docs/03_pipeline/DESIGN_EXPLORATION_PROTOCOL.md",
-      "mapped_code_units": [
-        "CODE::code/src/execution/task_executor.js::FILE",
-        "CODE::code/src/execution/task_registry.js::getTaskHandler",
-        "CODE::code/src/forge/forge_state_resolver.js::FILE",
-        "CODE::code/src/forge/forge_state_writer.js::FILE",
-        "CODE::code/src/modules/designExplorationEngine.js::FILE",
-        "CODE::code/src/modules/verifyEngine.js::FILE",
-        "CODE::code/src/orchestrator/autonomous_runner.js::FILE",
-        "CODE::code/src/orchestrator/entry_resolver.js::FILE",
-        "CODE::code/src/orchestrator/pipeline_definition.js::FILE",
-        "CODE::code/src/orchestrator/runner.js::runTaskByName",
-        "CODE::code/src/orchestrator/stage_transitions.js::FILE",
-        "CODE::code/src/orchestrator/status_writer.js::FILE"
-      ],
-      "mapped_artifacts": [
-        "artifacts/verify/verification_results.json"
-      ],
-      "coverage_status": "FULL"
-    },
-    {
-      "requirement_id": "HALO-DOC-18::R014",
+      "requirement_id": "FORGE-DOC-18::R010",
       "document": "docs/03_pipeline/DESIGN_EXPLORATION_PROTOCOL.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -12592,7 +12503,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-18::R015",
+      "requirement_id": "FORGE-DOC-18::R011",
       "document": "docs/03_pipeline/DESIGN_EXPLORATION_PROTOCOL.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -12614,7 +12525,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-18::R016",
+      "requirement_id": "FORGE-DOC-18::R012",
       "document": "docs/03_pipeline/DESIGN_EXPLORATION_PROTOCOL.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -12636,7 +12547,96 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-18::R017",
+      "requirement_id": "FORGE-DOC-18::R013",
+      "document": "docs/03_pipeline/DESIGN_EXPLORATION_PROTOCOL.md",
+      "mapped_code_units": [
+        "CODE::code/src/execution/task_executor.js::FILE",
+        "CODE::code/src/execution/task_registry.js::getTaskHandler",
+        "CODE::code/src/forge/forge_state_resolver.js::FILE",
+        "CODE::code/src/forge/forge_state_writer.js::FILE",
+        "CODE::code/src/modules/designExplorationEngine.js::FILE",
+        "CODE::code/src/modules/verifyEngine.js::FILE",
+        "CODE::code/src/orchestrator/autonomous_runner.js::FILE",
+        "CODE::code/src/orchestrator/entry_resolver.js::FILE",
+        "CODE::code/src/orchestrator/pipeline_definition.js::FILE",
+        "CODE::code/src/orchestrator/runner.js::runTaskByName",
+        "CODE::code/src/orchestrator/stage_transitions.js::FILE",
+        "CODE::code/src/orchestrator/status_writer.js::FILE"
+      ],
+      "mapped_artifacts": [
+        "artifacts/verify/verification_results.json"
+      ],
+      "coverage_status": "FULL"
+    },
+    {
+      "requirement_id": "FORGE-DOC-18::R014",
+      "document": "docs/03_pipeline/DESIGN_EXPLORATION_PROTOCOL.md",
+      "mapped_code_units": [
+        "CODE::code/src/execution/task_executor.js::FILE",
+        "CODE::code/src/execution/task_registry.js::getTaskHandler",
+        "CODE::code/src/forge/forge_state_resolver.js::FILE",
+        "CODE::code/src/forge/forge_state_writer.js::FILE",
+        "CODE::code/src/modules/decisionGate.js::FILE",
+        "CODE::code/src/modules/designExplorationEngine.js::FILE",
+        "CODE::code/src/modules/verifyEngine.js::FILE",
+        "CODE::code/src/orchestrator/autonomous_runner.js::FILE",
+        "CODE::code/src/orchestrator/entry_resolver.js::FILE",
+        "CODE::code/src/orchestrator/pipeline_definition.js::FILE",
+        "CODE::code/src/orchestrator/runner.js::runTaskByName",
+        "CODE::code/src/orchestrator/stage_transitions.js::FILE",
+        "CODE::code/src/orchestrator/status_writer.js::FILE"
+      ],
+      "mapped_artifacts": [
+        "artifacts/verify/verification_results.json"
+      ],
+      "coverage_status": "FULL"
+    },
+    {
+      "requirement_id": "FORGE-DOC-18::R015",
+      "document": "docs/03_pipeline/DESIGN_EXPLORATION_PROTOCOL.md",
+      "mapped_code_units": [
+        "CODE::code/src/execution/task_executor.js::FILE",
+        "CODE::code/src/execution/task_registry.js::getTaskHandler",
+        "CODE::code/src/forge/forge_state_resolver.js::FILE",
+        "CODE::code/src/forge/forge_state_writer.js::FILE",
+        "CODE::code/src/modules/designExplorationEngine.js::FILE",
+        "CODE::code/src/modules/verifyEngine.js::FILE",
+        "CODE::code/src/orchestrator/autonomous_runner.js::FILE",
+        "CODE::code/src/orchestrator/entry_resolver.js::FILE",
+        "CODE::code/src/orchestrator/pipeline_definition.js::FILE",
+        "CODE::code/src/orchestrator/runner.js::runTaskByName",
+        "CODE::code/src/orchestrator/stage_transitions.js::FILE",
+        "CODE::code/src/orchestrator/status_writer.js::FILE"
+      ],
+      "mapped_artifacts": [
+        "artifacts/verify/verification_results.json"
+      ],
+      "coverage_status": "FULL"
+    },
+    {
+      "requirement_id": "FORGE-DOC-18::R016",
+      "document": "docs/03_pipeline/DESIGN_EXPLORATION_PROTOCOL.md",
+      "mapped_code_units": [
+        "CODE::code/src/execution/task_executor.js::FILE",
+        "CODE::code/src/execution/task_registry.js::getTaskHandler",
+        "CODE::code/src/forge/forge_state_resolver.js::FILE",
+        "CODE::code/src/forge/forge_state_writer.js::FILE",
+        "CODE::code/src/modules/designExplorationEngine.js::FILE",
+        "CODE::code/src/modules/verifyEngine.js::FILE",
+        "CODE::code/src/orchestrator/autonomous_runner.js::FILE",
+        "CODE::code/src/orchestrator/entry_resolver.js::FILE",
+        "CODE::code/src/orchestrator/pipeline_definition.js::FILE",
+        "CODE::code/src/orchestrator/runner.js::runTaskByName",
+        "CODE::code/src/orchestrator/stage_transitions.js::FILE",
+        "CODE::code/src/orchestrator/status_writer.js::FILE"
+      ],
+      "mapped_artifacts": [
+        "artifacts/verify/verification_results.json"
+      ],
+      "coverage_status": "FULL"
+    },
+    {
+      "requirement_id": "FORGE-DOC-18::R017",
       "document": "docs/03_pipeline/DESIGN_EXPLORATION_PROTOCOL.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -12659,7 +12659,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-18::R018",
+      "requirement_id": "FORGE-DOC-18::R018",
       "document": "docs/03_pipeline/DESIGN_EXPLORATION_PROTOCOL.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -12681,7 +12681,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-18::R019",
+      "requirement_id": "FORGE-DOC-18::R019",
       "document": "docs/03_pipeline/DESIGN_EXPLORATION_PROTOCOL.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -14094,7 +14094,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R001",
+      "requirement_id": "FORGE-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R001",
       "document": "docs/03_pipeline/SELF_BUILDING_RUNTIME_ACTIVATION.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -14115,7 +14115,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R002",
+      "requirement_id": "FORGE-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R002",
       "document": "docs/03_pipeline/SELF_BUILDING_RUNTIME_ACTIVATION.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -14136,7 +14136,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R003",
+      "requirement_id": "FORGE-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R003",
       "document": "docs/03_pipeline/SELF_BUILDING_RUNTIME_ACTIVATION.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -14157,7 +14157,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R004",
+      "requirement_id": "FORGE-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R004",
       "document": "docs/03_pipeline/SELF_BUILDING_RUNTIME_ACTIVATION.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -14178,7 +14178,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R005",
+      "requirement_id": "FORGE-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R005",
       "document": "docs/03_pipeline/SELF_BUILDING_RUNTIME_ACTIVATION.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -14199,7 +14199,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R006",
+      "requirement_id": "FORGE-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R006",
       "document": "docs/03_pipeline/SELF_BUILDING_RUNTIME_ACTIVATION.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -14220,7 +14220,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R007",
+      "requirement_id": "FORGE-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R007",
       "document": "docs/03_pipeline/SELF_BUILDING_RUNTIME_ACTIVATION.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -14241,7 +14241,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R008",
+      "requirement_id": "FORGE-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R008",
       "document": "docs/03_pipeline/SELF_BUILDING_RUNTIME_ACTIVATION.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -14262,7 +14262,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R009",
+      "requirement_id": "FORGE-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R009",
       "document": "docs/03_pipeline/SELF_BUILDING_RUNTIME_ACTIVATION.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -14283,7 +14283,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R010",
+      "requirement_id": "FORGE-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R010",
       "document": "docs/03_pipeline/SELF_BUILDING_RUNTIME_ACTIVATION.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -14304,7 +14304,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R011",
+      "requirement_id": "FORGE-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R011",
       "document": "docs/03_pipeline/SELF_BUILDING_RUNTIME_ACTIVATION.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -14325,7 +14325,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R012",
+      "requirement_id": "FORGE-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R012",
       "document": "docs/03_pipeline/SELF_BUILDING_RUNTIME_ACTIVATION.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -14346,7 +14346,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R013",
+      "requirement_id": "FORGE-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R013",
       "document": "docs/03_pipeline/SELF_BUILDING_RUNTIME_ACTIVATION.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -14367,7 +14367,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R014",
+      "requirement_id": "FORGE-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R014",
       "document": "docs/03_pipeline/SELF_BUILDING_RUNTIME_ACTIVATION.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -14388,7 +14388,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R015",
+      "requirement_id": "FORGE-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R015",
       "document": "docs/03_pipeline/SELF_BUILDING_RUNTIME_ACTIVATION.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -14409,7 +14409,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R016",
+      "requirement_id": "FORGE-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R016",
       "document": "docs/03_pipeline/SELF_BUILDING_RUNTIME_ACTIVATION.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -14430,7 +14430,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R017",
+      "requirement_id": "FORGE-DOC-21__SELF_BUILDING_RUNTIME_ACTIVATION::R017",
       "document": "docs/03_pipeline/SELF_BUILDING_RUNTIME_ACTIVATION.md",
       "mapped_code_units": [
         "CODE::code/src/execution/task_executor.js::FILE",
@@ -16974,7 +16974,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-22::R001",
+      "requirement_id": "FORGE-DOC-22::R001",
       "document": "docs/07_decisions/DECISION_ARTIFACT_SCHEMA.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -17053,7 +17053,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-22::R002",
+      "requirement_id": "FORGE-DOC-22::R002",
       "document": "docs/07_decisions/DECISION_ARTIFACT_SCHEMA.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -17132,7 +17132,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-22::R003",
+      "requirement_id": "FORGE-DOC-22::R003",
       "document": "docs/07_decisions/DECISION_ARTIFACT_SCHEMA.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -17211,7 +17211,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-22::R004",
+      "requirement_id": "FORGE-DOC-22::R004",
       "document": "docs/07_decisions/DECISION_ARTIFACT_SCHEMA.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -17290,7 +17290,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-22::R005",
+      "requirement_id": "FORGE-DOC-22::R005",
       "document": "docs/07_decisions/DECISION_ARTIFACT_SCHEMA.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -17369,7 +17369,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-22::R006",
+      "requirement_id": "FORGE-DOC-22::R006",
       "document": "docs/07_decisions/DECISION_ARTIFACT_SCHEMA.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -17448,7 +17448,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-22::R007",
+      "requirement_id": "FORGE-DOC-22::R007",
       "document": "docs/07_decisions/DECISION_ARTIFACT_SCHEMA.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -17527,7 +17527,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-22::R008",
+      "requirement_id": "FORGE-DOC-22::R008",
       "document": "docs/07_decisions/DECISION_ARTIFACT_SCHEMA.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -17606,7 +17606,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-22::R009",
+      "requirement_id": "FORGE-DOC-22::R009",
       "document": "docs/07_decisions/DECISION_ARTIFACT_SCHEMA.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -17685,7 +17685,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-22::R010",
+      "requirement_id": "FORGE-DOC-22::R010",
       "document": "docs/07_decisions/DECISION_ARTIFACT_SCHEMA.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -17764,7 +17764,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-22::R011",
+      "requirement_id": "FORGE-DOC-22::R011",
       "document": "docs/07_decisions/DECISION_ARTIFACT_SCHEMA.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -17843,7 +17843,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-22::R012",
+      "requirement_id": "FORGE-DOC-22::R012",
       "document": "docs/07_decisions/DECISION_ARTIFACT_SCHEMA.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -17922,7 +17922,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-22::R013",
+      "requirement_id": "FORGE-DOC-22::R013",
       "document": "docs/07_decisions/DECISION_ARTIFACT_SCHEMA.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -18001,7 +18001,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-22::R014",
+      "requirement_id": "FORGE-DOC-22::R014",
       "document": "docs/07_decisions/DECISION_ARTIFACT_SCHEMA.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -18080,7 +18080,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-22::R015",
+      "requirement_id": "FORGE-DOC-22::R015",
       "document": "docs/07_decisions/DECISION_ARTIFACT_SCHEMA.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -18159,7 +18159,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-22::R016",
+      "requirement_id": "FORGE-DOC-22::R016",
       "document": "docs/07_decisions/DECISION_ARTIFACT_SCHEMA.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -18238,7 +18238,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-22::R017",
+      "requirement_id": "FORGE-DOC-22::R017",
       "document": "docs/07_decisions/DECISION_ARTIFACT_SCHEMA.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -18317,7 +18317,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-22::R018",
+      "requirement_id": "FORGE-DOC-22::R018",
       "document": "docs/07_decisions/DECISION_ARTIFACT_SCHEMA.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -18396,7 +18396,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-22::R019",
+      "requirement_id": "FORGE-DOC-22::R019",
       "document": "docs/07_decisions/DECISION_ARTIFACT_SCHEMA.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -18475,7 +18475,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-22::R020",
+      "requirement_id": "FORGE-DOC-22::R020",
       "document": "docs/07_decisions/DECISION_ARTIFACT_SCHEMA.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE",
@@ -18555,7 +18555,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-22::R021",
+      "requirement_id": "FORGE-DOC-22::R021",
       "document": "docs/07_decisions/DECISION_ARTIFACT_SCHEMA.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -18634,7 +18634,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-22::R022",
+      "requirement_id": "FORGE-DOC-22::R022",
       "document": "docs/07_decisions/DECISION_ARTIFACT_SCHEMA.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -18713,7 +18713,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R001",
+      "requirement_id": "FORGE-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R001",
       "document": "docs/07_decisions/DECISION_GATE_BEHAVIOR_SPEC.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -18792,7 +18792,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R002",
+      "requirement_id": "FORGE-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R002",
       "document": "docs/07_decisions/DECISION_GATE_BEHAVIOR_SPEC.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -18871,7 +18871,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R003",
+      "requirement_id": "FORGE-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R003",
       "document": "docs/07_decisions/DECISION_GATE_BEHAVIOR_SPEC.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -18950,7 +18950,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R004",
+      "requirement_id": "FORGE-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R004",
       "document": "docs/07_decisions/DECISION_GATE_BEHAVIOR_SPEC.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -19029,7 +19029,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R005",
+      "requirement_id": "FORGE-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R005",
       "document": "docs/07_decisions/DECISION_GATE_BEHAVIOR_SPEC.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -19108,7 +19108,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R006",
+      "requirement_id": "FORGE-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R006",
       "document": "docs/07_decisions/DECISION_GATE_BEHAVIOR_SPEC.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -19187,7 +19187,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R007",
+      "requirement_id": "FORGE-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R007",
       "document": "docs/07_decisions/DECISION_GATE_BEHAVIOR_SPEC.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE",
@@ -19267,7 +19267,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R008",
+      "requirement_id": "FORGE-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R008",
       "document": "docs/07_decisions/DECISION_GATE_BEHAVIOR_SPEC.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -19346,7 +19346,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R009",
+      "requirement_id": "FORGE-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R009",
       "document": "docs/07_decisions/DECISION_GATE_BEHAVIOR_SPEC.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -19425,7 +19425,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R010",
+      "requirement_id": "FORGE-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R010",
       "document": "docs/07_decisions/DECISION_GATE_BEHAVIOR_SPEC.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -19504,7 +19504,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R011",
+      "requirement_id": "FORGE-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R011",
       "document": "docs/07_decisions/DECISION_GATE_BEHAVIOR_SPEC.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -19583,7 +19583,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R012",
+      "requirement_id": "FORGE-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R012",
       "document": "docs/07_decisions/DECISION_GATE_BEHAVIOR_SPEC.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -19662,7 +19662,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R013",
+      "requirement_id": "FORGE-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R013",
       "document": "docs/07_decisions/DECISION_GATE_BEHAVIOR_SPEC.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -19741,7 +19741,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R014",
+      "requirement_id": "FORGE-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R014",
       "document": "docs/07_decisions/DECISION_GATE_BEHAVIOR_SPEC.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -19820,7 +19820,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R015",
+      "requirement_id": "FORGE-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R015",
       "document": "docs/07_decisions/DECISION_GATE_BEHAVIOR_SPEC.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"
@@ -19899,7 +19899,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R016",
+      "requirement_id": "FORGE-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R016",
       "document": "docs/07_decisions/DECISION_GATE_BEHAVIOR_SPEC.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE",
@@ -19979,7 +19979,7 @@
       "coverage_status": "FULL"
     },
     {
-      "requirement_id": "HALO-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R017",
+      "requirement_id": "FORGE-DOC-21__DECISION_GATE_BEHAVIOR_SPEC::R017",
       "document": "docs/07_decisions/DECISION_GATE_BEHAVIOR_SPEC.md",
       "mapped_code_units": [
         "CODE::code/src/modules/decisionGate.js::FILE"

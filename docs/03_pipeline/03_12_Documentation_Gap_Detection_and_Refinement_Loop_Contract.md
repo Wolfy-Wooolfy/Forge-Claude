@@ -1,6 +1,6 @@
-# Documentation Gap Detection & Refinement Loop Contract
+﻿# Documentation Gap Detection & Refinement Loop Contract
 
-**Document ID:** HALO-DOC-12  
+**Document ID:** FORGE-DOC-12  
 **Stage:** B  
 **Status:** BINDING – EXECUTION CONTRACT  
 **Applies To:** Stage B – Documentation Engine  

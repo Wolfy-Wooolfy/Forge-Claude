@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "path": "_tmp_code_files.txt",
     "size_bytes": 1491,
@@ -2292,13 +2292,13 @@
     "captured_at": "SNAPSHOT_LOCKED"
   },
   {
-    "path": "bin/halo-autonomy-step.js",
+    "path": "bin/forge-autonomy-step.js",
     "size_bytes": 2780,
     "hash": "db87b8f90f5ae75c1cbf5d8f1f59d22b73971bd33cc5bf7d2d645c45984cb598",
     "captured_at": "SNAPSHOT_LOCKED"
   },
   {
-    "path": "bin/halo-run.js",
+    "path": "bin/forge-run.js",
     "size_bytes": 1023,
     "hash": "590c6d0b74d068fb80ecd4da28c39f4c917eb588375af7ec9faf50440b20ed7c",
     "captured_at": "SNAPSHOT_LOCKED"

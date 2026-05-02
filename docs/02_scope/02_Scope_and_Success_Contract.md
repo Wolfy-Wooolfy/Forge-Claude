@@ -1,4 +1,4 @@
-# Scope & Success Contract (v1)
+﻿# Scope & Success Contract (v1)
 
 **Document ID:** DOC-02  
 **Project:** Forge  
@@ -262,7 +262,7 @@ The pipeline is allowed to:
 As long as:
 - No required information is missing
 - No multiple valid options exist
-- No HALO boundary is at risk
+- No Forge boundary is at risk
 
 ---
 
@@ -477,7 +477,7 @@ and is strictly forbidden.
 
 ---
 
-### 3.3 Violate HALO Core Rules
+### 3.3 Violate Forge Core Rules
 
 The pipeline must never violate:
 

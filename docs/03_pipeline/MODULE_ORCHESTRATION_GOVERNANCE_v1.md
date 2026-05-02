@@ -1,4 +1,4 @@
-# MODULE_ORCHESTRATION_GOVERNANCE_v1
+﻿# MODULE_ORCHESTRATION_GOVERNANCE_v1
 Document ID: DOC-38  
 Status: EXECUTION-BOUND  
 Authority Level: HARD (Fail-Closed)  
@@ -370,7 +370,6 @@ artifacts/exploration/
 In addition, the following namespaces are permitted as IMMUTABLE-LEGACY
 (GRANDFATHERED) for historical evidence only:
 
-- artifacts/tasks/
 - artifacts/stage_A/
 - artifacts/stage_B/
 - artifacts/stage_C/
@@ -396,12 +395,13 @@ ONLY by their designated system component:
 |---|---|---|
 | artifacts/forge/ | forge_state_resolver only | DOC-31, SCHEMA-07 |
 | artifacts/orchestration/ | orchestrator only | docs/10_runtime/10_Tech_Assumptions_and_Local_Runtime_Setup.md |
-| artifacts/cognitive/ | cognitive_adapter only | HALO-DOC-16, DOC-05 §4.6 |
+| artifacts/tasks/ | task_registry / orchestrator only | docs/03_pipeline/MODULE_ORCHESTRATION_GOVERNANCE_v1.md §11 |
+| artifacts/cognitive/ | cognitive_adapter only | FORGE-DOC-16, DOC-05 §4.6 |
 | artifacts/llm/ | cognitive_adapter only | DOC-10-CE-SEL §5 |
 | artifacts/ai/ | AI Layer modules only | docs/11_ai_layer/04_AI_LAYER_ARTIFACTS.md |
 | artifacts/coverage/ | Vision Compliance module only | DOC-15, DOC-16 |
-| artifacts/verify/ | Boundary Audit layer only | HALO-DOC-08 §2.2.1, §2.2.2 |
-| artifacts/archive/ | forge-reset-new-project.js only | HALO-DOC-24 §6 |
+| artifacts/verify/ | Boundary Audit layer only | FORGE-DOC-08 §2.2.1, §2.2.2 |
+| artifacts/archive/ | forge-reset-new-project.js only | FORGE-DOC-24 §6 |
 | artifacts/projects/ | intake module only | docs/03_pipeline/INTAKE_MODULE_CONTRACT_v1.md |
 | artifacts/admission/ | Idea Structuring Layer only | DOC-01 §5 |
 

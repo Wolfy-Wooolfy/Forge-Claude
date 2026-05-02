@@ -1,4 +1,4 @@
-const fs = require("fs");
+﻿const fs = require("fs");
 const path = require("path");
 
 const { runIntake } = require("../modules/intakeEngine");
@@ -113,45 +113,6 @@ const registry = Object.freeze({
       closure_artifact: true,
       artifact: relTaskClosure,
       status_patch: result && result.status_patch ? result.status_patch : {}
-    };
-  },
-
-  "TASK-049": (status) => {
-    const { runAudit } = require("../modules/auditEngine");
-
-    const result = runAudit(status);
-
-    const relTaskClosure = "artifacts/tasks/TASK-049.execution.closure.md";
-    const absTaskClosure = path.resolve(ROOT, relTaskClosure);
-
-    if (fs.existsSync(absTaskClosure)) {
-      throw new Error("Idempotency violation: closure artifact already exists for TASK-049");
-    }
-
-    const stamp = new Date().toISOString();
-
-    const closure = [
-      "# Task Execution Closure",
-      "",
-      `- task: TASK-049`,
-      `- timestamp: ${stamp}`,
-      `- stage: ${String(status.current_stage || "").trim() || "UNKNOWN"}`,
-      `- stage_progress_percent: 100`,
-      "",
-      "## Notes",
-      "- TASK-049 executed: Audit Refresh (NamingAuthority + Deprecated term scan).",
-      ""
-    ].join("\n");
-
-    fs.mkdirSync(path.dirname(absTaskClosure), { recursive: true });
-    fs.writeFileSync(absTaskClosure, closure, { encoding: "utf8" });
-
-    return {
-      stage_progress_percent: 100,
-      artifact: relTaskClosure,
-      closure_artifact: true,
-      clear_current_task: true,
-      status_patch: result.status_patch || {}
     };
   },
 
@@ -284,6 +245,30 @@ const registry = Object.freeze({
   },
 
   "TASK-066: MODULE FLOW — Design Exploration": (context) => {
+    // Conditional activation: skip if no execution fork detected
+    const gapActionsPath = path.join(ROOT, 'artifacts', 'gap', 'gap_actions.json');
+    let forkDetected = false;
+    if (fs.existsSync(gapActionsPath)) {
+      try {
+        const gapActions = JSON.parse(fs.readFileSync(gapActionsPath, 'utf8'));
+        forkDetected = gapActions.execution_fork_detected === true;
+      } catch (_) {}
+    }
+
+    if (!forkDetected) {
+      return {
+        stage_progress_percent: 100,
+        closure_artifact: true,
+        artifact: 'artifacts/tasks/TASK-066.execution.closure.md',
+        status_patch: {
+          issues: [],
+          blocking_questions: [],
+          current_task: '',
+          next_step: 'DESIGN_EXPLORATION auto-skipped: no execution fork detected. Next=Decision Gate.'
+        }
+      };
+    }
+
     const result = runDesignExploration(context);
 
     const sp = result && result.status_patch ? { ...result.status_patch } : {};
@@ -1911,7 +1896,7 @@ const registry = Object.freeze({
   "preconditions": [
     "Valid status.json state",
     "Task handler registered in task_registry",
-    "Execution invoked via halo-autonomy-step"
+    "Execution invoked via forge-autonomy-step"
   ],
   "stop_conditions": [
     "Abort on missing handler",

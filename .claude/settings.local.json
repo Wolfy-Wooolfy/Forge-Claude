@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"d:\\\\\\\\S\\\\\\\\Halo\\\\\\\\Tech\\\\\\\\Forge-Claude\")",
+      "Bash(xargs ls *)",
+      "Bash(awk '{print $9, $5}')"
+    ]
+  }
+}

@@ -1,4 +1,4 @@
-# Stage C — Test Evidence
+﻿# Stage C — Test Evidence
 
 ```json
 {
@@ -7,7 +7,7 @@
   "environment": {
     "os": "win32 x64",
     "node_version": "v22.17.1",
-    "working_directory": "D:\\S\\Halo\\Tech\\halo-personal-autonomous-pipeline",
+    "working_directory": "D:\\S\\Halo\\Tech\\forge-personal-autonomous-pipeline",
     "package_manager": "npm"
   },
   "commands": [
@@ -47,6 +47,6 @@
     "artifacts/tasks/TASK-034.execution.closure.md"
   ],
   "status": "PASS",
-  "notes": "== HALO Pre-Run Check ==\n[HALO] SMOKE: prepare transition B -> C progressed stage to 0%\nSmoke tests: PASS\nIntegrity OK\nIntegrity: PASS\nPre-Run Check: OK\n"
+  "notes": "== Forge Pre-Run Check ==\n[Forge] SMOKE: prepare transition B -> C progressed stage to 0%\nSmoke tests: PASS\nIntegrity OK\nIntegrity: PASS\nPre-Run Check: OK\n"
 }
 ```

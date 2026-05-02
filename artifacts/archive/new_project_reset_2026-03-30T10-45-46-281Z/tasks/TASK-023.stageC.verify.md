@@ -1,4 +1,4 @@
-# TASK-023 — Stage C Autonomy Verification (Non-Executable)
+﻿# TASK-023 — Stage C Autonomy Verification (Non-Executable)
 
 ## Verification Objective
 Ensure that autonomy scaffolding exists ONLY as structure
@@ -13,7 +13,7 @@ and that no autonomous execution is possible at this stage.
 - No background processes
 
 2) Opt-In Enforcement
-- Autonomy cannot start unless HALO_AUTONOMY=1
+- Autonomy cannot start unless FORGE_AUTONOMY=1
 - Autonomy cannot start if next_step == IDLE
 - Autonomy cannot start if blocking_questions exist
 

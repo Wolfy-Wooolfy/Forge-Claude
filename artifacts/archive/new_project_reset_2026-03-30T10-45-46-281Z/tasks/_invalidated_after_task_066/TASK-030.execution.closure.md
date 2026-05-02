@@ -1,4 +1,4 @@
-# TASK-030 — Execution Closure
+﻿# TASK-030 — Execution Closure
 
 ```json
 {
@@ -16,7 +16,7 @@
   "preconditions": [
     "Valid status.json state",
     "Task handler registered in task_registry",
-    "Execution invoked via halo-autonomy-step"
+    "Execution invoked via forge-autonomy-step"
   ],
   "stop_conditions": [
     "Abort on missing handler",

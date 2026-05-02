@@ -1,223 +1,169 @@
-<!-- Forge AI Workspace entry page -->
 <!DOCTYPE html>
-<!-- Main web app shell. -->
-<html lang="en">
+<html lang="ar" dir="auto">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Forge AI Workspace</title>
+  <title>Forge — AI Workspace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <style>
-    * {
-      box-sizing: border-box;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-base:       #0d1117;
+      --bg-surface:    #161b22;
+      --bg-elevated:   #1c2128;
+      --bg-overlay:    #21262d;
+      --border:        #30363d;
+      --border-muted:  #21262d;
+      --text-primary:  #e6edf3;
+      --text-secondary:#8b949e;
+      --text-muted:    #6e7681;
+      --blue:          #58a6ff;
+      --blue-dark:     #1f6feb;
+      --blue-bg:       #0c2340;
+      --green:         #3fb950;
+      --green-bg:      #0a3320;
+      --amber:         #d29922;
+      --amber-bg:      #2f230a;
+      --red:           #f85149;
+      --red-bg:        #3d0f0e;
+      --purple:        #bc8cff;
+      --radius-sm:     6px;
+      --radius-md:     10px;
+      --radius-lg:     16px;
+      --radius-xl:     24px;
+      --shadow-sm:     0 1px 3px rgba(0,0,0,.4);
+      --shadow-md:     0 4px 16px rgba(0,0,0,.5);
+      --shadow-lg:     0 8px 32px rgba(0,0,0,.6);
     }
 
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: #e2e8f0;
-      overflow: hidden;
-    }
-
-    .app {
-      max-width: 1500px;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-base);
+      color: var(--text-primary);
       height: 100vh;
-      margin: 0 auto;
-      padding: 24px;
+      overflow: hidden;
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── App Shell ── */
+    .app {
       display: flex;
       flex-direction: column;
+      height: 100vh;
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 0 20px 16px;
       overflow: hidden;
     }
 
-    .header {
-      margin-bottom: 24px;
-    }
-
-    .test-banner {
-      margin-bottom: 18px;
-      border: 1px solid #facc15;
-      border-radius: 8px;
-      background: #422006;
-      color: #fef3c7;
-      padding: 12px 14px;
-      font-weight: 700;
-    }
-
-    .header h1 {
-      margin: 0 0 8px;
-      font-size: 28px;
-    }
-
-    .header p {
-      margin: 0;
-      color: #94a3b8;
-      line-height: 1.6;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1.2fr 1fr;
-      gap: 20px;
-    }
-
-    .panel {
-      background: #111827;
-      border: 1px solid #1f2937;
-      border-radius: 16px;
-      padding: 20px;
-    }
-
-    .panel h2 {
-      margin-top: 0;
+    /* ── Topbar ── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-muted);
       margin-bottom: 16px;
-      font-size: 20px;
+      flex: 0 0 auto;
+      gap: 16px;
     }
 
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 14px;
-      color: #cbd5e1;
-    }
-
-    textarea,
-    select {
-      width: 100%;
-      border-radius: 12px;
-      border: 1px solid #334155;
-      background: #0b1220;
-      color: #e2e8f0;
-      padding: 14px;
-      font-size: 15px;
-      line-height: 1.6;
-      outline: none;
-    }
-
-    textarea {
-      min-height: 260px;
-      resize: vertical;
-    }
-
-    textarea:focus,
-    select:focus {
-      border-color: #38bdf8;
-    }
-
-    .actions {
+    .topbar-brand {
       display: flex;
-      gap: 12px;
-      margin-top: 16px;
-      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      flex: 0 0 auto;
     }
 
-    button {
-      border: 0;
-      border-radius: 12px;
-      padding: 12px 18px;
-      font-size: 14px;
+    .brand-icon {
+      font-size: 22px;
+      color: var(--blue);
+      line-height: 1;
+    }
+
+    .brand-name {
+      font-size: 18px;
       font-weight: 700;
-      cursor: pointer;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
     }
 
-    .primary {
-      background: #38bdf8;
-      color: #082f49;
+    .brand-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 400;
     }
 
-    .secondary {
-      background: #1e293b;
-      color: #e2e8f0;
-      border: 1px solid #334155;
+    .topbar-desc {
+      flex: 1;
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto;
     }
 
-    .danger {
-      background: #3f1d1d;
-      color: #fecaca;
-      border: 1px solid #7f1d1d;
+    .topbar-status {
+      flex: 0 0 auto;
     }
 
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
     }
 
-    .status {
-      margin-top: 14px;
-      padding: 12px 14px;
-      border-radius: 12px;
-      background: #0b1220;
-      border: 1px solid #1e293b;
-      color: #cbd5e1;
-      min-height: 46px;
-      white-space: pre-wrap;
+    .status-pill::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text-muted);
     }
 
-    .section {
-      margin-top: 18px;
+    .status-pill.active::before  { background: var(--green); animation: pulse 1.6s infinite; }
+    .status-pill.error::before   { background: var(--red); }
+    .status-pill.waiting::before { background: var(--amber); }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: .4; }
     }
 
-    .output-box {
-      background: #0b1220;
-      border: 1px solid #1e293b;
-      border-radius: 12px;
-      padding: 14px;
-      min-height: 180px;
-      white-space: pre-wrap;
-      overflow: auto;
-      line-height: 1.6;
-    }
-
-    .file-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .file-card {
-      background: #0b1220;
-      border: 1px solid #1e293b;
-      border-radius: 12px;
-      padding: 14px;
-    }
-
-    .file-path {
-      font-weight: 700;
-      margin-bottom: 8px;
-      color: #7dd3fc;
-      word-break: break-word;
-    }
-
-    .file-preview {
-      color: #cbd5e1;
-      white-space: pre-wrap;
-      word-break: break-word;
-      line-height: 1.6;
-    }
-
-    .empty {
-      color: #94a3b8;
-    }
-
+    /* ── Main workspace grid ── */
     .workspace-shell {
       display: grid;
-      grid-template-columns: minmax(0, 3fr) minmax(340px, 1fr);
-      gap: 24px;
+      grid-template-columns: minmax(0, 3fr) minmax(320px, 1fr);
+      gap: 20px;
       align-items: stretch;
       flex: 1;
       min-height: 0;
       overflow: hidden;
     }
 
+    /* ── Chat panel ── */
     .chat-panel {
-      background: #111827;
-      border: 1px solid #1f2937;
-      border-radius: 24px;
-      padding: 0;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
       min-height: 0;
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+      box-shadow: var(--shadow-md);
     }
 
     .chat-stream {
@@ -227,69 +173,63 @@
       flex: 1;
       min-height: 0;
       overflow-y: auto;
-      padding: 20px 40px;
+      padding: 20px 36px;
       scroll-behavior: smooth;
-      align-items: center;
     }
+
+    .chat-stream::-webkit-scrollbar { width: 4px; }
+    .chat-stream::-webkit-scrollbar-track { background: transparent; }
+    .chat-stream::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
     .chat-message {
-      border: 1px solid #1e293b;
-      border-radius: 20px;
-      padding: 16px 18px;
-      background: #0b1220;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-lg);
+      padding: 14px 18px;
+      background: var(--bg-elevated);
+      box-shadow: var(--shadow-sm);
       width: 100%;
-      max-width: none;
+      animation: msgEnter .2s ease-out;
     }
 
-    .chat-message[dir="rtl"] {
-      direction: rtl;
-      text-align: right;
+    @keyframes msgEnter {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
-    .chat-message[dir="ltr"] {
-      direction: ltr;
-      text-align: left;
-    }
+    .chat-message[dir="rtl"] { direction: rtl; text-align: right; }
+    .chat-message[dir="ltr"] { direction: ltr; text-align: left; }
 
     .chat-message.user {
-      margin-left: auto;
-      text-align: right;
-    }
-
-    .chat-message.assistant {
-      margin-right: auto;
-    }
-
-    .chat-message.user {
-      background: linear-gradient(180deg, #0a3550 0%, #082f49 100%);
-      border-color: #0ea5e9;
+      background: linear-gradient(160deg, var(--blue-bg) 0%, #0a2240 100%);
+      border-color: #1d4e89;
       align-self: flex-end;
     }
 
     .chat-message.assistant {
-      background: #111827;
+      background: var(--bg-elevated);
       align-self: flex-start;
     }
 
     .message-label {
-      font-size: 12px;
+      font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #94a3b8;
-      margin-bottom: 10px;
-      font-weight: 700;
+      letter-spacing: .08em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      font-weight: 600;
     }
 
     .message-title {
-      margin: 0 0 12px;
-      font-size: 18px;
+      margin: 0 0 10px;
+      font-size: 16px;
+      font-weight: 600;
     }
 
+    /* ── Composer ── */
     .composer-message {
-      border-top: 1px solid #1f2937;
-      background: #0f172a;
-      padding: 10px 14px;
+      border-top: 1px solid var(--border-muted);
+      background: var(--bg-base);
+      padding: 10px 16px;
       display: flex;
       flex-direction: column;
       gap: 6px;
@@ -305,202 +245,452 @@
       min-height: 44px;
       max-height: 120px;
       resize: none;
-      border-radius: 18px;
-      padding: 12px 14px;
+      border-radius: var(--radius-lg);
+      padding: 11px 14px;
       font-size: 14px;
       flex: 1;
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      font-family: inherit;
+      outline: none;
+      transition: border-color .15s;
     }
+
+    .composer-message textarea:focus { border-color: var(--blue); }
 
     .send-icon-btn {
-      width: 44px;
-      height: 44px;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       padding: 0;
-      font-size: 20px;
+      font-size: 18px;
       line-height: 1;
-      background: #38bdf8;
+      background: var(--blue);
       color: #082f49;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      transition: background .15s, transform .1s;
     }
 
+    .send-icon-btn:hover { background: #79bcff; transform: scale(1.05); }
+    .send-icon-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
     .status-inline {
-      font-size: 12px;
-      color: #64748b;
+      font-size: 11px;
+      color: var(--text-muted);
       padding-left: 4px;
+      min-height: 16px;
     }
+
+    /* ── Sidebar ── */
+    .workspace-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-height: 0;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    .workspace-sidebar::-webkit-scrollbar { width: 4px; }
+    .workspace-sidebar::-webkit-scrollbar-track { background: transparent; }
+    .workspace-sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    .sidebar-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .sidebar-card h2 {
+      margin: 0 0 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .card-header h2 { margin: 0; }
+
+    .icon-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .15s, color .15s;
+    }
+
+    .icon-btn:hover { background: var(--bg-overlay); color: var(--text-primary); }
+
+    /* ── Form controls ── */
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    select {
+      width: 100%;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      padding: 8px 10px;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      cursor: pointer;
+    }
+
+    select:focus { border-color: var(--blue); }
+
+    textarea {
+      width: 100%;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      padding: 8px 10px;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      resize: vertical;
+    }
+
+    textarea:focus { border-color: var(--blue); }
+
+    /* ── Buttons ── */
+    button {
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity .15s, background .15s;
+    }
+
+    button:disabled { opacity: .45; cursor: not-allowed; }
+
+    .primary  { background: var(--blue); color: #082f49; }
+    .primary:hover:not(:disabled)  { background: #79bcff; }
+
+    .secondary {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+    .secondary:hover:not(:disabled) { background: var(--bg-overlay); }
+
+    .danger {
+      background: var(--red-bg);
+      color: #fca5a5;
+      border: 1px solid #7f1d1d;
+    }
+    .danger:hover:not(:disabled) { background: #4d1212; }
+
+    /* ── Output / info boxes ── */
+    .output-box {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      white-space: pre-wrap;
+      overflow: auto;
+      line-height: 1.6;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .output-box.empty { color: var(--text-muted); }
+
+    .compact-box { min-height: 72px; }
+
+    .status {
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-muted);
+      color: var(--text-secondary);
+      min-height: 40px;
+      white-space: pre-wrap;
+      font-size: 12px;
+    }
+
+    /* ── File / history cards ── */
+    .file-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .file-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+
+    .file-card.empty { color: var(--text-muted); }
+
+    .file-path {
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--blue);
+      word-break: break-word;
+      font-size: 12px;
+    }
+
+    .file-preview {
+      color: var(--text-secondary);
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.6;
+    }
+
+    /* ── Actions row ── */
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .approval-actions { margin-top: 10px; }
 
     .assistant-stack {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 8px;
     }
 
-    .workspace-sidebar {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      min-height: 0;
-      overflow-y: auto;
-      padding-right: 4px;
-    }
-
-    .sidebar-card {
-      background: #111827;
-      border: 1px solid #1f2937;
-      border-radius: 20px;
-      padding: 18px;
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
-    }
-
-    .sidebar-card h2 {
-      margin: 0 0 14px;
-      font-size: 16px;
-    }
-
-    .compact-box {
-      min-height: 96px;
-    }
-
+    /* ── Auth fields ── */
     .auth-fields {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
 
-    .auth-fields textarea {
-      min-height: 60px;
-    }
+    .auth-fields textarea { min-height: 38px; }
 
-    .approval-actions {
-      margin-top: 14px;
-    }
-
-    .hidden-state {
-      display: none;
-    }
-
+    /* ── Strategy choice ── */
     .strategy-choice-list {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
 
     .strategy-choice-btn {
       width: 100%;
       text-align: left;
-      background: #0b1220;
-      color: #e2e8f0;
-      border: 1px solid #334155;
-      border-radius: 12px;
-      padding: 12px 14px;
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
       cursor: pointer;
-      font-size: 14px;
-      line-height: 1.6;
+      font-size: 13px;
+      line-height: 1.5;
+      transition: border-color .15s, background .15s;
     }
 
-    .strategy-choice-btn:hover {
-      border-color: #38bdf8;
-      background: #0f172a;
+    .strategy-choice-btn:hover { border-color: var(--blue); background: var(--bg-overlay); }
+    .strategy-choice-btn strong { display: block; color: var(--blue); margin-bottom: 4px; }
+
+    /* ── Governance badges ── */
+    .gov-badges {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
 
-    .strategy-choice-btn strong {
-      display: block;
-      color: #7dd3fc;
-      margin-bottom: 6px;
+    .gov-badge-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 0;
+      border-bottom: 1px solid var(--border-muted);
     }
 
+    .gov-badge-row:last-child { border-bottom: none; }
+
+    .badge-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .02em;
+    }
+
+    .badge-unknown  { background: var(--bg-overlay); color: var(--text-muted); border: 1px solid var(--border); }
+    .badge-pass     { background: var(--green-bg); color: var(--green); border: 1px solid #145523; }
+    .badge-fail     { background: var(--red-bg); color: var(--red); border: 1px solid #5c1a19; }
+    .badge-warn     { background: var(--amber-bg); color: var(--amber); border: 1px solid #5a3d08; }
+    .badge-loading  { background: var(--blue-bg); color: var(--blue); border: 1px solid #1a3f6e; }
+
+    /* ── Project context header ── */
+    .project-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .project-row label { margin-bottom: 0; }
+
+    /* ── Footer ── */
     .footer {
-      margin-top: 14px;
-      padding-top: 12px;
-      border-top: 1px solid #1f2937;
-      color: #94a3b8;
-      font-size: 14px;
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border-muted);
+      color: var(--text-muted);
+      font-size: 11px;
       text-align: center;
       flex: 0 0 auto;
     }
 
-    .footer p {
-      margin: 0;
-    }
+    /* ── Hidden state (legacy boxes kept for JS) ── */
+    .hidden-state { display: none; }
 
+    /* ── Responsive ── */
     @media (max-width: 900px) {
-      .workspace-shell {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 900px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
+      .workspace-shell { grid-template-columns: 1fr; }
+      .topbar-desc { display: none; }
     }
   </style>
 </head>
 <body>
   <div class="app">
 
-    <div class="header">
-      <h1>Forge AI Workspace</h1>
-      <p>اكتب طلبك بالعربي أو بالإنجليزي. النظام هيجهز Draft للملفات المقترحة، وبعد مراجعتك وموافقتك يتم إنشاء Decision Packet governed بدل الكتابة المباشرة.</p>
-    </div>
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-brand">
+        <span class="brand-icon">⬡</span>
+        <span class="brand-name">Forge</span>
+        <span class="brand-sub">AI Workspace</span>
+      </div>
+      <p class="topbar-desc">اكتب طلبك بالعربي أو بالإنجليزي — النظام يجهز Draft منظم بعد موافقتك قبل أي تنفيذ.</p>
+      <div class="topbar-status">
+        <div id="globalStatusPill" class="status-pill">Ready</div>
+      </div>
+    </header>
 
+    <!-- Workspace -->
     <div class="workspace-shell">
+
+      <!-- Chat panel -->
       <div class="chat-panel">
         <div class="chat-stream">
 
+          <!-- Legacy output boxes (hidden, kept for JS) -->
           <div class="hidden-state" aria-hidden="true">
-            <div id="responseBox" class="output-box empty">No response yet.</div>
-
-            <div id="filesBox" class="file-list">
-              <div class="file-card empty">No files proposed yet.</div>
-            </div>
-
-            <div id="previewBox" class="file-list">
-              <div class="file-card empty">No diff preview yet.</div>
-            </div>
-
-            <div id="analysisBox" class="output-box empty">No operation analysis yet.</div>
+            <div id="responseBox"  class="output-box empty">No response yet.</div>
+            <div id="filesBox"     class="file-list"><div class="file-card empty">No files proposed yet.</div></div>
+            <div id="previewBox"   class="file-list"><div class="file-card empty">No diff preview yet.</div></div>
+            <div id="analysisBox"  class="output-box empty">No operation analysis yet.</div>
           </div>
+
         </div>
-          <div class="composer-message">
-            <div class="composer-input-row">
-              <textarea id="requestInput" placeholder="اكتب رسالتك هنا..."></textarea>
-              <button id="chatSendBtn" class="send-icon-btn" title="Send">➜</button>
-            </div>
-            <div id="statusBox" class="status-inline">Ready.</div>
+
+        <!-- Composer -->
+        <div class="composer-message">
+          <div class="composer-input-row">
+            <textarea id="requestInput" placeholder="اكتب رسالتك هنا..."></textarea>
+            <button id="chatSendBtn" class="send-icon-btn" title="Send">➜</button>
           </div>
+          <div id="statusBox" class="status-inline">Ready.</div>
+        </div>
       </div>
 
+      <!-- Sidebar -->
       <div class="workspace-sidebar">
+
+        <!-- Project Context -->
         <div class="sidebar-card">
           <h2>Project Context</h2>
-
-          <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px;">
-            <label for="projectSelect" style="margin-bottom:0;">Active project</label>
-            <button id="newProjectBtn" type="button" class="secondary">New Project</button>
+          <div class="project-row">
+            <label for="projectSelect">Active project</label>
+            <button id="newProjectBtn" type="button" class="secondary">+ New</button>
           </div>
-
           <select id="projectSelect"></select>
-
-          <div id="projectStateBox" class="status">Loading project state...</div>
+          <div id="projectStateBox" class="status" style="margin-top:10px;">Loading project state...</div>
         </div>
+
+        <!-- Decision Control -->
         <div class="sidebar-card">
           <h2>Decision Control</h2>
-
           <label for="approverRoleSelect">Approver role</label>
           <select id="approverRoleSelect">
             <option value="cto">cto</option>
           </select>
-
-          <div class="assistant-stack">
-            <div id="approvalInfoBox" class="output-box compact-box empty">Approval policy not loaded yet.</div>
-            <div id="operationInfoBox" class="output-box compact-box empty">Operation summary not loaded yet.</div>
+          <div class="assistant-stack" style="margin-top:10px;">
+            <div id="approvalInfoBox"   class="output-box compact-box empty">Approval policy not loaded yet.</div>
+            <div id="operationInfoBox"  class="output-box compact-box empty">Operation summary not loaded yet.</div>
           </div>
-
           <div class="actions approval-actions">
-            <button id="approveBtn" class="primary" disabled>Approve & Queue Decision</button>
-            <button id="rejectBtn" class="danger" disabled>Reject</button>
+            <button id="approveBtn" class="primary"  disabled>Approve &amp; Queue Decision</button>
+            <button id="rejectBtn"  class="danger"   disabled>Reject</button>
           </div>
         </div>
+
+        <!-- Governance -->
+        <div class="sidebar-card">
+          <div class="card-header">
+            <h2>Governance</h2>
+            <button id="govRefreshBtn" class="icon-btn" title="Refresh governance status">↻</button>
+          </div>
+          <div class="gov-badges">
+            <div class="gov-badge-row">
+              <span class="badge-label">Spec compliance</span>
+              <span id="gBadgeSpec" class="badge badge-unknown">—</span>
+            </div>
+            <div class="gov-badge-row">
+              <span class="badge-label">Providers</span>
+              <span id="gBadgeProvider" class="badge badge-unknown">—</span>
+            </div>
+            <div class="gov-badge-row">
+              <span class="badge-label">Decisions</span>
+              <span id="gBadgeDecision" class="badge badge-unknown">—</span>
+            </div>
+            <div class="gov-badge-row">
+              <span class="badge-label">Open forks</span>
+              <span id="gBadgeForks" class="badge badge-unknown">—</span>
+            </div>
+          </div>
+          <div id="govStatusBox" class="output-box" style="margin-top:10px;min-height:48px;font-size:11px;">Click ↻ to check governance status.</div>
+        </div>
+
+        <!-- Project Activity -->
         <div class="sidebar-card">
           <h2>Project Activity</h2>
           <div id="historyBox" class="file-list">
@@ -508,6 +698,7 @@
           </div>
         </div>
 
+        <!-- Conversation Memory -->
         <div class="sidebar-card">
           <h2>Conversation Memory</h2>
           <div id="conversationHistoryBox" class="file-list">
@@ -515,29 +706,27 @@
           </div>
         </div>
 
+        <!-- Workspace Access -->
         <div class="sidebar-card">
           <h2>Workspace Access</h2>
-
           <div class="auth-fields">
             <label for="authUsernameInput">Username</label>
             <textarea id="authUsernameInput">test</textarea>
-
             <label for="authPasswordInput">Password</label>
             <textarea id="authPasswordInput">1234</textarea>
           </div>
-
           <div class="actions">
             <button id="authRegisterBtn" class="secondary">Register</button>
-            <button id="authLoginBtn" class="secondary">Login</button>
+            <button id="authLoginBtn"    class="secondary">Login</button>
           </div>
-
-          <div id="authResultBox" class="output-box compact-box empty">No auth response yet.</div>
+          <div id="authResultBox" class="output-box compact-box empty" style="margin-top:10px;">No auth response yet.</div>
         </div>
+
       </div>
     </div>
 
     <footer class="footer">
-      <p>&copy; 2026 Forge AI Workspace. All rights reserved.</p>
+      <p>&copy; 2026 Forge AI Workspace</p>
     </footer>
   </div>
 
@@ -609,7 +798,7 @@
     }
 
     function detectUserLanguage(value) {
-      return /[\u0600-\u06FF]/.test(String(value || "")) ? "ar" : "en";
+      return /[؀-ۿ]/.test(String(value || "")) ? "ar" : "en";
     }
 
     function getRuntimeStateLabel(stateValue, lang) {
@@ -920,6 +1109,20 @@
 
     function setStatus(text) {
       statusBox.textContent = text;
+      // Mirror to topbar global status pill
+      const pill = document.getElementById("globalStatusPill");
+      if (pill) {
+        pill.textContent = text.length > 60 ? text.slice(0, 57) + "…" : text;
+        pill.className = "status-pill";
+        const lower = text.toLowerCase();
+        if (lower.includes("error") || lower.includes("failed") || lower.includes("blocked")) {
+          pill.classList.add("error");
+        } else if (lower.includes("waiting") || lower.includes("pending") || lower.includes("thinking")) {
+          pill.classList.add("waiting");
+        } else if (lower.includes("ready") || lower.includes("success") || lower.includes("created")) {
+          pill.classList.add("active");
+        }
+      }
     }
 
     function renderResponse(data) {
@@ -1158,10 +1361,10 @@
           .split("\n")
           .map(line => {
             if (line.startsWith("+")) {
-              return `<span style="color:#22c55e;">${line}</span>`;
+              return `<span style="color:#3fb950;">${line}</span>`;
             }
             if (line.startsWith("-")) {
-              return `<span style="color:#ef4444;">${line}</span>`;
+              return `<span style="color:#f85149;">${line}</span>`;
             }
             return `<span>${line}</span>`;
           })
@@ -2077,9 +2280,95 @@
       chatStream.scrollTop = chatStream.scrollHeight;
     });
 
+    // ── Governance badge refresh ──
+    const govRefreshBtn = document.getElementById("govRefreshBtn");
+    const govStatusBox  = document.getElementById("govStatusBox");
+    const gBadgeSpec     = document.getElementById("gBadgeSpec");
+    const gBadgeProvider = document.getElementById("gBadgeProvider");
+    const gBadgeDecision = document.getElementById("gBadgeDecision");
+    const gBadgeForks    = document.getElementById("gBadgeForks");
+
+    function setBadge(el, text, state) {
+      el.textContent = text;
+      el.className = "badge badge-" + state;
+    }
+
+    govRefreshBtn.addEventListener("click", async () => {
+      govRefreshBtn.disabled = true;
+      govRefreshBtn.textContent = "…";
+      govStatusBox.textContent = "Checking governance status…";
+
+      setBadge(gBadgeSpec,     "…", "loading");
+      setBadge(gBadgeProvider, "…", "loading");
+      setBadge(gBadgeDecision, "…", "loading");
+      setBadge(gBadgeForks,    "…", "loading");
+
+      const API_BASE = window.location.origin.replace(":3000", ":3100");
+      const lines = [];
+
+      try {
+        const [toolRes, auditRes, decRes, forkRes] = await Promise.allSettled([
+          fetch(`${API_BASE}/api/governance/tool-integration-readiness`, { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" }).then(r => r.json()),
+          fetch(`${API_BASE}/api/governance/boundary-audit/all`,          { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" }).then(r => r.json()),
+          fetch(`${API_BASE}/api/governance/decision-artifact-validator`,  { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" }).then(r => r.json()),
+          fetch(`${API_BASE}/api/governance/fork/report`,                  { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" }).then(r => r.json())
+        ]);
+
+        // Tool integration / providers
+        if (toolRes.status === "fulfilled" && toolRes.value) {
+          const d = toolRes.value;
+          const pass = d.result === "PASS" || d.ok === true;
+          setBadge(gBadgeProvider, pass ? "PASS" : "WARN", pass ? "pass" : "warn");
+          lines.push(`Providers: ${d.result || (pass ? "PASS" : "WARN")} — modules ${d.modules_found || "?"}/${d.modules_checked || "?"}`);
+        } else {
+          setBadge(gBadgeProvider, "N/A", "unknown");
+        }
+
+        // Boundary audit
+        if (auditRes.status === "fulfilled" && auditRes.value) {
+          const d = auditRes.value;
+          const pass = d.overall === "PASS" || d.result === "PASS";
+          setBadge(gBadgeSpec, pass ? "PASS" : "FAIL", pass ? "pass" : "fail");
+          lines.push(`Spec: ${d.overall || d.result || "?"} — stages audited: ${d.stages_audited || "?"}`);
+        } else {
+          setBadge(gBadgeSpec, "N/A", "unknown");
+        }
+
+        // Decision validator
+        if (decRes.status === "fulfilled" && decRes.value) {
+          const d = decRes.value;
+          const pass = d.result === "PASS" || (d.invalid_count === 0 && d.valid_count > 0);
+          setBadge(gBadgeDecision, pass ? "PASS" : (d.invalid_count > 0 ? "FAIL" : "WARN"), pass ? "pass" : (d.invalid_count > 0 ? "fail" : "warn"));
+          lines.push(`Decisions: valid ${d.valid_count || 0}, invalid ${d.invalid_count || 0}`);
+        } else {
+          setBadge(gBadgeDecision, "N/A", "unknown");
+        }
+
+        // Fork report
+        if (forkRes.status === "fulfilled" && forkRes.value) {
+          const d = forkRes.value;
+          const open = d.open_forks_count || (Array.isArray(d.open_forks) ? d.open_forks.length : 0);
+          setBadge(gBadgeForks, open === 0 ? "0 open" : `${open} open`, open === 0 ? "pass" : "warn");
+          lines.push(`Forks: ${open} open, ${d.resolved_forks_count || 0} resolved`);
+        } else {
+          setBadge(gBadgeForks, "N/A", "unknown");
+        }
+
+        govStatusBox.textContent = lines.join("\n") || "Governance check complete.";
+      } catch (err) {
+        govStatusBox.textContent = `Error: ${err.message}`;
+        setBadge(gBadgeSpec,     "ERR", "fail");
+        setBadge(gBadgeProvider, "ERR", "fail");
+        setBadge(gBadgeDecision, "ERR", "fail");
+        setBadge(gBadgeForks,    "ERR", "fail");
+      } finally {
+        govRefreshBtn.disabled = false;
+        govRefreshBtn.textContent = "↻";
+      }
+    });
+
     loadApprovalPolicy();
     loadProjects();
   </script>
-<!-- Workspace footer marker -->
 </body>
 </html>

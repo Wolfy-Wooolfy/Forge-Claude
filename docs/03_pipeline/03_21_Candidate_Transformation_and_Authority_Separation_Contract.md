@@ -1,6 +1,6 @@
-# Candidate Transformation & Authority Separation Contract
+﻿# Candidate Transformation & Authority Separation Contract
 
-**Document ID:** HALO-DOC-21  
+**Document ID:** FORGE-DOC-21  
 **Applies To:** All Cognitive Outputs  
 **Status:** HARD ENFORCEMENT  
 **Enforcement:** Fail-Closed  

@@ -1,4 +1,4 @@
-# System Overview & Operating Model
+﻿# System Overview & Operating Model
 ## Forge
 
 **Status:** Authoritative – v1  
@@ -47,7 +47,7 @@ This boundary is governed behaviorally by:
 Forge is **not a decision assistant**, **not a reasoning authority**, and **not a conversational agent**.
 
 It does NOT:
-- Decide what HALO should be
+- Decide what Forge should be
 - Judge correctness beyond explicit contracts
 - Resolve subjective or strategic questions
 
@@ -131,7 +131,7 @@ Operational authority exists ONLY in:
 - Decision Logging & Change Traceability Specification
 - Artifact Schema & Repository Layout Standard
 - Build & Verify Playbook
-- HALO Boundary Audit Rules
+- Forge Boundary Audit Rules
 - Tech Assumptions & Local Runtime Setup
 
 ---
@@ -164,7 +164,7 @@ For the purpose of this system, the following terms are canonical and non-negoti
 
 - Boundary Audit Layer  
   A mandatory, independent enforcement layer that:
-  - Evaluates compliance against HALO Boundary Audit Rules
+  - Evaluates compliance against Forge Boundary Audit Rules
   - Produces binary PASS / FAIL outcomes only
   - Gates all stage closure and downstream advancement
   - Cannot be overridden, bypassed, or reinterpreted
@@ -269,7 +269,7 @@ This document MUST NEVER be used to:
 
 ## 2. Core Objective
 
-Enable HALO development to progress **autonomously for hours or days**, producing:
+Enable Forge development to progress **autonomously for hours or days**, producing:
 
 - Closed execution documents
 - Matching implementation artifacts (code/config)
@@ -287,7 +287,7 @@ An accepted task within Forge MUST:
 - Be executable, not exploratory
 - Have a clear end-state or deliverable
 - Be bounded in scope (no open-ended goals)
-- Be related directly to HALO development or its supporting systems
+- Be related directly to Forge development or its supporting systems
 
 The system MUST reject or reclassify any input that is:
 - Pure brainstorming
@@ -313,7 +313,7 @@ If task intent cannot be determined deterministically → Fail-Closed and escala
 - Not a brainstorming assistant
 - Not a multi-user platform
 - Not a self-modifying intelligence
-- Not an authority over HALO rules
+- Not an authority over Forge rules
 - Not allowed to invent requirements
 
 ---
@@ -363,7 +363,7 @@ Human involvement is treated as an **exception**, not a requirement.
 
 Autonomous execution within Forge does NOT grant the system
 any authority to reinterpret intent, redefine success,
-or alter HALO governance rules.
+or alter Forge governance rules.
 
 Autonomy applies ONLY to:
 - Execution sequencing
@@ -374,7 +374,7 @@ Autonomy applies ONLY to:
 The system has ZERO authority to:
 - Change scope definitions
 - Invent missing requirements
-- Override HALO boundary rules
+- Override Forge boundary rules
 - Treat probabilistic output as final truth
 
 If autonomy and authority ever conflict:
@@ -391,7 +391,7 @@ The system MUST interrupt the human authority ONLY if:
 
 1. More than one valid execution path exists
 2. Mandatory input is missing (credentials, keys, explicit decisions)
-3. A HALO boundary, scope rule, or authority rule may be violated
+3. A Forge boundary, scope rule, or authority rule may be violated
 
 In all other cases:
 - Execution MUST continue
@@ -479,8 +479,8 @@ If any ambiguity exists regarding progress:
 
 Forge operates under strict authority limits:
 
-- HALO documentation is authoritative
-- Existing HALO rules are immutable unless explicitly updated by the owner
+- Forge documentation is authoritative
+- Existing Forge rules are immutable unless explicitly updated by the owner
 - The system may propose changes but never apply them silently
 - All outputs are traceable to inputs
 
@@ -526,7 +526,7 @@ MUST be justified ONLY by the lower-level execution contracts.
 
 ## 10.1 Mandatory Boundary Audit Coupling
 
-All execution within Forge is **strictly coupled** to the HALO Boundary Audit Rules.
+All execution within Forge is **strictly coupled** to the Forge Boundary Audit Rules.
 
 This means:
 
@@ -538,7 +538,7 @@ This means:
 Boundary Audit is not a supporting mechanism.
 It is a **hard execution gate** whose exact invocation points,
 scope, and outcomes
-are defined EXCLUSIVELY in the HALO Boundary Audit Rules.
+are defined EXCLUSIVELY in the Forge Boundary Audit Rules.
 
 This document MUST NOT:
 - Expand audit scope
@@ -583,25 +583,25 @@ and MUST be treated as a critical system fault.
 
 ---
 
-## 11. Relationship to HALO
+## 11. Relationship to Forge
 
-Forge is a **pure execution layer** that operates in service of HALO.
+Forge is a **pure execution layer** that operates in service of Forge.
 
 It is NOT part of:
-- HALO’s cognitive runtime
-- HALO’s identity system
-- HALO’s memory or vault architecture
-- HALO’s reasoning or intelligence logic
+- Forge’s cognitive runtime
+- Forge’s identity system
+- Forge’s memory or vault architecture
+- Forge’s reasoning or intelligence logic
 
 Forge does not contain intrinsic reasoning capability or reasoning authority.
 It governs intelligence through contracts; it does not own it.
 
-It executes tasks **about HALO**, not **inside HALO**.
+It executes tasks **about Forge**, not **inside Forge**.
 
 Any attempt to:
-- Embed Forge into HALO cognition
-- Treat Forge output as HALO truth
-- Allow Forge to influence HALO identity or memory
+- Embed Forge into Forge cognition
+- Treat Forge output as Forge truth
+- Allow Forge to influence Forge identity or memory
 
 is a system violation.
 
@@ -611,7 +611,7 @@ is a system violation.
 
 This system is considered successful when:
 
-- HALO tasks can be issued as high-level intents
+- Forge tasks can be issued as high-level intents
 - Execution proceeds end-to-end autonomously
 - Human attention is required only at true decision points
 - Progress is always visible and auditable
@@ -713,11 +713,11 @@ In the event of any conflict between governing documents of the
 Forge, authority is resolved strictly
 in the following order:
 
-1. HALO Core Rules & Boundary Contracts  
+1. Forge Core Rules & Boundary Contracts  
 2. Scope & Success Contract  
 3. Autonomy Policy & Human Interrupt Protocol  
 4. Pipeline Stages Specification  
-5. HALO Boundary Audit Rules (Fail-Closed Pack)  
+5. Forge Boundary Audit Rules (Fail-Closed Pack)  
 6. Progress Tracking & Status Report Contract (v1)  
 7. Build & Verify Playbook (Local)  
 8. Decision Logging & Change Traceability Specification  
@@ -741,7 +741,7 @@ Silently adapting behavior is forbidden.
 
 ## System Entry & Execution Boundary (Hard)
 
-All execution within HALO MUST originate from the approved Pipeline.
+All execution within Forge MUST originate from the approved Pipeline.
 
 No component, engine, module, or subsystem
 is permitted to execute independently,

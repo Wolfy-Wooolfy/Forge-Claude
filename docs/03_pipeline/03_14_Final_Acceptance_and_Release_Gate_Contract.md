@@ -1,6 +1,6 @@
-# Final Acceptance & Release Gate Contract
+﻿# Final Acceptance & Release Gate Contract
 
-**Document ID:** HALO-DOC-14  
+**Document ID:** FORGE-DOC-14  
 **Stage:** D  
 **Status:** BINDING – EXECUTION CONTRACT  
 **Applies To:** Stage D – Final Verification & Acceptance  
@@ -11,7 +11,7 @@
 ## 1. Purpose
 
 Stage D defines the ONLY authoritative acceptance gate
-for a HALO pipeline execution lifecycle.
+for a Forge pipeline execution lifecycle.
 
 Stage D determines:
 

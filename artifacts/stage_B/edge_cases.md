@@ -1,4 +1,4 @@
-# Stage B — Edge Cases
+﻿# Stage B — Edge Cases
 
 ```json
 {
@@ -47,7 +47,7 @@
 **Resolution:** Add embedded JSON conforming to SCHEMA-06.
 
 ### EC-004 — Duplicate Document ID detected
-**Condition:** Two documents share the same DOC-XX or HALO-DOC-XX identifier
+**Condition:** Two documents share the same DOC-XX or FORGE-DOC-XX identifier
 **Classification:** Governance violation (DOC-20 §8)
 **Behavior:** Execution MUST enter BLOCKED state.
 **Resolution:** Assign unique IDs per DOC-20 §6. Update DOC-19 index.

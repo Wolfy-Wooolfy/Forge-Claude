@@ -1,4 +1,4 @@
-# TASK-023 — Stage B Autonomy Skeleton (No Execution)
+﻿# TASK-023 — Stage B Autonomy Skeleton (No Execution)
 
 ## Purpose
 Define exact file placement and interfaces for a controlled autonomy loop
@@ -37,9 +37,9 @@ WITHOUT enabling execution logic.
   - stdout only, no files
 
 ## CLI Hook (Disabled by Default)
-- Path: bin/halo-autonomy.js
+- Path: bin/forge-autonomy.js
 - Behavior:
-  - Requires explicit env var: HALO_AUTONOMY=1
+  - Requires explicit env var: FORGE_AUTONOMY=1
   - Requires explicit max runtime argument (optional, capped)
 
 ## Constraints (Hard)

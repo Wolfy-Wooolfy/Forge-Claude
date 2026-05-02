@@ -1,18 +1,18 @@
-# RELEASE 1.2.0 — Manifest
+﻿# RELEASE 1.2.0 — Manifest
 
 **Status:** FINAL — EXECUTION-BOUND  
 **Release Type:** Minor (Bounded Multi-Step Execution)
 
 ## What Changed
 
-- Added explicit --max-steps support to halo-run CLI
+- Added explicit --max-steps support to forge-run CLI
 - Deterministic bounded multi-step execution
 - Default max_steps = 1 (backward compatible)
 - No autonomy expansion introduced
 
 ## Files Modified
 
-- bin/halo-run.js
+- bin/forge-run.js
 
 ## Files Added
 

@@ -6,6 +6,42 @@ const fs = require("fs");
 const crypto = require("crypto");
 const { handleAuthRequest } = require("../auth/authSystem");
 const { createAiOsRuntime } = require("../ai_os/projectRuntime");
+const { createActiveProjectManager } = require("../ai_os/activeProjectManager");
+const { createBusinessAnalysisEngine } = require("../ai_os/businessAnalysisEngine");
+const { createDocumentationReviewEngine } = require("../ai_os/documentationReviewEngine");
+const { createVerificationLoop } = require("../ai_os/verificationLoop");
+const { createProjectReviewEngine } = require("../ai_os/projectReviewEngine");
+const { createDeliveryPackageBuilder } = require("../ai_os/deliveryPackageBuilder");
+const { createIdeationEngine } = require("../ai_os/ideationEngine");
+const { createConversationEngine } = require("../ai_os/conversationEngine");
+const { createConversationMemoryManager } = require("../ai_os/conversationMemoryManager");
+const { createRefinementLoopOrchestrator } = require("../ai_os/refinementLoopOrchestrator");
+const { createDiscussionLoopGate } = require("../ai_os/discussionLoopGate");
+const { createDocumentationBuildLoop } = require("../ai_os/documentationBuildLoop");
+const { createLanguageDetectionCompliance } = require("../ai_os/languageDetectionCompliance");
+const { createUxValidator } = require("../ai_os/uxValidator");
+const { runVisionComplianceGate } = require("../modules/visionComplianceGate");
+const { runVisionAlignmentValidator } = require("../modules/visionAlignmentValidator");
+const { runCrossDocConsistencyEngine } = require("../modules/crossDocConsistencyEngine");
+const { runCodeToSpecTraceValidator } = require("../modules/codeToSpecTraceValidator");
+const { runDocsGapAnalyzerValidator } = require("../modules/docsGapAnalyzerValidator");
+const { runCognitiveLayerContractEnforcer } = require("../modules/cognitiveLayerContractEnforcer");
+const { runProviderAuthorityEnforcer } = require("../modules/providerAuthorityEnforcer");
+const { runFullLoopReport } = require("../modules/loopEnforcementOrchestrator");
+const { runSpecCompletenessEnforcer } = require("../modules/specCompletenessEnforcer");
+const { runBoundaryAuditStageGate, auditAllStages } = require("../modules/boundaryAuditStageGate");
+const { runDecisionArtifactValidator } = require("../modules/decisionArtifactValidator");
+const { runDocGapLoopContract } = require("../modules/docGapLoopContract");
+const { runToolIntegrationReadiness } = require("../modules/toolIntegrationReadiness");
+const { runDecisionFileNameEnforcer } = require("../modules/decisionFileNameEnforcer");
+const { runCanonicalArtifactValidator } = require("../modules/canonicalArtifactValidator");
+const { runDecisionFinalityEnforcer, sealDecision } = require("../modules/decisionFinalityEnforcer");
+const { declareFork, resolveFork, runForkDetectionReport } = require("../modules/forkDetectionEngine");
+const { runRecommendationSeparationValidator } = require("../modules/recommendationSeparationValidator");
+const { runCodexContractValidator } = require("../modules/codexContractValidator");
+const { runNodeSmokeCheck } = require("../modules/nodeSmokeCheck");
+const { runProjectIsolationGuard } = require("../modules/projectIsolationGuard");
+const { runResearchTransparencyReport, createResearchTransparencyLayer } = require("../modules/researchTransparencyLayer");
 
 const ProviderRouter = require("../providers/providerRouter");
 
@@ -27,6 +63,21 @@ function createWorkspaceApiServer(options = {}) {
   const projectRegistryPath = path.resolve(projectsRoot, "project_registry.json");
 
   const aiOsRuntime = createAiOsRuntime({ root });
+  const activeProjectManager = createActiveProjectManager({ root });
+  const businessAnalysisEngine = createBusinessAnalysisEngine({ root });
+  const documentationReviewEngine = createDocumentationReviewEngine({ root });
+  const verificationLoop = createVerificationLoop({ root });
+  const projectReviewEngine = createProjectReviewEngine({ root });
+  const deliveryPackageBuilder = createDeliveryPackageBuilder({ root });
+  const ideationEngine = createIdeationEngine({ root });
+  const conversationEngine = createConversationEngine({ root });
+  const conversationMemoryManager = createConversationMemoryManager({ root });
+  const refinementLoopOrchestrator = createRefinementLoopOrchestrator({ root });
+  const discussionLoopGate = createDiscussionLoopGate({ root });
+  const documentationBuildLoop = createDocumentationBuildLoop({ root });
+  const languageDetectionCompliance = createLanguageDetectionCompliance({ root });
+  const uxValidator = createUxValidator({ root });
+  const researchTransparency = createResearchTransparencyLayer({ root });
 
   const allowedWriteRoots = [
     path.resolve(root, "artifacts/llm"),
@@ -2833,7 +2884,7 @@ function buildExecutionPackage(packet) {
 
       if (req.method === "POST" && pathname === "/api/ai-os/options") {
         const body = await readBody(req);
-        sendJson(res, 200, aiOsRuntime.registerOptions(body));
+        sendJson(res, 200, await aiOsRuntime.registerOptions(body));
         return;
       }
 
@@ -2845,7 +2896,7 @@ function buildExecutionPackage(packet) {
 
       if (req.method === "POST" && pathname === "/api/ai-os/documentation/draft") {
         const body = await readBody(req);
-        sendJson(res, 200, aiOsRuntime.saveDocumentationDraft(body));
+        sendJson(res, 200, await aiOsRuntime.saveDocumentationDraft(body));
         return;
       }
 
@@ -2857,7 +2908,7 @@ function buildExecutionPackage(packet) {
 
       if (req.method === "POST" && pathname === "/api/ai-os/handoff") {
         const body = await readBody(req);
-        sendJson(res, 200, aiOsRuntime.createExecutionHandoff(body));
+        sendJson(res, 200, await aiOsRuntime.createExecutionHandoff(body));
         return;
       }
 
@@ -2865,6 +2916,192 @@ function buildExecutionPackage(packet) {
         sendJson(res, 200, aiOsRuntime.getProject({
           project_id: requestUrl.searchParams.get("project_id") || ""
         }));
+        return;
+      }
+
+      if (req.method === "GET" && pathname === "/api/ai-os/project/context") {
+        const projectId = requestUrl.searchParams.get("project_id") || "";
+        sendJson(res, 200, activeProjectManager.getProjectContext(projectId));
+        return;
+      }
+
+      if (req.method === "GET" && pathname === "/api/ai-os/active-project") {
+        const active = activeProjectManager.getActiveProject();
+        sendJson(res, 200, { ok: true, active_project: active });
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/ai-os/active-project/switch") {
+        const body = await readBody(req);
+        sendJson(res, 200, activeProjectManager.switchProject(body.project_id || ""));
+        return;
+      }
+
+      if (req.method === "GET" && pathname === "/api/ai-os/projects/list") {
+        sendJson(res, 200, activeProjectManager.listProjects());
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/ai-os/ideation/expand") {
+        const body = await readBody(req);
+        sendJson(res, 200, await ideationEngine.expandIdea(body));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/ai-os/research") {
+        const body = await readBody(req);
+        sendJson(res, 200, await ideationEngine.conductResearch(body));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/ai-os/business-analysis") {
+        const body = await readBody(req);
+        sendJson(res, 200, await businessAnalysisEngine.analyzeProject(body));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/ai-os/documentation/review") {
+        const body = await readBody(req);
+        sendJson(res, 200, await documentationReviewEngine.reviewDocumentation(body));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/ai-os/verify") {
+        const body = await readBody(req);
+        sendJson(res, 200, await verificationLoop.runVerification(body));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/ai-os/review") {
+        const body = await readBody(req);
+        sendJson(res, 200, await projectReviewEngine.reviewProject(body));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/ai-os/delivery/package") {
+        const body = await readBody(req);
+        sendJson(res, 200, await deliveryPackageBuilder.buildDeliveryPackage(body));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/ai-os/chat") {
+        const body = await readBody(req);
+        const result = await conversationEngine.processMessage(body);
+        if (result.ok && body.project_id) {
+          conversationMemoryManager.saveContext(body.project_id, {
+            role: "user",
+            content: String(body.message || ""),
+            created_at: new Date().toISOString()
+          });
+          if (result.message) {
+            conversationMemoryManager.saveContext(body.project_id, {
+              role: "assistant",
+              content: result.message,
+              created_at: new Date().toISOString()
+            });
+          }
+        }
+        sendJson(res, 200, result);
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/ai-os/confirm-transition") {
+        const body = await readBody(req);
+        sendJson(res, 200, await conversationEngine.confirmTransition(body));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/ai-os/confirm-operation") {
+        const body = await readBody(req);
+        sendJson(res, 200, await aiOsRuntime.confirmPendingOperation(body));
+        return;
+      }
+
+      if ((req.method === "GET" || req.method === "POST") && pathname === "/api/ai-os/project/summary") {
+        const body = req.method === "POST" ? await readBody(req) : {};
+        const projectId = String(body.project_id || requestUrl.searchParams.get("project_id") || "");
+        sendJson(res, 200, await conversationEngine.getProjectSummary({ ...body, project_id: projectId }));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/ai-os/checkpoint") {
+        const body = await readBody(req);
+        const { project_id, target_state } = body;
+        if (!project_id || !target_state) {
+          sendJson(res, 400, { ok: false, reason: "project_id and target_state are required" });
+          return;
+        }
+        sendJson(res, 200, await conversationEngine.generateCheckpoint(project_id, target_state));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/ai-os/loop/ideation") {
+        const body = await readBody(req);
+        sendJson(res, 200, await refinementLoopOrchestrator.runIdeationLoop(body));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/ai-os/loop/documentation") {
+        const body = await readBody(req);
+        sendJson(res, 200, await refinementLoopOrchestrator.runDocumentationLoop(body));
+        return;
+      }
+
+      if (req.method === "GET" && pathname === "/api/ai-os/conversation/context") {
+        const projectId = requestUrl.searchParams.get("project_id") || "";
+        if (!projectId) {
+          sendJson(res, 400, { ok: false, reason: "project_id required" });
+          return;
+        }
+        sendJson(res, 200, { ok: true, context: conversationMemoryManager.loadContext(projectId) });
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/ai-os/conversation/summary") {
+        const body = await readBody(req);
+        sendJson(res, 200, await conversationMemoryManager.generateContextSummary(body.project_id, body.user_language));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/ai-os/override/force-progression") {
+        const body = await readBody(req);
+        const projectId = String(body.project_id || "").trim();
+        const targetPhase = String(body.target_phase || "").trim();
+        if (!projectId || !targetPhase) {
+          sendJson(res, 400, { ok: false, reason: "project_id and target_phase are required" });
+          return;
+        }
+        const statePath = path.resolve(root, "artifacts/projects", projectId.toLowerCase().replace(/[^a-z0-9]+/g, "_"), "project_state.json");
+        if (!fs.existsSync(statePath)) {
+          sendJson(res, 404, { ok: false, reason: "PROJECT_NOT_FOUND" });
+          return;
+        }
+        const state = JSON.parse(fs.readFileSync(statePath, "utf8"));
+        const updated = {
+          ...state,
+          current_phase: targetPhase,
+          active_runtime_state: String(body.target_runtime_state || targetPhase),
+          last_updated_at: new Date().toISOString()
+        };
+        fs.writeFileSync(statePath, JSON.stringify(updated, null, 2), "utf8");
+        sendJson(res, 200, { ok: true, mode: "FORCED_PROGRESSION", project_id: projectId, target_phase: targetPhase });
+        return;
+      }
+
+      if (req.method === "GET" && pathname === "/api/ai-os/decisions/history") {
+        const projectId = requestUrl.searchParams.get("project_id") || "";
+        const normalizedId = projectId.toLowerCase().replace(/[^a-z0-9]+/g, "_");
+        const decisionsPath = path.resolve(root, "artifacts/projects", normalizedId, "ai_os", "decisions_log.json");
+        if (!fs.existsSync(decisionsPath)) {
+          sendJson(res, 200, { ok: true, decisions: [] });
+          return;
+        }
+        try {
+          const decisions = JSON.parse(fs.readFileSync(decisionsPath, "utf8"));
+          sendJson(res, 200, { ok: true, decisions: Array.isArray(decisions) ? decisions : [] });
+        } catch (err) {
+          sendJson(res, 200, { ok: true, decisions: [] });
+        }
         return;
       }
 
@@ -3036,6 +3273,202 @@ function buildExecutionPackage(packet) {
         if (handleAuthRequest(req, res, body, sendJson)) {
           return;
         }
+      }
+
+      // --- Governance routes ---
+      if (req.method === "POST" && pathname === "/api/governance/vision-compliance") {
+        sendJson(res, 200, runVisionComplianceGate({ root }));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/governance/vision-alignment") {
+        sendJson(res, 200, runVisionAlignmentValidator({ root }));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/governance/cross-doc-consistency") {
+        sendJson(res, 200, runCrossDocConsistencyEngine({ root }));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/governance/trace-validate") {
+        sendJson(res, 200, runCodeToSpecTraceValidator({ root }));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/governance/docs-gap-analyze") {
+        sendJson(res, 200, runDocsGapAnalyzerValidator({ root }));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/governance/cognitive-contract") {
+        sendJson(res, 200, runCognitiveLayerContractEnforcer({ root }));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/governance/provider-authority") {
+        sendJson(res, 200, runProviderAuthorityEnforcer({ root }));
+        return;
+      }
+
+      if (req.method === "GET" && pathname === "/api/governance/loop-report") {
+        sendJson(res, 200, runFullLoopReport({ root }));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/governance/spec-completeness") {
+        sendJson(res, 200, runSpecCompletenessEnforcer({ root }));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/governance/boundary-audit-gate") {
+        const body = await readBody(req);
+        sendJson(res, 200, runBoundaryAuditStageGate({ root, stage: body.stage }));
+        return;
+      }
+
+      if (req.method === "GET" && pathname === "/api/governance/boundary-audit-all") {
+        sendJson(res, 200, auditAllStages({ root }));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/governance/decision-validate") {
+        sendJson(res, 200, runDecisionArtifactValidator({ root }));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/governance/doc-gap-contract") {
+        sendJson(res, 200, runDocGapLoopContract({ root }));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/governance/tool-readiness") {
+        sendJson(res, 200, runToolIntegrationReadiness({ root }));
+        return;
+      }
+
+      // --- AI OS extended routes ---
+      if (req.method === "POST" && pathname === "/api/ai-os/discussion/gate") {
+        const body = await readBody(req);
+        sendJson(res, 200, discussionLoopGate.assertDiscussionComplete(body));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/ai-os/discussion/record") {
+        const body = await readBody(req);
+        sendJson(res, 200, discussionLoopGate.recordDiscussionIteration(body.project_id, body));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/ai-os/doc-build-loop") {
+        const body = await readBody(req);
+        sendJson(res, 200, await documentationBuildLoop.runDocBuildLoop(body));
+        return;
+      }
+
+      if (req.method === "GET" && pathname === "/api/ai-os/doc-build-loop/state") {
+        const projectId = requestUrl.searchParams.get("project_id") || "";
+        sendJson(res, 200, documentationBuildLoop.getLoopState(projectId));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/ai-os/language-compliance") {
+        const body = await readBody(req);
+        sendJson(res, 200, languageDetectionCompliance.runComplianceReport(body.project_id));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/ai-os/ux-validate") {
+        const body = await readBody(req);
+        sendJson(res, 200, uxValidator.validateResponse(body.project_id, body.response));
+        return;
+      }
+
+      // --- C-1: Decision naming enforcement ---
+      if (req.method === "POST" && pathname === "/api/governance/decision-naming") {
+        sendJson(res, 200, runDecisionFileNameEnforcer({ root }));
+        return;
+      }
+
+      // --- C-5: Canonical artifact container validation ---
+      if (req.method === "POST" && pathname === "/api/governance/canonical-artifacts") {
+        sendJson(res, 200, runCanonicalArtifactValidator({ root }));
+        return;
+      }
+
+      // --- H-1: Decision finality ---
+      if (req.method === "POST" && pathname === "/api/governance/decision-finality") {
+        sendJson(res, 200, runDecisionFinalityEnforcer({ root }));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/governance/decision-seal") {
+        const body = await readBody(req);
+        sendJson(res, 200, sealDecision(root, body.decision_id, body.decision_data || {}));
+        return;
+      }
+
+      // --- H-2: Fork detection ---
+      if (req.method === "POST" && pathname === "/api/governance/fork/declare") {
+        const body = await readBody(req);
+        sendJson(res, 200, declareFork({ root, ...body }));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/governance/fork/resolve") {
+        const body = await readBody(req);
+        sendJson(res, 200, resolveFork({ root, ...body }));
+        return;
+      }
+
+      if (req.method === "GET" && pathname === "/api/governance/fork/report") {
+        sendJson(res, 200, runForkDetectionReport({ root }));
+        return;
+      }
+
+      // --- H-3: Recommendation separation ---
+      if (req.method === "POST" && pathname === "/api/governance/recommendation-separation") {
+        sendJson(res, 200, runRecommendationSeparationValidator({ root }));
+        return;
+      }
+
+      // --- H-4: Codex contract ---
+      if (req.method === "POST" && pathname === "/api/governance/codex-contract") {
+        sendJson(res, 200, runCodexContractValidator({ root }));
+        return;
+      }
+
+      // --- H-5: Node smoke check ---
+      if (req.method === "POST" && pathname === "/api/governance/smoke-check") {
+        const body = await readBody(req);
+        sendJson(res, 200, runNodeSmokeCheck({ root, stage: body.stage || "SMOKE" }));
+        return;
+      }
+
+      // --- H-7: Project isolation ---
+      if (req.method === "POST" && pathname === "/api/governance/project-isolation") {
+        const body = await readBody(req);
+        sendJson(res, 200, runProjectIsolationGuard({ root, project_id: body.project_id }));
+        return;
+      }
+
+      // --- H-8: Research transparency ---
+      if (req.method === "POST" && pathname === "/api/governance/research-transparency") {
+        sendJson(res, 200, runResearchTransparencyReport({ root }));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/ai-os/research/wrap") {
+        const body = await readBody(req);
+        sendJson(res, 200, researchTransparency.wrapResearchResult(body.project_id, body.content, body.knowledge_type));
+        return;
+      }
+
+      // --- H-6: Project object model enforcement ---
+      if (req.method === "POST" && pathname === "/api/ai-os/project/ensure-model") {
+        const body = await readBody(req);
+        sendJson(res, 200, activeProjectManager.ensureProjectObjectModel(body.project_id));
+        return;
       }
 
       sendJson(res, 404, { error: "Not found" });

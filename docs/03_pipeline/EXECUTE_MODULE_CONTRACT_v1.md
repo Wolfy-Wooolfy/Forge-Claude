@@ -115,10 +115,15 @@ Execute MUST generate:
   "approved_code_actions": [
     {
       "action_id": "",
+      "origin_gap_id": "",
+      "action_type": "",
       "target_file": "",
-      "modification_type": "ADD | REPLACE | DELETE",
-      "reason": "",
-      "linked_gap_id": ""
+      "source_type": "",
+      "deterministic_template_used": true,
+      "allow_overwrite": false,
+      "wrote_content": true,
+      "old_sha256": null,
+      "new_sha256": ""
     }
   ]
 }

@@ -279,10 +279,12 @@ function runAudit(context) {
       repositoryState === "IDEA_ONLY" ||
       repositoryState === "DOCS_ONLY" ||
       repositoryState === "CODE_ONLY" ||
-      repositoryState === "MIXED";
+      repositoryState === "MIXED" ||
+      repositoryState === "DOCS_AND_CODE" ||
+      repositoryState === "FULL_PIPELINE_STATE";
     mark(validRepositoryState);
     if (!validRepositoryState) {
-      addViolation(violations, "Activation", "CRITICAL", "artifacts/intake/intake_context.json", "repository_state must be IDEA_ONLY, DOCS_ONLY, CODE_ONLY, or MIXED.");
+      addViolation(violations, "Activation", "CRITICAL", "artifacts/intake/intake_context.json", "repository_state must be IDEA_ONLY, DOCS_ONLY, CODE_ONLY, MIXED, DOCS_AND_CODE, or FULL_PIPELINE_STATE.");
     }
 
     mark(blockedFlag);
@@ -387,7 +389,7 @@ function runAudit(context) {
       requiredDirs = ["docs", "artifacts", "progress"];
     } else if (repositoryState === "CODE_ONLY") {
       requiredDirs = ["code", "artifacts", "progress"];
-    } else if (repositoryState === "MIXED") {
+    } else if (repositoryState === "MIXED" || repositoryState === "DOCS_AND_CODE" || repositoryState === "FULL_PIPELINE_STATE") {
       requiredDirs = ["docs", "artifacts", "code", "progress"];
     }
   }
@@ -528,7 +530,6 @@ function runAudit(context) {
 
   const deprecatedPatterns = [
     { id: "DEPRECATED_NAME_001", re: /Personal\s+Autonomous\s+Pipeline/i, label: "Deprecated system name pattern (001)" },
-    { id: "DEPRECATED_NAME_002", re: /HALO\s+Personal\s+Autonomous\s+Pipeline/i, label: "Deprecated system name pattern (002)" },
     { id: "DEPRECATED_NAME_003", re: /\bPAPH\b/i, label: "Deprecated system name token (003)" }
   ];
 
@@ -618,6 +619,39 @@ function runAudit(context) {
   writeJson(path.join(auditDirAbs, "audit_findings.json"), findingsPayload);
   writeText(path.join(auditDirAbs, "audit_report.md"), renderAuditReport(findingsPayload));
 
+  // Write fail-closed state directly to progress/status.json — independent of runner.js
+  const progressDir = path.join(rootAbs, "progress");
+  ensureDir(progressDir);
+  const statusPath = path.join(progressDir, "status.json");
+
+  let existingStatus = null;
+  try {
+    if (fs.existsSync(statusPath)) {
+      existingStatus = JSON.parse(fs.readFileSync(statusPath, "utf-8"));
+    }
+  } catch (_) {}
+
+  const currentStage =
+    existingStatus && ["A", "B", "C", "D"].includes(existingStatus.current_stage)
+      ? existingStatus.current_stage
+      : "A";
+
+  const blockedStatusPayload = {
+    status_type: blocked ? "BLOCKED" : "LIVE",
+    current_stage: currentStage,
+    overall_progress_percent: blocked ? Math.min(Number((existingStatus || {}).overall_progress_percent || 0), 99) : Number((existingStatus || {}).overall_progress_percent || 0),
+    stage_progress_percent: blocked ? Math.min(Number((existingStatus || {}).stage_progress_percent || 0), 99) : 100,
+    last_completed_artifact: "artifacts/audit/audit_report.md",
+    current_task: blocked ? String((existingStatus || {}).current_task || "") : "",
+    issues: blocked ? effectiveCriticalViolations.map((v) => ({ severity: v.severity, description: v.description })) : [],
+    blocking_questions: blocked ? ["Audit is BLOCKED — see artifacts/audit/audit_error.md for details"] : [],
+    next_step: blocked ? "" : "MODULE_FLOW — Audit PASS. Next=Trace (mode-aware downstream alignment pending)."
+  };
+
+  try {
+    fs.writeFileSync(statusPath, JSON.stringify(blockedStatusPayload, null, 2), "utf-8");
+  } catch (_) {}
+
   if (blocked) {
     const question = "Which CRITICAL violation should we address first (choose one category to proceed)?";
     writeText(
@@ -627,12 +661,19 @@ function runAudit(context) {
   }
 
   if (!blocked) {
-    rmDirIfExists(path.join(rootAbs, "artifacts", "trace"));
-    rmDirIfExists(path.join(rootAbs, "artifacts", "gap"));
-    rmDirIfExists(path.join(rootAbs, "artifacts", "decisions"));
-    rmDirIfExists(path.join(rootAbs, "artifacts", "backfill"));
-    rmDirIfExists(path.join(rootAbs, "artifacts", "execute"));
-    rmDirIfExists(path.join(rootAbs, "artifacts", "closure"));
+    writeText(
+      path.join(auditDirAbs, 'audit_error.md'),
+      '# Audit Status\n\nblocked: false\n\n## Result\nAudit completed with no blocking violations.\nSee artifacts/audit/audit_findings.json for full report.\n'
+    );
+    const isDryRun = String(process.env.FORGE_DRY_RUN || '').toLowerCase() === 'true';
+    if (!isDryRun) {
+      rmDirIfExists(path.join(rootAbs, "artifacts", "trace"));
+      rmDirIfExists(path.join(rootAbs, "artifacts", "gap"));
+      rmDirIfExists(path.join(rootAbs, "artifacts", "decisions"));
+      rmDirIfExists(path.join(rootAbs, "artifacts", "backfill"));
+      rmDirIfExists(path.join(rootAbs, "artifacts", "execute"));
+      rmDirIfExists(path.join(rootAbs, "artifacts", "closure"));
+    }
   }
 
   return {

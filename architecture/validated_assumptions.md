@@ -1,4 +1,4 @@
-# TASK-001 - Validated Assumptions
+﻿# TASK-001 - Validated Assumptions
 
 **Task ID:** TASK-001  
 **Stage:** A (Architecture)
@@ -10,7 +10,7 @@
 ### A-001 - Local execution environment exists
 **Statement:** The pipeline repository is available locally on the developer machine and is writable.  
 **Status:** VALIDATED  
-**Evidence:** Repository folders exist under `D:\S\Halo\Tech\halo-personal-autonomous-pipeline`.
+**Evidence:** Repository folders exist under `D:\S\Halo\Tech\forge-personal-autonomous-pipeline`.
 
 ---
 

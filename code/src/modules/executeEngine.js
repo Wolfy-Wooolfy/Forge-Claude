@@ -167,24 +167,66 @@ function runExecute(context) {
 
     const normalizedTargetRel = targetRel.replace(/\\/g, "/");
 
-    const isForgeCorePath =
-      normalizedTargetRel.startsWith("code/") ||
-      normalizedTargetRel.startsWith("bin/") ||
-      normalizedTargetRel.startsWith("docs/") ||
-      normalizedTargetRel.startsWith("artifacts/forge/") ||
-      normalizedTargetRel.startsWith("artifacts/tasks/") ||
-      normalizedTargetRel.startsWith("artifacts/orchestration/") ||
-      normalizedTargetRel.startsWith("artifacts/verify/") ||
-      normalizedTargetRel.startsWith("artifacts/closure/") ||
-      normalizedTargetRel.startsWith("web/");
+    // Fix 3 — Immutability for IMMUTABLE-LEGACY namespaces (DOC-38 §10)
+    // This check must come BEFORE the isForgeCorePath check so it cannot be bypassed by isSystemTask.
+    const IMMUTABLE_LEGACY_PREFIXES = [
+      'artifacts/stage_A/',
+      'artifacts/stage_B/',
+      'artifacts/stage_C/',
+      'artifacts/stage_D/',
+      'artifacts/reports/',
+      'artifacts/release/',
+      'artifacts/archive/',
+    ];
 
+    const isImmutableLegacy = IMMUTABLE_LEGACY_PREFIXES.some(p => normalizedTargetRel.startsWith(p));
+
+    if (isImmutableLegacy) {
+      return {
+        stage_progress_percent: 100,
+        blocked: true,
+        status_patch: {
+          next_step: '',
+          blocking_questions: [
+            `Execute BLOCKED: ${targetRel} is in an IMMUTABLE-LEGACY namespace and cannot be modified`
+          ]
+        }
+      };
+    }
+
+    // Fix 1 — Protect ALL artifact namespaces (DOC-36 §4)
+    // Execute may ONLY write to artifacts/execute/, web/, and artifacts/projects/*/output/.
+    const EXECUTE_ALLOWED_PREFIXES = [
+      'artifacts/execute/',
+      'web/',
+    ];
+    // Also allow: artifacts/projects/<any>/output/
+    const isProjectOutput = /^artifacts\/projects\/[^/]+\/output\//.test(normalizedTargetRel);
+
+    const isForgeCorePath = !EXECUTE_ALLOWED_PREFIXES.some(p => normalizedTargetRel.startsWith(p)) && !isProjectOutput;
+
+    // Fix 2 — Restrict isSystemTask bypass (DOC-36 §4)
+    // isSystemTask requires BOTH system_task === true AND task_type === "forge_build".
     const isSystemTask =
       action &&
-      (
-        action.system_task === true ||
-        String(action.task_type || "").toLowerCase() === "system_maintenance" ||
-        String(action.task_type || "").toLowerCase() === "forge_build"
-      );
+      action.system_task === true &&
+      String(action.task_type || '').toLowerCase() === 'forge_build';
+
+    if (isForgeCorePath && isSystemTask) {
+      const systemAllowed = normalizedTargetRel.startsWith('code/');
+      if (!systemAllowed) {
+        return {
+          stage_progress_percent: 100,
+          blocked: true,
+          status_patch: {
+            next_step: '',
+            blocking_questions: [
+              `Execute BLOCKED: system task cannot write to ${targetRel} — only code/ permitted for system tasks`
+            ]
+          }
+        };
+      }
+    }
 
     if (isForgeCorePath && !isSystemTask) {
       return {

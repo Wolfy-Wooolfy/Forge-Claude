@@ -1,4 +1,4 @@
-# Stage B — Documentation Gap Report
+﻿# Stage B — Documentation Gap Report
 
 ```json
 {
@@ -49,7 +49,7 @@
 | GAP-SCHEMA-002 | Schema violation | Stage C verification artifacts used `~~~json` fence | Fixed in `artifacts/stage_C/code_trace_matrix.md`, `code_mismatch_report.md`, `test_evidence.md` |
 | GAP-SCHEMA-003 | Schema violation | `vision_gap_report.md` had wrong fields | Fixed — rebuilt with `total_gaps_count`, `gaps`, `result` |
 | GAP-SCHEMA-004 | Schema vs contract | `vision_coverage_matrix_schema_v1.json` had 3 fields, DOC-15 §4 requires 7 | Schema updated, artifact rebuilt |
-| GAP-DOC-001 | Duplicate ID | DOC-17 used twice, HALO-DOC-20/21 used 3x each, HALO-DOC-18/19 used 2x each | All resolved in respective files + DOC-19 updated |
+| GAP-DOC-001 | Duplicate ID | DOC-17 used twice, FORGE-DOC-20/21 used 3x each, FORGE-DOC-18/19 used 2x each | All resolved in respective files + DOC-19 updated |
 | GAP-INDEX-001 | Missing registration | `docs/12_ai_os/` (21 files) not in DOC-19 | Added to Documentation Pack Index |
 | GAP-ARTIFACT-001 | Missing artifact | `artifacts/admission/` did not exist | Created `project_admission_definition.md` |
 | GAP-ARTIFACT-002 | Missing artifact | `progress/history/_rotation.json` absent | Created with `max_file_bytes: 102400` |

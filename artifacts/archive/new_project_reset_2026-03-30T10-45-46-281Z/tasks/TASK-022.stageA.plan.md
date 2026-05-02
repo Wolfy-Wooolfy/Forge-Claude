@@ -1,8 +1,8 @@
-# TASK-022 — Stage A Execution Plan
+﻿# TASK-022 — Stage A Execution Plan
 
 ## Task Objective
 Introduce controlled autonomy and bootstrap Stage D verification
-into the HALO Personal Autonomous Pipeline without breaking Release 1.1.0 guarantees.
+into the Forge Personal Autonomous Pipeline without breaking Release 1.1.0 guarantees.
 
 ## Scope (Explicit)
 This task SHALL:

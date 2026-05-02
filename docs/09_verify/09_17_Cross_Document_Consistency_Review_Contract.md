@@ -1,6 +1,6 @@
-# Cross-Document Consistency Review Contract
+﻿# Cross-Document Consistency Review Contract
 
-**Document ID:** HALO-DOC-17  
+**Document ID:** FORGE-DOC-17  
 **Status:** MANDATORY – GOVERNANCE INTEGRITY GATE  
 **Scope:** All Execution-Bound Documents  
 **Applies To:** Stage Contracts, Artifact Specs, Verification Playbooks  
@@ -36,7 +36,7 @@ The review MUST include:
 - docs/03_pipeline/*
 - docs/05_artifacts/*
 - docs/09_verify/*
-- HALO Boundary Audit Rules
+- Forge Boundary Audit Rules
 - Build & Verify Playbook
 
 If any execution-bound document is omitted:

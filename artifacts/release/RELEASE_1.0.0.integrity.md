@@ -1,4 +1,4 @@
-# HALO Core Runtime — Integrity Lock
+﻿# Forge Core Runtime — Integrity Lock
 
 **Release:** 1.0.0  
 **Type:** FILE INTEGRITY SNAPSHOT  
@@ -9,7 +9,7 @@
 ## 1. Purpose
 
 This document defines the integrity baseline for
-HALO Personal Autonomous Pipeline — Release 1.0.0.
+Forge Personal Autonomous Pipeline — Release 1.0.0.
 
 Any modification to the files listed here
 MUST be treated as a release invalidation.
@@ -24,7 +24,7 @@ The following files are integrity-locked:
 - `code/src/orchestrator/stage_transitions.js`
 - `code/src/orchestrator/status_writer.js`
 - `code/src/orchestrator/runner.js`
-- `bin/halo-run.js`
+- `bin/forge-run.js`
 
 ### Verification
 - `verify/smoke/stage_transitions_smoke.js`

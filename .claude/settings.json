@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs wc *)",
+      "Bash(awk '{print $2, $1}')",
+      "Bash(sort -k2 -rn)",
+      "Bash(node -e ' *)",
+      "Bash(node -e \"require\\('./code/src/workspace/apiServer'\\)\")",
+      "Bash(Get-ChildItem -Path \"d:\\\\S\\\\Halo\\\\Tech\\\\Forge-Claude\\\\web\" -Recurse -File)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(node -e \"require\\('./code/src/modules/verifyEngine'\\)\")",
+      "Bash(node -e \"require\\('./code/src/ai_os/conversationEngine'\\)\")",
+      "Bash(node -e \"require\\('./code/src/ai_os/activeProjectManager'\\)\")",
+      "Bash(node -e \"require\\('./code/src/modules/decisionFileNameEnforcer'\\)\")",
+      "Bash(node -e \"require\\('./code/src/modules/canonicalArtifactValidator'\\)\")",
+      "Bash(sed -n '583,2100p' \"/d/S/Halo/Tech/Forge-Claude/web/index.html\")",
+      "Read(//tmp/**)"
+    ]
+  }
+}

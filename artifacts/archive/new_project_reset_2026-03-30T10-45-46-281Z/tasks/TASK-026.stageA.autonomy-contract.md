@@ -1,4 +1,4 @@
-# TASK-026 — Stage A Single-Step Autonomy Contract
+﻿# TASK-026 — Stage A Single-Step Autonomy Contract
 
 ## Objective
 Enable a manually triggered autonomy capability that performs
@@ -29,7 +29,7 @@ AT MOST ONE deterministic pipeline advancement per invocation.
 - Any state mutation outside progress/status.json
 
 ## Start Conditions (ALL REQUIRED)
-- HALO_AUTONOMY=1
+- FORGE_AUTONOMY=1
 - Explicit CLI invocation
 - next_step starts with "Stage"
 - No blocking_questions present

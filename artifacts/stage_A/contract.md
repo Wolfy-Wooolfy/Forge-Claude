@@ -1,7 +1,7 @@
-# Stage A — Contract Definition (TASK-002)
+﻿# Stage A — Contract Definition (TASK-002)
 
 **Task ID:** TASK-002  
-**Task Name:** HALO Documentation Audit & Architectural Alignment → then Code-vs-Docs Review  
+**Task Name:** Forge Documentation Audit & Architectural Alignment → then Code-vs-Docs Review  
 **Stage:** A  
 **Mode:** Documentation-Only (No Execution)  
 **Enforcement:** Fail-Closed
@@ -12,7 +12,7 @@
 
 Produce a closed, auditable, deterministic plan to:
 
-1. Review all HALO project documents for correctness, completeness, and internal consistency.
+1. Review all Forge project documents for correctness, completeness, and internal consistency.
 2. Apply required document fixes (add/replace/delete) while preserving governance rules.
 3. Re-review documentation to confirm architecture connectivity (cross-links, precedence, contracts).
 4. Only after documents are closed, perform a code review against the documents.

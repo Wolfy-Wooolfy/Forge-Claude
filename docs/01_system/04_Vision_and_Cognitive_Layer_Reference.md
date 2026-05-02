@@ -1,4 +1,4 @@
-# Vision & Cognitive Layer Reference (v1)
+﻿# Vision & Cognitive Layer Reference (v1)
 
 **Status:** REFERENCE — NON-EXECUTABLE (Vision Baseline)  
 **Applies To:** Forge (Forge)  
@@ -25,7 +25,7 @@ If any behavior is desired, it must be expressed explicitly in:
 - Artifact Schema & Repository Layout Standard (Doc-05)
 - Progress Tracking & Status Report Contract (Doc-06)
 - Decision Logging & Change Traceability Spec (Doc-07)
-- HALO Boundary Audit Rules (Doc-08)
+- Forge Boundary Audit Rules (Doc-08)
 - Build & Verify Playbook (Doc-09)
 - Runtime Setup & Assumptions (Doc-10)
 

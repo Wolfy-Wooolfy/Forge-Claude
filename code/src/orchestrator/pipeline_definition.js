@@ -32,6 +32,7 @@ const pipeline = [
     task_name: "TASK-066: MODULE FLOW — Design Exploration",
     ordinal_position: 5,
     required_previous_module: "GAP",
+    conditional: true,
     terminal_flag: false
   },
   {

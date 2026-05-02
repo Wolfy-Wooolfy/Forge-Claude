@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 const { executeCognitive } = require("../cognitive/cognitive_adapter");
+const { checkLoopGate, recordIteration, resetHistory } = require("./loopTerminationValidator");
 
 function ensureDir(abs) {
   fs.mkdirSync(abs, { recursive: true });
@@ -309,6 +310,12 @@ async function runGap(context) {
     };
   }
 
+  // Loop termination gate — blocks if gap cycle has run too many times without progress
+  const loopGateResult = checkLoopGate({ max_iterations: context && context.max_gap_iterations ? context.max_gap_iterations : undefined });
+  if (loopGateResult) {
+    return loopGateResult;
+  }
+
   rmDirIfExists(path.resolve(rootAbs, "artifacts", "decisions"));
   rmDirIfExists(path.resolve(rootAbs, "artifacts", "backfill"));
   rmDirIfExists(path.resolve(rootAbs, "artifacts", "execute"));
@@ -420,6 +427,14 @@ async function runGap(context) {
   writeText(path.resolve(gapDirAbs, "gap_report.md"), renderGapReport(payload));
 
   const isBlocked = criticalCount > 0;
+
+  // Record this iteration for loop termination tracking
+  recordIteration(gaps.length, criticalCount);
+
+  // If gaps resolved to zero, reset loop history so future runs start fresh
+  if (!isBlocked) {
+    resetHistory();
+  }
 
   return {
     blocked: isBlocked,

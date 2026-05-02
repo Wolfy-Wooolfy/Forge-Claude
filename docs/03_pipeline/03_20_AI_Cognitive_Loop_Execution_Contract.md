@@ -1,6 +1,6 @@
-# AI Cognitive Loop Execution Contract
+﻿# AI Cognitive Loop Execution Contract
 
-**Document ID:** HALO-DOC-20  
+**Document ID:** FORGE-DOC-20  
 **Applies To:** Stages A, B, C  
 **Status:** CORE – NON-NEGOTIABLE  
 **Enforcement:** Fail-Closed  
@@ -10,7 +10,7 @@
 ## 1. Purpose
 
 This contract defines the deterministic execution model
-for the HALO Cognitive Layer.
+for the Forge Cognitive Layer.
 
 It formalizes the three mandatory intelligence loops:
 

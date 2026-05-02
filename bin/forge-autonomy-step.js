@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 
 const { run } = require("../code/src/orchestrator/runner");
 const { resolveEntry } = require("../code/src/orchestrator/entry_resolver");
@@ -12,7 +12,7 @@ function parseMaxSteps() {
   const v =
     process.env.FORGE_MAX_STEPS !== undefined
       ? process.env.FORGE_MAX_STEPS
-      : process.env.HALO_MAX_STEPS;
+      : process.env.FORGE_MAX_STEPS;
 
   const raw = String(v || "").trim();
 
@@ -23,7 +23,7 @@ function parseMaxSteps() {
   const n = Number(raw);
 
   if (!Number.isInteger(n) || n < 1) {
-    fail("FORGE_MAX_STEPS (or HALO_MAX_STEPS) must be an integer >= 1");
+    fail("FORGE_MAX_STEPS (or FORGE_MAX_STEPS) must be an integer >= 1");
   }
 
   return n;
@@ -65,10 +65,10 @@ async function main() {
   const autonomy =
     process.env.FORGE_AUTONOMY !== undefined
       ? process.env.FORGE_AUTONOMY
-      : process.env.HALO_AUTONOMY;
+      : process.env.FORGE_AUTONOMY;
 
   if (String(autonomy) !== "1") {
-    fail("FORGE_AUTONOMY=1 (or HALO_AUTONOMY=1) is required");
+    fail("FORGE_AUTONOMY=1 (or FORGE_AUTONOMY=1) is required");
   }
 
   const maxSteps = parseMaxSteps();

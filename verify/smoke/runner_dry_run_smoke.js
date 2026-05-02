@@ -1,7 +1,7 @@
-const fs = require("fs");
+﻿const fs = require("fs");
 const path = require("path");
 
-process.env.HALO_DRY_RUN = "true";
+process.env.FORGE_DRY_RUN = "true";
 
 const { run } = require(path.resolve(__dirname, "../../code/src/orchestrator/runner"));
 
@@ -34,7 +34,7 @@ function runSmoke() {
     }
   } finally {
     fs.writeFileSync(STATUS_PATH, original, { encoding: "utf8" });
-    delete process.env.HALO_DRY_RUN;
+    delete process.env.FORGE_DRY_RUN;
   }
 }
 

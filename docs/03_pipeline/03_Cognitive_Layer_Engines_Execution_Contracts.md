@@ -1,4 +1,4 @@
-# 📄 Document 11 — Cognitive Layer Engines Execution Contracts (v1)
+﻿# 📄 Document 11 — Cognitive Layer Engines Execution Contracts (v1)
 
 **Project:** Forge  
 **Version:** 1.0  
@@ -22,7 +22,7 @@ These engines MUST operate under:
 - Pipeline Stages Specification (Doc-03)
 - Progress Tracking & Status Report Contract (Doc-06)
 - Autonomy Policy & Human Interrupt Protocol (Doc-04)
-- HALO Boundary Audit Rules (Doc-08)
+- Forge Boundary Audit Rules (Doc-08)
 - Build & Verify Playbook (Local) (Doc-09)
 - Artifact Schema & Repository Layout Standard (Doc-05)
 

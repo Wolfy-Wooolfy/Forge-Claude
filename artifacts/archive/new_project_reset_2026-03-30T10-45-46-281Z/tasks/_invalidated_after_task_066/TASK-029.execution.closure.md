@@ -1,4 +1,4 @@
-# TASK-029 — Execution Closure
+﻿# TASK-029 — Execution Closure
 
 ```json
 {
@@ -18,7 +18,7 @@
     "Pipeline runtime available",
     "Task registry contains TASK-029 handler",
     "max_steps explicitly provided when running bounded multi-step",
-    "Execution invoked manually via halo-autonomy-step"
+    "Execution invoked manually via forge-autonomy-step"
   ],
   "stop_conditions": [
     "Idempotency violation if closure artifact already exists",
@@ -33,7 +33,7 @@
   "execution_result": {
     "success": true,
     "artifacts_verified": true,
-    "notes": "Multi-step execution contract confirmed: exactly one task per halo-autonomy-step run; deterministic handler resolution from static registry; no recursion/implicit chaining; fail-closed on missing/unregistered current_task."
+    "notes": "Multi-step execution contract confirmed: exactly one task per forge-autonomy-step run; deterministic handler resolution from static registry; no recursion/implicit chaining; fail-closed on missing/unregistered current_task."
   },
   "status": "CLOSED"
 }
@@ -46,7 +46,7 @@ Stage: C
 Result:
 Multi-step execution contract confirmed:
 
-* Exactly one task per halo-autonomy-step run
+* Exactly one task per forge-autonomy-step run
 * Deterministic handler resolution from static registry
 * No recursion / no implicit chaining
 * Fail-closed if current_task is missing or unregistered

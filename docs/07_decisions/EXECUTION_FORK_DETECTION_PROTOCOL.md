@@ -1,6 +1,6 @@
-# Execution Fork Detection Protocol
+﻿# Execution Fork Detection Protocol
 
-**Document ID:** HALO-DOC-27  
+**Document ID:** FORGE-DOC-27  
 **Status:** BINDING – EXECUTION FORK DETECTION AUTHORITY  
 **Scope:** Fork Detection Across Lifecycle Stages  
 **Applies To:** Stage A, Stage B, Stage C  
@@ -234,7 +234,7 @@ Decision escalation is permitted ONLY when deterministic selection is impossible
 
 Fork detection is a prerequisite for option evaluation.
 
-Option Evaluation Framework (HALO-DOC-19)
+Option Evaluation Framework (FORGE-DOC-19)
 may begin ONLY after a valid fork is confirmed.
 
 If no fork exists:

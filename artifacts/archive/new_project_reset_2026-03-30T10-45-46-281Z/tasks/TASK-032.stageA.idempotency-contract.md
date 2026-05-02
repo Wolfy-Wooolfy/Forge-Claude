@@ -1,4 +1,4 @@
-# TASK-032 — Stage C Execution Idempotency & State Guard Contract
+﻿# TASK-032 — Stage C Execution Idempotency & State Guard Contract
 
 ## Contract Objective
 
@@ -113,7 +113,7 @@ It only hardens execution safety.
 
 After TASK-032 implementation:
 
-HALO execution becomes:
+Forge execution becomes:
 
 * Idempotent
 * Monotonic

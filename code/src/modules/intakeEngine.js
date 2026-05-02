@@ -119,13 +119,30 @@ function detectRepositoryState(rootAbs) {
     };
   }
 
+  // Check for full pipeline state: has docs + code + forge pipeline artifacts
+  const hasForgeState = fs.existsSync(path.join(rootAbs, 'artifacts', 'forge', 'forge_state.json'));
+  const tasksDir = path.join(rootAbs, 'artifacts', 'tasks');
+  const hasTaskClosures = fs.existsSync(tasksDir) &&
+    fs.readdirSync(tasksDir).some(f => f.endsWith('.execution.closure.md'));
+
+  if (hasForgeState || hasTaskClosures) {
+    return {
+      repository_state: 'FULL_PIPELINE_STATE',
+      docs_present: hasDocs,
+      code_present: hasCode,
+      artifacts_present: hasArtifacts,
+      status_present: hasStatus,
+      rules: ['docs/ present', 'code/ present', 'forge pipeline artifacts detected']
+    };
+  }
+
   return {
-    repository_state: "MIXED",
+    repository_state: 'DOCS_AND_CODE',
     docs_present: hasDocs,
     code_present: hasCode,
     artifacts_present: hasArtifacts,
     status_present: hasStatus,
-    rules: ["docs/code mixed repository state detected"]
+    rules: ['docs/ present', 'code/ present', 'no pipeline closure artifacts']
   };
 }
 

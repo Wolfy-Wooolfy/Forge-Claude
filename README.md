@@ -1,4 +1,4 @@
-# Forge — Quickstart
+﻿# Forge — Quickstart
 
 **Release:** 1.0.0  
 **Mode:** Deterministic (Non-Autonomous)
@@ -36,7 +36,7 @@ Set `next_step` to include a target stage label, e.g.:
 
 
 3) Run the pipeline:
-- `node bin/halo-run.js`
+- `node bin/forge-run.js`
 
 
 4) Verify:

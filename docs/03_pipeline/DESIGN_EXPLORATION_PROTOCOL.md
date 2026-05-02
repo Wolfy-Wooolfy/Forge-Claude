@@ -1,6 +1,6 @@
-# Design Exploration Protocol
+﻿# Design Exploration Protocol
 
-**Document ID:** HALO-DOC-18  
+**Document ID:** FORGE-DOC-18  
 **Status:** BINDING – EXPLORATION GOVERNANCE  
 **Scope:** Controlled Alternative Evaluation inside Lifecycle Stages  
 **Applies To:** Stage A, Stage B, Stage C  

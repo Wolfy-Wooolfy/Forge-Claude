@@ -1,8 +1,8 @@
-# TASK-024 — Stage A Verification Contract (Stage D Authority)
+﻿# TASK-024 — Stage A Verification Contract (Stage D Authority)
 
 ## Purpose
 Define the authority, boundaries, and behavior of Stage D
-as a verification-only enforcement layer within HALO.
+as a verification-only enforcement layer within Forge.
 
 Stage D exists to VERIFY execution compliance.
 Stage D does NOT decide, recommend, or execute.

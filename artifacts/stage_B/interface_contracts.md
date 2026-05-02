@@ -1,4 +1,4 @@
-# Stage B — Interface Contracts
+﻿# Stage B — Interface Contracts
 
 ```json
 {
@@ -35,7 +35,7 @@
 | Audit | Trace | `artifacts/audit/audit_findings.json` | DOC-31 |
 | Trace | Gap | `artifacts/trace/trace_matrix.json` | DOC-32 |
 | Gap | Design Exploration | `artifacts/gap/gap_actions.json` | DOC-33 |
-| Design Exploration | Decision Gate | `artifacts/exploration/option_matrix.json` | HALO-DOC-18 |
+| Design Exploration | Decision Gate | `artifacts/exploration/option_matrix.json` | FORGE-DOC-18 |
 | Decision Gate | Backfill | `artifacts/decisions/module_flow_decision_gate.json` | DOC-34 |
 | Backfill | Execute | `artifacts/backfill/backfill_tasks.json` | DOC-35 |
 | Execute | Verify | `artifacts/execute/execute_plan.json` | DOC-36 |

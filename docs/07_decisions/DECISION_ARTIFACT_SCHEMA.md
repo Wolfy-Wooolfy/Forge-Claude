@@ -1,6 +1,6 @@
-# Decision Artifact Schema
+﻿# Decision Artifact Schema
 
-**Document ID:** HALO-DOC-22  
+**Document ID:** FORGE-DOC-22  
 **Status:** EXECUTION-BOUND  
 **Scope:** Defines the structure of Decision Artifacts generated after Design Exploration  
 **Applies To:** Forge Decision Lifecycle  
@@ -282,7 +282,82 @@ Create separate modules per pipeline stage.
 
 ---
 
-# 9. Summary
+# 9. Artifact Types in artifacts/decisions/
+
+Two distinct artifact types reside in `artifacts/decisions/`:
+
+## Type 1 — Pipeline Fork Decision
+
+Follows the schema defined in §4 above.
+Created after Design Exploration and Option Evaluation
+when an execution fork is resolved.
+
+Naming convention:
+
+```
+DEC-YYYYMMDD-NNN.md
+```
+
+## Type 2 — Workspace Approval Packet
+
+Created when an external AI workspace change
+requires authorization before execution.
+
+Schema:
+
+```json
+{
+  "execution_id": "",
+  "workspace_id": "",
+  "project_id": "",
+  "source": "EXTERNAL_AI_WORKSPACE",
+  "operation": {
+    "mode": "",
+    "file_count": 0,
+    "total_bytes": 0
+  },
+  "approval": {
+    "policy_version": "",
+    "approved_by_role": "",
+    "required_roles": [],
+    "approved_at": ""
+  },
+  "question": "",
+  "context_summary": "",
+  "options": [
+    {
+      "option_id": "",
+      "description": "",
+      "impact_scope": "",
+      "risk_level": "",
+      "downstream_effects": []
+    }
+  ],
+  "recommendation_reference": "",
+  "confirmation_required_format": "",
+  "proposed_files": [
+    {
+      "path": "",
+      "allow_overwrite": false,
+      "sha256": "",
+      "diff": "",
+      "required_roles": [],
+      "file_index": 0,
+      "file_count": 0
+    }
+  ]
+}
+```
+
+Naming convention:
+
+```
+decision_packet.json
+```
+
+---
+
+# 10. Summary
 
 Decision artifacts ensure that:
 

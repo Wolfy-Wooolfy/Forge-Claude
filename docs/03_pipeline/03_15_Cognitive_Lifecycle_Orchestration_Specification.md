@@ -1,6 +1,6 @@
-# Cognitive Lifecycle Orchestration Specification
+﻿# Cognitive Lifecycle Orchestration Specification
 
-**Document ID:** HALO-DOC-15  
+**Document ID:** FORGE-DOC-15  
 **Status:** BINDING – EXECUTION ORCHESTRATION  
 **Scope:** Full Lifecycle (Stage A → Stage D)  
 **Enforcement:** Fail-Closed  
