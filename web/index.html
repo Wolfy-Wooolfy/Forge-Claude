@@ -1535,7 +1535,8 @@
     }
 
     async function loadPreview(draft) {
-      const res = await fetch("http://localhost:3100/api/ai/preview", {
+      const apiBase = window.__FORGE_API_BASE__ || "http://localhost:3100";
+      const res = await fetch(`${apiBase}/api/ai/preview`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -1564,7 +1565,8 @@
 
     async function loadApprovalPolicy() {
       try {
-        const res = await fetch("http://localhost:3100/api/ai/approval-policy");
+        const apiBase = window.__FORGE_API_BASE__ || "http://localhost:3100";
+        const res = await fetch(`${apiBase}/api/ai/approval-policy`);
         const data = await res.json();
 
         if (!res.ok) {
@@ -1592,7 +1594,7 @@
     async function loadHistory() {
       try {
         const projectId = getActiveProjectId();
-        const apiBase = window.location.origin.replace(":3000", ":3100");
+        const apiBase = window.__FORGE_API_BASE__ || window.location.origin.replace(":3000", ":3100");
         const res = await fetch(`${apiBase}/api/ai/history?project_id=${encodeURIComponent(projectId)}`);
         const data = await res.json();
 
@@ -1782,7 +1784,8 @@
       setStatus("Creating governed decision packet...");
 
       try {
-        const res = await fetch("http://localhost:3100/api/ai/decision", {
+        const apiBase = window.__FORGE_API_BASE__ || "http://localhost:3100";
+        const res = await fetch(`${apiBase}/api/ai/decision`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -1847,7 +1850,7 @@
         throw new Error("API endpoint is required.");
       }
 
-      const API_BASE = window.location.origin.replace(":3000", ":3100");
+      const API_BASE = window.__FORGE_API_BASE__ || window.location.origin.replace(":3000", ":3100");
 
       const requestOptions = {
         method,
@@ -2454,7 +2457,7 @@
       setBadge(gBadgeDecision, "…", "loading");
       setBadge(gBadgeForks,    "…", "loading");
 
-      const API_BASE = window.location.origin.replace(":3000", ":3100");
+      const API_BASE = window.__FORGE_API_BASE__ || window.location.origin.replace(":3000", ":3100");
       const lines = [];
 
       try {

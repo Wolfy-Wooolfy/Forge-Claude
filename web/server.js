@@ -683,7 +683,10 @@ async function generateDraft(userRequest) {
 const server = http.createServer(async (req, res) => {
   try {
     if (req.method === "GET" && req.url === "/") {
-      const html = fs.readFileSync(indexPath, "utf-8");
+      let html = fs.readFileSync(indexPath, "utf-8");
+      const API_PORT = Number(process.env.FORGE_API_PORT || 3100);
+      const injection = `<script>window.__FORGE_API_BASE__ = "http://localhost:${API_PORT}";</script>`;
+      html = html.replace("</head>", `${injection}\n</head>`);
       sendText(res, 200, html, "text/html; charset=utf-8");
       return;
     }
@@ -835,6 +838,7 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(3000, () => {
-  console.log("Forge AI Workspace running at http://localhost:3000");
+const WEB_PORT = Number(process.env.FORGE_WEB_PORT || 3000);
+server.listen(WEB_PORT, () => {
+  console.log(`Forge AI Workspace running at http://localhost:${WEB_PORT}`);
 });
