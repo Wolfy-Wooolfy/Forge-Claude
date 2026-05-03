@@ -520,6 +520,44 @@
     .strategy-choice-btn:hover { border-color: var(--blue); background: var(--bg-overlay); }
     .strategy-choice-btn strong { display: block; color: var(--blue); margin-bottom: 4px; }
 
+    /* ── Quick-reply chips ── */
+    .quick-reply-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .quick-reply-chip {
+      background: var(--bg-elevated);
+      color: var(--blue);
+      border: 1px solid var(--blue);
+      border-radius: 16px;
+      padding: 5px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+      white-space: nowrap;
+    }
+
+    .quick-reply-chip:hover {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    /* ── Streaming cursor ── */
+    .stream-cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background: var(--text-primary);
+      margin-left: 2px;
+      vertical-align: text-bottom;
+      animation: blink .7s step-end infinite;
+    }
+
+    @keyframes blink { 50% { opacity: 0; } }
+
     /* ── Governance badges ── */
     .gov-badges {
       display: flex;
@@ -971,6 +1009,109 @@
       });
 
       appendMessage(type, title, contentHtml);
+    }
+
+    function renderQuickReplies(answers) {
+      if (!Array.isArray(answers) || answers.length === 0) return;
+
+      const lastMsg = chatStream.querySelector(".chat-message.assistant:last-of-type");
+      if (!lastMsg) return;
+
+      const existing = lastMsg.querySelector(".quick-reply-chips");
+      if (existing) existing.remove();
+
+      const container = document.createElement("div");
+      container.className = "quick-reply-chips";
+
+      answers.forEach((answer) => {
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "quick-reply-chip";
+        chip.textContent = answer;
+        chip.addEventListener("click", () => {
+          requestInput.value = answer;
+          container.remove();
+          chatSendBtn.click();
+        });
+        container.appendChild(chip);
+      });
+
+      lastMsg.appendChild(container);
+      chatStream.scrollTop = chatStream.scrollHeight;
+    }
+
+    async function streamChatMessage(message, projectId) {
+      const lang = detectUserLanguage(message);
+      pushMessage("user", lang === "ar" ? "رسالتك" : "You", `<div class="file-preview">${formatMessageText(message)}</div>`);
+      requestInput.value = "";
+      chatSendBtn.disabled = true;
+      setStatus(lang === "ar" ? "يكتب..." : "Typing...");
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "chat-message assistant";
+      wrapper.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
+      const label = document.createElement("div");
+      label.className = "message-label";
+      label.textContent = "AI Workspace";
+      const title = document.createElement("h2");
+      title.className = "message-title";
+      title.textContent = lang === "ar" ? "رد" : "Response";
+      const contentEl = document.createElement("div");
+      contentEl.className = "file-preview";
+      const cursor = document.createElement("span");
+      cursor.className = "stream-cursor";
+      contentEl.appendChild(cursor);
+      wrapper.appendChild(label);
+      wrapper.appendChild(title);
+      wrapper.appendChild(contentEl);
+      chatStream.appendChild(wrapper);
+      chatStream.scrollTop = chatStream.scrollHeight;
+
+      let fullText = "";
+      try {
+        const res = await fetch(`${API_BASE}/api/ai-os/chat/stream`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message, project_id: projectId, user_language: lang })
+        });
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buf = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buf += decoder.decode(value, { stream: true });
+          const parts = buf.split("\n\n");
+          buf = parts.pop();
+          for (const part of parts) {
+            if (!part.startsWith("data: ")) continue;
+            let evt;
+            try { evt = JSON.parse(part.slice(6)); } catch { continue; }
+            if (evt.type === "chunk") {
+              fullText += evt.c;
+              contentEl.textContent = fullText;
+              contentEl.appendChild(cursor);
+              chatStream.scrollTop = chatStream.scrollHeight;
+            } else if (evt.type === "done") {
+              fullText = evt.message || fullText;
+              contentEl.textContent = fullText;
+              cursor.remove();
+              chatStream.scrollTop = chatStream.scrollHeight;
+            } else if (evt.type === "error") {
+              contentEl.textContent = lang === "ar" ? "حدث خطأ. حاول مجدداً." : "An error occurred. Please try again.";
+              cursor.remove();
+            }
+          }
+        }
+      } catch (err) {
+        contentEl.textContent = lang === "ar" ? "تعذّر الاتصال بالخادم." : "Could not reach server.";
+        cursor.remove();
+      }
+
+      setStatus("");
+      chatSendBtn.disabled = false;
     }
 
     function buildStrategyChoiceHtml(items) {
@@ -1811,6 +1952,12 @@
         return;
       }
 
+      // Streaming conversational mode: project active, no pending discovery
+      if (!pendingAiOsDiscovery && currentProjectState && currentProjectState.project_id) {
+        await streamChatMessage(request, currentProjectState.project_id);
+        return;
+      }
+
       if (pendingAiOsDiscovery) {
         const discoveryState = { ...pendingAiOsDiscovery };
 
@@ -1847,6 +1994,8 @@
               detectUserLanguage(request) === "ar" ? "استكمال التحليل" : "Discovery Follow-up",
               `<div class="file-preview">${formatMessageText(questions.join("\n"))}</div>`
             );
+
+            renderQuickReplies(answerResult.suggested_answers);
 
             setStatus("AI OS discovery requires more information.");
             return;
@@ -2089,6 +2238,8 @@
             detectUserLanguage(request) === "ar" ? "أسئلة التحليل" : "Discovery Questions",
             `<div class="file-preview">${formatMessageText(questions.join("\n"))}</div>`
           );
+
+          renderQuickReplies(intake.suggested_answers);
 
           setStatus("AI OS discovery is waiting for your answers.");
           return;

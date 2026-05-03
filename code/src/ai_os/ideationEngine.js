@@ -43,6 +43,10 @@ function createIdeationEngine(options = {}) {
       return { ok: false, mode: "BLOCKED", reason: "PROJECT_NOT_FOUND" };
     }
 
+    const histPath = path.join(projectsRoot, projectId, "ai_os", "conversation_context.json");
+    const rawHistory = readJsonSafe(histPath, []);
+    const conversationHistory = Array.isArray(rawHistory) ? rawHistory.slice(-20) : [];
+
     const provider = new IdeationExpansionProvider();
     const providerResult = await provider.executeTask({
       task_id: `ideation_expand_${Date.now()}`,
@@ -50,7 +54,8 @@ function createIdeationEngine(options = {}) {
         domain: String(state.requirement_domain || ""),
         user_goal: String(state.user_goal || ""),
         requirement_model: state.requirement_model || {},
-        refinement_input: String(body.refinement_input || body.message || "")
+        refinement_input: String(body.refinement_input || body.message || ""),
+        conversation_history: conversationHistory
       }
     });
 
@@ -80,6 +85,7 @@ function createIdeationEngine(options = {}) {
       expansion,
       ready_for_options: readyForOptions,
       follow_up_question: expansion.follow_up_question || "",
+      suggested_answers: Array.isArray(expansion.suggested_answers) ? expansion.suggested_answers : [],
       project_id: projectId
     };
   }

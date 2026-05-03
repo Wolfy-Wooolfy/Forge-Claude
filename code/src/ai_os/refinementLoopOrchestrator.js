@@ -57,11 +57,16 @@ function createRefinementLoopOrchestrator(options = {}) {
       };
     }
 
+    const histPath = path.join(projectsRoot, projectId, "ai_os", "conversation_context.json");
+    const rawHistory = readJsonSafe(histPath, []);
+    const conversationHistory = Array.isArray(rawHistory) ? rawHistory.slice(-20) : [];
+
     const provider = new IdeationExpansionProvider();
     const iterations = [];
     let readyForOptions = false;
     let lastExpansion = null;
     let lastFollowUpQuestion = "";
+    let lastSuggestedAnswers = [];
 
     const existingExpansions = ideationLog.filter((e) => e.entry_type === "IDEA_EXPANSION");
     let refinementInput = String(body.refinement_input || body.message || "");
@@ -78,7 +83,8 @@ function createRefinementLoopOrchestrator(options = {}) {
           requirement_model: state.requirement_model || {},
           refinement_input: refinementInput,
           iteration: i + 1,
-          prior_expansions: existingExpansions.length + i
+          prior_expansions: existingExpansions.length + i,
+          conversation_history: conversationHistory
         }
       });
 
@@ -90,6 +96,7 @@ function createRefinementLoopOrchestrator(options = {}) {
       const expansion = providerResult.output;
       lastExpansion = expansion;
       lastFollowUpQuestion = expansion.follow_up_question || "";
+      lastSuggestedAnswers = Array.isArray(expansion.suggested_answers) ? expansion.suggested_answers : [];
       readyForOptions = expansion.readiness_assessment?.ready_for_options === true;
 
       const logEntry = {
@@ -126,6 +133,7 @@ function createRefinementLoopOrchestrator(options = {}) {
       ready_for_options: readyForOptions,
       last_expansion: lastExpansion,
       follow_up_question: lastFollowUpQuestion,
+      suggested_answers: lastSuggestedAnswers,
       loop_summary: iterations,
       project_id: projectId
     };

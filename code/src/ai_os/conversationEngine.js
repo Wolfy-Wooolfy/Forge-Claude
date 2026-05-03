@@ -4,6 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 const ConversationalResponseProvider = require("../providers/conversationalResponseProvider");
+const IntentClassificationProvider = require("../providers/intentClassificationProvider");
 
 const STATE_TRANSITION_THRESHOLDS = {
   DISCUSSION: ["DISCOVERY_REQUIRED"],
@@ -48,6 +49,15 @@ function createConversationEngine(options = {}) {
     return path.join(projectsRoot, normalizeProjectId(projectId), "project_state.json");
   }
 
+  function loadConversationHistory(projectId) {
+    const histPath = path.join(
+      projectsRoot, normalizeProjectId(projectId),
+      "ai_os", "conversation_context.json"
+    );
+    const raw = readJsonSafe(histPath, []);
+    return Array.isArray(raw) ? raw.slice(-20) : [];
+  }
+
   function loadState(projectId) {
     return readJsonSafe(statePath(projectId), null);
   }
@@ -60,7 +70,7 @@ function createConversationEngine(options = {}) {
     return crypto.randomBytes(8).toString("hex");
   }
 
-  async function generateConversationalMessage(operation, result, state, user_language, project_name) {
+  async function generateConversationalMessage(operation, result, state, user_language, project_name, conversation_history) {
     const provider = new ConversationalResponseProvider();
     const providerResult = await provider.executeTask({
       task_id: `conv_msg_${Date.now()}`,
@@ -69,7 +79,8 @@ function createConversationEngine(options = {}) {
         result,
         state: state.active_runtime_state || "DISCUSSION",
         user_language: user_language || state.user_language || "ar",
-        project_name: project_name || state.project_name || ""
+        project_name: project_name || state.project_name || "",
+        conversation_history: Array.isArray(conversation_history) ? conversation_history : []
       }
     });
 
@@ -263,15 +274,52 @@ function createConversationEngine(options = {}) {
       return { ok: false, mode: "BLOCKED", reason: "PROJECT_NOT_FOUND" };
     }
 
-    // If there's a pending confirmation, check if message is affirmative
-    if (state.pending_confirmation) {
-      const lower = message.toLowerCase();
-      const isAffirmative = [
-        "yes", "نعم", "اه", "أيوه", "موافق", "كمل", "تمام", "ok", "okay",
-        "sure", "proceed", "confirm", "أكد", "وافق"
-      ].some((word) => lower.includes(word));
+    const history = loadConversationHistory(projectId);
 
-      if (isAffirmative) {
+    // If there's a pending confirmation, classify intent via provider (C-2: no keyword matching)
+    if (state.pending_confirmation) {
+      const intentProvider = new IntentClassificationProvider();
+      const intentResult = await intentProvider.executeTask({
+        task_id: `intent_${Date.now()}`,
+        context: {
+          message,
+          pending_action: state.pending_confirmation.target_state || "",
+          user_language
+        }
+      });
+
+      const lang = user_language.toLowerCase().startsWith("en") ? "en" : "ar";
+      const fallbackClarification = lang === "ar"
+        ? "هل تقصد الموافقة على المتابعة أم تريد تعديلاً؟"
+        : "Do you mean to confirm, or would you like to make changes?";
+
+      // Fail-closed: provider failure → ask for clarification, never assume
+      if (intentResult.status !== "SUCCESS" || !intentResult.output) {
+        return {
+          ok: true,
+          mode: "PENDING_CONFIRMATION",
+          message: state.pending_confirmation.message,
+          confirmation_key: state.pending_confirmation.confirmation_key,
+          target_state: state.pending_confirmation.target_state,
+          project_id: projectId
+        };
+      }
+
+      const { intent, confidence, clarification_question } = intentResult.output;
+
+      // Low confidence → ask for clarification regardless of intent
+      if (confidence < 0.75) {
+        return {
+          ok: true,
+          mode: "PENDING_CONFIRMATION",
+          message: clarification_question || fallbackClarification,
+          confirmation_key: state.pending_confirmation.confirmation_key,
+          target_state: state.pending_confirmation.target_state,
+          project_id: projectId
+        };
+      }
+
+      if (intent === "AFFIRM") {
         return confirmTransition({
           project_id: projectId,
           user_language,
@@ -279,34 +327,33 @@ function createConversationEngine(options = {}) {
         });
       }
 
-      const isNegative = [
-        "no", "لا", "مش", "مو", "مو عارف", "cancel", "wait", "انتظر", "وقف"
-      ].some((word) => lower.includes(word));
-
-      if (isNegative) {
+      if (intent === "REJECT" || intent === "MODIFY") {
         const updatedState = { ...state };
         delete updatedState.pending_confirmation;
         saveState(projectId, updatedState);
+        const operation = intent === "MODIFY" ? "CONFIRMATION_MODIFY_REQUESTED" : "CONFIRMATION_CANCELLED";
         const convMsg = await generateConversationalMessage(
-          "CONFIRMATION_CANCELLED",
-          { message: "User cancelled the transition" },
+          operation,
+          { message, intent },
           updatedState,
-          user_language
+          user_language,
+          undefined,
+          history
         );
         return {
           ok: true,
-          mode: "CONFIRMATION_CANCELLED",
+          mode: intent === "MODIFY" ? "MODIFICATION_REQUESTED" : "CONFIRMATION_CANCELLED",
           message: convMsg.message,
           suggest_next: convMsg.suggest_next,
           project_id: projectId
         };
       }
 
-      // Non-conclusive — remind about pending confirmation
+      // UNCLEAR intent → ask for clarification
       return {
         ok: true,
         mode: "PENDING_CONFIRMATION",
-        message: state.pending_confirmation.message,
+        message: clarification_question || fallbackClarification,
         confirmation_key: state.pending_confirmation.confirmation_key,
         target_state: state.pending_confirmation.target_state,
         project_id: projectId
@@ -323,7 +370,9 @@ function createConversationEngine(options = {}) {
         project_name: state.project_name || ""
       },
       state,
-      user_language
+      user_language,
+      undefined,
+      history
     );
 
     return {

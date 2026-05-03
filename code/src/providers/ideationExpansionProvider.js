@@ -45,8 +45,11 @@ class IdeationExpansionProvider {
       "    { \"area\": \"string\", \"proposal\": \"string\", \"reasoning\": \"string\" }",
       "  ],",
       "  \"readiness_assessment\": { \"ready_for_options\": false, \"blocking_gaps\": [] },",
-      "  \"follow_up_question\": \"string — ONE focused question to move the idea forward, or empty if ready\"",
+      "  \"follow_up_question\": \"string — ONE focused question to move the idea forward, or empty if ready\",",
+      "  \"suggested_answers\": []",
       "}",
+      "",
+      "suggested_answers: 2-4 short answer options for follow_up_question. Empty array if follow_up_question is empty.",
       "",
       "readiness_assessment.ready_for_options must be true only when the idea is complete enough to generate options.",
       "",
@@ -71,7 +74,10 @@ class IdeationExpansionProvider {
       readiness_assessment: parsed.readiness_assessment && typeof parsed.readiness_assessment === "object"
         ? { ready_for_options: parsed.readiness_assessment.ready_for_options === true, blocking_gaps: Array.isArray(parsed.readiness_assessment.blocking_gaps) ? parsed.readiness_assessment.blocking_gaps : [] }
         : { ready_for_options: false, blocking_gaps: [] },
-      follow_up_question: typeof parsed.follow_up_question === "string" ? parsed.follow_up_question.trim() : ""
+      follow_up_question: typeof parsed.follow_up_question === "string" ? parsed.follow_up_question.trim() : "",
+      suggested_answers: Array.isArray(parsed.suggested_answers)
+        ? parsed.suggested_answers.map((a) => String(a || "")).filter(Boolean).slice(0, 4)
+        : []
     };
   }
 
@@ -79,6 +85,66 @@ class IdeationExpansionProvider {
     if (!this.apiKey) {
       return { status: "FAILED", output: null, metadata: { provider: this.name, reason: "OPENAI_API_KEY_MISSING" } };
     }
+
+    const rawHistory = Array.isArray(task.context && task.context.conversation_history)
+      ? task.context.conversation_history : [];
+    const historyMessages = rawHistory
+      .map((h) => ({
+        role: h.role === "assistant" ? "assistant" : "user",
+        content: String(h.content || h.message || "")
+      }))
+      .filter((h) => h.content);
+
+    const expandIdeaTool = {
+      type: "function",
+      function: {
+        name: "expand_idea",
+        description: "Expand and enrich the user's project idea with constructive analysis.",
+        parameters: {
+          type: "object",
+          properties: {
+            expanded_summary: { type: "string" },
+            missing_components: { type: "array", items: { type: "string" } },
+            suggested_directions: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  direction: { type: "string" },
+                  description: { type: "string" },
+                  pros: { type: "array", items: { type: "string" } },
+                  cons: { type: "array", items: { type: "string" } }
+                },
+                required: ["direction", "description", "pros", "cons"]
+              }
+            },
+            improvement_proposals: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  area: { type: "string" },
+                  proposal: { type: "string" },
+                  reasoning: { type: "string" }
+                },
+                required: ["area", "proposal", "reasoning"]
+              }
+            },
+            readiness_assessment: {
+              type: "object",
+              properties: {
+                ready_for_options: { type: "boolean" },
+                blocking_gaps: { type: "array", items: { type: "string" } }
+              },
+              required: ["ready_for_options", "blocking_gaps"]
+            },
+            follow_up_question: { type: "string" },
+            suggested_answers: { type: "array", items: { type: "string" } }
+          },
+          required: ["expanded_summary", "missing_components", "suggested_directions", "improvement_proposals", "readiness_assessment", "follow_up_question", "suggested_answers"]
+        }
+      }
+    };
 
     let response;
     try {
@@ -88,9 +154,11 @@ class IdeationExpansionProvider {
         body: JSON.stringify({
           model: this.model,
           temperature: 0.4,
-          response_format: { type: "json_object" },
+          tools: [expandIdeaTool],
+          tool_choice: { type: "function", function: { name: "expand_idea" } },
           messages: [
-            { role: "system", content: "Return valid JSON only. No markdown. No prose outside JSON." },
+            { role: "system", content: "You are the Ideation Expansion Engine for a governed AI Operating System." },
+            ...historyMessages,
             { role: "user", content: this.buildPrompt(task) }
           ]
         })
@@ -104,18 +172,22 @@ class IdeationExpansionProvider {
     }
 
     const payload = await response.json();
-    const content = payload && payload.choices && payload.choices[0] && payload.choices[0].message && typeof payload.choices[0].message.content === "string"
-      ? payload.choices[0].message.content : "";
+    const toolCall = payload.choices && payload.choices[0] && payload.choices[0].message &&
+      Array.isArray(payload.choices[0].message.tool_calls) && payload.choices[0].message.tool_calls[0];
+
+    if (!toolCall || toolCall.type !== "function") {
+      return { status: "FAILED", output: null, metadata: { provider: this.name, reason: "NO_TOOL_CALL" } };
+    }
 
     try {
-      const parsed = JSON.parse(this.extractJsonText(content));
+      const parsed = JSON.parse(toolCall.function.arguments);
       const normalized = this.normalizeOutput(parsed);
       if (!normalized) {
         return { status: "FAILED", output: null, metadata: { provider: this.name, reason: "INVALID_EXPANSION_SCHEMA" } };
       }
       return { status: "SUCCESS", output: normalized, metadata: { provider: this.name, model: this.model } };
     } catch (err) {
-      return { status: "FAILED", output: null, metadata: { provider: this.name, reason: "INVALID_JSON_OUTPUT", error: err && err.message ? err.message : String(err) } };
+      return { status: "FAILED", output: null, metadata: { provider: this.name, reason: "INVALID_TOOL_ARGUMENTS", error: err && err.message ? err.message : String(err) } };
     }
   }
 }

@@ -432,7 +432,8 @@ function createAiOsRuntime(options = {}) {
       ok: true,
       mode: clarificationQuestions.length > 0 ? "CLARIFICATION_REQUIRED" : "IDEATION_READY",
       project: updatedState,
-      blocking_questions: clarificationQuestions
+      blocking_questions: clarificationQuestions,
+      suggested_answers: Array.isArray(discovery.suggested_answers) ? discovery.suggested_answers : []
     };
   }
 
@@ -531,7 +532,8 @@ function createAiOsRuntime(options = {}) {
       ok: true,
       mode: discovery.completeness ? "IDEATION_READY" : "CLARIFICATION_REQUIRED",
       project: updatedState,
-      blocking_questions: discovery.open_questions
+      blocking_questions: discovery.open_questions,
+      suggested_answers: Array.isArray(discovery.suggested_answers) ? discovery.suggested_answers : []
     };
   }
 

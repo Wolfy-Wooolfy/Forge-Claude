@@ -15,6 +15,7 @@ const { createDeliveryPackageBuilder } = require("../ai_os/deliveryPackageBuilde
 const { createIdeationEngine } = require("../ai_os/ideationEngine");
 const { createConversationEngine } = require("../ai_os/conversationEngine");
 const { createConversationMemoryManager } = require("../ai_os/conversationMemoryManager");
+const ConversationalResponseProvider = require("../providers/conversationalResponseProvider");
 const { createRefinementLoopOrchestrator } = require("../ai_os/refinementLoopOrchestrator");
 const { createDiscussionLoopGate } = require("../ai_os/discussionLoopGate");
 const { createDocumentationBuildLoop } = require("../ai_os/documentationBuildLoop");
@@ -3002,6 +3003,62 @@ function buildExecutionPackage(packet) {
           }
         }
         sendJson(res, 200, result);
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/ai-os/chat/stream") {
+        const body = await readBody(req);
+        const projectId = String(body.project_id || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+        const message = String(body.message || "").trim();
+        const user_language = String(body.user_language || "ar");
+
+        res.writeHead(200, {
+          "Content-Type": "text/event-stream; charset=utf-8",
+          "Cache-Control": "no-cache",
+          "Connection": "keep-alive",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type"
+        });
+
+        const sendEvent = (payload) => {
+          res.write(`data: ${JSON.stringify(payload)}\n\n`);
+        };
+
+        if (!message || !projectId) {
+          sendEvent({ type: "error", reason: "MISSING_MESSAGE_OR_PROJECT" });
+          res.end();
+          return;
+        }
+
+        const history = conversationMemoryManager.loadContext(projectId);
+
+        const provider = new ConversationalResponseProvider();
+        try {
+          const { message: fullMessage, suggest_next } = await provider.streamTask(
+            {
+              task_id: `stream_${Date.now()}`,
+              context: {
+                operation: "USER_MESSAGE_RECEIVED",
+                result: { user_message: message },
+                state: "DISCUSSION",
+                user_language,
+                project_name: body.project_name || projectId,
+                conversation_history: history
+              }
+            },
+            (token) => sendEvent({ type: "chunk", c: token })
+          );
+
+          conversationMemoryManager.saveContext(projectId, { role: "user", content: message, created_at: new Date().toISOString() });
+          conversationMemoryManager.saveContext(projectId, { role: "assistant", content: fullMessage, created_at: new Date().toISOString() });
+
+          sendEvent({ type: "done", message: fullMessage, suggest_next, mode: "MESSAGE_PROCESSED", project_id: projectId });
+        } catch (err) {
+          sendEvent({ type: "error", reason: err.message || "STREAM_FAILED" });
+        }
+
+        res.end();
         return;
       }
 

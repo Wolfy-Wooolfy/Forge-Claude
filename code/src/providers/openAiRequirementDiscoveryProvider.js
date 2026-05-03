@@ -50,6 +50,9 @@ class OpenAiRequirementDiscoveryProvider {
       requirement_model: output.requirement_model,
       completeness: output.completeness,
       open_questions: output.open_questions.map((question) => String(question || "")).filter(Boolean),
+      suggested_answers: Array.isArray(output.suggested_answers)
+        ? output.suggested_answers.map((a) => String(a || "")).filter(Boolean).slice(0, 4)
+        : [],
       reasoning_summary: typeof output.reasoning_summary === "string" ? output.reasoning_summary : ""
     };
   }
@@ -86,8 +89,11 @@ class OpenAiRequirementDiscoveryProvider {
       "  \"requirement_model\": {},",
       "  \"completeness\": false,",
       "  \"open_questions\": [],",
+      "  \"suggested_answers\": [],",
       "  \"reasoning_summary\": \"string\"",
       "}",
+      "",
+      "suggested_answers: 2-4 short answer options for the FIRST open_question only. Empty array if completeness is true or no questions.",
       "",
       "Completeness must be true only when no execution-impacting ambiguity remains.",
       "",
@@ -111,85 +117,67 @@ class OpenAiRequirementDiscoveryProvider {
       };
     }
 
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${this.apiKey}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: this.model,
-        temperature: 0.2,
-        response_format: { type: "json_object" },
-        messages: [
-          {
-            role: "system",
-            content: "Return valid JSON only. Do not include markdown or prose outside JSON."
+    const discoverTool = {
+      type: "function",
+      function: {
+        name: "discover_requirements",
+        description: "Perform universal, domain-agnostic requirement discovery from user input.",
+        parameters: {
+          type: "object",
+          properties: {
+            domain: { type: "string", description: "Detected project domain" },
+            requirement_model: { type: "object", description: "Structured requirement model" },
+            completeness: { type: "boolean", description: "True only when no execution-impacting ambiguity remains" },
+            open_questions: { type: "array", items: { type: "string" }, description: "Targeted follow-up questions for missing requirements" },
+            suggested_answers: { type: "array", items: { type: "string" }, description: "2-4 short answer options for the first open_question, empty if complete" },
+            reasoning_summary: { type: "string", description: "Brief explanation of the discovery reasoning" }
           },
-          {
-            role: "user",
-            content: this.buildPrompt(task)
-          }
-        ]
-      })
-    });
+          required: ["domain", "requirement_model", "completeness", "open_questions", "suggested_answers", "reasoning_summary"]
+        }
+      }
+    };
+
+    let response;
+    try {
+      response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${this.apiKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: this.model,
+          temperature: 0.2,
+          tools: [discoverTool],
+          tool_choice: { type: "function", function: { name: "discover_requirements" } },
+          messages: [
+            { role: "system", content: "You are the Requirement Discovery Engine for a governed AI Operating System." },
+            { role: "user", content: this.buildPrompt(task) }
+          ]
+        })
+      });
+    } catch (err) {
+      return { status: "FAILED", output: null, metadata: { provider: this.name, reason: "FETCH_ERROR", error: err && err.message ? err.message : String(err) } };
+    }
 
     if (!response.ok) {
-      return {
-        status: "FAILED",
-        output: null,
-        metadata: {
-          provider: this.name,
-          reason: "OPENAI_HTTP_ERROR",
-          status_code: response.status,
-          response_text: await response.text()
-        }
-      };
+      return { status: "FAILED", output: null, metadata: { provider: this.name, reason: "OPENAI_HTTP_ERROR", status_code: response.status } };
     }
 
     const payload = await response.json();
-    const content =
-      payload &&
-      payload.choices &&
-      payload.choices[0] &&
-      payload.choices[0].message &&
-      typeof payload.choices[0].message.content === "string"
-        ? payload.choices[0].message.content
-        : "";
+    const toolCall = payload.choices && payload.choices[0] && payload.choices[0].message &&
+      Array.isArray(payload.choices[0].message.tool_calls) && payload.choices[0].message.tool_calls[0];
+
+    if (!toolCall || toolCall.type !== "function") {
+      return { status: "FAILED", output: null, metadata: { provider: this.name, reason: "NO_TOOL_CALL" } };
+    }
 
     try {
-      const parsed = JSON.parse(this.extractJsonText(content));
+      const parsed = JSON.parse(toolCall.function.arguments);
       const normalized = this.normalizeOutput(parsed);
-
       if (!normalized) {
-        return {
-          status: "FAILED",
-          output: null,
-          metadata: {
-            provider: this.name,
-            reason: "INVALID_REQUIREMENT_DISCOVERY_SCHEMA"
-          }
-        };
+        return { status: "FAILED", output: null, metadata: { provider: this.name, reason: "INVALID_REQUIREMENT_DISCOVERY_SCHEMA" } };
       }
-
-      return {
-        status: "SUCCESS",
-        output: normalized,
-        metadata: {
-          provider: this.name,
-          model: this.model
-        }
-      };
+      return { status: "SUCCESS", output: normalized, metadata: { provider: this.name, model: this.model } };
     } catch (err) {
-      return {
-        status: "FAILED",
-        output: null,
-        metadata: {
-          provider: this.name,
-          reason: "INVALID_JSON_OUTPUT",
-          error: err && err.message ? err.message : String(err)
-        }
-      };
+      return { status: "FAILED", output: null, metadata: { provider: this.name, reason: "INVALID_TOOL_ARGUMENTS", error: err && err.message ? err.message : String(err) } };
     }
   }
 }
