@@ -554,6 +554,29 @@
       color: #fff;
     }
 
+    .quick-reply-chip.selected {
+      background: var(--blue);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .quick-reply-send {
+      display: inline-flex;
+      align-items: center;
+      margin-top: 4px;
+      padding: 5px 14px;
+      background: var(--blue-dark);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 13px;
+      font-family: inherit;
+      transition: background .15s;
+    }
+
+    .quick-reply-send:hover { background: var(--blue); }
+
     /* ── Streaming cursor ── */
     .stream-cursor {
       display: inline-block;
@@ -687,7 +710,10 @@
           <h2>Project Context</h2>
           <div class="project-row">
             <label for="projectSelect">Active project</label>
-            <button id="newProjectBtn" type="button" class="secondary">+ New</button>
+            <div style="display:flex;gap:6px;">
+              <button id="newProjectBtn" type="button" class="secondary">+ New</button>
+              <button id="deleteProjectBtn" type="button" class="secondary" title="حذف المشروع الحالي نهائياً" style="color:var(--red);border-color:var(--red);">🗑</button>
+            </div>
           </div>
           <select id="projectSelect"></select>
           <div id="projectStateBox" class="status" style="margin-top:10px;">Loading project state...</div>
@@ -781,6 +807,7 @@
     const requestInput = document.getElementById("requestInput");
     const projectSelect = document.getElementById("projectSelect");
     const newProjectBtn = document.getElementById("newProjectBtn");
+    const deleteProjectBtn = document.getElementById("deleteProjectBtn");
     const projectStateBox = document.getElementById("projectStateBox");
     const chatSendBtn = document.getElementById("chatSendBtn");
     const approveBtn = document.getElementById("approveBtn");
@@ -1029,21 +1056,70 @@
       const existing = lastMsg.querySelector(".quick-reply-chips");
       if (existing) existing.remove();
 
+      // Normalize legacy string arrays to chip objects
+      const chips = answers.map((a) =>
+        typeof a === "string"
+          ? { label: a, value: a, exclusive: false, multi_select: true }
+          : { label: String(a.label || a.value || ""), value: String(a.value || a.label || ""), exclusive: a.exclusive === true, multi_select: a.multi_select !== false }
+      ).filter((c) => c.label);
+
+      const hasMultiSelect = chips.some((c) => c.multi_select && !c.exclusive);
+
       const container = document.createElement("div");
       container.className = "quick-reply-chips";
 
-      answers.forEach((answer) => {
-        const chip = document.createElement("button");
-        chip.type = "button";
-        chip.className = "quick-reply-chip";
-        chip.textContent = answer;
-        chip.addEventListener("click", () => {
-          requestInput.value = answer;
+      const selectedValues = new Set();
+
+      let sendBtn = null;
+      if (hasMultiSelect) {
+        sendBtn = document.createElement("button");
+        sendBtn.type = "button";
+        sendBtn.className = "quick-reply-send";
+        sendBtn.textContent = "إرسال الاختيارات";
+        sendBtn.style.display = "none";
+        sendBtn.addEventListener("click", () => {
+          const text = [...selectedValues].join("، ");
+          if (!text) return;
+          requestInput.value = text;
           container.remove();
           chatSendBtn.click();
         });
-        container.appendChild(chip);
+      }
+
+      chips.forEach((chip) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "quick-reply-chip";
+        btn.textContent = chip.label;
+
+        btn.addEventListener("click", () => {
+          if (chip.exclusive) {
+            // Exclusive: clear all selections, send immediately
+            requestInput.value = chip.value;
+            container.remove();
+            chatSendBtn.click();
+          } else if (!chip.multi_select) {
+            // Single-choice: send immediately
+            requestInput.value = chip.value;
+            container.remove();
+            chatSendBtn.click();
+          } else {
+            // Multi-select: toggle selection
+            if (selectedValues.has(chip.value)) {
+              selectedValues.delete(chip.value);
+              btn.classList.remove("selected");
+            } else {
+              selectedValues.add(chip.value);
+              btn.classList.add("selected");
+            }
+            if (sendBtn) sendBtn.style.display = selectedValues.size > 0 ? "" : "none";
+          }
+        });
+
+        container.appendChild(btn);
       });
+
+      if (sendBtn) container.appendChild(sendBtn);
 
       lastMsg.appendChild(container);
       chatStream.scrollTop = chatStream.scrollHeight;
@@ -1961,6 +2037,37 @@
         setStatus(`Project created: ${data.project.project_name}`);
       } catch (err) {
         setStatus(`Project creation failed: ${err.message}`);
+      }
+    });
+
+    deleteProjectBtn.addEventListener("click", async () => {
+      const projectId = getActiveProjectId();
+      if (projectId === "default_project") {
+        alert("لا يمكن حذف المشروع الافتراضي.");
+        return;
+      }
+      const projectName = projectSelect.options[projectSelect.selectedIndex]
+        ? projectSelect.options[projectSelect.selectedIndex].text
+        : projectId;
+      const confirmed = window.confirm(
+        `هل أنت متأكد من حذف المشروع "${projectName}" نهائياً؟\nسيتم حذف كل المحادثات والوثائق والكود المرتبط به.\nهذا الإجراء لا يمكن التراجع عنه.`
+      );
+      if (!confirmed) return;
+      try {
+        const data = await requestAPI("/api/projects/delete", { project_id: projectId });
+        if (data.ok) {
+          resetDraft();
+          currentStrategyCandidates = [];
+          currentRequestText = "";
+          pendingConversationCheckpoint = null;
+          chatStream.innerHTML = "";
+          await loadProjects("default_project");
+          setStatus("Project deleted.");
+        } else {
+          setStatus(`Delete failed: ${data.reason || "Unknown error"}`);
+        }
+      } catch (err) {
+        setStatus(`Delete failed: ${err.message}`);
       }
     });
 

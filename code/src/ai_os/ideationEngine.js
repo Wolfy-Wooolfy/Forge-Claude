@@ -47,11 +47,19 @@ function createIdeationEngine(options = {}) {
     const rawHistory = readJsonSafe(histPath, []);
     const conversationHistory = Array.isArray(rawHistory) ? rawHistory.slice(-20) : [];
 
+    const currentDomain = String(state.requirement_domain || "");
+    const domainLocked = state.domain_locked === true;
+
+    if (state.vision_locked === true) {
+      console.log(`[VISION GATE] Vision locked: ${state.vision_version}. Future operations will be validated against it.`);
+    }
+
     const provider = new IdeationExpansionProvider();
     const providerResult = await provider.executeTask({
       task_id: `ideation_expand_${Date.now()}`,
       context: {
-        domain: String(state.requirement_domain || ""),
+        previous_domain: currentDomain,
+        domain_locked: domainLocked,
         user_goal: String(state.user_goal || ""),
         requirement_model: state.requirement_model || {},
         refinement_input: String(body.refinement_input || body.message || ""),
@@ -70,6 +78,19 @@ function createIdeationEngine(options = {}) {
 
     const expansion = providerResult.output;
 
+    // Handle domain pivot: if provider detected a different domain, persist it
+    const detectedDomain = expansion.detected_domain;
+    if (detectedDomain && detectedDomain !== currentDomain) {
+      const latestState = readJsonSafe(statePath, {});
+      const domainHistory = Array.isArray(latestState.domain_history) ? latestState.domain_history : [];
+      if (currentDomain) {
+        domainHistory.push({ domain: currentDomain, replaced_by: detectedDomain, at: nowIso() });
+      }
+      latestState.requirement_domain = detectedDomain;
+      latestState.domain_history = domainHistory;
+      writeJson(statePath, latestState);
+    }
+
     appendArrayJson(path.join(aiOsRoot(projectId), "ideation_log.json"), {
       entry_type: "IDEA_EXPANSION",
       refinement_input: String(body.refinement_input || ""),
@@ -86,6 +107,8 @@ function createIdeationEngine(options = {}) {
       ready_for_options: readyForOptions,
       follow_up_question: expansion.follow_up_question || "",
       suggested_answers: Array.isArray(expansion.suggested_answers) ? expansion.suggested_answers : [],
+      detected_domain: expansion.detected_domain || "",
+      pivot_detected: expansion.pivot_detected === true,
       project_id: projectId
     };
   }

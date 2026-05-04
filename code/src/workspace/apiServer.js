@@ -1812,6 +1812,10 @@ ${trimmedExisting}`
             ? existing.clarification_answers
             : {},
       requirement_domain: overrides.requirement_domain || existing.requirement_domain || "",
+      domain_locked: typeof overrides.domain_locked === "boolean" ? overrides.domain_locked
+        : typeof existing.domain_locked === "boolean" ? existing.domain_locked : false,
+      domain_history: Array.isArray(overrides.domain_history) ? overrides.domain_history
+        : Array.isArray(existing.domain_history) ? existing.domain_history : [],
       requirement_completeness:
         typeof overrides.requirement_completeness === "boolean"
           ? overrides.requirement_completeness
@@ -1856,6 +1860,10 @@ ${trimmedExisting}`
       pending_decisions: hasExecutionPackage ? ["EXECUTION_PACKAGE_PENDING_FORGE"] : [],
       memory_state: proposalCount > 0 || hasDecisionPacket ? "ACTIVE" : "EMPTY",
       version_registry: Array.isArray(existing.version_registry) ? existing.version_registry : [],
+      vision: existing.vision || null,
+      vision_locked: typeof existing.vision_locked === "boolean" ? existing.vision_locked : false,
+      vision_version: existing.vision_version || null,
+      vision_history: Array.isArray(existing.vision_history) ? existing.vision_history : [],
       active_project_flag: readActiveProjectId() === projectId,
       last_updated_at: new Date().toISOString()
     };
@@ -1966,6 +1974,23 @@ ${trimmedExisting}`
       active_project_id: projectId,
       project: state
     };
+  }
+
+  function deleteProject(body = {}) {
+    const projectId = normalizeProjectId(body.project_id || "");
+    if (!projectId || projectId === "default_project") {
+      return { ok: false, reason: "CANNOT_DELETE_DEFAULT_PROJECT" };
+    }
+    const projectRoot = path.resolve(root, "artifacts", "projects", projectId);
+    if (!fs.existsSync(projectRoot)) {
+      return { ok: false, reason: "PROJECT_NOT_FOUND" };
+    }
+    fs.rmSync(projectRoot, { recursive: true, force: true });
+    if (readActiveProjectId() === projectId) {
+      writeActiveProject("default_project");
+    }
+    persistProjectState("default_project");
+    return { ok: true, deleted: true, project_id: projectId };
   }
 
   function getProjectArtifactsRoot(projectIdInput) {
@@ -3200,6 +3225,13 @@ function buildExecutionPackage(packet) {
           active_project_id: projectId,
           project: state
         });
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/projects/delete") {
+        const body = await readBody(req);
+        const result = deleteProject(body);
+        sendJson(res, result.ok ? 200 : 400, result);
         return;
       }
 
