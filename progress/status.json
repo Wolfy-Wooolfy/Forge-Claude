@@ -1,11 +1,11 @@
 {
   "status_type": "LIVE",
   "current_stage": "A",
-  "overall_progress_percent": 50,
-  "stage_progress_percent": 50,
-  "last_completed_artifact": "artifacts/audit/audit_report.md",
-  "current_task": "TASK-002",
+  "overall_progress_percent": 55,
+  "stage_progress_percent": 60,
+  "last_completed_artifact": "artifacts/decisions/DECISION-20260503-pipeline-reconnect.md",
+  "current_task": "PIPELINE-RECONNECT",
   "issues": [],
   "blocking_questions": [],
-  "next_step": "Next step"
+  "next_step": "Integration test: verify conversation_context.json is created and phase transition triggers on approval"
 }

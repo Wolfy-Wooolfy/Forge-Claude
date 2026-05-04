@@ -520,6 +520,15 @@
     .strategy-choice-btn:hover { border-color: var(--blue); background: var(--bg-overlay); }
     .strategy-choice-btn strong { display: block; color: var(--blue); margin-bottom: 4px; }
 
+    /* ── Pending confirmation message style ── */
+    .chat-message.assistant.mode-pending-confirmation {
+      border-color: var(--blue);
+      border-left-width: 3px;
+    }
+    .chat-message.assistant.mode-pending-confirmation .message-title {
+      color: var(--blue);
+    }
+
     /* ── Quick-reply chips ── */
     .quick-reply-chips {
       display: flex;
@@ -1069,7 +1078,8 @@
 
       let fullText = "";
       try {
-        const res = await fetch(`${API_BASE}/api/ai-os/chat/stream`, {
+        const apiBase = window.__FORGE_API_BASE__ || window.location.origin.replace(":3000", ":3100");
+        const res = await fetch(`${apiBase}/api/ai-os/chat/stream`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message, project_id: projectId, user_language: lang })
@@ -1098,6 +1108,13 @@
               fullText = evt.message || fullText;
               contentEl.textContent = fullText;
               cursor.remove();
+              if (evt.mode === "PENDING_CONFIRMATION") {
+                title.textContent = lang === "ar" ? "تأكيد مطلوب" : "Confirmation needed";
+                wrapper.classList.add("mode-pending-confirmation");
+              }
+              if (Array.isArray(evt.suggested_answers) && evt.suggested_answers.length > 0) {
+                renderQuickReplies(evt.suggested_answers);
+              }
               chatStream.scrollTop = chatStream.scrollHeight;
             } else if (evt.type === "error") {
               contentEl.textContent = lang === "ar" ? "حدث خطأ. حاول مجدداً." : "An error occurred. Please try again.";

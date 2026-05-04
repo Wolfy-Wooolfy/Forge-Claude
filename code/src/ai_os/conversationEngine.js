@@ -30,6 +30,7 @@ const CONFIRMATION_REQUIRED_TRANSITIONS = new Set([
 function createConversationEngine(options = {}) {
   const root = path.resolve(options.root || process.cwd());
   const projectsRoot = path.resolve(root, "artifacts/projects");
+  const ideationEngine = options.ideationEngine || null;
 
   function ensureDir(dirPath) { fs.mkdirSync(dirPath, { recursive: true }); }
   function readJsonSafe(filePath, fallback) {
@@ -100,7 +101,7 @@ function createConversationEngine(options = {}) {
 
   async function generateCheckpoint(projectId, targetState) {
     const state = loadState(projectId);
-    if (!state) return null;
+    if (!state) return { ok: false, mode: "BLOCKED", reason: "PROJECT_NOT_FOUND", project_id: projectId };
 
     const lang = String(state.user_language || "ar").toLowerCase();
     const provider = new ConversationalResponseProvider();
@@ -360,12 +361,48 @@ function createConversationEngine(options = {}) {
       };
     }
 
-    // Route based on current state
+    // Route DISCUSSION / IDEATION to ideation engine for discovery loop
+    const currentState = state.active_runtime_state || "DISCUSSION";
+    if ((currentState === "DISCUSSION" || currentState === "IDEATION") && ideationEngine) {
+      if (currentState === "DISCUSSION") {
+        const transitionState = { ...state, active_runtime_state: "IDEATION", last_updated_at: nowIso() };
+        if (!transitionState.user_goal && message) transitionState.user_goal = message;
+        saveState(projectId, transitionState);
+      }
+
+      const ideationResult = await ideationEngine.expandIdea({
+        project_id: projectId,
+        message,
+        refinement_input: message
+      });
+
+      if (!ideationResult.ok) {
+        return { ok: false, mode: "BLOCKED", reason: ideationResult.reason || "IDEATION_FAILED", project_id: projectId };
+      }
+
+      if (ideationResult.ready_for_options) {
+        return generateCheckpoint(projectId, "OPTION_DECISION");
+      }
+
+      return {
+        ok: true,
+        mode: "IDEATION_IN_PROGRESS",
+        message: ideationResult.follow_up_question || "",
+        suggest_next: Array.isArray(ideationResult.suggested_answers) && ideationResult.suggested_answers.length
+          ? "اختر من الخيارات أو اكتب ردك"
+          : "",
+        suggested_answers: Array.isArray(ideationResult.suggested_answers) ? ideationResult.suggested_answers : [],
+        current_state: "IDEATION",
+        project_id: projectId
+      };
+    }
+
+    // All other states: generate a conversational response
     const convMsg = await generateConversationalMessage(
       "USER_MESSAGE_RECEIVED",
       {
         user_message: message,
-        current_state: state.active_runtime_state,
+        current_state: currentState,
         user_goal: state.user_goal || "",
         project_name: state.project_name || ""
       },
@@ -380,7 +417,7 @@ function createConversationEngine(options = {}) {
       mode: "MESSAGE_PROCESSED",
       message: convMsg.message,
       suggest_next: convMsg.suggest_next,
-      current_state: state.active_runtime_state,
+      current_state: currentState,
       project_id: projectId
     };
   }
