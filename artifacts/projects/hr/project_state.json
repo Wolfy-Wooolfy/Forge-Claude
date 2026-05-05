@@ -1,0 +1,70 @@
+{
+  "project_id": "hr",
+  "project_name": "HR",
+  "project_type": "REVIEW",
+  "project_mode": "EXTEND_EXISTING",
+  "project_status": "ACTIVE",
+  "primary_language": "MIXED",
+  "user_goal": "لا انا غيرت رايي وعايز سيستم HR",
+  "business_goal": "",
+  "technical_goal": "",
+  "current_phase": "DISCOVERY",
+  "active_runtime_state": "IDEATION",
+  "workspace_path": "D:\\S\\Halo\\Tech\\Forge-Claude",
+  "source_of_truth": "ZIP_SNAPSHOT",
+  "selected_strategy": "",
+  "accepted_options": [],
+  "rejected_options": [],
+  "open_questions": [],
+  "clarification_answers": {},
+  "requirement_domain": "HR",
+  "domain_locked": false,
+  "domain_history": [
+    {
+      "domain": "general",
+      "replaced_by": "HR",
+      "at": "2026-05-05T10:23:13.565Z"
+    }
+  ],
+  "requirement_completeness": false,
+  "requirement_model": {},
+  "requirement_reasoning_summary": "",
+  "provider_error": "",
+  "documentation_state": "EMPTY",
+  "execution_package_state": "NOT_READY",
+  "execution_state": "NOT_STARTED",
+  "verification_state": "NOT_READY",
+  "delivery_state": "NOT_READY",
+  "conversation_history": {
+    "proposal_count": 0,
+    "draft_count": 0
+  },
+  "decision_history": {
+    "has_decision_packet": false
+  },
+  "artifact_registry": {
+    "project_root": "artifacts/projects/hr",
+    "project_state": "artifacts/projects/hr/project_state.json",
+    "decision_packet": "",
+    "execution_package": ""
+  },
+  "review_cycles_count": 0,
+  "pending_decisions": [],
+  "memory_state": "EMPTY",
+  "version_registry": [],
+  "vision": null,
+  "vision_locked": false,
+  "vision_version": null,
+  "vision_history": [],
+  "active_project_flag": true,
+  "last_updated_at": "2026-05-05T10:22:11.869Z",
+  "name_goal_mismatch_asked": true,
+  "domain_lock_intent": "SOFT_LOCKED",
+  "pending_confirmation": {
+    "target_state": "OPTION_DECISION",
+    "confirmation_key": "7cfa7f9bfb553d73",
+    "created_at": "2026-05-05T10:24:15.852Z",
+    "expires_at": "2026-05-05T10:54:15.852Z",
+    "message": "لاحظت إنك بدأت بمرحلة الأفكار IDEATION وهدفك كان الانتقال لمرحلة اتخاذ القرار OPTION_DECISION. لكنك غيرت رأيك وقررت إنك عايز سيستم HR. ده معناه إنك محتاج تعيد النظر في الأفكار اللي كانت عندك وتحدد بوضوح المتطلبات اللي عايزها في سيستم HR. ممكن تبدأ بتحديد أهم الميزات اللي محتاجها حالياً زي إدارة الرواتب أو متابعة الحضور؟"
+  }
+}

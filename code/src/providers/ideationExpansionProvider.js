@@ -28,16 +28,27 @@ class IdeationExpansionProvider {
       "",
       "DOMAIN DETECTION RULES (Critical):",
       "- You MUST detect the project domain from 'User Goal' and 'User Refinement Input'. Do NOT copy previous_domain.",
+      "- detected_domain MUST NEVER be empty or null. Even on the first turn, infer the domain from user_goal + refinement_input. Examples: CRM system → 'CRM', HR system → 'HR', online store → 'ecommerce', task management → 'productivity'. If truly unclear, use 'general'.",
       "- If the current message indicates a different domain than previous_domain → set pivot_detected=true, detected_domain=<new domain>.",
       "- All suggested_directions, missing_components, and follow_up_question MUST be in the detected_domain ONLY.",
       "- Domain Lock: " + (ctx.domain_locked ? "LOCKED — user confirmed this domain. Only ask a pivot question if they explicitly request a domain change." : "OPEN — re-detect domain freely from the current user message."),
+      "- Domain Lock Intent: " + (() => {
+        const dli = ctx.domain_lock_intent || "FLEXIBLE";
+        if (dli === "SOFT_LOCKED") return "SOFT_LOCKED — only change domain if the user EXPLICITLY names a different domain (e.g. 'بدلاً من X عايز Y', 'لا مش X عايز Y'). Ambiguous, short, or chip-like inputs MUST keep the current domain (" + String(ctx.previous_domain || "") + "). Setting pivot_detected=true for ambiguous input is FORBIDDEN.";
+        if (dli === "HARD_LOCKED") return "HARD_LOCKED — NEVER change domain under any circumstances.";
+        return "FLEXIBLE — detect domain freely from current message.";
+      })(),
       "",
       "SUGGESTED ANSWERS RULES:",
-      "- suggested_answers is an array of chip objects: { label, value, exclusive, multi_select }",
+      "- suggested_answers is an array of chip objects: { label, value, exclusive, multi_select, action }",
       "- multi_select: true → user can select multiple chips before sending (use for feature lists, goals, etc.)",
       "- multi_select: false → single click sends immediately (use for yes/no, confirmation questions)",
       "- exclusive: true → this chip clears all others and sends immediately (use for 'All of the above', 'None')",
-      "- Always include an 'اكتب إجابة مختلفة' chip with exclusive:false, multi_select:false at the end when multi_select chips exist.",
+      "- action: 'open_input' → special chip that clears chips and focuses the text input WITHOUT sending any message. Use for custom-answer options.",
+      "- ALWAYS include as the LAST chip: { label: 'اكتب إجابة مختلفة', value: '', action: 'open_input', exclusive: false, multi_select: false }. This lets users type a custom answer. Do NOT include a non-empty value for this chip.",
+      "",
+      "PROPOSAL REQUEST RULE (Critical):",
+      "- If the user's refinement input explicitly requests a complete proposal, plan, or recommendation — e.g. Arabic: 'اعمل مقترح', 'اعرض اقتراح', 'خلاص قرر', 'عايزك تقرر', 'اعرض خطة', 'ابدأ التنفيذ', 'كفاية أسئلة'; English: 'make a proposal', 'give recommendation', 'just decide', 'proceed', 'enough questions' — you MUST set readiness_assessment.ready_for_options = true and blocking_gaps = []. Even if details are incomplete, do NOT ask another question. The downstream system will mark incomplete sections as TBD.",
       "",
       "General Rules:",
       "- Respond in the same language as the user_goal.",
@@ -46,8 +57,19 @@ class IdeationExpansionProvider {
       "- Identify what key components are missing from the current idea.",
       "- Propose improvements with clear reasoning.",
       "",
+      "Project Name (domain hint): " + String(ctx.project_name || "none"),
       "Previous Domain (for reference only — do NOT use as the answer): " + String(ctx.previous_domain || "none"),
       "User Goal: " + String(ctx.user_goal || ""),
+      "",
+      "NAME-GOAL MISMATCH RULE:",
+      "- If project_name clearly implies a domain AND user_goal implies a DIFFERENT domain → set name_goal_mismatch=true.",
+      "- If they are compatible or project_name is generic → name_goal_mismatch=false.",
+      "- EXAMPLES (memorize these):",
+      "  ✗ MISMATCH: project_name='HR', user_goal='عايز اعمل سيستم CRM' → name_goal_mismatch=true  (HR ≠ CRM)",
+      "  ✗ MISMATCH: project_name='inventory', user_goal='I want to build a social network' → name_goal_mismatch=true",
+      "  ✓ MATCH: project_name='HR', user_goal='عايز سيستم موارد بشرية' → name_goal_mismatch=false",
+      "  ✓ MATCH: project_name='MyApp', user_goal='عايز اعمل سيستم CRM' → name_goal_mismatch=false  (generic name)",
+      "  ✓ MATCH: project_name='CRM', user_goal='عايز اعمل سيستم CRM' → name_goal_mismatch=false",
       "",
       "Current Requirement Model:",
       JSON.stringify(ctx.requirement_model || {}, null, 2),
@@ -59,14 +81,15 @@ class IdeationExpansionProvider {
 
   normalizeChip(raw) {
     if (typeof raw === "string") {
-      return { label: raw, value: raw, exclusive: false, multi_select: true };
+      return { label: raw, value: raw, exclusive: false, multi_select: true, action: null };
     }
     if (raw && typeof raw === "object") {
       return {
         label: typeof raw.label === "string" ? raw.label : String(raw.value || raw.label || ""),
         value: typeof raw.value === "string" ? raw.value : String(raw.label || ""),
         exclusive: raw.exclusive === true,
-        multi_select: raw.multi_select !== false
+        multi_select: raw.multi_select !== false,
+        action: typeof raw.action === "string" ? raw.action : null
       };
     }
     return null;
@@ -87,9 +110,10 @@ class IdeationExpansionProvider {
         : { ready_for_options: false, blocking_gaps: [] },
       follow_up_question: typeof parsed.follow_up_question === "string" ? parsed.follow_up_question.trim() : "",
       suggested_answers: chips,
-      detected_domain: typeof parsed.detected_domain === "string" ? parsed.detected_domain.trim() : "",
+      detected_domain: (typeof parsed.detected_domain === "string" && parsed.detected_domain.trim()) ? parsed.detected_domain.trim() : "general",
       pivot_detected: parsed.pivot_detected === true,
-      domain_confidence: typeof parsed.domain_confidence === "number" ? Math.min(1, Math.max(0, parsed.domain_confidence)) : 1
+      domain_confidence: typeof parsed.domain_confidence === "number" ? Math.min(1, Math.max(0, parsed.domain_confidence)) : 1,
+      name_goal_mismatch: parsed.name_goal_mismatch === true
     };
   }
 
@@ -159,16 +183,18 @@ class IdeationExpansionProvider {
                   label:        { type: "string" },
                   value:        { type: "string" },
                   exclusive:    { type: "boolean" },
-                  multi_select: { type: "boolean" }
+                  multi_select: { type: "boolean" },
+                  action:       { type: "string", description: "Special action: 'open_input' to focus textarea without sending" }
                 },
                 required: ["label", "value", "exclusive", "multi_select"]
               }
             },
-            detected_domain:   { type: "string",  description: "Domain detected from current user message (not from cache)" },
-            pivot_detected:    { type: "boolean", description: "True if domain changed from previous_domain" },
-            domain_confidence: { type: "number",  description: "Confidence 0-1 in detected domain" }
+            detected_domain:    { type: "string",  description: "Domain detected from current user message (not from cache)" },
+            pivot_detected:     { type: "boolean", description: "True if domain changed from previous_domain" },
+            domain_confidence:  { type: "number",  description: "Confidence 0-1 in detected domain" },
+            name_goal_mismatch: { type: "boolean", description: "True if project_name implies a domain that conflicts with user_goal" }
           },
-          required: ["expanded_summary", "missing_components", "suggested_directions", "improvement_proposals", "readiness_assessment", "follow_up_question", "suggested_answers", "detected_domain", "pivot_detected", "domain_confidence"]
+          required: ["expanded_summary", "missing_components", "suggested_directions", "improvement_proposals", "readiness_assessment", "follow_up_question", "suggested_answers", "detected_domain", "pivot_detected", "domain_confidence", "name_goal_mismatch"]
         }
       }
     };

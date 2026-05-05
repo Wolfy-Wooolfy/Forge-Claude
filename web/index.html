@@ -840,9 +840,11 @@
       wrapper.className = "chat-message " + (type === "user" ? "user" : "assistant");
       wrapper.setAttribute("dir", detectUserLanguage(contentHtml || "") === "ar" ? "rtl" : "ltr");
 
+      // Bug-4 fix: user messages don't need an h2 title — label already says "You"
+      const titleHtml = (type !== "user" && title) ? `<h2 class="message-title">${title}</h2>` : "";
       wrapper.innerHTML = `
         <div class="message-label">${type === "user" ? "You" : "AI Workspace"}</div>
-        <h2 class="message-title">${title}</h2>
+        ${titleHtml}
         <div>${contentHtml}</div>
       `;
 
@@ -1056,11 +1058,11 @@
       const existing = lastMsg.querySelector(".quick-reply-chips");
       if (existing) existing.remove();
 
-      // Normalize legacy string arrays to chip objects
+      // Normalize legacy string arrays to chip objects — preserve action field (Bug-3 fix)
       const chips = answers.map((a) =>
         typeof a === "string"
-          ? { label: a, value: a, exclusive: false, multi_select: true }
-          : { label: String(a.label || a.value || ""), value: String(a.value || a.label || ""), exclusive: a.exclusive === true, multi_select: a.multi_select !== false }
+          ? { label: a, value: a, exclusive: false, multi_select: true, action: null }
+          : { label: String(a.label || a.value || ""), value: String(a.value || a.label || ""), exclusive: a.exclusive === true, multi_select: a.multi_select !== false, action: a.action || null }
       ).filter((c) => c.label);
 
       const hasMultiSelect = chips.some((c) => c.multi_select && !c.exclusive);
@@ -1093,6 +1095,12 @@
         btn.textContent = chip.label;
 
         btn.addEventListener("click", () => {
+          // Bug-3 fix: open_input chips clear chips and focus the textarea — no message sent
+          if (chip.action === "open_input" || (chip.value === "" && !chip.exclusive)) {
+            container.remove();
+            requestInput.focus();
+            return;
+          }
           if (chip.exclusive) {
             // Exclusive: clear all selections, send immediately
             requestInput.value = chip.value;
@@ -1126,8 +1134,10 @@
     }
 
     async function streamChatMessage(message, projectId) {
+      // Bug-4 fix: never display or send an empty / placeholder message
+      if (!message || !message.trim()) return;
       const lang = detectUserLanguage(message);
-      pushMessage("user", lang === "ar" ? "رسالتك" : "You", `<div class="file-preview">${formatMessageText(message)}</div>`);
+      pushMessage("user", "", `<div class="file-preview">${formatMessageText(message)}</div>`);
       requestInput.value = "";
       chatSendBtn.disabled = true;
       setStatus(lang === "ar" ? "يكتب..." : "Typing...");

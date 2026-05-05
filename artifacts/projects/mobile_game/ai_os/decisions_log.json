@@ -1,9 +1,0 @@
-[
-  {
-    "entry_type": "OPTION_DECISION",
-    "selected_option_id": "OPTION-1",
-    "decision_owner": "CTO",
-    "rationale": "Start with MVP to reduce risk and validate the game concept before advanced development.",
-    "created_at": "2026-04-25T13:16:44.030Z"
-  }
-]

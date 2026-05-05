@@ -1,11 +1,11 @@
 {
   "status_type": "LIVE",
   "current_stage": "A",
-  "overall_progress_percent": 65,
-  "stage_progress_percent": 80,
-  "last_completed_artifact": "artifacts/decisions/DECISION-20260504-phase-0-vision-scaffolding.md",
+  "overall_progress_percent": 85,
+  "stage_progress_percent": 99,
+  "last_completed_artifact": "artifacts/decisions/DECISION-20260505-phase-0-bug-fix-round-3.md",
   "current_task": "PHASE-0-FOUNDATION-REPAIR",
   "issues": [],
   "blocking_questions": [],
-  "next_step": "Manual integration test: (1) verify domain pivot in chat, (2) verify multi-select chips in UI, (3) verify project deletion, (4) verify vision fields in new project_state.json"
+  "next_step": "Manual integration test (round 3): create project 'HR' → say 'عايز CRM' → verify mismatch question appears ONCE only → any response continues ideation normally"
 }

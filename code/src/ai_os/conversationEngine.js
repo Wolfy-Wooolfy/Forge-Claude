@@ -384,10 +384,21 @@ function createConversationEngine(options = {}) {
         return generateCheckpoint(projectId, "OPTION_DECISION");
       }
 
+      // Bug-5 fix: build deterministic pivot message — never rely on LLM wording for domain names
+      let ideationMessage = ideationResult.follow_up_question || "";
+      if (ideationResult.pivot_detected) {
+        const prevDomain = ideationResult.previous_domain || "";
+        const newDomain  = ideationResult.detected_domain  || "";
+        const lang = user_language.toLowerCase().startsWith("en") ? "en" : "ar";
+        ideationMessage = lang === "ar"
+          ? `لاحظت إنك كنت بتتكلم عن "${prevDomain}" ودلوقتي رسالتك بتوحي لـ "${newDomain}". هل تريد التحويل لـ "${newDomain}"؟`
+          : `I noticed you were discussing "${prevDomain}" but your message now points to "${newDomain}". Would you like to switch to "${newDomain}"?`;
+      }
+
       return {
         ok: true,
         mode: "IDEATION_IN_PROGRESS",
-        message: ideationResult.follow_up_question || "",
+        message: ideationMessage,
         suggest_next: Array.isArray(ideationResult.suggested_answers) && ideationResult.suggested_answers.length
           ? "اختر من الخيارات أو اكتب ردك"
           : "",
