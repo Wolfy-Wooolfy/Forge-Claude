@@ -2,12 +2,12 @@
   "schema_version": "2.0",
   "status_type": "LIVE",
   "current_stage": "A",
-  "overall_progress_percent": 88,
+  "overall_progress_percent": 90,
   "stage_progress_percent": 100,
-  "current_task": "PHASE-0-CLOSED",
-  "next_phase": "PHASE-0.5",
-  "next_step": "Begin PHASE-0.5: Contradiction sweep across docs/12_ai_os/, docs/04_autonomy/, docs/11_ai_layer/. Output: artifacts/audit/blueprint_contradiction_sweep.md",
-  "last_completed_artifact": "artifacts/decisions/DECISION-20260508-phase-0-closure-and-blueprint-prep.md",
+  "current_task": "PHASE-0.5-SWEEP-COMPLETE",
+  "next_phase": "PHASE-0.5-RESOLUTIONS",
+  "next_step": "Resolve BLOCKERs B-01 (Stage D vs 3-stage model) and B-02 (Blueprint authority position) via DECISION-20260508-phase-0.5-resolutions.md before PHASE-1 can begin.",
+  "last_completed_artifact": "artifacts/audit/blueprint_contradiction_sweep.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -17,6 +17,16 @@
   "lean_v2_exit_status": "BEFORE_EXIT",
   "lean_v2_exit_phase": "PHASE-5.1",
   "phases_post_exit_assumed": false,
+  "phase_0_5_sweep": {
+    "sweep_artifact": "artifacts/audit/blueprint_contradiction_sweep.md",
+    "total_files_read": 114,
+    "blockers": 2,
+    "warns": 8,
+    "infos": 4,
+    "verdict": "BLOCKED",
+    "resolution_artifact": "artifacts/decisions/DECISION-20260508-phase-0.5-resolutions.md",
+    "resolution_status": "PENDING_OWNER_DECISION"
+  },
   "runtime_health": {
     "last_doctor_run": null,
     "last_doctor_status": "UNKNOWN",
@@ -27,6 +37,30 @@
     "active_permission_mode": "WORKSPACE_WRITE",
     "note": "Fields populate after PHASE-4 (Doctor) and PHASE-5 (Self-Test Harness) close."
   },
-  "issues": [],
-  "blocking_questions": []
+  "issues": [
+    {
+      "id": "B-01",
+      "severity": "BLOCKER",
+      "summary": "Stage D defined as mandatory in Layer-0 pipeline docs vs Blueprint 3-stage model (A/B/C only)",
+      "resolution": "PENDING"
+    },
+    {
+      "id": "B-02",
+      "severity": "BLOCKER",
+      "summary": "architecture/FORGE_V2_BLUEPRINT.md has no defined position in DOC-11 authority hierarchy",
+      "resolution": "PENDING"
+    }
+  ],
+  "blocking_questions": [
+    {
+      "id": "BQ-01",
+      "question": "Does Blueprint adoption supersede docs/03_pipeline/ Stage D definition? See DECISION-20260508-phase-0.5-resolutions.md R-01 for proposed resolution.",
+      "required_for": "PHASE-1"
+    },
+    {
+      "id": "BQ-02",
+      "question": "Where does architecture/FORGE_V2_BLUEPRINT.md sit in DOC-11 authority hierarchy? See DECISION-20260508-phase-0.5-resolutions.md R-02 for proposed resolution.",
+      "required_for": "PHASE-1"
+    }
+  ]
 }
