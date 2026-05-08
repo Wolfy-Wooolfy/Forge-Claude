@@ -4,10 +4,10 @@
   "current_stage": "A",
   "overall_progress_percent": 95,
   "stage_progress_percent": 100,
-  "current_task": "PHASE-3-CLOSED",
-  "next_phase": "PHASE-4",
-  "next_step": "Begin PHASE-4: Doctor / Health. Send PROMPT-PHASE-4-DOCTOR.md.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-20260508-phase-3-permission-layer.md",
+  "current_task": "PHASE-4-CLOSED",
+  "next_phase": "PHASE-5",
+  "next_step": "Begin PHASE-5: Self-Test Harness (mock OpenAI + scenario runner). Send PROMPT-PHASE-5-HARNESS.md.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-20260508-phase-4-doctor.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -27,28 +27,48 @@
     "resolution_artifact": "artifacts/decisions/DECISION-20260508-phase-0.5-resolutions.md",
     "resolution_status": "APPLIED",
     "resolution_applied": "2026-05-08",
-    "blockers_resolved": ["B-01", "B-02"],
+    "blockers_resolved": [
+      "B-01",
+      "B-02"
+    ],
     "warns_pending": {
       "before_phase_1": [],
       "before_phase_2": [],
       "before_phase_3": [],
-      "resolved_pre_phase_3": ["W-03"],
-      "dissolved": ["W-08"],
-      "resolved_pre_phase_1": ["W-04", "W-05", "W-06", "W-07"],
-      "resolved_pre_phase_2": ["W-01", "W-02"]
+      "resolved_pre_phase_3": [
+        "W-03"
+      ],
+      "dissolved": [
+        "W-08"
+      ],
+      "resolved_pre_phase_1": [
+        "W-04",
+        "W-05",
+        "W-06",
+        "W-07"
+      ],
+      "resolved_pre_phase_2": [
+        "W-01",
+        "W-02"
+      ]
     }
   },
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": null,
-    "last_doctor_status": "UNKNOWN",
+    "last_doctor_run": "2026-05-08T18:05:47.856Z",
+    "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": false,
     "providers_registered_count": 12,
     "tools_registered_count": 23,
     "active_permission_mode": "WORKSPACE_WRITE",
     "permission_policy_installed": true,
-    "note": "providers_registered_count populated by PHASE-1. tools_registered_count=23 across 7 families. permission_policy_installed=true from PHASE-3. doctor/self_test populate after PHASE-4/PHASE-5."
+    "note": "providers_registered_count populated by PHASE-1. tools_registered_count=23 across 7 families. permission_policy_installed=true from PHASE-3. doctor/self_test populate after PHASE-4/PHASE-5.",
+    "last_doctor_counts": {
+      "pass": 12,
+      "warn": 2,
+      "fail": 0
+    }
   }
 }
