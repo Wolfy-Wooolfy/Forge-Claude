@@ -114,13 +114,13 @@ function createRegistry(options) {
     // Step 3 — authorize
     let authResult;
     try {
-      authResult = _authorize(name, input, context);
+      authResult = await _authorize(tool, input, context);
     } catch (e) {
       const env = failed("AUTHORIZATION_ERROR", e.message);
       _tryAudit(root, name, input, env);
       return env;
     }
-    if (authResult && authResult.allowed === false) {
+    if (authResult && authResult.allow === false) {
       const env = denied(
         authResult.reason  || "AUTHORIZATION_DENIED",
         authResult.detail  || null,
@@ -233,6 +233,16 @@ function getDefaultRegistry() {
   if (!_defaultRegistry) {
     _defaultRegistry = createRegistry();
     _defaultRegistry.load();
+
+    // Install permission policy (PHASE-3 — replaces permitAll default).
+    // Dynamic require avoids circular dependency at boot time.
+    try {
+      const { installDefaultPolicy } = require("../permission/permissionPolicy");
+      installDefaultPolicy(_defaultRegistry);
+    } catch (err) {
+      // Permission layer not yet built (PHASE-2 standalone scenario) — stay on permitAll.
+      console.warn("[tool registry] permission layer not loaded, using permitAll:", err.message);
+    }
   }
   return _defaultRegistry;
 }
