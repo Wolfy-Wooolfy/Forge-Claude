@@ -4,10 +4,10 @@
   "current_stage": "A",
   "overall_progress_percent": 95,
   "stage_progress_percent": 100,
-  "current_task": "PHASE-1-CLOSED",
-  "next_phase": "PHASE-2",
-  "next_step": "PHASE-2 is unblocked. All pre-PHASE-2 WARNs resolved. Begin PHASE-2 (Tool Runtime Layer) per architecture/FORGE_V2_PHASE_ROADMAP.md.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-20260508-phase-0.5-warn-resolutions-pre-phase-2.md",
+  "current_task": "PHASE-2-CLOSED",
+  "next_phase": "PHASE-3",
+  "next_step": "PHASE-3 (Permission/Safety Layer). Resolve W-03 (before PHASE-3) first. Then begin PHASE-3 per architecture/FORGE_V2_PHASE_ROADMAP.md.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-20260508-phase-2-tool-runtime.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -45,8 +45,8 @@
     "doctor_endpoint_available": false,
     "self_test_harness_available": false,
     "providers_registered_count": 12,
-    "tools_registered_count": null,
+    "tools_registered_count": 23,
     "active_permission_mode": "WORKSPACE_WRITE",
-    "note": "providers_registered_count populated by PHASE-1. tools_registered_count populates after PHASE-2. doctor/self_test after PHASE-4/PHASE-5."
+    "note": "providers_registered_count populated by PHASE-1. tools_registered_count=23 across 7 families. doctor/self_test populate after PHASE-4/PHASE-5."
   }
 }

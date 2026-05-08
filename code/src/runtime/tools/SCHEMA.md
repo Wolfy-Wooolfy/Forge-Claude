@@ -146,7 +146,7 @@ Inputs are summarised — never full content. Used by:
 | `artifact.*` | write_decision, write_audit, list |
 | `pipeline.*` | run_module, advance_stage, mark_blocked |
 
-That's **22 tools shipped in PHASE-2**. Additional tools are added in their owning phases:
+That's **23 tools shipped in PHASE-2**. Additional tools are added in their owning phases:
 - `vision.*` in PHASE-7
 - `built_project_tests.*` in PHASE-8
 - `research.*` in PHASE-9
