@@ -152,6 +152,15 @@ Rotation/archival of Files 1–3 is a PHASE-12 production concern.
 
 ### L2. Tool Runtime
 
+> **Terminology note.** Throughout this Blueprint, "Tool" (capital T) refers
+> exclusively to an L2 Runtime Tool — a registered object with `name`,
+> `required_mode`, `input_schema`, `output_schema`, `preview()`, and `execute()`.
+> The lowercase "tool" used in `docs/11_ai_layer/07_TOOL_VS_CONVERSATION_CONTRACT.md`
+> refers to AI Layer approved API endpoints (e.g., `/api/ai/analyze`,
+> `/api/ai/propose`) — a different concept at the UX/API layer. The two are
+> NOT interchangeable. When this Blueprint says "Tool", it always means the L2
+> runtime object. Added 2026-05-08 via DECISION-20260508-phase-0.5-warn-resolutions-pre-phase-2.
+
 **Problem today.** When the conversation engine wants to "save a file", it calls `fs.writeFileSync` directly. When the API server wants to "list projects", it walks the filesystem directly. Side effects are scattered across 91 endpoints and 17 engines. There is no inventory of "what can Forge do to the filesystem / shell / network", and no way to:
 
 - Reject a write in `read-only` mode.
@@ -199,6 +208,21 @@ These are not new functionality. They are **wrappers around the side effects tha
 - `input_schema`/`output_schema` parse as JSON Schema.
 
 Boot fails on violation.
+
+**L2 Tool Runtime does NOT replace pipeline modules.** The pipeline modules defined
+in `code/src/modules/` and governed by `docs/11_ai_layer/09_WORKSPACE_RUNTIME_LANE.md`
+(WORKSPACE_DECISION_GATE → WORKSPACE_BACKFILL → WORKSPACE_EXECUTE → WORKSPACE_VERIFY)
+are **orchestration stages** — they sequence work, produce artifacts, and enforce
+governance contracts. L2 Tools are **side-effect executors** — they perform atomic
+write/read/shell operations with schema validation, permission gating, and audit trail.
+
+The relationship is: pipeline modules **USE** L2 Tools to perform side effects. They
+ARE NOT L2 Tools themselves and do not need to be rewritten as Tools. The two layers
+coexist: pipeline modules orchestrate; L2 Tools execute side effects.
+
+PHASE-6 (apiServer.js migration) will mechanically lift direct `fs.*`, `child_process.*`,
+and `fetch()` calls inside pipeline modules to L2 tool invocations — without changing
+the pipeline structure, module boundaries, or governance contracts.
 
 ---
 

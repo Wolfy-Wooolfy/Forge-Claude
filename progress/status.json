@@ -6,8 +6,8 @@
   "stage_progress_percent": 100,
   "current_task": "PHASE-1-CLOSED",
   "next_phase": "PHASE-2",
-  "next_step": "Begin PHASE-2: Tool Runtime Layer. Send PROMPT-PHASE-2-TOOLS.md.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-20260508-phase-1-provider-contract.md",
+  "next_step": "PHASE-2 is unblocked. All pre-PHASE-2 WARNs resolved. Begin PHASE-2 (Tool Runtime Layer) per architecture/FORGE_V2_PHASE_ROADMAP.md.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-20260508-phase-0.5-warn-resolutions-pre-phase-2.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -30,10 +30,11 @@
     "blockers_resolved": ["B-01", "B-02"],
     "warns_pending": {
       "before_phase_1": [],
-      "before_phase_2": ["W-01", "W-02"],
+      "before_phase_2": [],
       "before_phase_3": ["W-03"],
       "dissolved": ["W-08"],
-      "resolved_pre_phase_1": ["W-04", "W-05", "W-06", "W-07"]
+      "resolved_pre_phase_1": ["W-04", "W-05", "W-06", "W-07"],
+      "resolved_pre_phase_2": ["W-01", "W-02"]
     }
   },
   "issues": [],

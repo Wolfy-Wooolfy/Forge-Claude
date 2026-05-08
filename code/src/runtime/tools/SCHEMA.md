@@ -8,6 +8,14 @@
 
 ## 1. Why this exists
 
+> **Terminology note.** In this specification and in `architecture/FORGE_V2_BLUEPRINT.md`,
+> "Tool" (capital T) refers exclusively to an L2 Runtime Tool — a registered object with
+> `name`, `required_mode`, `input_schema`, `output_schema`, `preview()`, and `execute()`.
+> This is distinct from the lowercase "tool" used in
+> `docs/11_ai_layer/07_TOOL_VS_CONVERSATION_CONTRACT.md`, which refers to approved AI
+> Layer API endpoints (e.g., `/api/ai/analyze`). The two concepts are NOT interchangeable.
+> Added 2026-05-08 via DECISION-20260508-phase-0.5-warn-resolutions-pre-phase-2.
+
 Forge today scatters side effects across 91 endpoints and 17 engines. There is no inventory of "things Forge can do to the world", no audit trail per action, and no way to gate writes behind permission modes or to preview them before applying. This contract fixes that by inverting the relationship: **every side effect becomes a registered Tool. Direct `fs.*`, `child_process.*`, or `fetch()` calls outside the Tools directory are forbidden by `CLAUDE.md` §11.4.**
 
 ## 2. Tool shape
