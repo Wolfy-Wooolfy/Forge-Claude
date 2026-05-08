@@ -158,6 +158,19 @@ installDefaultPolicy(toolRegistry);                  // sets authorize() functio
 
 The registry was previously permit-all (PHASE-2 default); installing the policy is what flips L3 on.
 
+#### Forbidden env vars
+
+L3 MUST NOT read `process.env.FORGE_DECISION_OVERRIDE`. Reading it in any
+permission policy code is a contract violation. `FORGE_DECISION_OVERRIDE`
+belongs to the Pipeline Decision Gate layer
+(`docs/04_autonomy/04_Autonomy_Policy_and_Human_Interrupt_Protocol.md` §8),
+which is a separate orchestration layer. The two layers have independent
+env var namespaces and independent authority.
+
+The only env vars L3 is permitted to read are:
+- `FORGE_PERMISSION_MODE` — selects active permission mode
+- `FORGE_ALLOW_SELF_MODIFY` — gates `DANGER_FULL_ACCESS`
+
 ## 11. What this contract does NOT cover
 
 - **Provider call permissions.** Provider Contract v2 has its own surface (input/output schemas, retry, fail-closed). Permission policy applies to the Tool Runtime, not to LLM invocations.

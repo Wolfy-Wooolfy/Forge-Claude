@@ -6,8 +6,8 @@
   "stage_progress_percent": 100,
   "current_task": "PHASE-2-CLOSED",
   "next_phase": "PHASE-3",
-  "next_step": "PHASE-3 (Permission/Safety Layer). Resolve W-03 (before PHASE-3) first. Then begin PHASE-3 per architecture/FORGE_V2_PHASE_ROADMAP.md.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-20260508-phase-2-tool-runtime.md",
+  "next_step": "Begin PHASE-3: Permission/Safety Layer. Send PROMPT-PHASE-3-PERMISSION.md.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-20260508-phase-0.5-warn-resolutions-pre-phase-3.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -31,7 +31,8 @@
     "warns_pending": {
       "before_phase_1": [],
       "before_phase_2": [],
-      "before_phase_3": ["W-03"],
+      "before_phase_3": [],
+      "resolved_pre_phase_3": ["W-03"],
       "dissolved": ["W-08"],
       "resolved_pre_phase_1": ["W-04", "W-05", "W-06", "W-07"],
       "resolved_pre_phase_2": ["W-01", "W-02"]

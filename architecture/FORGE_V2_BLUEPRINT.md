@@ -254,6 +254,15 @@ Plus two control modes:
                        deterministically (no human in the loop in tests).
 ```
 
+**Layer isolation.** L3 reads ONLY two environment variables:
+`FORGE_PERMISSION_MODE` (selects the active mode) and
+`FORGE_ALLOW_SELF_MODIFY` (gates `DANGER_FULL_ACCESS`). L3 does NOT read
+`FORGE_DECISION_OVERRIDE` or any other override channel. The Pipeline
+Decision Gate (per `docs/04_autonomy/04_Autonomy_Policy_and_Human_Interrupt_Protocol.md`)
+operates on a separate orchestration layer and uses its own override
+channel; the two layers do not share env vars and neither bypasses the
+other.
+
 **Per-tool requirement.** Every Tool declares its `required_mode`. The active mode is set at server start from env (`FORGE_PERMISSION_MODE`, default `WORKSPACE_WRITE`). Authorization rule:
 
 ```
