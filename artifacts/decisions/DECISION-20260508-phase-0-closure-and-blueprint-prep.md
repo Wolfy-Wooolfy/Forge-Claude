@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | **Decision ID** | DECISION-20260508-phase-0-closure-and-blueprint-prep |
-| **Status** | PROPOSED — pending owner approval |
+| **Status** | APPROVED |
 | **Authored** | 2026-05-08 |
 | **Supersedes** | — |
 | **Related** | DECISION-20260504-phase-0-fix-1-domain-pivot, DECISION-20260504-phase-0-fix-2-multiselect-chips, DECISION-20260504-phase-0-fix-3-project-deletion, DECISION-20260504-phase-0-vision-scaffolding, DECISION-20260505-phase-0-bug-fix-round, DECISION-20260505-phase-0-bug-fix-round-2, DECISION-20260505-phase-0-bug-fix-round-3 |
@@ -74,7 +74,7 @@ No other state is affected because no code or runtime artifacts changed.
 
 > _(Capture verbatim owner reply here. Format:_ `"<reply text>" — 2026-05-08T<HH:MM>Z` _)_
 
-Approval: **PENDING**
+Approval: "موافق على كل التعديلات مهما كانت طبقا للى بعتهولك" — 2026-05-08T00:30Z
 
 ---
 
