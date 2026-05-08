@@ -2,12 +2,12 @@
   "schema_version": "2.0",
   "status_type": "LIVE",
   "current_stage": "A",
-  "overall_progress_percent": 93,
+  "overall_progress_percent": 95,
   "stage_progress_percent": 100,
-  "current_task": "PHASE-0.5-COMPLETE",
-  "next_phase": "PHASE-1",
-  "next_step": "PHASE-1 is unblocked. All BLOCKERs and pre-PHASE-1 WARNs resolved. Begin PHASE-1 (Provider Contract v2) per architecture/FORGE_V2_PHASE_ROADMAP.md.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-20260508-phase-0.5-warn-resolutions-pre-phase-1.md",
+  "current_task": "PHASE-1-CLOSED",
+  "next_phase": "PHASE-2",
+  "next_step": "Begin PHASE-2: Tool Runtime Layer. Send PROMPT-PHASE-2-TOOLS.md.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-20260508-phase-1-provider-contract.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -43,9 +43,9 @@
     "last_doctor_status": "UNKNOWN",
     "doctor_endpoint_available": false,
     "self_test_harness_available": false,
-    "providers_registered_count": null,
+    "providers_registered_count": 12,
     "tools_registered_count": null,
     "active_permission_mode": "WORKSPACE_WRITE",
-    "note": "Fields populate after PHASE-4 (Doctor) and PHASE-5 (Self-Test Harness) close."
+    "note": "providers_registered_count populated by PHASE-1. tools_registered_count populates after PHASE-2. doctor/self_test after PHASE-4/PHASE-5."
   }
 }
