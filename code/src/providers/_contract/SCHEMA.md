@@ -33,7 +33,13 @@ Contract = {
     backoff_ms: number[]                      OPTIONAL — default [500, 2000]
   }
   timeout_ms: number                          OPTIONAL — default 30000
-  temperature: number                         OPTIONAL — default 0.6
+  temperature: number                         OPTIONAL — default 0
+  creative_override: boolean                  OPTIONAL — default false
+                                              If true, temperature defaults to 0.6 unless
+                                              temperature is also set explicitly.
+                                              Only creative providers (ideation_expansion,
+                                              designExploration) may declare this.
+                                              Requires justification in authority_doc.
   fail_mode: "FAIL_CLOSED"                    REQUIRED to be "FAIL_CLOSED" if present
 }
 ```
@@ -77,6 +83,20 @@ async function handler({ context, contract, callChat, task }) {
   return result.arguments;  // → { status: "SUCCESS", output: result.arguments }
 }
 ```
+
+### 3.0 Transport-agnostic contract
+
+The handler function is **transport-agnostic**. The `callChat()` parameter shown above
+is provided by the contract layer as a convenience for HTTP-based LLM providers (OpenAI).
+Handlers are NOT required to use it. A handler MAY instead:
+
+- Spawn a child process (e.g., `codex.cmd` CLI) and parse stdout.
+- Call a local socket, pipe, or binary.
+- Use any other I/O mechanism.
+
+The handler's ONLY contract obligation is: given `{ context, contract, callChat, task }`,
+return data whose shape matches `contract.output_tool.parameters`.
+The transport used to produce that data is the handler's implementation detail.
 
 ### 3.1 What handlers MUST NOT do
 
@@ -130,7 +150,23 @@ These reasons are stable and assertable. Scenario harness scenarios can referenc
 
 ## 5. Trace requirement
 
-Every `executeTask()` invocation appends one row to `artifacts/ai/cost_ledger.jsonl`. Schema:
+Every `executeTask()` invocation produces FOUR mandatory artifacts (per
+`docs/01_system/05_Cognitive_Adapter_Layer_Architecture_Contract.md` §6, Fail-Closed):
+
+| # | Path | Type | Fail-Closed? |
+|---|---|---|---|
+| 1 | `artifacts/llm/metadata/<task_id>.json` | forensic metadata | YES |
+| 2 | `artifacts/llm/requests/<task_id>.json`  | full prompt sent | YES |
+| 3 | `artifacts/llm/responses/<task_id>.json` | full raw response | YES |
+| 4 | `artifacts/ai/cost_ledger.jsonl`         | rolling cost row  | NO (best-effort) |
+
+**Forensic trace (Files 1–3):** written before the handler's return value is surfaced to
+the caller. If any write fails → `executeTask()` returns immediately with:
+`{ status: "FAIL_CLOSED", metadata: { reason: "TRACE_WRITE_FAILED", file: "<path>" } }`.
+The caller never receives a partial result.
+
+**Cost ledger (File 4):** append-only, best-effort. Write failure is logged as WARN but
+does not abort the result. Schema:
 
 ```
 {
@@ -151,7 +187,7 @@ Every `executeTask()` invocation appends one row to `artifacts/ai/cost_ledger.js
 }
 ```
 
-The ledger is append-only. Rotation/archival is a separate concern (PHASE-12 production setup).
+Rotation/archival of Files 1–3 is a PHASE-12 production concern.
 
 ## 6. Boot validation
 

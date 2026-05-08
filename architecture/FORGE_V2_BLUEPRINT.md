@@ -95,7 +95,11 @@ ProviderContract {
   // Behavior policy
   retry_policy  : { max_attempts: 2, backoff_ms: [500, 2000] }
   timeout_ms    : 30000
-  temperature   : 0.6
+  temperature   : 0                           // deterministic by default
+  creative_override : false                   // set true on creative providers (e.g.
+                                              // ideation_expansion) to default to 0.6.
+                                              // Requires explicit contract declaration;
+                                              // cannot be assumed.
   fail_mode     : "FAIL_CLOSED"             // never silent fallback to local logic
 
   // Trace requirement
@@ -113,7 +117,28 @@ A new file `code/src/providers/_contract/providerContract.js` exports a `defineP
 
 If validation fails at boot, **the API server refuses to start**. Fail-closed at startup.
 
-**Rate / cost accounting.** Every provider call writes a row to `artifacts/ai/cost_ledger.jsonl`:
+**Provider Registry and Engine Selection are distinct layers.**
+The registry (`providerRegistry.js`) answers: *what providers are available and valid?*
+The Cognitive Engine Selection Mode (`COGNITIVE_ENGINE_SELECTION_MODE` — governed by
+`docs/10_runtime/10_05_Cognitive_Engine_Selection_and_Routing_Policy.md`) answers:
+*which registered provider gets invoked for this call type in the current mode?*
+`providerRouter.js` consumes both: reads the active selection mode to determine the
+target `provider_id`, then executes it via the registry. The two mechanisms are
+complementary, not conflicting.
+
+**Trace + cost accounting.** Every `executeTask()` invocation produces FOUR mandatory
+artifacts (per `docs/01_system/05_Cognitive_Adapter_Layer_Architecture_Contract.md` §6,
+Fail-Closed):
+
+1. `artifacts/llm/metadata/<task_id>.json` — provider_id, model, tokens, latency, attempt
+2. `artifacts/llm/requests/<task_id>.json`  — full prompt (system + messages) sent to model
+3. `artifacts/llm/responses/<task_id>.json` — full raw model response received
+4. `artifacts/ai/cost_ledger.jsonl`         — one row appended per call (rolling summary)
+
+Files 1–3 are **forensic trace** (mandatory, Fail-Closed: if the write fails, `executeTask()`
+returns `{ status: "FAIL_CLOSED", metadata: { reason: "TRACE_WRITE_FAILED" } }`).
+
+File 4 is the **rolling cost summary** for cost-budget gates:
 
 ```
 { "ts": "...", "provider_id": "conversational_response", "model": "gpt-4o",
@@ -121,7 +146,7 @@ If validation fails at boot, **the API server refuses to start**. Fail-closed at
   "estimated_usd": 0.00231, "project_id": "hr_demo", "task_id": "conv_msg_..." }
 ```
 
-This is the foundation for the future cost-budget gate (out of scope for v2.0 first cut, but the data starts being collected immediately).
+Rotation/archival of Files 1–3 is a PHASE-12 production concern.
 
 ---
 

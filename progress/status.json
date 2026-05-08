@@ -2,12 +2,12 @@
   "schema_version": "2.0",
   "status_type": "LIVE",
   "current_stage": "A",
-  "overall_progress_percent": 92,
+  "overall_progress_percent": 93,
   "stage_progress_percent": 100,
   "current_task": "PHASE-0.5-COMPLETE",
   "next_phase": "PHASE-1",
-  "next_step": "Begin PHASE-1 (Provider Contract v2). Resolve W-04/W-05/W-06/W-07 before or at PHASE-1 start per sweep findings. See artifacts/audit/blueprint_contradiction_sweep.md.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-20260508-phase-0.5-resolutions.md",
+  "next_step": "PHASE-1 is unblocked. All BLOCKERs and pre-PHASE-1 WARNs resolved. Begin PHASE-1 (Provider Contract v2) per architecture/FORGE_V2_PHASE_ROADMAP.md.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-20260508-phase-0.5-warn-resolutions-pre-phase-1.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -25,14 +25,15 @@
     "infos": 4,
     "verdict": "RESOLVED",
     "resolution_artifact": "artifacts/decisions/DECISION-20260508-phase-0.5-resolutions.md",
-    "resolution_status": "APPROVED",
+    "resolution_status": "APPLIED",
     "resolution_applied": "2026-05-08",
     "blockers_resolved": ["B-01", "B-02"],
     "warns_pending": {
-      "before_phase_1": ["W-04", "W-05", "W-06", "W-07"],
+      "before_phase_1": [],
       "before_phase_2": ["W-01", "W-02"],
       "before_phase_3": ["W-03"],
-      "dissolved": ["W-08"]
+      "dissolved": ["W-08"],
+      "resolved_pre_phase_1": ["W-04", "W-05", "W-06", "W-07"]
     }
   },
   "issues": [],
