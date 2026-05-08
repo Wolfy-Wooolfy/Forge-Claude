@@ -146,3 +146,42 @@ If any step above is skipped or violated:
 - No interpretation is allowed
 
 This document is binding.
+
+---
+
+## 6. Closure Gate (Mandatory for every phase)
+
+A phase is **never** considered complete until ALL of the following are true:
+
+1. `node bin/forge-doctor.js` exits with status code 0.
+2. `node bin/forge-test.js` produces a report where every scenario is either `PASS` or `SKIPPED`. **A single `FAIL` blocks closure.**
+3. A decision artifact under `artifacts/decisions/DECISION-<ts>-phase-<N>-closure.md` exists and contains:
+   - explicit owner approval (verbatim chat reply quoted)
+   - the list of scenarios that passed (with run IDs)
+   - the list of files modified
+   - any unresolved risks
+4. `progress/status.json.current_task` is updated to the next phase.
+5. `progress/status.json.next_step` describes the immediate next action (not a vague goal).
+6. An Exit Report is posted to the user (Arabic), containing:
+   - الملفات المعدّلة (paths)
+   - السلوك الجديد (1-2 paragraphs)
+   - Scenarios اللي عدت
+   - Risks متبقية
+
+If any of (1)–(6) is missing, the phase remains OPEN. The assistant is forbidden from declaring completion or moving to the next phase.
+
+This rule supersedes any other instruction that suggests "partial closure" or "move on and finish later".
+
+---
+
+## 7. Phase Failure Rule
+
+When a closure-gate criterion fails:
+
+1. The phase **stays OPEN**. `current_task` is NOT advanced.
+2. The decision artifact gains an `unmet_criteria: [...]` field listing the specific failure (e.g. `"scenario_id_5 FAIL: expected tool fs.write_file not called"`).
+3. A sub-task is opened to address the failure. The sub-task lives under the same phase, identified as `<phase>.<n>` (e.g. `PHASE-2.1`, `PHASE-2.2`).
+4. The phase only closes once the sub-tasks resolve every `unmet_criteria`.
+5. **Phases are atomic.** No phase is "partially closed". A phase is OPEN, IN_PROGRESS, or CLOSED — there is no fourth state.
+
+This rule prevents drift, hidden tech debt, and the "we'll come back to it later" failure mode.

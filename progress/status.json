@@ -1,11 +1,32 @@
 {
+  "schema_version": "2.0",
   "status_type": "LIVE",
   "current_stage": "A",
-  "overall_progress_percent": 85,
-  "stage_progress_percent": 99,
-  "last_completed_artifact": "artifacts/decisions/DECISION-20260505-phase-0-bug-fix-round-3.md",
-  "current_task": "PHASE-0-FOUNDATION-REPAIR",
+  "overall_progress_percent": 88,
+  "stage_progress_percent": 100,
+  "current_task": "PHASE-0-CLOSED",
+  "next_phase": "PHASE-0.5",
+  "next_step": "Begin PHASE-0.5: Contradiction sweep across docs/12_ai_os/, docs/04_autonomy/, docs/11_ai_layer/. Output: artifacts/audit/blueprint_contradiction_sweep.md",
+  "last_completed_artifact": "artifacts/decisions/DECISION-20260508-phase-0-closure-and-blueprint-prep.md",
+  "blueprint_authority": {
+    "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
+    "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
+    "approval_decision": "DECISION-20260508-phase-0-closure-and-blueprint-prep.md",
+    "approval_status": "OWNER_APPROVED_2026-05-08"
+  },
+  "lean_v2_exit_status": "BEFORE_EXIT",
+  "lean_v2_exit_phase": "PHASE-5.1",
+  "phases_post_exit_assumed": false,
+  "runtime_health": {
+    "last_doctor_run": null,
+    "last_doctor_status": "UNKNOWN",
+    "doctor_endpoint_available": false,
+    "self_test_harness_available": false,
+    "providers_registered_count": null,
+    "tools_registered_count": null,
+    "active_permission_mode": "WORKSPACE_WRITE",
+    "note": "Fields populate after PHASE-4 (Doctor) and PHASE-5 (Self-Test Harness) close."
+  },
   "issues": [],
-  "blocking_questions": [],
-  "next_step": "Manual integration test (round 3): create project 'HR' → say 'عايز CRM' → verify mismatch question appears ONCE only → any response continues ideation normally"
+  "blocking_questions": []
 }
