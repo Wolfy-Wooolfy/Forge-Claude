@@ -35,6 +35,7 @@ Includes:
 - docs/06_progress/*
 - docs/09_verify/*
 - docs/10_runtime/*
+- architecture/FORGE_V2_BLUEPRINT.md   ← added 2026-05-08 via DECISION-20260508-phase-0.5-resolutions.md
 
 These define:
 - What may execute
@@ -130,6 +131,19 @@ If ambiguity remains:
 → A single blocking question must be raised
 
 No inferred resolution is allowed.
+
+### 3.1 Intra-Layer-0 Conflict Resolution
+
+> Added 2026-05-08 via DECISION-20260508-phase-0.5-resolutions.md (B-02 resolution, Option C).
+
+When two Layer-0 documents conflict (including `architecture/FORGE_V2_BLUEPRINT.md` vs any other Layer-0 member):
+
+- No automatic priority applies between Layer-0 peers.
+- A dedicated decision artifact MUST be written, scoped to the specific conflict.
+- The decision artifact requires owner approval before execution resumes.
+- Until the conflict is resolved → BLOCKED state.
+
+No inferred resolution is allowed for intra-Layer-0 conflicts.
 
 ---
 

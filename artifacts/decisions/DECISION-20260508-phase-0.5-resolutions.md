@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | **Decision ID** | DECISION-20260508-phase-0.5-resolutions |
-| **Status** | PENDING_OWNER_DECISION |
+| **Status** | APPROVED |
 | **Authored** | 2026-05-08 |
 | **Triggered by** | artifacts/audit/blueprint_contradiction_sweep.md (2 BLOCKERs found) |
 | **Related** | DECISION-20260508-phase-0.5-contradiction-sweep-start, DECISION-20260508-phase-0-closure-and-blueprint-prep |
@@ -209,11 +209,12 @@ Effect on open WARNs: W-01 through W-08 remain open; they are PHASE-specific and
 
 ## 5. Application Scope
 
-This decision authorizes text changes to exactly 2 files. Application will happen in a separate session (`PHASE-0.5-RESOLUTIONS-APPLY`) after owner approval.
+This decision authorized text changes to exactly 2 files. Applied in session `PHASE-0.5-RESOLUTIONS-APPLY` — 2026-05-08.
 
 After application:
-- `progress/status.json` `next_step` points to PHASE-1.
-- `progress/status.json` `issues` and `blocking_questions` cleared (B-01, B-02 resolved).
+- `architecture/FORGE_V2_BLUEPRINT.md` — Status updated, Authority block replaced, Part A item 2 updated to four-stage, Part D-Stage section added.
+- `docs/04_autonomy/05_Artifact_Authority_Hierarchy_Specification.md` — Blueprint added to Layer 0 list, §3.1 Intra-Layer-0 Conflict Resolution added.
+- `progress/status.json` — B-01 and B-02 cleared, next_step updated to PHASE-1.
 
 ---
 
@@ -221,7 +222,7 @@ After application:
 
 > _(Capture verbatim owner reply here.)_
 
-Approval: ________________ — 2026-05-08
+Approval: "approved" — 2026-05-08
 
 ---
 
