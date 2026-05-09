@@ -1,0 +1,21 @@
+{
+  "id": "S55",
+  "name": "pkg.list pip reads requirements.txt without spawning (cross-adapter READ_ONLY coverage)",
+  "type": "direct_tool",
+  "permission": "READ_ONLY",
+  "tool": "pkg.list",
+  "fixture_files": [
+    { "path": "artifacts/projects/test_pkg_s55/requirements.txt", "content": "six==1.16.0\ncertifi>=2023.0.0\n" }
+  ],
+  "input": {
+    "adapter_id": "pip",
+    "project_id": "test_pkg_s55"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "adapter_id", "expected": "pip" },
+    { "type": "state_field_equals", "field": "action",     "expected": "list" },
+    { "type": "state_field_exists", "field": "packages" },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

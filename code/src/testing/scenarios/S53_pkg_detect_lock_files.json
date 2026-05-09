@@ -1,0 +1,20 @@
+{
+  "id": "S53",
+  "name": "pkg.detect_lock_files finds package-lock.json in test workspace (no binary required)",
+  "type": "direct_tool",
+  "permission": "READ_ONLY",
+  "tool": "pkg.detect_lock_files",
+  "fixture_files": [
+    { "path": "artifacts/projects/test_pkg_s53/package-lock.json", "content": "{\"name\":\"test-s53\",\"version\":\"1\",\"lockfileVersion\":3,\"packages\":{}}" }
+  ],
+  "input": {
+    "project_id": "test_pkg_s53"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_exists", "field": "found" },
+    { "type": "state_field_exists", "field": "found.0" },
+    { "type": "state_field_exists", "field": "found.0.adapter_id" },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

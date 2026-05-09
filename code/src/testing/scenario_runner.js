@@ -177,10 +177,10 @@ async function _runDirectProvider(scenario, root) {
 // ── Dispatch: direct_tool ─────────────────────────────────────────────────────
 
 async function _runDirectTool(scenario, root) {
-  const { createPolicy }   = require(
+  const { createPolicy, resetDefaultPolicy }   = require(
     path.join(root, "code", "src", "runtime", "permission", "permissionPolicy")
   );
-  const { createRegistry } = require(
+  const { createRegistry, resetDefaultRegistry } = require(
     path.join(root, "code", "src", "runtime", "tools", "_registry")
   );
   const { readEntries }    = require(
@@ -196,6 +196,8 @@ async function _runDirectTool(scenario, root) {
     savedEnv[key] = process.env[key];
     process.env[key] = envToSet[key];
   }
+  resetDefaultRegistry();
+  resetDefaultPolicy();
 
   const prompter = (scenario.permission === "PROMPT") ? _autoDenyPrompter : undefined;
 
@@ -237,6 +239,8 @@ async function _runDirectTool(scenario, root) {
       if (savedEnv[key] === undefined) delete process.env[key];
       else process.env[key] = savedEnv[key];
     }
+    resetDefaultRegistry();
+    resetDefaultPolicy();
   }
 
   const newAudit = readEntries(root, { since_ts: startTs });
@@ -717,6 +721,17 @@ async function _runApiserver(scenario, root) {
 
 // ── Single scenario runner ────────────────────────────────────────────────────
 
+async function _probeRequiredBinary(binary, root) {
+  const { createPolicy }   = require(path.join(root, "code", "src", "runtime", "permission", "permissionPolicy"));
+  const { createRegistry } = require(path.join(root, "code", "src", "runtime", "tools", "_registry"));
+  const probePolicy = createPolicy({ root, active_mode: "READ_ONLY" });
+  const probeReg    = createRegistry({ root });
+  probeReg.load();
+  probeReg.setAuthorizeFunction((tool, input, ctx) => probePolicy.authorize(tool, input, ctx));
+  const result = await probeReg.invoke("env.probe_binary", { binary, args: ["--version"] }, { root });
+  return !!(result && result.status === "SUCCESS");
+}
+
 async function _runOne(scenario, root) {
   const t0   = Date.now();
   const base = {
@@ -728,6 +743,18 @@ async function _runOne(scenario, root) {
     assertions:  [],
     error:       null
   };
+
+  // R-A: requires_binary skip — uses env.probe_binary (Track A, AC-16)
+  if (typeof scenario.requires_binary === "string") {
+    const found = await _probeRequiredBinary(scenario.requires_binary, root);
+    if (!found) {
+      return Object.assign(base, {
+        status:      "SKIP",
+        skip_reason: "binary not found: " + scenario.requires_binary,
+        duration_ms: Date.now() - t0
+      });
+    }
+  }
 
   try {
     let execResult;

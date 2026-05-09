@@ -96,9 +96,17 @@ function _buildSafeEnv(overrides) {
 
 // ── shared spawn helper ───────────────────────────────────────────────────────
 
+// On Windows, .cmd/.bat scripts can't be spawned with shell:false.
+// Wrapping with cmd.exe /c is injection-safe: Node.js quotes each arg separately.
+function _resolveArgv(argv) {
+  if (process.platform !== "win32") return argv;
+  return ["cmd.exe", "/c"].concat(argv);
+}
+
 function _spawnCommand(argv, spawnOpts, timeoutMs) {
+  const effectiveArgv = _resolveArgv(argv);
   return new Promise((resolve) => {
-    const proc = spawn(argv[0], argv.slice(1), Object.assign({ shell: false }, spawnOpts));
+    const proc = spawn(effectiveArgv[0], effectiveArgv.slice(1), Object.assign({ shell: false }, spawnOpts));
 
     let stdout = "";
     let stderr = "";

@@ -45,15 +45,15 @@ function printSummary() {
   console.log("\n── PHASE-5 Self-Test Harness Meta Smoke Test ────────────────────\n");
 
   // ── M1: scenario files exist and are valid JSON ───────────────────────────
-  console.log("M1: 47 scenario JSON files present and parse");
+  console.log("M1: 57 scenario JSON files present and parse");
   {
     const scenDir = path.join(ROOT, "code", "src", "testing", "scenarios");
     const files   = fs.existsSync(scenDir)
       ? fs.readdirSync(scenDir).filter((f) => f.endsWith(".json")).sort()
       : [];
 
-    check("M1 exactly 47 scenario files",
-      files.length === 47,
+    check("M1 exactly 57 scenario files",
+      files.length === 57,
       "found " + files.length);
 
     let allParsed = true;
@@ -72,9 +72,9 @@ function printSummary() {
         return JSON.parse(fs.readFileSync(path.join(scenDir, f), "utf8")).id;
       } catch { return null; }
     });
-    const expectedIds = ["S01","S02","S03","S04","S05","S06","S07","S08","S09","S10","S11","S12","S13","S14","S15","S16","S17","S18","S19","S20","S21","S22","S23","S24","S25","S26","S27","S28","S29","S30","S31","S32","S33","S34","S35","S36","S37","S38","S39","S40","S41","S42","S43","S44","S45","S46","S47"];
+    const expectedIds = ["S01","S02","S03","S04","S05","S06","S07","S08","S09","S10","S11","S12","S13","S14","S15","S16","S17","S18","S19","S20","S21","S22","S23","S24","S25","S26","S27","S28","S29","S30","S31","S32","S33","S34","S35","S36","S37","S38","S39","S40","S41","S42","S43","S44","S45","S46","S47","S48","S49","S50","S51","S52","S53","S54","S55","S56","S57"];
     const allIds = expectedIds.every((id) => ids.includes(id));
-    check("M1 all expected IDs present (S01–S47)", allIds,
+    check("M1 all expected IDs present (S01–S57)", allIds,
       "missing: " + expectedIds.filter((id) => !ids.includes(id)).join(", "));
   }
 
@@ -177,8 +177,8 @@ function printSummary() {
       report.counts && typeof report.counts.pass === "number",
       "got " + JSON.stringify(report.counts));
 
-    check("M4 report has 47 scenarios",
-      Array.isArray(report.scenarios) && report.scenarios.length === 47,
+    check("M4 report has 57 scenarios",
+      Array.isArray(report.scenarios) && report.scenarios.length === 57,
       "got " + (report.scenarios ? report.scenarios.length : "no array"));
   }
 

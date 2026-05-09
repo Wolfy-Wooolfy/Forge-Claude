@@ -1,0 +1,23 @@
+{
+  "id": "S50",
+  "name": "pkg.audit npm returns mock result in TEST mode without spawning real audit",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "pkg.audit",
+  "fixture_files": [
+    { "path": "artifacts/projects/test_pkg_s50/package.json", "content": "{\"name\":\"test-s50\",\"version\":\"1.0.0\"}" }
+  ],
+  "input": {
+    "adapter_id": "npm",
+    "project_id": "test_pkg_s50",
+    "_mock_audit_result": { "vulnerabilities": 0, "info": 0, "low": 0, "high": 0 }
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "adapter_id", "expected": "npm" },
+    { "type": "state_field_equals", "field": "action",     "expected": "audit" },
+    { "type": "state_field_exists", "field": "audit_result" },
+    { "type": "state_field_equals", "field": "_mock_used", "expected": true },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

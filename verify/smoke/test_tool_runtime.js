@@ -57,7 +57,7 @@ async function run() {
   }
   {
     const summary = registry.healthSummary();
-    check("S1 total tools == 30", summary.total === 30, "got " + summary.total);
+    check("S1 total tools == 37", summary.total === 37, "got " + summary.total);
   }
 
   // ── S2 — All tools have valid required_mode ───────────────────────────────

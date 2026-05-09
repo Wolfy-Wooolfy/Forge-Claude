@@ -1,0 +1,23 @@
+{
+  "id": "S48",
+  "name": "pkg.install npm installs package into test workspace (Tier 1)",
+  "type": "direct_tool",
+  "permission": "WORKSPACE_WRITE",
+  "tool": "pkg.install",
+  "fixture_files": [
+    { "path": "artifacts/projects/test_pkg_s48/package.json", "content": "{\"name\":\"test-s48\",\"version\":\"1.0.0\"}" },
+    { "path": "artifacts/projects/test_pkg_s48/vision.md", "content": "---\nproject_id: test_pkg_s48\nproject_name: Test Pkg S48\ndomain: test\nvision_version: 1\nvision_locked: true\nvision_locked_at: 2026-05-10T00:00:00.000Z\nlocked_by_role: owner\namendments_history: []\ngoals:\n  primary: test\n  secondary: []\nconstraints: []\nnon_goals: []\n---\n\n# Project Vision: Test Pkg S48\n" }
+  ],
+  "input": {
+    "adapter_id": "npm",
+    "packages": ["is-odd"],
+    "project_id": "test_pkg_s48"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "adapter_id", "expected": "npm" },
+    { "type": "state_field_equals", "field": "action",     "expected": "install" },
+    { "type": "state_field_equals", "field": "exit_code",  "expected": 0 },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

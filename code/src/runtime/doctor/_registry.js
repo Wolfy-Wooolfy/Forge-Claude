@@ -19,7 +19,8 @@ const checks = [
   require("./checks/diskSpace"),
   require("./checks/traceMatrixSize"),
   require("./checks/shellHardening"),
-  require("./checks/environmentDetection")
+  require("./checks/environmentDetection"),
+  require("./checks/packageManagement")
 ];
 
 function listChecks()  { return checks.slice(); }

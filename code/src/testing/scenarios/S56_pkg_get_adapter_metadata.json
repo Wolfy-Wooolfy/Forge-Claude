@@ -1,0 +1,17 @@
+{
+  "id": "S56",
+  "name": "pkg.get_adapter returns npm adapter metadata (READ_ONLY)",
+  "type": "direct_tool",
+  "permission": "READ_ONLY",
+  "tool": "pkg.get_adapter",
+  "input": {
+    "adapter_id": "npm"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "id",        "expected": "npm" },
+    { "type": "state_field_equals", "field": "tier",      "expected": 1 },
+    { "type": "state_field_exists", "field": "label" },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

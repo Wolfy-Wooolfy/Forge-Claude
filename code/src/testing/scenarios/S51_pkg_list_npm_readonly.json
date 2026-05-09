@@ -1,0 +1,21 @@
+{
+  "id": "S51",
+  "name": "pkg.list npm reads package.json dependencies without spawning (READ_ONLY)",
+  "type": "direct_tool",
+  "permission": "READ_ONLY",
+  "tool": "pkg.list",
+  "fixture_files": [
+    { "path": "artifacts/projects/test_pkg_s51/package.json", "content": "{\"name\":\"test-s51\",\"version\":\"1.0.0\",\"dependencies\":{\"lodash\":\"^4.17.21\"}}" }
+  ],
+  "input": {
+    "adapter_id": "npm",
+    "project_id": "test_pkg_s51"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "adapter_id", "expected": "npm" },
+    { "type": "state_field_equals", "field": "action",     "expected": "list" },
+    { "type": "state_field_exists", "field": "packages" },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "id": "S54",
+  "name": "pkg.install (WORKSPACE_WRITE) is DENIED when permission mode is READ_ONLY",
+  "type": "direct_tool",
+  "permission": "READ_ONLY",
+  "tool": "pkg.install",
+  "input": {
+    "adapter_id": "npm",
+    "packages": ["is-odd"],
+    "project_id": "test_pkg_s54"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "DENIED" },
+    { "type": "state_field_exists", "field": "reason" },
+    { "type": "state_field_exists", "field": "detail" },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}
