@@ -45,15 +45,15 @@ function printSummary() {
   console.log("\n── PHASE-5 Self-Test Harness Meta Smoke Test ────────────────────\n");
 
   // ── M1: scenario files exist and are valid JSON ───────────────────────────
-  console.log("M1: 12 scenario JSON files present and parse");
+  console.log("M1: 13 scenario JSON files present and parse");
   {
     const scenDir = path.join(ROOT, "code", "src", "testing", "scenarios");
     const files   = fs.existsSync(scenDir)
       ? fs.readdirSync(scenDir).filter((f) => f.endsWith(".json")).sort()
       : [];
 
-    check("M1 exactly 12 scenario files",
-      files.length === 12,
+    check("M1 exactly 13 scenario files",
+      files.length === 13,
       "found " + files.length);
 
     let allParsed = true;
@@ -72,9 +72,9 @@ function printSummary() {
         return JSON.parse(fs.readFileSync(path.join(scenDir, f), "utf8")).id;
       } catch { return null; }
     });
-    const expectedIds = ["S01","S02","S03","S04","S05","S06","S07","S08","S09","S10","S11","S12"];
+    const expectedIds = ["S01","S02","S03","S04","S05","S06","S07","S08","S09","S10","S11","S12","S13"];
     const allIds = expectedIds.every((id) => ids.includes(id));
-    check("M1 all expected IDs present (S01–S12)", allIds,
+    check("M1 all expected IDs present (S01–S13)", allIds,
       "missing: " + expectedIds.filter((id) => !ids.includes(id)).join(", "));
   }
 
@@ -176,8 +176,8 @@ function printSummary() {
       report.counts && typeof report.counts.pass === "number",
       "got " + JSON.stringify(report.counts));
 
-    check("M4 report has 12 scenarios",
-      Array.isArray(report.scenarios) && report.scenarios.length === 12,
+    check("M4 report has 13 scenarios",
+      Array.isArray(report.scenarios) && report.scenarios.length === 13,
       "got " + (report.scenarios ? report.scenarios.length : "no array"));
   }
 

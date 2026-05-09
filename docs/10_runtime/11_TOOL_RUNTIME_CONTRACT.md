@@ -73,6 +73,10 @@ PHASE-6 (apiServer.js migration) will mechanically lift direct `fs.*`,
 `child_process.*`, and `fetch()` calls inside pipeline modules to Tool invocations —
 without changing the pipeline structure, module boundaries, or governance contracts.
 
+**Note (PHASE-6.0):** The `pipeline.*` tool family (run_module, advance_stage,
+mark_blocked) was removed in PHASE-6.0 — 0 callers confirmed across the entire
+codebase. Pipeline orchestration uses `fs.*` and `state.*` tools directly.
+
 ---
 
 ## 5. Tool families shipped in PHASE-2
@@ -85,8 +89,7 @@ without changing the pipeline structure, module boundaries, or governance contra
 | `state.*` | 2 | READ_ONLY (read), WORKSPACE_WRITE (patch) |
 | `project.*` | 4 | READ_ONLY (list), WORKSPACE_WRITE (create/activate/delete) |
 | `artifact.*` | 3 | READ_ONLY (list), WORKSPACE_WRITE (write_decision/write_audit) |
-| `pipeline.*` | 3 | WORKSPACE_WRITE (run_module/advance_stage/mark_blocked) |
-| **Total** | **22** | |
+| **Total** | **20** | (pipeline.* removed in PHASE-6.0 — see §4.3) |
 
 Additional families deferred: `vision.*` (PHASE-7), `built_project_tests.*` (PHASE-8),
 `research.*` (PHASE-9).

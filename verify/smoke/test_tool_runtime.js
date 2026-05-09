@@ -41,8 +41,8 @@ function check(label, condition, detail) {
 async function run() {
   console.log("\n── PHASE-2 Tool Runtime Smoke Test ──────────────────────────────\n");
 
-  // ── S1 — Default registry loads and reports 22 tools ─────────────────────
-  console.log("S1: Default registry loads with 23 tools");
+  // ── S1 — Default registry loads and reports 20 tools ─────────────────────
+  console.log("S1: Default registry loads with 20 tools");
   resetDefaultRegistry();
   let registry;
   try {
@@ -57,7 +57,7 @@ async function run() {
   }
   {
     const summary = registry.healthSummary();
-    check("S1 total tools == 23", summary.total === 23, "got " + summary.total);
+    check("S1 total tools == 20", summary.total === 20, "got " + summary.total);
   }
 
   // ── S2 — All tools have valid required_mode ───────────────────────────────

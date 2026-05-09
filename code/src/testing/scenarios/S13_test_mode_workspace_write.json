@@ -1,0 +1,15 @@
+{
+  "id": "S13",
+  "name": "TEST mode allows artifacts/ writes for CI scenarios",
+  "type": "direct_tool",
+  "tool": "fs.write_file",
+  "permission": "TEST",
+  "input": {
+    "path": "artifacts/self-test/s13_test_mode.txt",
+    "content": "TEST mode workspace write"
+  },
+  "assertions": [
+    { "type": "status_equals", "expected": "SUCCESS" },
+    { "type": "artifact_exists", "path": "artifacts/self-test/s13_test_mode.txt" }
+  ]
+}

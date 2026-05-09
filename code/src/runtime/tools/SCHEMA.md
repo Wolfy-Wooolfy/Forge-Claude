@@ -98,7 +98,6 @@ Callers branch on `status`. They MUST NOT try/catch the call — the contract gu
 | `INVALID_PROJECT_ID` | project_tools |
 | `ALREADY_EXISTS` / `NOT_FOUND` / `IS_ACTIVE` | project_tools |
 | `INVALID_FILENAME` | artifact_tools |
-| `STATUS_NOT_FOUND` | pipeline_tools |
 | Custom per Tool | Tool-defined |
 
 Scenarios assert on these reasons.
@@ -144,9 +143,8 @@ Inputs are summarised — never full content. Used by:
 | `state.*` | read, patch |
 | `project.*` | create, activate, list, delete |
 | `artifact.*` | write_decision, write_audit, list |
-| `pipeline.*` | run_module, advance_stage, mark_blocked |
 
-That's **23 tools shipped in PHASE-2**. Additional tools are added in their owning phases:
+That's **20 tools active** (3 pipeline.* tools — run_module, advance_stage, mark_blocked — removed in PHASE-6.0 per complexity review FINDINGS-WARN-1; 0 callers confirmed). Additional tools are added in their owning phases:
 - `vision.*` in PHASE-7
 - `built_project_tests.*` in PHASE-8
 - `research.*` in PHASE-9
