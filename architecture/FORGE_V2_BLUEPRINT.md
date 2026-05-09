@@ -417,6 +417,91 @@ After every module (file group) Forge writes, it runs the scenario set. If a sce
 
 ---
 
+## Part B-2 — Forge as Orchestration Layer (added 2026-05-09 via vision shift)
+
+The four layers in Part B describe **how Forge governs its own operation**.
+This section describes **what Forge does for the owner**.
+
+### The Conductor Model
+
+Forge is the conductor between a non-technical owner and a growing set
+of external execution tools:
+
+```
+┌─────────────────────────────────────────┐
+│  Owner (non-technical, plain language)  │
+└────────────────────┬────────────────────┘
+                     │  intent in natural language
+                     ▼
+┌─────────────────────────────────────────┐
+│  Forge (Conductor)                      │
+│  - Understands intent                   │
+│  - Plans steps                          │
+│  - Selects the right tool per step      │
+│  - Surfaces blockers requiring judgment │
+│  - Reports in plain language            │
+└────────────────────┬────────────────────┘
+                     │  tool invocations via L2
+                     ▼
+┌─────────────────────────────────────────┐
+│  External Execution Surface             │
+│  - LLM APIs (Claude, OpenAI)            │
+│  - Code execution (Claude Code, shell)  │
+│  - Environments (Docker, package mgrs)  │
+│  - Browsers (Playwright, fetch)         │
+│  - Cloud APIs (Vercel, AWS, ...)        │
+└─────────────────────────────────────────┘
+```
+
+### Key principle: Orchestrate, do not reimplement
+
+Forge is not a build of Devin or Claude Code from scratch. Each external
+tool is an L2 Tool Runtime adapter:
+
+- `shell.run` — wraps shell execution with sandboxing
+- `env.install` — wraps package managers
+- `browser.navigate` — wraps Playwright/fetch
+- `deploy.vercel` — wraps Vercel CLI
+- ...one tool per capability
+
+This keeps Forge's own surface area small while leveraging maximally
+mature external tooling.
+
+### Owner-facing contract
+
+What Forge promises to the owner:
+
+1. **Plain-language interface.** Owner never needs technical vocabulary.
+2. **Tool selection is transparent but unobstructive.** Forge tells the
+   owner what tool it's using and why, but does not require approval
+   for each tool — only for category-level boundaries (per L3 Permission
+   Policy modes).
+3. **Blockers surface clearly.** When Forge needs the owner's judgment
+   (a domain decision, credentials, approval to install a tool),
+   Forge asks in plain language with context.
+4. **Reports are concrete.** Output is "I built X, deployed it to Y,
+   here's the URL", not "Operation completed successfully."
+
+### What this means for the roadmap
+
+PHASE-7 onward in the roadmap is now organized into **Track B**: each
+phase adds one external-tool integration to L2. See Part F (Phase
+Roadmap) for the updated sequence.
+
+The four-layer foundation (L1–L5a, Part B above) is **complete after
+Track A** (PHASE-6.C). Track B builds on top without modifying the
+foundation.
+
+### FINDINGS-INFO-5: docs/12_ai_os/ compatibility
+
+The files in `docs/12_ai_os/` reference the original framing ("personal
+AI Operating System for building software projects"). They are compatible
+with Part B-2 — there is no direct conflict, only a framing gap. A
+dedicated documentation reconciliation pass may be opened in a future
+session if needed. No docs/** changes in this session.
+
+---
+
 ## Part C — Existing Modules: Decisions
 
 Every existing file in `code/src/modules/`, `code/src/providers/`, `code/src/ai_os/`, `code/src/orchestrator/`, `code/src/workspace/` is classified into one of:
@@ -577,33 +662,43 @@ Every Phase prompt (Part F) ends with these three checkpoints. Skipping any of t
 
 ---
 
-## Part F — Phase Roadmap (preview only; full prompts in Message 6)
+## Part F — Phase Roadmap (updated 2026-05-09 via vision shift — Track A + Track B)
 
-The previous 6-phase roadmap (Phase 0–5 in `files.zip`) is partially superseded. New roadmap:
+> Full phase prompts in `architecture/FORGE_V2_PHASE_ROADMAP.md`. This section is a summary view.
+> Original single-track table superseded by decision `DECISION-20260509-vision-shift-track-b.md`.
 
-| New Phase | Title | Replaces | Estimated effort |
-|---|---|---|---|
-| **PHASE-0** *(complete)* | Foundation Repair | Phase 0 (old) | ✓ Done in repo |
-| **PHASE-1** | Provider Contract v2 + Provider Registry | (new) | 4–6 days |
-| **PHASE-2** | Tool Runtime Layer | (new) | 6–8 days |
-| **PHASE-3** | Permission / Safety Layer | (new) | 4–5 days |
-| **PHASE-4** | Doctor / Health Layer | (new) | 3–4 days |
-| **PHASE-5** | Forge Self-Test Harness — chat + tool calling mock only (Q8) | (new) | 5–7 days |
-| **PHASE-5.1** | **Complexity Review checkpoint (Q9)** | (new) | 1 day |
-| **🏁 LEAN v2 EXIT (Q6)** | **Optional stop point. Forge is already substantially safer here.** PHASE-6+ requires fresh owner decision. | — | — |
-| **PHASE-6** | apiServer.js migration — starts with **Endpoint Audit (Q7)** | (new) | 5–7 days |
-| **PHASE-7** | Vision Authority System | Phase 1 (old) | 10–14 days |
-| **PHASE-8** | Built-Project Test Harness + projectTestPlanProvider | (extends old Phase 2) | 6–8 days |
-| **PHASE-9** | Knowledge Base & Research Agent | Phase 2 (old) | 18–21 days |
-| **PHASE-10** | Frontend Refactor (React) | Phase 3 (old) | 14–21 days |
-| **PHASE-11** | Existing Project Intake | Phase 4 (old) | 14–21 days |
-| **PHASE-12** | Personal Production Setup | Phase 5 (old) | 5–7 days |
+### Track A — Foundation (in progress)
 
-**Key changes from the old roadmap:**
+Track A phases close the infrastructure layer. After Track A, every Forge-internal write goes
+through L2; permission policy reaches every file.
 
-- New phases 1–6 sit in front of Vision Authority. Reason: Vision Authority is itself easier to build correctly once the four layers exist, because the Vision Compliance Gate becomes one more permission rule (L3) and one more tool (L2).
-- Old Phase 2 is split: the part that is "deterministic test scaffolding for built projects" moves up to PHASE-8 (right after Vision); the part that is "web research + KB" stays as PHASE-9.
-- Frontend Refactor is unchanged in content but moves later. The current `web/index.html` works; refactoring it before the backend is stable is wasted churn.
+| Phase | Title | Status |
+|---|---|---|
+| 0 – 5.1 | Foundation + 4 layers + harness + complexity review | ✓ Done |
+| 6.0 – 6.B.5 | ai_os migration to L2 (sub-phases A, B.1 – B.5) | ✓ Done |
+| 6.C | apiServer.js migration — final L2 layer | ⏳ Next |
+
+### Track B — Capability Expansion (new — requires separate owner decision per phase)
+
+Each Track B phase adds one external-tool integration. No Track B phase auto-starts.
+Each requires a fresh decision artifact and explicit owner approval before it may begin.
+
+| Phase | Title | Capability added |
+|---|---|---|
+| 7-A | Vision Authority System | declarative vision compliance |
+| 7-B | Code Execution Tool | `shell.run` with sandboxing |
+| 7-C | Environment Management | `env.install`, `env.docker_run`, `env.detect` |
+| 7-D | Browser Automation | `browser.navigate`, `browser.read`, `browser.click` |
+| 8 | Built-Project Test Harness | testing for built artifacts |
+| 9 | Knowledge Base + Research Agent | vector DB + research loop |
+| 10 | Iterative Build Loop | MVP → review → refine cycle |
+| 11 | Existing Project Intake | reverse-vision from existing code |
+| 12 | Personal Production + Deployment | `deploy.*` tools + production setup |
+| 13 | Conversational UX Polish | React frontend + voice + visual feedback |
+
+**Renumbering note:** Old PHASE-7 (Vision Authority) → PHASE-7-A. Old PHASE-10 (Frontend Refactor) → PHASE-13. PHASE-10 is now the new Iterative Build Loop. All historical decision artifacts referencing old phase numbers remain valid; this table is the authoritative forward-looking index.
+
+**Phase activation rule:** PHASE-6.C opens automatically after PHASE-6.B.5 closes (it is the last Track A phase). Every Track B phase requires a new decision artifact + owner approval before it may begin.
 
 ---
 

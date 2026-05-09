@@ -12,7 +12,10 @@
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
     "approval_decision": "DECISION-20260508-phase-0-closure-and-blueprint-prep.md",
-    "approval_status": "OWNER_APPROVED_2026-05-08"
+    "approval_status": "OWNER_APPROVED_2026-05-08",
+    "vision_scope": "AI_CO_FOUNDER",
+    "vision_scope_decision": "DECISION-20260509-vision-shift-track-b.md",
+    "vision_scope_approved_at": "2026-05-09"
   },
   "lean_v2_exit_status": "EXIT_NOT_TAKEN",
   "lean_v2_exit_phase": "PHASE-5.1",

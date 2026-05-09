@@ -1,8 +1,9 @@
 # Forge v2.0 — Phase Roadmap (detailed)
 
 > **Companion to:** `architecture/FORGE_V2_BLUEPRINT.md`
-> **Status:** PROPOSED — superseding `files.zip` once owner approves.
+> **Status:** LIVE — Track A in progress (as of 2026-05-09)
 > **Authored:** 2026-05-07
+> **Updated:** 2026-05-09 — Track A / Track B split per `DECISION-20260509-vision-shift-track-b.md`. PHASE-7 renamed PHASE-7-A; new placeholder phases 7-B, 7-C, 7-D, 10 (Iterative Build Loop), 13 (Conversational UX Polish) added. Old PHASE-10 (Frontend Refactor) is now PHASE-13.
 
 This document is the bridge between the Blueprint (the *what*) and the per-phase prompts that go to Claude Code (the *how*). It answers three questions for every phase:
 
@@ -34,11 +35,22 @@ This document is the bridge between the Blueprint (the *what*) and the per-phase
 
 **Net:** No content from the old roadmap is dropped. Six phases became thirteen by inserting six runtime layers in front of Vision Authority and splitting the old Phase 2.
 
+**2026-05-09 Track A / Track B renaming (additive — no content removed):**
+
+| Old number | New number | Change |
+|---|---|---|
+| PHASE-7 (Vision Authority) | **PHASE-7-A** | Re-labeled; content unchanged |
+| PHASE-10 (Frontend Refactor) | **PHASE-13** | Re-labeled; content unchanged |
+| *(new)* | **PHASE-7-B** | Code Execution Tool (`shell.run`) |
+| *(new)* | **PHASE-7-C** | Environment Management |
+| *(new)* | **PHASE-7-D** | Browser Automation |
+| *(new)* | **PHASE-10** | Iterative Build Loop (MVP → review → refine) |
+
 ---
 
 ## Section 2 — The thirteen phases (full detail)
 
-### PHASE-0 — Foundation Repair (status: COMPLETE)
+### **[Track A]** PHASE-0 — Foundation Repair (status: COMPLETE)
 
 **Goal.** Close the Phase 0 fixes already executed (domain pivot, multi-select chips, project deletion, vision scaffolding).
 
@@ -57,7 +69,7 @@ This document is the bridge between the Blueprint (the *what*) and the per-phase
 
 ---
 
-### PHASE-0.5 — Pre-Blueprint Contradiction Sweep
+### **[Track A]** PHASE-0.5 — Pre-Blueprint Contradiction Sweep
 
 **Goal.** Read every authoritative document that could conflict with the Blueprint and either confirm alignment or produce a delta list. Required by Q5.
 
@@ -84,7 +96,7 @@ This document is the bridge between the Blueprint (the *what*) and the per-phase
 
 ---
 
-### PHASE-1 — Provider Contract v2 + Provider Registry
+### **[Track A]** PHASE-1 — Provider Contract v2 + Provider Registry
 
 **Goal.** Every provider in `code/src/providers/` is a thin handler over a shared contract. Boot validates the contract.
 
@@ -134,7 +146,7 @@ code/src/providers/providerRouter.js                   — now driven by registr
 
 ---
 
-### PHASE-2 — Tool Runtime Layer
+### **[Track A]** PHASE-2 — Tool Runtime Layer
 
 **Goal.** Every side effect that today goes through `fs.*` directly is reachable through a registered Tool with `name`, `required_mode`, `input_schema`, `output_schema`, `preview`, `execute`. The Tool Runtime is *added* in this phase; existing call sites are migrated in PHASE-6.
 
@@ -174,7 +186,7 @@ code/src/runtime/audit/toolAuditLog.js         — append-only JSONL log per too
 
 ---
 
-### PHASE-3 — Permission / Safety Layer
+### **[Track A]** PHASE-3 — Permission / Safety Layer
 
 **Goal.** Every Tool execution passes through a permission policy. Active mode is set at boot. PROMPT mode is wired into the conversation engine.
 
@@ -215,7 +227,7 @@ code/src/workspace/apiServer.js       — new endpoint POST /api/permission/resp
 
 ---
 
-### PHASE-4 — Doctor / Health Layer
+### **[Track A]** PHASE-4 — Doctor / Health Layer
 
 **Goal.** A single endpoint and CLI report Forge's runtime state.
 
@@ -266,7 +278,7 @@ code/src/orchestrator/status_writer.js
 
 ---
 
-### PHASE-5 — Forge Self-Test Harness (L5a)
+### **[Track A]** PHASE-5 — Forge Self-Test Harness (L5a)
 
 **Goal.** Mock OpenAI service + scenario runner + 12 baseline scenarios. CI-runnable.
 
@@ -324,7 +336,7 @@ bin/forge-test.js                                      — CLI entry: runs all s
 
 ---
 
-### PHASE-6 — apiServer.js migration (Stages 1 + 2)
+### **[Track A]** PHASE-6 — apiServer.js migration (Stages 1 + 2)
 
 **Goal.** Lift every direct `fs.*` call in `apiServer.js` and the engines into Tool Runtime calls (Stage 1), then extract handlers out of `apiServer.js` into `code/src/workspace/handlers/` (Stage 2).
 
@@ -372,7 +384,7 @@ After Stage 2, `apiServer.js` should be under 800 lines (today: 3596).
 
 ---
 
-### PHASE-7 — Vision Authority System
+### **[Track B]** PHASE-7-A — Vision Authority System
 
 **Goal.** What old Phase 1 promised, but built on top of the four runtime layers. VisionComplianceGate is no longer a bespoke regex scanner; it is one L3 deny-rule (`writes to docs/** require vision_locked=true`) plus one L2 tool (`vision.amend_proposal`).
 
@@ -425,7 +437,37 @@ code/src/orchestrator/pipeline_definition.js           — VISION_COMPLIANCE mod
 
 ---
 
-### PHASE-8 — Built-Project Test Harness (L5b) + projectTestPlanProvider
+### **[Track B]** PHASE-7-B — Code Execution Tool *(placeholder)*
+
+**Capability added.** `shell.run` and `shell.run_in_workspace` — sandboxed shell execution. Forge can run build commands, test suites, and package-install commands on behalf of the owner.
+
+**Status.** Placeholder — requires fresh decision artifact + owner approval before this phase begins.
+
+**Depends on.** PHASE-7-A (Vision Authority must be live before ungoverned execution tools are added).
+
+---
+
+### **[Track B]** PHASE-7-C — Environment Management *(placeholder)*
+
+**Capability added.** `env.install`, `env.docker_run`, `env.detect` — detect local runtime environment, install dependencies, launch Docker containers.
+
+**Status.** Placeholder — requires fresh decision artifact + owner approval before this phase begins.
+
+**Depends on.** PHASE-7-B (needs shell execution tool as foundation).
+
+---
+
+### **[Track B]** PHASE-7-D — Browser Automation *(placeholder)*
+
+**Capability added.** `browser.navigate`, `browser.read`, `browser.click` — Playwright-backed browser control for research, scraping, and UI validation tasks.
+
+**Status.** Placeholder — requires fresh decision artifact + owner approval before this phase begins.
+
+**Depends on.** PHASE-7-A. (Independent of 7-B/7-C — can be sequenced separately if needed.)
+
+---
+
+### **[Track B]** PHASE-8 — Built-Project Test Harness (L5b) + projectTestPlanProvider
 
 **Goal.** When Forge generates a project, it generates a deterministic test scenario set alongside the code. The same `scenario_runner.js` from PHASE-5 runs them.
 
@@ -472,11 +514,11 @@ code/src/orchestrator/pipeline_definition.js           — EXECUTE module gains
 
 **Estimated effort.** 6–8 days.
 
-**Depends on.** PHASE-7 (needs vision-aligned spec to drive the test plan).
+**Depends on.** PHASE-7-A (needs vision-aligned spec to drive the test plan).
 
 ---
 
-### PHASE-9 — Knowledge Base & Research Agent
+### **[Track B]** PHASE-9 — Knowledge Base & Research Agent
 
 **Goal.** What old Phase 2's KB part promised: web research, credibility scoring, local vector store, citation tracking.
 
@@ -527,13 +569,25 @@ code/src/modules/auditEngine.js                        — new audit rule:
 
 **Estimated effort.** 18–21 days.
 
-**Depends on.** PHASE-7. (PHASE-8 is parallel-able — see Section 3.)
+**Depends on.** PHASE-7-A. (PHASE-8 is parallel-able — see Section 3.)
 
 ---
 
-### PHASE-10 — Frontend Refactor (React)
+### **[Track B]** PHASE-10 — Iterative Build Loop *(placeholder)*
 
-**Goal.** Same as old Phase 3. Move `web/index.html` to React + Vite + TypeScript + Tailwind + shadcn/ui. Backend unchanged.
+**Capability added.** MVP → owner review → refine cycle. Instead of monolithic builds, Forge produces a minimal working version, surfaces it to the owner for feedback, then iterates. Necessary for non-technical owners who cannot evaluate partial-build artifacts.
+
+**Status.** Placeholder — requires fresh decision artifact + owner approval before this phase begins.
+
+**Depends on.** PHASE-9 (KB must be live to drive research-backed refinement).
+
+---
+
+### **[Track B]** PHASE-13 — Conversational UX Polish
+
+**Goal.** Same as old Phase 3 (Frontend Refactor). Move `web/index.html` to React + Vite + TypeScript + Tailwind + shadcn/ui. Add voice input and visual feedback. Backend unchanged. **Sequenced last in Track B** because polished UX investment is warranted only after the orchestration layer is genuinely impressive.
+
+*(Formerly: PHASE-10 — Frontend Refactor. Re-labeled 2026-05-09 per vision shift decision.)*
 
 **New folder.** `web/apps/forge-workspace/` — full React app.
 
@@ -548,7 +602,7 @@ code/src/modules/auditEngine.js                        — new audit rule:
 
 ---
 
-### PHASE-11 — Existing Project Intake & Reverse Vision
+### **[Track B]** PHASE-11 — Existing Project Intake & Reverse Vision
 
 **Goal.** Same as old Phase 4. User uploads a project folder/zip → Forge analyzes (multi-language tree-sitter), infers vision retroactively, drops it into the same loop.
 
@@ -563,11 +617,11 @@ code/src/modules/auditEngine.js                        — new audit rule:
 
 **Estimated effort.** 14–21 days.
 
-**Depends on.** PHASE-7 (Vision Authority must be live so reverse-vision can lock).
+**Depends on.** PHASE-7-A (Vision Authority must be live so reverse-vision can lock).
 
 ---
 
-### PHASE-12 — Personal Production Setup
+### **[Track B]** PHASE-12 — Personal Production Setup
 
 **Goal.** Same as old Phase 5: PM2/systemd/launchd, encrypted key storage, backups, monitoring, INSTALL.md.
 
