@@ -116,7 +116,11 @@
       "Bash(Get-ChildItem \"d:\\\\S\\\\Halo\\\\Tech\\\\Forge-Claude\\\\artifacts\\\\decisions\")",
       "Bash(Sort-Object Name)",
       "Bash(Select-Object -Last 5 -ExpandProperty Name)",
-      "Bash(node -e \"const fs=require\\('fs'\\),p='artifacts/projects'; if\\(fs.existsSync\\(p\\)\\){const d=fs.readdirSync\\(p\\).filter\\(x=>x.includes\\('test_conv'\\)\\);console.log\\(d.length>0?d.join\\(','\\):'\\(clean\\)'\\);}else{console.log\\('\\(no projects dir\\)'\\);};\")"
+      "Bash(node -e \"const fs=require\\('fs'\\),p='artifacts/projects'; if\\(fs.existsSync\\(p\\)\\){const d=fs.readdirSync\\(p\\).filter\\(x=>x.includes\\('test_conv'\\)\\);console.log\\(d.length>0?d.join\\(','\\):'\\(clean\\)'\\);}else{console.log\\('\\(no projects dir\\)'\\);};\")",
+      "Bash(node bin/forge-test.js S19)",
+      "Bash(node bin/forge-test.js S17 S18 S19)",
+      "Bash(node bin/forge-test.js S17)",
+      "Bash(grep -v \"^$\")"
     ],
     "additionalDirectories": [
       "\\tmp"
