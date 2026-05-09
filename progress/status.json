@@ -4,10 +4,10 @@
   "current_stage": "A",
   "overall_progress_percent": 99,
   "stage_progress_percent": 100,
-  "current_task": "PHASE-6.B.1-CLOSED",
-  "next_phase": "PHASE-6.B.2",
-  "next_step": "Begin PHASE-6.B.2: write conversation_history from processMessage; address FINDINGS-WARN-4.",
-  "last_completed_artifact": "artifacts/decisions/PHASE-6.B.1-exit-report.md",
+  "current_task": "PHASE-6.B.2-CLOSED",
+  "next_phase": "PHASE-6.B.3",
+  "next_step": "Begin PHASE-6.B.3: migrate next batch of ai_os engines (ideationEngine + 2-3 others). conversationMemoryManager done.",
+  "last_completed_artifact": "artifacts/decisions/PHASE-6.B.2-exit-report.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -24,8 +24,7 @@
     "completed_at": "2026-05-09T07:26:04.487Z",
     "warnings_to_address_in_phase_6": [
       "FINDINGS-WARN-1",
-      "FINDINGS-WARN-2",
-      "FINDINGS-WARN-4"
+      "FINDINGS-WARN-2"
     ]
   },
   "phase_0_5_sweep": {
@@ -72,7 +71,7 @@
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
     "self_test_last_run": "2026-05-09",
-    "self_test_last_result": "13 passed, 0 failed, 0 skipped (13 total) — 4 conversation scenarios now have real assertions",
+    "self_test_last_result": "13 passed, 0 failed, 0 skipped (13 total) — S11 now verifies conversation history persistence",
     "self_test_scenarios_pass": 13,
     "self_test_scenarios_skip": 0,
     "self_test_scenarios_fail": 0,
@@ -80,7 +79,7 @@
     "tools_registered_count": 20,
     "active_permission_mode": "WORKSPACE_WRITE",
     "permission_policy_installed": true,
-    "note": "PHASE-6.B.1 closed. Conversation scenarios S06/S07/S09/S11 now have real assertions (prev empty). Bug-8 fixed (status hardcoding in _normalizeConversationResult). turns array supported in _runConversation. FINDINGS-WARN-3 resolved. FINDINGS-WARN-4 logged (conversation_history not written — deferred to PHASE-6.B.2). Next: PHASE-6.B.2.",
+    "note": "PHASE-6.B.2 closed. conversationMemoryManager migrated to L2 Tool Runtime. processMessage now owns history persistence (L3 gating active). apiServer 4 saveContext sites removed. Bug-9 resolved. FINDINGS-WARN-4 RESOLVED via S11 artifact_exists assertion. Next: PHASE-6.B.3 (next batch of ai_os engines).",
     "last_doctor_counts": {
       "pass": 12,
       "warn": 2,

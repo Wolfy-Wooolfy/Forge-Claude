@@ -71,8 +71,8 @@ function createWorkspaceApiServer(options = {}) {
   const projectReviewEngine = createProjectReviewEngine({ root });
   const deliveryPackageBuilder = createDeliveryPackageBuilder({ root });
   const ideationEngine = createIdeationEngine({ root });
-  const conversationEngine = createConversationEngine({ root, ideationEngine });
   const conversationMemoryManager = createConversationMemoryManager({ root });
+  const conversationEngine = createConversationEngine({ root, ideationEngine, conversationMemoryManager });
   const refinementLoopOrchestrator = createRefinementLoopOrchestrator({ root });
   const discussionLoopGate = createDiscussionLoopGate({ root });
   const documentationBuildLoop = createDocumentationBuildLoop({ root });
@@ -3014,20 +3014,6 @@ function buildExecutionPackage(packet) {
       if (req.method === "POST" && pathname === "/api/ai-os/chat") {
         const body = await readBody(req);
         const result = await conversationEngine.processMessage(body);
-        if (result.ok && body.project_id) {
-          conversationMemoryManager.saveContext(body.project_id, {
-            role: "user",
-            content: String(body.message || ""),
-            created_at: new Date().toISOString()
-          });
-          if (result.message) {
-            conversationMemoryManager.saveContext(body.project_id, {
-              role: "assistant",
-              content: result.message,
-              created_at: new Date().toISOString()
-            });
-          }
-        }
         sendJson(res, 200, result);
         return;
       }
@@ -3069,11 +3055,6 @@ function buildExecutionPackage(packet) {
             sendEvent({ type: "error", reason: result.reason || "PROCESS_FAILED" });
             res.end();
             return;
-          }
-
-          conversationMemoryManager.saveContext(projectId, { role: "user", content: message, created_at: new Date().toISOString() });
-          if (result.message) {
-            conversationMemoryManager.saveContext(projectId, { role: "assistant", content: result.message, created_at: new Date().toISOString() });
           }
 
           if (result.message) {

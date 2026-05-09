@@ -33,6 +33,15 @@ function createConversationEngine(options = {}) {
   const projectsRoot = path.resolve(root, "artifacts/projects");
   const ideationEngine = options.ideationEngine || null;
 
+  let _memoryManager = options.conversationMemoryManager || null;
+  function getMemoryManager() {
+    if (_memoryManager) return _memoryManager;
+    console.warn("[conversationEngine] memoryManager not injected; lazy-instantiating. Update callers to pass it explicitly.");
+    const { createConversationMemoryManager } = require("./conversationMemoryManager");
+    _memoryManager = createConversationMemoryManager({ root });
+    return _memoryManager;
+  }
+
   function readJsonSafe(filePath, fallback) {
     try { return fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath, "utf8")) : fallback; }
     catch { return fallback; }
@@ -248,6 +257,31 @@ function createConversationEngine(options = {}) {
     };
   }
 
+  async function persistTurn(projectId, userMessage, result) {
+    if (!result || result.ok !== true) return;
+    if (!projectId) return;
+    const mm = getMemoryManager();
+    try {
+      if (userMessage) {
+        await mm.saveContext(projectId, {
+          role: "user",
+          content: userMessage,
+          created_at: nowIso()
+        });
+      }
+      if (result.message) {
+        await mm.saveContext(projectId, {
+          role: "assistant",
+          content: result.message,
+          created_at: nowIso()
+        });
+      }
+    } catch (err) {
+      console.error("[conversationEngine] history persistence failed:", err.message);
+      result.history_persisted = false;
+    }
+  }
+
   // C-2: Provider Discovery Hard Prohibition
   // Per docs/12_ai_os/03_CONVERSATION_LAYER_CONTRACT.md §13.7.3
   // The conversation layer MUST NOT infer requirements using keyword logic.
@@ -304,7 +338,7 @@ function createConversationEngine(options = {}) {
 
       // Fail-closed: provider failure → ask for clarification, never assume
       if (intentResult.status !== "SUCCESS" || !intentResult.output) {
-        return {
+        const r = {
           ok: true,
           mode: "PENDING_CONFIRMATION",
           message: state.pending_confirmation.message,
@@ -312,13 +346,15 @@ function createConversationEngine(options = {}) {
           target_state: state.pending_confirmation.target_state,
           project_id: projectId
         };
+        await persistTurn(projectId, message, r);
+        return r;
       }
 
       const { intent, confidence, clarification_question } = intentResult.output;
 
       // Low confidence → ask for clarification regardless of intent
       if (confidence < 0.75) {
-        return {
+        const r = {
           ok: true,
           mode: "PENDING_CONFIRMATION",
           message: clarification_question || fallbackClarification,
@@ -326,14 +362,18 @@ function createConversationEngine(options = {}) {
           target_state: state.pending_confirmation.target_state,
           project_id: projectId
         };
+        await persistTurn(projectId, message, r);
+        return r;
       }
 
       if (intent === "AFFIRM") {
-        return confirmTransition({
+        const r = await confirmTransition({
           project_id: projectId,
           user_language,
           confirmation_key: state.pending_confirmation.confirmation_key
         });
+        await persistTurn(projectId, message, r);
+        return r;
       }
 
       if (intent === "REJECT" || intent === "MODIFY") {
@@ -349,17 +389,19 @@ function createConversationEngine(options = {}) {
           undefined,
           history
         );
-        return {
+        const r = {
           ok: true,
           mode: intent === "MODIFY" ? "MODIFICATION_REQUESTED" : "CONFIRMATION_CANCELLED",
           message: convMsg.message,
           suggest_next: convMsg.suggest_next,
           project_id: projectId
         };
+        await persistTurn(projectId, message, r);
+        return r;
       }
 
       // UNCLEAR intent → ask for clarification
-      return {
+      const rUnclear = {
         ok: true,
         mode: "PENDING_CONFIRMATION",
         message: clarification_question || fallbackClarification,
@@ -367,6 +409,8 @@ function createConversationEngine(options = {}) {
         target_state: state.pending_confirmation.target_state,
         project_id: projectId
       };
+      await persistTurn(projectId, message, rUnclear);
+      return rUnclear;
     }
 
     // Route DISCUSSION / IDEATION to ideation engine for discovery loop
@@ -389,7 +433,9 @@ function createConversationEngine(options = {}) {
       }
 
       if (ideationResult.ready_for_options) {
-        return generateCheckpoint(projectId, "OPTION_DECISION");
+        const r = await generateCheckpoint(projectId, "OPTION_DECISION");
+        await persistTurn(projectId, message, r);
+        return r;
       }
 
       // Bug-5 fix: build deterministic pivot message — never rely on LLM wording for domain names
@@ -403,7 +449,7 @@ function createConversationEngine(options = {}) {
           : `I noticed you were discussing "${prevDomain}" but your message now points to "${newDomain}". Would you like to switch to "${newDomain}"?`;
       }
 
-      return {
+      const rIdeation = {
         ok: true,
         mode: "IDEATION_IN_PROGRESS",
         message: ideationMessage,
@@ -414,6 +460,8 @@ function createConversationEngine(options = {}) {
         current_state: "IDEATION",
         project_id: projectId
       };
+      await persistTurn(projectId, message, rIdeation);
+      return rIdeation;
     }
 
     // All other states: generate a conversational response
@@ -431,7 +479,7 @@ function createConversationEngine(options = {}) {
       history
     );
 
-    return {
+    const rProcessed = {
       ok: true,
       mode: "MESSAGE_PROCESSED",
       message: convMsg.message,
@@ -439,6 +487,8 @@ function createConversationEngine(options = {}) {
       current_state: currentState,
       project_id: projectId
     };
+    await persistTurn(projectId, message, rProcessed);
+    return rProcessed;
   }
 
   return {

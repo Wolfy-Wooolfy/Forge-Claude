@@ -16,6 +16,7 @@
     { "type": "state_field_equals", "field": "mode",          "expected": "MESSAGE_PROCESSED" },
     { "type": "state_field_equals", "field": "current_state", "expected": "DISCUSSION" },
     { "type": "state_field_equals", "field": "project_id",    "expected": "test_conv_s11" },
-    { "type": "state_field_equals", "field": "turn_count",    "expected": 2 }
+    { "type": "state_field_equals", "field": "turn_count",    "expected": 2 },
+    { "type": "artifact_exists",    "path": "artifacts/projects/test_conv_s11/ai_os/conversation_context.json" }
   ]
 }

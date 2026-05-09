@@ -289,7 +289,13 @@ async function _runConversation(scenario, root) {
     const { createConversationEngine } = require(
       path.join(root, "code", "src", "ai_os", "conversationEngine")
     );
-    const engine = createConversationEngine({ root });
+    const { createConversationMemoryManager } = require(
+      path.join(root, "code", "src", "ai_os", "conversationMemoryManager")
+    );
+    const engine = createConversationEngine({
+      root,
+      conversationMemoryManager: createConversationMemoryManager({ root })
+    });
 
     const turns = Array.isArray(scenario.input && scenario.input.turns)
       ? scenario.input.turns
@@ -329,15 +335,23 @@ async function _runConversation(scenario, root) {
     if (savedMode !== undefined) process.env.FORGE_PERMISSION_MODE = savedMode;
     else delete process.env.FORGE_PERMISSION_MODE;
     resetDefaultRegistry();
-
-    if (fixtureCreated) {
-      try { fs.unlinkSync(fixturePath); } catch { /* best-effort */ }
-      try { fs.rmdirSync(projectDir); } catch { /* best-effort */ }
-    }
+    // Fixture cleanup is deferred to _runOne so assertions can inspect filesystem state.
   }
 
   const newAudit = readEntries(root, { since_ts: startTs });
-  return _normalizeConversationResult(raw, newAudit);
+  const result   = _normalizeConversationResult(raw, newAudit);
+
+  if (fixtureCreated) {
+    Object.defineProperty(result, "_cleanup", {
+      value: () => {
+        try { fs.rmSync(projectDir, { recursive: true, force: true }); } catch { /* best-effort */ }
+      },
+      enumerable: false,
+      writable:   false
+    });
+  }
+
+  return result;
 }
 
 // ── Single scenario runner ────────────────────────────────────────────────────
@@ -370,11 +384,18 @@ async function _runOne(scenario, root) {
 
     const { runAll } = require("./assertions/_registry");
     const ctx = { root };
-    const { allPassed, results: assertResults } = runAll(
-      scenario.assertions || [],
-      execResult,
-      ctx
-    );
+    let allPassed, assertResults;
+    try {
+      ({ allPassed, results: assertResults } = runAll(
+        scenario.assertions || [],
+        execResult,
+        ctx
+      ));
+    } finally {
+      if (execResult && typeof execResult._cleanup === "function") {
+        execResult._cleanup();
+      }
+    }
 
     return Object.assign(base, {
       status:      allPassed ? "PASS" : "FAIL",

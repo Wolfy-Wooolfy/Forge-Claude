@@ -3,19 +3,27 @@
 const fs = require("fs");
 const path = require("path");
 const ConversationalResponseProvider = require("../providers/conversationalResponseProvider");
+const { getDefaultRegistry } = require("../runtime/tools/_registry");
 
 function createConversationMemoryManager(options = {}) {
   const root = path.resolve(options.root || process.cwd());
   const projectsRoot = path.resolve(root, "artifacts/projects");
 
-  function ensureDir(dirPath) { fs.mkdirSync(dirPath, { recursive: true }); }
   function readJsonSafe(filePath, fallback) {
     try { return fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath, "utf8")) : fallback; }
     catch { return fallback; }
   }
-  function writeJson(filePath, payload) {
-    ensureDir(path.dirname(filePath));
-    fs.writeFileSync(filePath, JSON.stringify(payload, null, 2), "utf8");
+  async function writeJson(filePath, payload) {
+    const reg = getDefaultRegistry();
+    const relPath = path.relative(root, filePath).split(path.sep).join("/");
+    const r = await reg.invoke("fs.write_file", {
+      path:    relPath,
+      content: JSON.stringify(payload, null, 2)
+    }, { root });
+    if (r.status !== "SUCCESS") {
+      throw new Error("writeJson failed [" + relPath + "]: " +
+        (r.metadata && r.metadata.reason) + ": " + (r.metadata && r.metadata.detail));
+    }
   }
   function nowIso() { return new Date().toISOString(); }
   function normalizeProjectId(value) {
@@ -26,14 +34,13 @@ function createConversationMemoryManager(options = {}) {
     return path.join(projectsRoot, normalizeProjectId(projectId), "ai_os", "conversation_context.json");
   }
 
-  function saveContext(projectId, entry) {
+  async function saveContext(projectId, entry) {
     const filePath = contextPath(projectId);
-    const current = readJsonSafe(filePath, []);
-    const list = Array.isArray(current) ? current : [];
+    const current  = readJsonSafe(filePath, []);
+    const list     = Array.isArray(current) ? current : [];
     list.push({ ...entry, saved_at: nowIso() });
-    // Keep last 100 entries to avoid unbounded growth
-    const trimmed = list.slice(-100);
-    writeJson(filePath, trimmed);
+    const trimmed  = list.slice(-100);
+    await writeJson(filePath, trimmed);
     return { ok: true, entry_count: trimmed.length };
   }
 
@@ -41,8 +48,8 @@ function createConversationMemoryManager(options = {}) {
     return readJsonSafe(contextPath(projectId), []);
   }
 
-  function clearContext(projectId) {
-    writeJson(contextPath(projectId), []);
+  async function clearContext(projectId) {
+    await writeJson(contextPath(projectId), []);
     return { ok: true };
   }
 
