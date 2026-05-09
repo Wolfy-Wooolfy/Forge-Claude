@@ -1,0 +1,23 @@
+{
+  "id": "S02",
+  "name": "intentClassificationProvider classifies user approval as AFFIRM",
+  "type": "direct_provider",
+  "provider": "intentClassificationProvider",
+  "input": {
+    "message": "نعم، موافق على الفكرة",
+    "pending_action": "إنشاء مشروع جديد",
+    "user_language": "ar"
+  },
+  "mock": {
+    "tool_name": "classify_intent",
+    "args": {
+      "intent": "AFFIRM",
+      "confidence": 0.95,
+      "clarification_question": ""
+    }
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "intent", "expected": "AFFIRM" }
+  ]
+}

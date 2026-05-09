@@ -1,0 +1,12 @@
+{
+  "id": "S11",
+  "name": "multi-turn conversation state preserved across turns via conversationEngine",
+  "type": "conversation",
+  "input": {
+    "turns": [
+      { "role": "user", "message": "اسمي خالد" },
+      { "role": "user", "message": "ما اسمي؟" }
+    ]
+  },
+  "assertions": []
+}

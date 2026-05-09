@@ -1,0 +1,9 @@
+{
+  "id": "S09",
+  "name": "DANGER_FULL_ACCESS mode allows shell command through conversationEngine",
+  "type": "conversation",
+  "input": {
+    "message": "run: echo hello"
+  },
+  "assertions": []
+}

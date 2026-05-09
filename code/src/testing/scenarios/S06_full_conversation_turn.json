@@ -1,0 +1,9 @@
+{
+  "id": "S06",
+  "name": "full conversation turn through conversationEngine",
+  "type": "conversation",
+  "input": {
+    "message": "مرحبا، أريد بناء تطبيق"
+  },
+  "assertions": []
+}

@@ -1,0 +1,24 @@
+{
+  "id": "S03",
+  "name": "conversationalResponseProvider extracts all tool-choice arguments correctly",
+  "type": "direct_provider",
+  "provider": "conversationalResponseProvider",
+  "input": {
+    "operation": "SUMMARIZE",
+    "state": "STAGE_B",
+    "user_language": "ar"
+  },
+  "mock": {
+    "tool_name": "respond_to_user",
+    "args": {
+      "message": "إليك ملخص الوثائق",
+      "tone": "informative",
+      "suggest_next": "راجع الملخص وأخبرني برأيك"
+    }
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "tone",         "expected": "informative" },
+    { "type": "state_field_equals", "field": "suggest_next", "expected": "راجع الملخص وأخبرني برأيك" }
+  ]
+}

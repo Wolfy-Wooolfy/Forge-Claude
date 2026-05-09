@@ -1,0 +1,14 @@
+{
+  "id": "S08",
+  "name": "fs.write_file denied in PROMPT mode (no interactive session in harness)",
+  "type": "direct_tool",
+  "tool": "fs.write_file",
+  "permission": "PROMPT",
+  "input": {
+    "path": "artifacts/self-test/s08.txt",
+    "content": "S08 self-test write — should be denied by PROMPT auto-deny"
+  },
+  "assertions": [
+    { "type": "status_equals", "expected": "DENIED" }
+  ]
+}

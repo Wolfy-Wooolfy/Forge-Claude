@@ -1,0 +1,17 @@
+{
+  "id": "S12",
+  "name": "W-03 isolation: FORGE_DECISION_OVERRIDE has no effect on permission layer",
+  "type": "direct_tool",
+  "tool": "fs.write_file",
+  "permission": "READ_ONLY",
+  "env": {
+    "FORGE_DECISION_OVERRIDE": "APPROVE_ALL"
+  },
+  "input": {
+    "path": "artifacts/self-test/s12.txt",
+    "content": "S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROVE_ALL"
+  },
+  "assertions": [
+    { "type": "status_equals", "expected": "DENIED" }
+  ]
+}

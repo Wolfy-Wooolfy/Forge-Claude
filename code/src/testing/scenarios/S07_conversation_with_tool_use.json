@@ -1,0 +1,9 @@
+{
+  "id": "S07",
+  "name": "conversation turn results in tool invocation through conversationEngine",
+  "type": "conversation",
+  "input": {
+    "message": "احفظ هذه الملاحظة: فكرة رائعة"
+  },
+  "assertions": []
+}

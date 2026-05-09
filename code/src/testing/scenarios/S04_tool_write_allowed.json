@@ -1,0 +1,14 @@
+{
+  "id": "S04",
+  "name": "fs.write_file succeeds in WORKSPACE_WRITE permission mode",
+  "type": "direct_tool",
+  "tool": "fs.write_file",
+  "permission": "WORKSPACE_WRITE",
+  "input": {
+    "path": "artifacts/self-test/s04.txt",
+    "content": "S04 self-test write — WORKSPACE_WRITE allows file creation"
+  },
+  "assertions": [
+    { "type": "status_equals", "expected": "SUCCESS" }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": "S10",
+  "name": "doctor runDoctor() returns ok=true with no FAIL checks",
+  "type": "direct_doctor",
+  "env": {
+    "OPENAI_API_KEY": "sk-mock-harness-s10-doctor-000000000000"
+  },
+  "input": {},
+  "assertions": [
+    { "type": "status_equals",      "expected": "PASS" },
+    { "type": "state_field_equals", "field": "ok", "expected": true }
+  ]
+}

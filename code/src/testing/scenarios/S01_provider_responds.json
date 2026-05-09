@@ -1,0 +1,23 @@
+{
+  "id": "S01",
+  "name": "conversationalResponseProvider returns respond_to_user tool call",
+  "type": "direct_provider",
+  "provider": "conversationalResponseProvider",
+  "input": {
+    "operation": "GREET",
+    "state": "STAGE_A",
+    "user_language": "ar"
+  },
+  "mock": {
+    "tool_name": "respond_to_user",
+    "args": {
+      "message": "مرحبا بك في Forge",
+      "tone": "friendly",
+      "suggest_next": "أخبرني عن فكرتك"
+    }
+  },
+  "assertions": [
+    { "type": "status_equals",    "expected": "SUCCESS" },
+    { "type": "response_contains", "substring": "مرحبا" }
+  ]
+}

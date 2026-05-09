@@ -1,0 +1,14 @@
+{
+  "id": "S05",
+  "name": "fs.write_file denied in READ_ONLY permission mode",
+  "type": "direct_tool",
+  "tool": "fs.write_file",
+  "permission": "READ_ONLY",
+  "input": {
+    "path": "artifacts/self-test/s05.txt",
+    "content": "S05 self-test write — should be denied"
+  },
+  "assertions": [
+    { "type": "status_equals", "expected": "DENIED" }
+  ]
+}
