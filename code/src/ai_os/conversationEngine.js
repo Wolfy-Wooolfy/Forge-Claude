@@ -5,6 +5,7 @@ const path = require("path");
 const crypto = require("crypto");
 const ConversationalResponseProvider = require("../providers/conversationalResponseProvider");
 const IntentClassificationProvider = require("../providers/intentClassificationProvider");
+const { getDefaultRegistry } = require("../runtime/tools/_registry");
 
 const STATE_TRANSITION_THRESHOLDS = {
   DISCUSSION: ["DISCOVERY_REQUIRED"],
@@ -32,14 +33,21 @@ function createConversationEngine(options = {}) {
   const projectsRoot = path.resolve(root, "artifacts/projects");
   const ideationEngine = options.ideationEngine || null;
 
-  function ensureDir(dirPath) { fs.mkdirSync(dirPath, { recursive: true }); }
   function readJsonSafe(filePath, fallback) {
     try { return fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath, "utf8")) : fallback; }
     catch { return fallback; }
   }
-  function writeJson(filePath, payload) {
-    ensureDir(path.dirname(filePath));
-    fs.writeFileSync(filePath, JSON.stringify(payload, null, 2), "utf8");
+  async function writeJson(filePath, payload) {
+    const reg = getDefaultRegistry();
+    const relPath = path.relative(root, filePath).split(path.sep).join("/");
+    const r = await reg.invoke("fs.write_file", {
+      path:    relPath,
+      content: JSON.stringify(payload, null, 2)
+    }, { root });
+    if (r.status !== "SUCCESS") {
+      throw new Error("writeJson failed [" + relPath + "]: " +
+        (r.metadata && r.metadata.reason) + ": " + (r.metadata && r.metadata.detail));
+    }
   }
   function nowIso() { return new Date().toISOString(); }
   function normalizeProjectId(value) {
@@ -63,8 +71,8 @@ function createConversationEngine(options = {}) {
     return readJsonSafe(statePath(projectId), null);
   }
 
-  function saveState(projectId, state) {
-    writeJson(statePath(projectId), state);
+  async function saveState(projectId, state) {
+    await writeJson(statePath(projectId), state);
   }
 
   function generateConfirmationKey() {
@@ -141,7 +149,7 @@ function createConversationEngine(options = {}) {
     }
 
     const updatedState = { ...state, pending_confirmation: pending };
-    saveState(projectId, updatedState);
+    await saveState(projectId, updatedState);
 
     return {
       ok: true,
@@ -167,7 +175,7 @@ function createConversationEngine(options = {}) {
     if (pending.expires_at && new Date() > new Date(pending.expires_at)) {
       const updatedState = { ...state };
       delete updatedState.pending_confirmation;
-      saveState(projectId, updatedState);
+      await saveState(projectId, updatedState);
       return { ok: false, mode: "BLOCKED", reason: "CONFIRMATION_EXPIRED" };
     }
 
@@ -179,7 +187,7 @@ function createConversationEngine(options = {}) {
     const updatedState = { ...state, active_runtime_state: targetState };
     delete updatedState.pending_confirmation;
     updatedState.last_updated_at = nowIso();
-    saveState(projectId, updatedState);
+    await saveState(projectId, updatedState);
 
     const convMsg = await generateConversationalMessage(
       `TRANSITION_CONFIRMED_TO_${targetState}`,
@@ -331,7 +339,7 @@ function createConversationEngine(options = {}) {
       if (intent === "REJECT" || intent === "MODIFY") {
         const updatedState = { ...state };
         delete updatedState.pending_confirmation;
-        saveState(projectId, updatedState);
+        await saveState(projectId, updatedState);
         const operation = intent === "MODIFY" ? "CONFIRMATION_MODIFY_REQUESTED" : "CONFIRMATION_CANCELLED";
         const convMsg = await generateConversationalMessage(
           operation,
@@ -367,7 +375,7 @@ function createConversationEngine(options = {}) {
       if (currentState === "DISCUSSION") {
         const transitionState = { ...state, active_runtime_state: "IDEATION", last_updated_at: nowIso() };
         if (!transitionState.user_goal && message) transitionState.user_goal = message;
-        saveState(projectId, transitionState);
+        await saveState(projectId, transitionState);
       }
 
       const ideationResult = await ideationEngine.expandIdea({

@@ -4,10 +4,10 @@
   "current_stage": "A",
   "overall_progress_percent": 99,
   "stage_progress_percent": 100,
-  "current_task": "PHASE-6.0-CLOSED",
-  "next_phase": "PHASE-6.A",
-  "next_step": "Begin PHASE-6.A: migrate conversationEngine + activeProjectManager + projectRuntime to use Tool Runtime (registry.invoke). S06 + S07 should flip from SKIP to PASS.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-20260509-phase-6.0-pre-migration-cleanup.md",
+  "current_task": "PHASE-6.A-CLOSED",
+  "next_phase": "PHASE-6.B",
+  "next_step": "Begin PHASE-6.B: author real assertions for S06-S11 (FINDINGS-WARN-3), then apiServer endpoint audit and migration.",
+  "last_completed_artifact": "artifacts/decisions/PHASE-6.A-exit-report.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -24,7 +24,8 @@
     "completed_at": "2026-05-09T07:26:04.487Z",
     "warnings_to_address_in_phase_6": [
       "FINDINGS-WARN-1",
-      "FINDINGS-WARN-2"
+      "FINDINGS-WARN-2",
+      "FINDINGS-WARN-3"
     ]
   },
   "phase_0_5_sweep": {
@@ -70,16 +71,16 @@
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
-    "self_test_last_run": "2026-05-08",
-    "self_test_last_result": "9 passed, 0 failed, 4 skipped (13 total)",
-    "self_test_scenarios_pass": 9,
-    "self_test_scenarios_skip": 4,
+    "self_test_last_run": "2026-05-09",
+    "self_test_last_result": "13 passed, 0 failed, 0 skipped (13 total)",
+    "self_test_scenarios_pass": 13,
+    "self_test_scenarios_skip": 0,
     "self_test_scenarios_fail": 0,
     "providers_registered_count": 12,
     "tools_registered_count": 20,
     "active_permission_mode": "WORKSPACE_WRITE",
     "permission_policy_installed": true,
-    "note": "PHASE-6.0 closed. pipeline_tools.js removed (3 tools, 0 callers). S13 TEST mode scenario added. 6 suites passing. Next: PHASE-6.A engine migration (conversationEngine + activeProjectManager + projectRuntime).",
+    "note": "PHASE-6.A closed. 3 engines migrated to L2 Tool Runtime. Conversation dispatch wired in scenario_runner. §3.6 L3 gating confirmed via audit log. FINDINGS-WARN-3: S06-S11 assertions empty — trivial PASS. Next: PHASE-6.B (real assertions + apiServer audit).",
     "last_doctor_counts": {
       "pass": 12,
       "warn": 2,

@@ -2,16 +2,13 @@
 
 const fs = require("fs");
 const path = require("path");
+const { getDefaultRegistry } = require("../runtime/tools/_registry");
 
 function createActiveProjectManager(options = {}) {
   const root = path.resolve(options.root || process.cwd());
   const projectsRoot = path.resolve(root, "artifacts/projects");
   const activeProjectPath = path.resolve(projectsRoot, "active_project.json");
   const projectRegistryPath = path.resolve(projectsRoot, "project_registry.json");
-
-  function ensureDir(dirPath) {
-    fs.mkdirSync(dirPath, { recursive: true });
-  }
 
   function readJsonSafe(filePath, fallback) {
     try {
@@ -22,9 +19,17 @@ function createActiveProjectManager(options = {}) {
     }
   }
 
-  function writeJson(filePath, payload) {
-    ensureDir(path.dirname(filePath));
-    fs.writeFileSync(filePath, JSON.stringify(payload, null, 2), "utf8");
+  async function writeJson(filePath, payload) {
+    const reg = getDefaultRegistry();
+    const relPath = path.relative(root, filePath).split(path.sep).join("/");
+    const r = await reg.invoke("fs.write_file", {
+      path:    relPath,
+      content: JSON.stringify(payload, null, 2)
+    }, { root });
+    if (r.status !== "SUCCESS") {
+      throw new Error("writeJson failed [" + relPath + "]: " +
+        (r.metadata && r.metadata.reason) + ": " + (r.metadata && r.metadata.detail));
+    }
   }
 
   function nowIso() {
@@ -40,7 +45,7 @@ function createActiveProjectManager(options = {}) {
     return readJsonSafe(activeProjectPath, null);
   }
 
-  function setActiveProject(projectId) {
+  async function setActiveProject(projectId) {
     const id = normalizeProjectId(projectId);
     if (!id) {
       return { ok: false, reason: "INVALID_PROJECT_ID" };
@@ -52,20 +57,25 @@ function createActiveProjectManager(options = {}) {
     }
 
     const payload = { active_project_id: id, activated_at: nowIso() };
-    writeJson(activeProjectPath, payload);
+    await writeJson(activeProjectPath, payload);
     return { ok: true, active_project_id: id };
   }
 
-  function clearActiveProject() {
+  async function clearActiveProject() {
     if (fs.existsSync(activeProjectPath)) {
-      fs.unlinkSync(activeProjectPath);
+      const reg = getDefaultRegistry();
+      const relPath = path.relative(root, activeProjectPath).split(path.sep).join("/");
+      const r = await reg.invoke("fs.delete_file", { path: relPath }, { root });
+      if (r.status !== "SUCCESS" && r.status !== "FAILED") {
+        throw new Error("clearActiveProject failed: " + (r.metadata && r.metadata.reason));
+      }
     }
     return { ok: true };
   }
 
-  function switchProject(toProjectId) {
+  async function switchProject(toProjectId) {
     const previous = getActiveProject();
-    const result = setActiveProject(toProjectId);
+    const result = await setActiveProject(toProjectId);
     if (!result.ok) return result;
     return {
       ok: true,
@@ -117,7 +127,7 @@ function createActiveProjectManager(options = {}) {
     };
   }
 
-  function registerProject(projectId, projectName) {
+  async function registerProject(projectId, projectName) {
     const id = normalizeProjectId(projectId);
     const registry = readJsonSafe(projectRegistryPath, { projects: [] });
     const projects = Array.isArray(registry.projects) ? registry.projects : [];
@@ -135,7 +145,7 @@ function createActiveProjectManager(options = {}) {
       projects.push(entry);
     }
 
-    writeJson(projectRegistryPath, { projects });
+    await writeJson(projectRegistryPath, { projects });
     return { ok: true, project_id: id };
   }
 
@@ -188,7 +198,7 @@ function createActiveProjectManager(options = {}) {
     active_project_flag: true
   };
 
-  function ensureProjectObjectModel(projectId) {
+  async function ensureProjectObjectModel(projectId) {
     const id = normalizeProjectId(projectId);
     const statePath = path.join(projectsRoot, id, "project_state.json");
     const state = readJsonSafe(statePath, null);
@@ -207,8 +217,7 @@ function createActiveProjectManager(options = {}) {
 
     if (mutated) {
       updated.last_updated_at = new Date().toISOString();
-      fs.mkdirSync(path.dirname(statePath), { recursive: true });
-      fs.writeFileSync(statePath, JSON.stringify(updated, null, 2), "utf-8");
+      await writeJson(statePath, updated);
     }
 
     const missingRequired = REQUIRED_PROJECT_FIELDS.filter((f) => updated[f] === undefined || updated[f] === null);

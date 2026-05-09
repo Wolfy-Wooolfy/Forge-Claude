@@ -3,6 +3,7 @@
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
+const { getDefaultRegistry } = require("../runtime/tools/_registry");
 const OpenAiRequirementDiscoveryProvider = require("../providers/openAiRequirementDiscoveryProvider");
 const OpenAiOptionsProvider = require("../providers/openAiOptionsProvider");
 const OpenAiDocumentationProvider = require("../providers/openAiDocumentationProvider");
@@ -11,10 +12,6 @@ const OpenAiExecutionFilesProvider = require("../providers/openAiExecutionFilesP
 function createAiOsRuntime(options = {}) {
   const root = path.resolve(options.root || process.cwd());
   const projectsRoot = path.resolve(root, "artifacts/projects");
-
-  function ensureDir(dirPath) {
-    fs.mkdirSync(dirPath, { recursive: true });
-  }
 
   function readJsonSafe(filePath, fallback) {
     try {
@@ -28,9 +25,17 @@ function createAiOsRuntime(options = {}) {
     }
   }
 
-  function writeJson(filePath, payload) {
-    ensureDir(path.dirname(filePath));
-    fs.writeFileSync(filePath, JSON.stringify(payload, null, 2), "utf8");
+  async function writeJson(filePath, payload) {
+    const reg = getDefaultRegistry();
+    const relPath = path.relative(root, filePath).split(path.sep).join("/");
+    const r = await reg.invoke("fs.write_file", {
+      path:    relPath,
+      content: JSON.stringify(payload, null, 2)
+    }, { root });
+    if (r.status !== "SUCCESS") {
+      throw new Error("writeJson failed [" + relPath + "]: " +
+        (r.metadata && r.metadata.reason) + ": " + (r.metadata && r.metadata.detail));
+    }
   }
 
   function normalizeProjectId(value) {
@@ -101,11 +106,11 @@ function createAiOsRuntime(options = {}) {
     return lines.join("\n");
   }
 
-  function appendArrayJson(filePath, entry) {
+  async function appendArrayJson(filePath, entry) {
     const current = readJsonSafe(filePath, []);
     const list = Array.isArray(current) ? current : [];
     list.push(entry);
-    writeJson(filePath, list);
+    await writeJson(filePath, list);
     return list;
   }
 
@@ -159,7 +164,7 @@ function createAiOsRuntime(options = {}) {
     return buildDefaultState(projectId, projectName);
   }
 
-  function saveProjectState(state) {
+  async function saveProjectState(state) {
     const projectId = normalizeProjectId(state.project_id);
     const finalState = {
       ...state,
@@ -168,7 +173,7 @@ function createAiOsRuntime(options = {}) {
       last_updated_at: nowIso()
     };
 
-    writeJson(projectStatePath(projectId), finalState);
+    await writeJson(projectStatePath(projectId), finalState);
     return finalState;
   }
 
@@ -364,7 +369,7 @@ function createAiOsRuntime(options = {}) {
     const discovery = await buildRequirementDiscoveryViaProvider(message);
 
     if (!discovery.ok) {
-      const blockedState = saveProjectState({
+      const blockedState = await saveProjectState({
         ...state,
         project_name: projectName,
         primary_language: detectPrimaryLanguage(message),
@@ -392,7 +397,7 @@ function createAiOsRuntime(options = {}) {
 
     const clarificationQuestions = discovery.open_questions;
 
-    const updatedState = saveProjectState({
+    const updatedState = await saveProjectState({
       ...state,
       project_name: projectName,
       primary_language: detectPrimaryLanguage(message),
@@ -410,13 +415,13 @@ function createAiOsRuntime(options = {}) {
       requirement_reasoning_summary: discovery.reasoning_summary
     });
 
-    appendArrayJson(path.join(aiOsRoot(projectId), "conversation_log.json"), {
+    await appendArrayJson(path.join(aiOsRoot(projectId), "conversation_log.json"), {
       entry_type: "USER_MESSAGE",
       message,
       created_at: nowIso()
     });
 
-    appendArrayJson(path.join(aiOsRoot(projectId), "ideation_log.json"), {
+    await appendArrayJson(path.join(aiOsRoot(projectId), "ideation_log.json"), {
       entry_type: "IDEATION_INTAKE",
       message,
       needs_clarification: clarificationQuestions.length > 0,
@@ -461,7 +466,7 @@ function createAiOsRuntime(options = {}) {
       };
     }
 
-    appendArrayJson(path.join(aiOsRoot(projectId), "conversation_log.json"), {
+    await appendArrayJson(path.join(aiOsRoot(projectId), "conversation_log.json"), {
       entry_type: "CLARIFICATION_ANSWERS",
       answers,
       created_at: nowIso()
@@ -484,7 +489,7 @@ function createAiOsRuntime(options = {}) {
     );
 
     if (!discovery.ok) {
-      const blockedState = saveProjectState({
+      const blockedState = await saveProjectState({
         ...state,
         current_phase: "DISCOVERY",
         active_runtime_state: "INVALID_ARCHITECTURE",
@@ -503,7 +508,7 @@ function createAiOsRuntime(options = {}) {
       };
     }
 
-    appendArrayJson(path.join(aiOsRoot(projectId), "ideation_log.json"), {
+    await appendArrayJson(path.join(aiOsRoot(projectId), "ideation_log.json"), {
       entry_type: discovery.completeness ? "DISCOVERY_COMPLETED" : "DISCOVERY_ITERATION_REQUIRED",
       open_questions_answered: state.open_questions,
       answers,
@@ -516,7 +521,7 @@ function createAiOsRuntime(options = {}) {
       created_at: nowIso()
     });
 
-    const updatedState = saveProjectState({
+    const updatedState = await saveProjectState({
       ...state,
       current_phase: discovery.completeness ? "DISCOVERY_COMPLETE" : "DISCOVERY",
       active_runtime_state: discovery.completeness ? "IDEATION" : "DISCOVERY_REQUIRED",
@@ -599,7 +604,7 @@ function createAiOsRuntime(options = {}) {
       risk_level: String(option.risk_level || "MEDIUM").toUpperCase()
     }));
 
-    const updatedState = saveProjectState({
+    const updatedState = await saveProjectState({
       ...state,
       current_phase: "PLANNING",
       active_runtime_state: "OPTION_DECISION",
@@ -610,7 +615,7 @@ function createAiOsRuntime(options = {}) {
       pending_decisions: normalizedOptions.map((option) => option.option_id)
     });
 
-    appendArrayJson(path.join(aiOsRoot(projectId), "options_log.json"), {
+    await appendArrayJson(path.join(aiOsRoot(projectId), "options_log.json"), {
       entry_type: reopenDecision ? "OPTIONS_REOPENED" : "OPTIONS_PRESENTED",
       options: normalizedOptions,
       recommendation: String(body.recommendation || ""),
@@ -625,7 +630,7 @@ function createAiOsRuntime(options = {}) {
     };
   }
 
-  function decideOption(body = {}) {
+  async function decideOption(body = {}) {
     const projectId = normalizeProjectId(body.project_id);
     const selectedOptionId = String(body.selected_option_id || "").trim();
 
@@ -651,7 +656,7 @@ function createAiOsRuntime(options = {}) {
       selectedOptionId
     ]));
 
-    const updatedState = saveProjectState({
+    const updatedState = await saveProjectState({
       ...state,
       current_phase: "DOCS_DRAFTING",
       active_runtime_state: "DOCUMENTATION",
@@ -660,7 +665,7 @@ function createAiOsRuntime(options = {}) {
       pending_decisions: []
     });
 
-    appendArrayJson(path.join(aiOsRoot(projectId), "decisions_log.json"), {
+    await appendArrayJson(path.join(aiOsRoot(projectId), "decisions_log.json"), {
       entry_type: "OPTION_DECISION",
       selected_option_id: selectedOptionId,
       decision_owner: String(body.decision_owner || "USER"),
@@ -743,13 +748,15 @@ function createAiOsRuntime(options = {}) {
       content = providerResult.content;
     }
 
-    const docsDir = path.join(aiOsRoot(projectId), "documentation");
-    const draftPath = path.join(docsDir, "draft.md");
+    const draftPath = path.join(aiOsRoot(projectId), "documentation", "draft.md");
+    const draftReg = getDefaultRegistry();
+    const relDraftPath = path.relative(root, draftPath).split(path.sep).join("/");
+    const draftResult = await draftReg.invoke("fs.write_file", { path: relDraftPath, content }, { root });
+    if (draftResult.status !== "SUCCESS") {
+      throw new Error("saveDocumentationDraft failed: " + (draftResult.metadata && draftResult.metadata.reason));
+    }
 
-    ensureDir(docsDir);
-    fs.writeFileSync(draftPath, content, "utf8");
-
-    const updatedState = saveProjectState({
+    const updatedState = await saveProjectState({
       ...state,
       current_phase: "DOCS_REVIEW",
       active_runtime_state: "DOCUMENTATION_REVIEW",
@@ -765,7 +772,7 @@ function createAiOsRuntime(options = {}) {
     };
   }
 
-  function approveDocumentation(body = {}) {
+  async function approveDocumentation(body = {}) {
     const projectId = normalizeProjectId(body.project_id);
     const draftPath = path.join(aiOsRoot(projectId), "documentation", "draft.md");
 
@@ -786,7 +793,7 @@ function createAiOsRuntime(options = {}) {
       return discoveryGate;
     }
 
-    const updatedState = saveProjectState({
+    const updatedState = await saveProjectState({
       ...state,
       current_phase: "EXECUTION_PREPARATION",
       active_runtime_state: "EXECUTION_HANDOFF_READY",
@@ -907,7 +914,7 @@ function createAiOsRuntime(options = {}) {
       }))
     };
 
-    writeJson(responseAbs, responsePayload);
+    await writeJson(responseAbs, responsePayload);
 
     const executionPackage = {
       package_id: packageId,
@@ -963,11 +970,16 @@ function createAiOsRuntime(options = {}) {
       }
     };
 
-    writeJson(packageAbs, executionPackage);
-    writeJson(handoffAbs, executionPackage);
-    fs.writeFileSync(handoffMdAbs, renderExecutionHandoffMd(executionPackage), "utf8");
+    await writeJson(packageAbs, executionPackage);
+    await writeJson(handoffAbs, executionPackage);
+    const handoffMdReg = getDefaultRegistry();
+    const relHandoffMdPath = path.relative(root, handoffMdAbs).split(path.sep).join("/");
+    const mdResult = await handoffMdReg.invoke("fs.write_file", { path: relHandoffMdPath, content: renderExecutionHandoffMd(executionPackage) }, { root });
+    if (mdResult.status !== "SUCCESS") {
+      throw new Error("createExecutionHandoff md failed: " + (mdResult.metadata && mdResult.metadata.reason));
+    }
 
-    const updatedState = saveProjectState({
+    const updatedState = await saveProjectState({
       ...state,
       current_phase: "EXECUTION_READY",
       active_runtime_state: "EXECUTION_HANDOFF_CREATED",
@@ -992,7 +1004,7 @@ function createAiOsRuntime(options = {}) {
     };
   }
 
-  function setPendingOperation(projectId, operation, bodySnapshot) {
+  async function setPendingOperation(projectId, operation, bodySnapshot) {
     const state = loadProjectState(projectId);
     const confirmationKey = crypto.randomBytes(8).toString("hex");
     const expires_at = new Date(Date.now() + 30 * 60 * 1000).toISOString();
@@ -1003,7 +1015,7 @@ function createAiOsRuntime(options = {}) {
       created_at: nowIso(),
       expires_at
     };
-    saveProjectState({ ...state, pending_confirmation: pending });
+    await saveProjectState({ ...state, pending_confirmation: pending });
     return { confirmationKey, expires_at };
   }
 
@@ -1019,7 +1031,7 @@ function createAiOsRuntime(options = {}) {
     if (pending.expires_at && new Date() > new Date(pending.expires_at)) {
       const cleaned = { ...state };
       delete cleaned.pending_confirmation;
-      saveProjectState(cleaned);
+      await saveProjectState(cleaned);
       return { ok: false, mode: "BLOCKED", reason: "CONFIRMATION_EXPIRED" };
     }
 
@@ -1030,7 +1042,7 @@ function createAiOsRuntime(options = {}) {
     // Clear the pending confirmation before re-executing so we don't loop
     const resumeState = { ...state };
     delete resumeState.pending_confirmation;
-    saveProjectState(resumeState);
+    await saveProjectState(resumeState);
 
     const resumeBody = { ...pending.body_snapshot, _confirmed: true };
 
@@ -1055,7 +1067,7 @@ function createAiOsRuntime(options = {}) {
     const state = loadProjectState(projectId);
     // Only gate when auto-generating (no content supplied); if content is supplied it's explicit
     if (!String(body.content || "").trim()) {
-      const { confirmationKey, expires_at } = setPendingOperation(projectId, "saveDocumentationDraft", body);
+      const { confirmationKey, expires_at } = await setPendingOperation(projectId, "saveDocumentationDraft", body);
       const lang = String(state.user_language || "ar").toLowerCase();
       const message = lang.startsWith("en")
         ? "I'm ready to generate the project documentation. This will move us to the review phase. Confirm to proceed."
@@ -1078,7 +1090,7 @@ function createAiOsRuntime(options = {}) {
     if (body._confirmed) return _createExecutionHandoff(body);
     const projectId = normalizeProjectId(body.project_id || "");
     const state = loadProjectState(projectId);
-    const { confirmationKey, expires_at } = setPendingOperation(projectId, "createExecutionHandoff", body);
+    const { confirmationKey, expires_at } = await setPendingOperation(projectId, "createExecutionHandoff", body);
     const lang = String(state.user_language || "ar").toLowerCase();
     const message = lang.startsWith("en")
       ? "This will create a final execution handoff package and send it to Forge Core. This action cannot be undone. Confirm to proceed."

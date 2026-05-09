@@ -89,6 +89,24 @@ function _normalizeDoctorResult(raw) {
   };
 }
 
+function _normalizeConversationResult(raw, audit) {
+  return {
+    status: "PASS",
+    output: {
+      response:   (raw && raw.message) || "",
+      tool_calls: [],
+      state: {
+        ok:            !!(raw && raw.ok),
+        mode:          (raw && raw.mode)          || "UNKNOWN",
+        current_state: (raw && raw.current_state) || null,
+        project_id:    (raw && raw.project_id)    || null,
+        reason:        (raw && raw.reason)         || null
+      }
+    },
+    audit: audit || []
+  };
+}
+
 // ── Dispatch: direct_provider ─────────────────────────────────────────────────
 
 async function _runDirectProvider(scenario, root) {
@@ -228,6 +246,70 @@ async function _runDirectDoctor(scenario, root) {
   return _normalizeDoctorResult(raw);
 }
 
+// ── Dispatch: conversation ────────────────────────────────────────────────────
+
+async function _runConversation(scenario, root) {
+  const { resetDefaultRegistry } = require(
+    path.join(root, "code", "src", "runtime", "tools", "_registry")
+  );
+  const { readEntries } = require(
+    path.join(root, "code", "src", "runtime", "audit", "toolAuditLog")
+  );
+
+  const permission = scenario.permission || "WORKSPACE_WRITE";
+  const savedMode  = process.env.FORGE_PERMISSION_MODE;
+  process.env.FORGE_PERMISSION_MODE = permission;
+  resetDefaultRegistry();
+
+  const projectId  = scenario.project_id ||
+    ("test_conv_" + scenario.id.toLowerCase());
+  const projectDir  = path.join(root, "artifacts", "projects", projectId);
+  const fixturePath = path.join(projectDir, "project_state.json");
+  let fixtureCreated = false;
+
+  if (!fs.existsSync(fixturePath)) {
+    fs.mkdirSync(projectDir, { recursive: true });
+    fs.writeFileSync(fixturePath, JSON.stringify({
+      project_id:    projectId,
+      project_name:  "Conversation Test " + scenario.id,
+      current_state: "DISCUSSION",
+      active_runtime_state: "DISCUSSION",
+      user_goal:     "",
+      _version:      1,
+      created_at:    new Date().toISOString()
+    }, null, 2));
+    fixtureCreated = true;
+  }
+
+  const startTs = new Date().toISOString();
+  let raw;
+  try {
+    const { createConversationEngine } = require(
+      path.join(root, "code", "src", "ai_os", "conversationEngine")
+    );
+    const engine = createConversationEngine({ root });
+    raw = await engine.processMessage({
+      project_id:    projectId,
+      message:       (scenario.input && scenario.input.message) || "",
+      user_language: (scenario.input && scenario.input.user_language) || "ar"
+    });
+  } catch (err) {
+    raw = { ok: false, mode: "BLOCKED", reason: err.message };
+  } finally {
+    if (savedMode !== undefined) process.env.FORGE_PERMISSION_MODE = savedMode;
+    else delete process.env.FORGE_PERMISSION_MODE;
+    resetDefaultRegistry();
+
+    if (fixtureCreated) {
+      try { fs.unlinkSync(fixturePath); } catch { /* best-effort */ }
+      try { fs.rmdirSync(projectDir); } catch { /* best-effort */ }
+    }
+  }
+
+  const newAudit = readEntries(root, { since_ts: startTs });
+  return _normalizeConversationResult(raw, newAudit);
+}
+
 // ── Single scenario runner ────────────────────────────────────────────────────
 
 async function _runOne(scenario, root) {
@@ -243,14 +325,6 @@ async function _runOne(scenario, root) {
   };
 
   try {
-    if (scenario.type === "conversation") {
-      return Object.assign(base, {
-        status:      "SKIP",
-        skip_reason: "conversation engine not wired",
-        duration_ms: Date.now() - t0
-      });
-    }
-
     let execResult;
     if (scenario.type === "direct_provider") {
       execResult = await _runDirectProvider(scenario, root);
@@ -258,6 +332,8 @@ async function _runOne(scenario, root) {
       execResult = await _runDirectTool(scenario, root);
     } else if (scenario.type === "direct_doctor") {
       execResult = await _runDirectDoctor(scenario, root);
+    } else if (scenario.type === "conversation") {
+      execResult = await _runConversation(scenario, root);
     } else {
       throw new Error("unknown scenario type: " + scenario.type);
     }

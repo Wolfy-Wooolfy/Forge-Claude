@@ -181,8 +181,8 @@ function printSummary() {
       "got " + (report.scenarios ? report.scenarios.length : "no array"));
   }
 
-  // ── M5: SKIP scenarios are S06, S07, S09, S11 ────────────────────────────
-  console.log("\nM5: conversation scenarios (S06, S07, S09, S11) are SKIPPED");
+  // ── M5: no scenarios SKIP (all conversation types now dispatched) ─────────
+  console.log("\nM5: 0 scenarios SKIP (conversation dispatch wired in PHASE-6.A)");
   {
     const { runScenarios } = require(
       path.join(ROOT, "code", "src", "testing", "scenario_runner")
@@ -193,12 +193,8 @@ function printSummary() {
       .map((s) => s.id)
       .sort();
 
-    check("M5 exactly 4 scenarios SKIP",
-      skipIds.length === 4,
-      "got " + skipIds.join(", "));
-
-    check("M5 SKIP set = S06, S07, S09, S11",
-      JSON.stringify(skipIds) === JSON.stringify(["S06","S09","S11","S07"].sort()),
+    check("M5 exactly 0 scenarios SKIP",
+      skipIds.length === 0,
       "got " + skipIds.join(", "));
   }
 
