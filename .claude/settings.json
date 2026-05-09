@@ -112,7 +112,10 @@
       "Bash(node --check \"d:\\\\S\\\\Halo\\\\Tech\\\\Forge-Claude\\\\code\\\\src\\\\ai_os\\\\activeProjectManager.js\")",
       "Bash(node --check \"d:\\\\S\\\\Halo\\\\Tech\\\\Forge-Claude\\\\code\\\\src\\\\ai_os\\\\projectRuntime.js\")",
       "Bash(node verify/smoke/test_permission_policy.js)",
-      "Bash(node -e \"const s=require\\('./progress/status.json'\\); console.log\\('current_task:', s.current_task\\); console.log\\('next_phase:', s.next_phase\\); console.log\\('warnings:', s.complexity_review.warnings_to_address_in_phase_6\\);\")"
+      "Bash(node -e \"const s=require\\('./progress/status.json'\\); console.log\\('current_task:', s.current_task\\); console.log\\('next_phase:', s.next_phase\\); console.log\\('warnings:', s.complexity_review.warnings_to_address_in_phase_6\\);\")",
+      "Bash(Get-ChildItem \"d:\\\\S\\\\Halo\\\\Tech\\\\Forge-Claude\\\\artifacts\\\\decisions\")",
+      "Bash(Sort-Object Name)",
+      "Bash(Select-Object -Last 5 -ExpandProperty Name)"
     ],
     "additionalDirectories": [
       "\\tmp"
