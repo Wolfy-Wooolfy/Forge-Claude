@@ -17,6 +17,7 @@ const { createConversationMemoryManager } = require("../ai_os/conversationMemory
 const { createDocumentationBuildLoop } = require("../ai_os/documentationBuildLoop");
 const { runVisionComplianceGate } = require("../modules/visionComplianceGate");
 const { runSpecCompletenessEnforcer } = require("../modules/specCompletenessEnforcer");
+const { getDefaultRegistry } = require("../runtime/tools/_registry");
 
 const ProviderRouter = require("../providers/providerRouter");
 
@@ -2457,6 +2458,47 @@ function buildExecutionPackage(packet) {
 
     sendJson(res, 200, result);
   }
+
+  // ── L2 write helpers (Stage 2B) ────────────────────────────────────────────
+
+  async function writeFile(absPath, content) {
+    const reg = getDefaultRegistry();
+    const relPath = path.relative(root, absPath).split(path.sep).join("/");
+    const r = await reg.invoke("fs.write_file", { path: relPath, content: String(content) }, { root });
+    if (r.status !== "SUCCESS") {
+      throw new Error("writeFile failed [" + relPath + "]: " +
+        ((r.metadata && r.metadata.reason) || "") + ": " +
+        ((r.metadata && r.metadata.detail) || ""));
+    }
+  }
+
+  async function writeJson(absPath, payload) {
+    return writeFile(absPath, JSON.stringify(payload, null, 2));
+  }
+
+  async function tryWriteJson(absPath, payload) {
+    try {
+      await writeJson(absPath, payload);
+    } catch (_e) {
+      // best-effort: warn, do not throw
+    }
+  }
+
+  async function tryAppendArrayJson(absPath, entry) {
+    let existing = [];
+    try {
+      if (fs.existsSync(absPath)) {
+        const raw = JSON.parse(fs.readFileSync(absPath, "utf8"));
+        existing = Array.isArray(raw) ? raw : [];
+      }
+    } catch (_e) {
+      existing = [];
+    }
+    existing.push(entry);
+    await tryWriteJson(absPath, existing);
+  }
+
+  // ── End L2 write helpers ────────────────────────────────────────────────────
 
   const server = http.createServer(async (req, res) => {
     try {
