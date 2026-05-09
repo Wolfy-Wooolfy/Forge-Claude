@@ -8,41 +8,15 @@ const { handleAuthRequest } = require("../auth/authSystem");
 const { createAiOsRuntime } = require("../ai_os/projectRuntime");
 const { createActiveProjectManager } = require("../ai_os/activeProjectManager");
 const { createBusinessAnalysisEngine } = require("../ai_os/businessAnalysisEngine");
-const { createDocumentationReviewEngine } = require("../ai_os/documentationReviewEngine");
 const { createVerificationLoop } = require("../ai_os/verificationLoop");
 const { createProjectReviewEngine } = require("../ai_os/projectReviewEngine");
 const { createDeliveryPackageBuilder } = require("../ai_os/deliveryPackageBuilder");
 const { createIdeationEngine } = require("../ai_os/ideationEngine");
 const { createConversationEngine } = require("../ai_os/conversationEngine");
 const { createConversationMemoryManager } = require("../ai_os/conversationMemoryManager");
-const ConversationalResponseProvider = require("../providers/conversationalResponseProvider");
-const { createRefinementLoopOrchestrator } = require("../ai_os/refinementLoopOrchestrator");
-const { createDiscussionLoopGate } = require("../ai_os/discussionLoopGate");
 const { createDocumentationBuildLoop } = require("../ai_os/documentationBuildLoop");
-const { createLanguageDetectionCompliance } = require("../ai_os/languageDetectionCompliance");
-const { createUxValidator } = require("../ai_os/uxValidator");
 const { runVisionComplianceGate } = require("../modules/visionComplianceGate");
-const { runVisionAlignmentValidator } = require("../modules/visionAlignmentValidator");
-const { runCrossDocConsistencyEngine } = require("../modules/crossDocConsistencyEngine");
-const { runCodeToSpecTraceValidator } = require("../modules/codeToSpecTraceValidator");
-const { runDocsGapAnalyzerValidator } = require("../modules/docsGapAnalyzerValidator");
-const { runCognitiveLayerContractEnforcer } = require("../modules/cognitiveLayerContractEnforcer");
-const { runProviderAuthorityEnforcer } = require("../modules/providerAuthorityEnforcer");
-const { runFullLoopReport } = require("../modules/loopEnforcementOrchestrator");
 const { runSpecCompletenessEnforcer } = require("../modules/specCompletenessEnforcer");
-const { runBoundaryAuditStageGate, auditAllStages } = require("../modules/boundaryAuditStageGate");
-const { runDecisionArtifactValidator } = require("../modules/decisionArtifactValidator");
-const { runDocGapLoopContract } = require("../modules/docGapLoopContract");
-const { runToolIntegrationReadiness } = require("../modules/toolIntegrationReadiness");
-const { runDecisionFileNameEnforcer } = require("../modules/decisionFileNameEnforcer");
-const { runCanonicalArtifactValidator } = require("../modules/canonicalArtifactValidator");
-const { runDecisionFinalityEnforcer, sealDecision } = require("../modules/decisionFinalityEnforcer");
-const { declareFork, resolveFork, runForkDetectionReport } = require("../modules/forkDetectionEngine");
-const { runRecommendationSeparationValidator } = require("../modules/recommendationSeparationValidator");
-const { runCodexContractValidator } = require("../modules/codexContractValidator");
-const { runNodeSmokeCheck } = require("../modules/nodeSmokeCheck");
-const { runProjectIsolationGuard } = require("../modules/projectIsolationGuard");
-const { runResearchTransparencyReport, createResearchTransparencyLayer } = require("../modules/researchTransparencyLayer");
 
 const ProviderRouter = require("../providers/providerRouter");
 
@@ -66,19 +40,13 @@ function createWorkspaceApiServer(options = {}) {
   const aiOsRuntime = createAiOsRuntime({ root });
   const activeProjectManager = createActiveProjectManager({ root });
   const businessAnalysisEngine = createBusinessAnalysisEngine({ root });
-  const documentationReviewEngine = createDocumentationReviewEngine({ root });
   const verificationLoop = createVerificationLoop({ root });
   const projectReviewEngine = createProjectReviewEngine({ root });
   const deliveryPackageBuilder = createDeliveryPackageBuilder({ root });
   const ideationEngine = createIdeationEngine({ root });
   const conversationMemoryManager = createConversationMemoryManager({ root });
   const conversationEngine = createConversationEngine({ root, ideationEngine, conversationMemoryManager });
-  const refinementLoopOrchestrator = createRefinementLoopOrchestrator({ root });
-  const discussionLoopGate = createDiscussionLoopGate({ root });
   const documentationBuildLoop = createDocumentationBuildLoop({ root });
-  const languageDetectionCompliance = createLanguageDetectionCompliance({ root });
-  const uxValidator = createUxValidator({ root });
-  const researchTransparency = createResearchTransparencyLayer({ root });
 
   const allowedWriteRoots = [
     path.resolve(root, "artifacts/llm"),
@@ -406,26 +374,6 @@ function createWorkspaceApiServer(options = {}) {
     }
   }
 
-  function buildFocusedFileContext(fileContent) {
-    const text = String(fileContent || "");
-    const maxChars = 12000;
-
-    if (text.length <= maxChars) {
-      return text;
-    }
-
-    const head = text.slice(0, 7000);
-    const tail = text.slice(-4000);
-
-    return [
-      head,
-      "",
-      "/* ... FILE CONTEXT TRUNCATED FOR PATCH GENERATION ... */",
-      "",
-      tail
-    ].join("\n");
-  }
-
   function buildRequestAwareFileContext(fileContent, requestText) {
     const text = String(fileContent || "");
     const request = String(requestText || "").toLowerCase().trim();
@@ -533,100 +481,6 @@ function createWorkspaceApiServer(options = {}) {
               : "")
       }))
       .filter((operation) => operation.type.length > 0);
-  }
-
-  function applyPatchOperations(baseContent, operations, filePath = "") {
-    const normalizedOperations = normalizePatchOperations(operations);
-
-    if (normalizedOperations.length === 0) {
-      throw new Error(`Patch operations are required for: ${filePath || "unknown file"}`);
-    }
-
-    let nextContent = String(baseContent || "");
-
-    normalizedOperations.forEach((operation) => {
-      if (operation.type === "write_full_file") {
-        nextContent = operation.content;
-        return;
-      }
-
-      if (operation.type === "replace_once") {
-        if (!operation.find) {
-          throw new Error(`replace_once missing find for: ${filePath}`);
-        }
-
-        if (nextContent.includes(operation.find)) {
-          nextContent = nextContent.replace(operation.find, operation.replace);
-          return;
-        }
-
-        const normalizedCurrent = nextContent.replace(/\r\n/g, "\n");
-        const normalizedFind = operation.find.replace(/\r\n/g, "\n");
-        const normalizedReplace = operation.replace.replace(/\r\n/g, "\n");
-
-        if (!normalizedCurrent.includes(normalizedFind)) {
-          throw new Error(`replace_once anchor not found for: ${filePath}`);
-        }
-
-        nextContent = normalizedCurrent.replace(normalizedFind, normalizedReplace);
-        return;
-      }
-
-      if (operation.type === "insert_after") {
-        const anchor = operation.anchor || operation.find;
-        const content = operation.content || operation.replace;
-
-        if (!anchor) {
-          throw new Error(`insert_after missing anchor for: ${filePath}`);
-        }
-
-        if (!nextContent.includes(anchor)) {
-          throw new Error(`insert_after anchor not found for: ${filePath}`);
-        }
-
-        nextContent = nextContent.replace(
-          anchor,
-          `${anchor}${content}`
-        );
-        return;
-      }
-
-      if (operation.type === "insert_before") {
-        const anchor = operation.anchor || operation.find;
-        const content = operation.content || operation.replace;
-
-        if (!anchor) {
-          throw new Error(`insert_before missing anchor for: ${filePath}`);
-        }
-
-        if (!nextContent.includes(anchor)) {
-          throw new Error(`insert_before anchor not found for: ${filePath}`);
-        }
-
-        nextContent = nextContent.replace(
-          anchor,
-          `${content}${anchor}`
-        );
-        return;
-      }
-
-      if (operation.type === "delete_once") {
-        if (!operation.find) {
-          throw new Error(`delete_once missing find for: ${filePath}`);
-        }
-
-        if (!nextContent.includes(operation.find)) {
-          throw new Error(`delete_once target not found for: ${filePath}`);
-        }
-
-        nextContent = nextContent.replace(operation.find, "");
-        return;
-      }
-
-      throw new Error(`Unsupported patch operation type: ${operation.type}`);
-    });
-
-    return nextContent;
   }
 
   function interpretUserIntent(requestText) {
@@ -1273,170 +1127,6 @@ ${trimmedExisting}`
       selected_file_count: selectedFiles.length,
       summary: analysisSummary,
       findings: analysisArtifact.findings
-    };
-  }
-
-  function buildExecutionPlanFromDraft(draftArtifact, executionId) {
-    const files = Array.isArray(draftArtifact.files) ? draftArtifact.files : [];
-
-    return {
-      workspace_execution_id: executionId,
-      generated_at: new Date().toISOString(),
-      files: files.map((file) => {
-        const operations = normalizePatchOperations(file.operations);
-
-        if (operations.length > 0) {
-          return {
-            file_path: file.path,
-            operation: "modify",
-            changes: [
-              {
-                type: "targeted_patch",
-                operations
-              }
-            ]
-          };
-        }
-
-        return {
-          file_path: file.path,
-          operation: "create",
-          changes: [
-            {
-              type: "full_content",
-              content: file.content
-            }
-          ]
-        };
-      })
-    };
-  }
-
-  function materializeDraftFilesForApproval(draftArtifact) {
-    const files = Array.isArray(draftArtifact && draftArtifact.files)
-      ? draftArtifact.files
-      : [];
-
-    return files.map((file) => {
-      const relPath = normalizeRelativePath(file && file.path ? file.path : "");
-      const absolutePath = path.resolve(root, relPath);
-      const baseContent = fs.existsSync(absolutePath)
-        ? fs.readFileSync(absolutePath, "utf8")
-        : "";
-      const operations = normalizePatchOperations(file && file.operations);
-
-      const content = operations.length > 0
-        ? applyPatchOperations(baseContent, operations, relPath)
-        : (typeof (file && file.content) === "string" ? file.content : "");
-
-      return {
-        path: relPath,
-        content,
-        allow_overwrite: file && file.allow_overwrite === true
-      };
-    });
-  }
-
-  function applyExecutionPlan(executionPlan) {
-    const plan = executionPlan && typeof executionPlan === "object" ? executionPlan : {};
-    const files = Array.isArray(plan.files) ? plan.files : [];
-
-    if (files.length === 0) {
-      throw new Error("Execution plan contains no files");
-    }
-
-    const appliedFiles = files.map((file) => {
-      const relPath = normalizeRelativePath(file && file.file_path ? file.file_path : "");
-      const absolutePath = path.resolve(root, relPath);
-
-      if (!relPath) {
-        throw new Error("Execution plan file_path is required");
-      }
-
-      if (!isPathAllowed(absolutePath)) {
-        throw new Error(`Execution blocked for path: ${relPath}`);
-      }
-
-      const changes = Array.isArray(file.changes) ? file.changes : [];
-      const patchChange = changes.find((change) => change && change.type === "targeted_patch");
-      const fullContentChange = changes.find((change) => change && change.type === "full_content");
-
-      fs.mkdirSync(path.dirname(absolutePath), { recursive: true });
-
-      let finalContent = "";
-      let bytesWritten = 0;
-
-      if (patchChange) {
-        const existing = fs.existsSync(absolutePath)
-          ? fs.readFileSync(absolutePath, "utf8")
-          : "";
-
-        finalContent = applyPatchOperations(
-          existing,
-          patchChange.operations,
-          relPath
-        );
-
-        bytesWritten = Buffer.byteLength(finalContent, "utf8");
-      } else if (fullContentChange) {
-        const content = typeof fullContentChange.content === "string" ? fullContentChange.content : "";
-
-        finalContent = content;
-
-        if (fs.existsSync(absolutePath)) {
-          const existing = fs.readFileSync(absolutePath, "utf8");
-
-          const hasGeneratedRequestBlock =
-            content.includes("// Generated from request:") ||
-            content.includes("// Generated from request:\r\n");
-
-          if (hasGeneratedRequestBlock) {
-            let baseContent = existing;
-
-            baseContent = baseContent.replace(
-              /\n*\/\/ ==== AI GENERATED ADDITION ====\n[\s\S]*?(?=\n\/\/ ==== AI GENERATED ADDITION ====|\n\/\/ ==== AI MERGED ADDITION ====|$)/g,
-              ""
-            );
-
-            baseContent = baseContent.replace(
-              /\n*\/\/ ==== AI MERGED ADDITION ====\n[\s\S]*?(?=\n\/\/ ==== AI GENERATED ADDITION ====|\n\/\/ ==== AI MERGED ADDITION ====|$)/g,
-              ""
-            );
-
-            baseContent = baseContent.trimEnd();
-
-            finalContent = baseContent
-              ? `${baseContent}\n\n// ==== AI MERGED ADDITION ====\n\n${content}`
-              : content;
-          } else {
-            finalContent = existing
-              ? `${existing}\n\n${content}`
-              : content;
-          }
-        }
-
-        bytesWritten = Buffer.byteLength(content, "utf8");
-      } else {
-        throw new Error(`Execution plan missing supported change for: ${relPath}`);
-      }
-
-      fs.writeFileSync(absolutePath, finalContent, "utf8");
-
-      return {
-        file_path: relPath,
-        operation: file.operation || "create",
-        bytes_written: bytesWritten
-      };
-    });
-
-    return {
-      ok: true,
-      workspace_execution_id: typeof plan.workspace_execution_id === "string"
-        ? plan.workspace_execution_id
-        : "",
-      applied_files: appliedFiles,
-      file_count: appliedFiles.length,
-      applied_at: new Date().toISOString()
     };
   }
 
@@ -2768,116 +2458,6 @@ function buildExecutionPackage(packet) {
     sendJson(res, 200, result);
   }
 
-  async function handleApprove(body, res) {
-    const proposalId = typeof body.proposal_id === "string" ? body.proposal_id.trim() : "";
-    const approverRole = typeof body.approver_role === "string" && body.approver_role.trim()
-      ? body.approver_role.trim()
-      : "cto";
-
-    const discoveryGate = assertWorkspaceDiscoveryComplete(body);
-
-    if (!discoveryGate.ok) {
-      sendJson(res, 409, discoveryGate);
-      return;
-    }
-
-    if (!proposalId) {
-      sendJson(res, 400, { error: "proposal_id is required" });
-      return;
-    }
-
-    const projectId =
-      typeof body.project_id === "string" && body.project_id.trim() !== ""
-        ? body.project_id.trim()
-        : "default_project";
-
-    const draftPath = path.resolve(
-      root,
-      "artifacts",
-      "projects",
-      projectId,
-      "ai",
-      "drafts",
-      `${proposalId}.draft.json`
-    );
-    const proposalPath = path.resolve(
-      root,
-      "artifacts",
-      "projects",
-      projectId,
-      "ai",
-      "proposals",
-      `${proposalId}.proposal.json`
-    );
-
-    if (!fs.existsSync(draftPath)) {
-      sendJson(res, 404, { error: "Draft not found" });
-      return;
-    }
-
-    const draftArtifact = readJsonSafe(draftPath, null);
-    const proposalArtifact = readJsonSafe(proposalPath, null);
-
-    if (!draftArtifact || !Array.isArray(draftArtifact.files)) {
-      sendJson(res, 400, { error: "Invalid draft artifact" });
-      return;
-    }
-
-    const materializedFiles = materializeDraftFilesForApproval(draftArtifact);
-
-    const decisionResult = createDecisionPacket(
-      {
-        ...draftArtifact,
-        files: materializedFiles,
-        summary: proposalArtifact && typeof proposalArtifact.description === "string"
-          ? proposalArtifact.description
-          : "Proposal approved for execution."
-      },
-      proposalArtifact && typeof proposalArtifact.request === "string"
-        ? proposalArtifact.request
-        : "",
-      approverRole
-    );
-
-    draftArtifact.approved = true;
-    draftArtifact.ready_for_decision = true;
-    draftArtifact.approved_at = new Date().toISOString();
-    draftArtifact.approved_by_role = approverRole;
-
-    if (proposalArtifact && typeof proposalArtifact === "object") {
-      proposalArtifact.execution_approved = true;
-      proposalArtifact.execution_approved_at = new Date().toISOString();
-      proposalArtifact.execution_approved_by_role = approverRole;
-      fs.writeFileSync(proposalPath, JSON.stringify(proposalArtifact, null, 2), "utf8");
-    }
-
-    fs.writeFileSync(draftPath, JSON.stringify(draftArtifact, null, 2), "utf8");
-
-    if (decisionResult && decisionResult.decision_packet_id) {
-      decisionResult.decision_link_artifact = writeDecisionLinkArtifact(
-        proposalId,
-        decisionResult.decision_packet_id,
-        decisionResult.project_id
-      );
-    }
-
-    sendJson(res, 200, {
-      ok: true,
-      mode: "APPROVED",
-      proposal_id: proposalId,
-      approver_role: approverRole,
-      decision: decisionResult
-    });
-  }
-
-  async function handleApplyExecutePlan(body, res) {
-    sendJson(res, 409, {
-      ok: false,
-      error: "CONVERSATION_EXECUTION_BLOCKED",
-      message: "Direct execution from conversation/workspace is blocked. Approved execution must be handed off to Forge through an approved execution package."
-    });
-  }
-
   const server = http.createServer(async (req, res) => {
     try {
       const requestUrl = new URL(req.url, "http://localhost");
@@ -2921,18 +2501,6 @@ function buildExecutionPackage(packet) {
         return;
       }
 
-      if (req.method === "POST" && pathname === "/api/ai-os/documentation/draft") {
-        const body = await readBody(req);
-        sendJson(res, 200, await aiOsRuntime.saveDocumentationDraft(body));
-        return;
-      }
-
-      if (req.method === "POST" && pathname === "/api/ai-os/documentation/approve") {
-        const body = await readBody(req);
-        sendJson(res, 200, aiOsRuntime.approveDocumentation(body));
-        return;
-      }
-
       if (req.method === "POST" && pathname === "/api/ai-os/handoff") {
         const body = await readBody(req);
         sendJson(res, 200, await aiOsRuntime.createExecutionHandoff(body));
@@ -2943,12 +2511,6 @@ function buildExecutionPackage(packet) {
         sendJson(res, 200, aiOsRuntime.getProject({
           project_id: requestUrl.searchParams.get("project_id") || ""
         }));
-        return;
-      }
-
-      if (req.method === "GET" && pathname === "/api/ai-os/project/context") {
-        const projectId = requestUrl.searchParams.get("project_id") || "";
-        sendJson(res, 200, activeProjectManager.getProjectContext(projectId));
         return;
       }
 
@@ -2975,21 +2537,9 @@ function buildExecutionPackage(packet) {
         return;
       }
 
-      if (req.method === "POST" && pathname === "/api/ai-os/research") {
-        const body = await readBody(req);
-        sendJson(res, 200, await ideationEngine.conductResearch(body));
-        return;
-      }
-
       if (req.method === "POST" && pathname === "/api/ai-os/business-analysis") {
         const body = await readBody(req);
         sendJson(res, 200, await businessAnalysisEngine.analyzeProject(body));
-        return;
-      }
-
-      if (req.method === "POST" && pathname === "/api/ai-os/documentation/review") {
-        const body = await readBody(req);
-        sendJson(res, 200, await documentationReviewEngine.reviewDocumentation(body));
         return;
       }
 
@@ -3013,8 +2563,7 @@ function buildExecutionPackage(packet) {
 
       if (req.method === "POST" && pathname === "/api/ai-os/chat") {
         const body = await readBody(req);
-        const result = await conversationEngine.processMessage(body);
-        sendJson(res, 200, result);
+        sendJson(res, 200, await conversationEngine.processMessage(body));
         return;
       }
 
@@ -3080,106 +2629,6 @@ function buildExecutionPackage(packet) {
         }
 
         res.end();
-        return;
-      }
-
-      if (req.method === "POST" && pathname === "/api/ai-os/confirm-transition") {
-        const body = await readBody(req);
-        sendJson(res, 200, await conversationEngine.confirmTransition(body));
-        return;
-      }
-
-      if (req.method === "POST" && pathname === "/api/ai-os/confirm-operation") {
-        const body = await readBody(req);
-        sendJson(res, 200, await aiOsRuntime.confirmPendingOperation(body));
-        return;
-      }
-
-      if ((req.method === "GET" || req.method === "POST") && pathname === "/api/ai-os/project/summary") {
-        const body = req.method === "POST" ? await readBody(req) : {};
-        const projectId = String(body.project_id || requestUrl.searchParams.get("project_id") || "");
-        sendJson(res, 200, await conversationEngine.getProjectSummary({ ...body, project_id: projectId }));
-        return;
-      }
-
-      if (req.method === "POST" && pathname === "/api/ai-os/checkpoint") {
-        const body = await readBody(req);
-        const { project_id, target_state } = body;
-        if (!project_id || !target_state) {
-          sendJson(res, 400, { ok: false, reason: "project_id and target_state are required" });
-          return;
-        }
-        sendJson(res, 200, await conversationEngine.generateCheckpoint(project_id, target_state));
-        return;
-      }
-
-      if (req.method === "POST" && pathname === "/api/ai-os/loop/ideation") {
-        const body = await readBody(req);
-        sendJson(res, 200, await refinementLoopOrchestrator.runIdeationLoop(body));
-        return;
-      }
-
-      if (req.method === "POST" && pathname === "/api/ai-os/loop/documentation") {
-        const body = await readBody(req);
-        sendJson(res, 200, await refinementLoopOrchestrator.runDocumentationLoop(body));
-        return;
-      }
-
-      if (req.method === "GET" && pathname === "/api/ai-os/conversation/context") {
-        const projectId = requestUrl.searchParams.get("project_id") || "";
-        if (!projectId) {
-          sendJson(res, 400, { ok: false, reason: "project_id required" });
-          return;
-        }
-        sendJson(res, 200, { ok: true, context: conversationMemoryManager.loadContext(projectId) });
-        return;
-      }
-
-      if (req.method === "POST" && pathname === "/api/ai-os/conversation/summary") {
-        const body = await readBody(req);
-        sendJson(res, 200, await conversationMemoryManager.generateContextSummary(body.project_id, body.user_language));
-        return;
-      }
-
-      if (req.method === "POST" && pathname === "/api/ai-os/override/force-progression") {
-        const body = await readBody(req);
-        const projectId = String(body.project_id || "").trim();
-        const targetPhase = String(body.target_phase || "").trim();
-        if (!projectId || !targetPhase) {
-          sendJson(res, 400, { ok: false, reason: "project_id and target_phase are required" });
-          return;
-        }
-        const statePath = path.resolve(root, "artifacts/projects", projectId.toLowerCase().replace(/[^a-z0-9]+/g, "_"), "project_state.json");
-        if (!fs.existsSync(statePath)) {
-          sendJson(res, 404, { ok: false, reason: "PROJECT_NOT_FOUND" });
-          return;
-        }
-        const state = JSON.parse(fs.readFileSync(statePath, "utf8"));
-        const updated = {
-          ...state,
-          current_phase: targetPhase,
-          active_runtime_state: String(body.target_runtime_state || targetPhase),
-          last_updated_at: new Date().toISOString()
-        };
-        fs.writeFileSync(statePath, JSON.stringify(updated, null, 2), "utf8");
-        sendJson(res, 200, { ok: true, mode: "FORCED_PROGRESSION", project_id: projectId, target_phase: targetPhase });
-        return;
-      }
-
-      if (req.method === "GET" && pathname === "/api/ai-os/decisions/history") {
-        const projectId = requestUrl.searchParams.get("project_id") || "";
-        const normalizedId = projectId.toLowerCase().replace(/[^a-z0-9]+/g, "_");
-        const decisionsPath = path.resolve(root, "artifacts/projects", normalizedId, "ai_os", "decisions_log.json");
-        if (!fs.existsSync(decisionsPath)) {
-          sendJson(res, 200, { ok: true, decisions: [] });
-          return;
-        }
-        try {
-          const decisions = JSON.parse(fs.readFileSync(decisionsPath, "utf8"));
-          sendJson(res, 200, { ok: true, decisions: Array.isArray(decisions) ? decisions : [] });
-        } catch (err) {
-          sendJson(res, 200, { ok: true, decisions: [] });
-        }
         return;
       }
 
@@ -3261,18 +2710,6 @@ function buildExecutionPackage(packet) {
         return;
       }
 
-      if (req.method === "POST" && req.url === "/api/ai/approve") {
-        const body = await readBody(req);
-        await handleApprove(body, res);
-        return;
-      }
-
-      if (req.method === "POST" && req.url === "/api/ai/apply-execute-plan") {
-        const body = await readBody(req);
-        await handleApplyExecutePlan(body, res);
-        return;
-      }
-
       if (req.method === "POST" && req.url === "/api/ai/read-file") {
         const body = await readBody(req);
 
@@ -3304,39 +2741,6 @@ function buildExecutionPackage(packet) {
         return;
       }
 
-      if (req.method === "POST" && req.url === "/api/ai/draft") {
-        const body = await readBody(req);
-
-        const discoveryGate = assertWorkspaceDiscoveryComplete(body);
-
-        if (!discoveryGate.ok) {
-          sendJson(res, 409, discoveryGate);
-          return;
-        }
-
-        const requestText = typeof body.request === "string" ? body.request.trim() : "";
-
-        if (!requestText) {
-          sendJson(res, 400, { error: "Request is required" });
-          return;
-        }
-
-        const draft = {
-          files: [
-            {
-              path: "code/test_workspace_integration.js",
-              content: requestText.includes("Overwrite file")
-                ? requestText.split("with:")[1]?.split("allow_overwrite")[0]?.trim() || ""
-                : `console.log("Auto-generated from request");`,
-              allow_overwrite: true
-            }
-          ]
-        };
-
-        sendJson(res, 200, draft);
-        return;
-      }
-      
       if (req.method === "POST" && req.url === "/api/ai/preview") {
         const body = await readBody(req);
         await handlePreview(body, res);
@@ -3366,85 +2770,12 @@ function buildExecutionPackage(packet) {
         return;
       }
 
-      if (req.method === "POST" && pathname === "/api/governance/vision-alignment") {
-        sendJson(res, 200, runVisionAlignmentValidator({ root }));
-        return;
-      }
-
-      if (req.method === "POST" && pathname === "/api/governance/cross-doc-consistency") {
-        sendJson(res, 200, runCrossDocConsistencyEngine({ root }));
-        return;
-      }
-
-      if (req.method === "POST" && pathname === "/api/governance/trace-validate") {
-        sendJson(res, 200, runCodeToSpecTraceValidator({ root }));
-        return;
-      }
-
-      if (req.method === "POST" && pathname === "/api/governance/docs-gap-analyze") {
-        sendJson(res, 200, runDocsGapAnalyzerValidator({ root }));
-        return;
-      }
-
-      if (req.method === "POST" && pathname === "/api/governance/cognitive-contract") {
-        sendJson(res, 200, runCognitiveLayerContractEnforcer({ root }));
-        return;
-      }
-
-      if (req.method === "POST" && pathname === "/api/governance/provider-authority") {
-        sendJson(res, 200, runProviderAuthorityEnforcer({ root }));
-        return;
-      }
-
-      if (req.method === "GET" && pathname === "/api/governance/loop-report") {
-        sendJson(res, 200, runFullLoopReport({ root }));
-        return;
-      }
-
       if (req.method === "POST" && pathname === "/api/governance/spec-completeness") {
         sendJson(res, 200, runSpecCompletenessEnforcer({ root }));
         return;
       }
 
-      if (req.method === "POST" && pathname === "/api/governance/boundary-audit-gate") {
-        const body = await readBody(req);
-        sendJson(res, 200, runBoundaryAuditStageGate({ root, stage: body.stage }));
-        return;
-      }
-
-      if (req.method === "GET" && pathname === "/api/governance/boundary-audit-all") {
-        sendJson(res, 200, auditAllStages({ root }));
-        return;
-      }
-
-      if (req.method === "POST" && pathname === "/api/governance/decision-validate") {
-        sendJson(res, 200, runDecisionArtifactValidator({ root }));
-        return;
-      }
-
-      if (req.method === "POST" && pathname === "/api/governance/doc-gap-contract") {
-        sendJson(res, 200, runDocGapLoopContract({ root }));
-        return;
-      }
-
-      if (req.method === "POST" && pathname === "/api/governance/tool-readiness") {
-        sendJson(res, 200, runToolIntegrationReadiness({ root }));
-        return;
-      }
-
       // --- AI OS extended routes ---
-      if (req.method === "POST" && pathname === "/api/ai-os/discussion/gate") {
-        const body = await readBody(req);
-        sendJson(res, 200, await discussionLoopGate.assertDiscussionComplete(body));
-        return;
-      }
-
-      if (req.method === "POST" && pathname === "/api/ai-os/discussion/record") {
-        const body = await readBody(req);
-        sendJson(res, 200, await discussionLoopGate.recordDiscussionIteration(body.project_id, body));
-        return;
-      }
-
       if (req.method === "POST" && pathname === "/api/ai-os/doc-build-loop") {
         const body = await readBody(req);
         sendJson(res, 200, await documentationBuildLoop.runDocBuildLoop(body));
@@ -3454,105 +2785,6 @@ function buildExecutionPackage(packet) {
       if (req.method === "GET" && pathname === "/api/ai-os/doc-build-loop/state") {
         const projectId = requestUrl.searchParams.get("project_id") || "";
         sendJson(res, 200, documentationBuildLoop.getLoopState(projectId));
-        return;
-      }
-
-      if (req.method === "POST" && pathname === "/api/ai-os/language-compliance") {
-        const body = await readBody(req);
-        sendJson(res, 200, await languageDetectionCompliance.runComplianceReport(body.project_id));
-        return;
-      }
-
-      if (req.method === "POST" && pathname === "/api/ai-os/ux-validate") {
-        const body = await readBody(req);
-        sendJson(res, 200, await uxValidator.validateResponse(body.project_id, body.response));
-        return;
-      }
-
-      // --- C-1: Decision naming enforcement ---
-      if (req.method === "POST" && pathname === "/api/governance/decision-naming") {
-        sendJson(res, 200, runDecisionFileNameEnforcer({ root }));
-        return;
-      }
-
-      // --- C-5: Canonical artifact container validation ---
-      if (req.method === "POST" && pathname === "/api/governance/canonical-artifacts") {
-        sendJson(res, 200, runCanonicalArtifactValidator({ root }));
-        return;
-      }
-
-      // --- H-1: Decision finality ---
-      if (req.method === "POST" && pathname === "/api/governance/decision-finality") {
-        sendJson(res, 200, runDecisionFinalityEnforcer({ root }));
-        return;
-      }
-
-      if (req.method === "POST" && pathname === "/api/governance/decision-seal") {
-        const body = await readBody(req);
-        sendJson(res, 200, sealDecision(root, body.decision_id, body.decision_data || {}));
-        return;
-      }
-
-      // --- H-2: Fork detection ---
-      if (req.method === "POST" && pathname === "/api/governance/fork/declare") {
-        const body = await readBody(req);
-        sendJson(res, 200, declareFork({ root, ...body }));
-        return;
-      }
-
-      if (req.method === "POST" && pathname === "/api/governance/fork/resolve") {
-        const body = await readBody(req);
-        sendJson(res, 200, resolveFork({ root, ...body }));
-        return;
-      }
-
-      if (req.method === "GET" && pathname === "/api/governance/fork/report") {
-        sendJson(res, 200, runForkDetectionReport({ root }));
-        return;
-      }
-
-      // --- H-3: Recommendation separation ---
-      if (req.method === "POST" && pathname === "/api/governance/recommendation-separation") {
-        sendJson(res, 200, runRecommendationSeparationValidator({ root }));
-        return;
-      }
-
-      // --- H-4: Codex contract ---
-      if (req.method === "POST" && pathname === "/api/governance/codex-contract") {
-        sendJson(res, 200, runCodexContractValidator({ root }));
-        return;
-      }
-
-      // --- H-5: Node smoke check ---
-      if (req.method === "POST" && pathname === "/api/governance/smoke-check") {
-        const body = await readBody(req);
-        sendJson(res, 200, runNodeSmokeCheck({ root, stage: body.stage || "SMOKE" }));
-        return;
-      }
-
-      // --- H-7: Project isolation ---
-      if (req.method === "POST" && pathname === "/api/governance/project-isolation") {
-        const body = await readBody(req);
-        sendJson(res, 200, runProjectIsolationGuard({ root, project_id: body.project_id }));
-        return;
-      }
-
-      // --- H-8: Research transparency ---
-      if (req.method === "POST" && pathname === "/api/governance/research-transparency") {
-        sendJson(res, 200, runResearchTransparencyReport({ root }));
-        return;
-      }
-
-      if (req.method === "POST" && pathname === "/api/ai-os/research/wrap") {
-        const body = await readBody(req);
-        sendJson(res, 200, researchTransparency.wrapResearchResult(body.project_id, body.content, body.knowledge_type));
-        return;
-      }
-
-      // --- H-6: Project object model enforcement ---
-      if (req.method === "POST" && pathname === "/api/ai-os/project/ensure-model") {
-        const body = await readBody(req);
-        sendJson(res, 200, activeProjectManager.ensureProjectObjectModel(body.project_id));
         return;
       }
 
