@@ -17,7 +17,9 @@ const checks = [
   require("./checks/missingDependencies"),
   require("./checks/recentExecution"),
   require("./checks/diskSpace"),
-  require("./checks/traceMatrixSize")
+  require("./checks/traceMatrixSize"),
+  require("./checks/shellHardening"),
+  require("./checks/environmentDetection")
 ];
 
 function listChecks()  { return checks.slice(); }

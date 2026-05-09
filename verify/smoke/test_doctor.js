@@ -60,12 +60,12 @@ function printSummary() {
       "got " + JSON.stringify(report.counts));
   }
 
-  // ── S2: report contains exactly 14 checks ────────────────────────────────
-  console.log("\nS2: report contains exactly 14 checks");
+  // ── S2: report contains exactly 16 checks ────────────────────────────────
+  console.log("\nS2: report contains exactly 16 checks");
   {
     const report = await runDoctor({ root: ROOT, write_report: false, update_status: false });
-    check("S2 checks.length == 14",
-      report.checks.length === 14,
+    check("S2 checks.length == 16",
+      report.checks.length === 16,
       "got " + report.checks.length);
   }
 
@@ -93,7 +93,7 @@ function printSummary() {
   }
 
   // ── S5: skip_checks reduces result count ─────────────────────────────────
-  console.log("\nS5: skip_checks=[openai_api_key] returns 13 checks");
+  console.log("\nS5: skip_checks=[openai_api_key] returns 15 checks");
   {
     const partial = await runDoctor({
       root:         ROOT,
@@ -101,8 +101,8 @@ function printSummary() {
       update_status: false,
       skip_checks:  ["openai_api_key"]
     });
-    check("S5 skip_checks works (13 instead of 14)",
-      partial.checks.length === 13,
+    check("S5 skip_checks works (15 instead of 16)",
+      partial.checks.length === 15,
       "got " + partial.checks.length);
     check("S5 openai_api_key not in results",
       !partial.checks.find((c) => c.id === "openai_api_key"),

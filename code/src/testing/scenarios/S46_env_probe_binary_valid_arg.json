@@ -1,0 +1,18 @@
+{
+  "id": "S46",
+  "name": "env.probe_binary with valid arg returns probe result with exit_code and stdout",
+  "type": "direct_tool",
+  "permission": "READ_ONLY",
+  "tool": "env.probe_binary",
+  "input": {
+    "binary": "node",
+    "args": ["--version"]
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "exit_code",  "expected": 0 },
+    { "type": "state_field_equals", "field": "timed_out",  "expected": false },
+    { "type": "state_field_exists", "field": "stdout" },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

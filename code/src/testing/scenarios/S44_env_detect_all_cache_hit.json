@@ -1,0 +1,23 @@
+{
+  "id": "S44",
+  "name": "env.detect_all with use_cache:true returns cached fingerprint when valid cache exists",
+  "type": "direct_tool",
+  "permission": "READ_ONLY",
+  "tool": "env.detect_all",
+  "input": {
+    "use_cache": true
+  },
+  "fixture_files": [
+    {
+      "path": "artifacts/env/system_fingerprint.json",
+      "content": "{\"detected_at\":\"2099-01-01T00:00:00.000Z\",\"ttl\":86400,\"fingerprint\":{\"os\":{\"id\":\"os\",\"detected\":true,\"data\":{\"platform\":\"win32\"},\"detected_at\":\"2099-01-01T00:00:00.000Z\"},\"node\":{\"id\":\"node\",\"detected\":true,\"data\":{\"version\":\"v99.0.0\"},\"detected_at\":\"2099-01-01T00:00:00.000Z\"}}}"
+    }
+  ],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "cache_used",  "expected": true },
+    { "type": "state_field_exists", "field": "fingerprint.os" },
+    { "type": "state_field_exists", "field": "fingerprint.node" },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

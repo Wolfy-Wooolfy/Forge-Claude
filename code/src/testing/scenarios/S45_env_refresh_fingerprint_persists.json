@@ -1,0 +1,15 @@
+{
+  "id": "S45",
+  "name": "env.refresh_fingerprint runs all detectors and persists artifact to disk",
+  "type": "direct_tool",
+  "permission": "WORKSPACE_WRITE",
+  "tool": "env.refresh_fingerprint",
+  "input": {},
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_exists", "field": "fingerprint.os" },
+    { "type": "state_field_exists", "field": "detected_at" },
+    { "type": "artifact_exists",    "path": "artifacts/env/system_fingerprint.json" },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

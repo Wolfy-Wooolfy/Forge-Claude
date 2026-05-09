@@ -1,0 +1,16 @@
+{
+  "id": "S40",
+  "name": "shell.run_with_prompt denies chmod 777 via HARD_DENY_PATTERNS",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "shell.run_with_prompt",
+  "input": {
+    "argv": ["chmod", "777", "/tmp/test_s40"]
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "FAILED" },
+    { "type": "state_field_equals", "field": "reason", "expected": "HARD_DENY" },
+    { "type": "state_field_equals", "field": "detail", "expected": "command pattern blocked" },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

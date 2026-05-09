@@ -1,0 +1,23 @@
+{
+  "id": "S37",
+  "name": "shell.run_in_workspace succeeds when vision_locked=true",
+  "type": "direct_tool",
+  "permission": "WORKSPACE_WRITE",
+  "tool": "shell.run_in_workspace",
+  "input": {
+    "project_id": "test_shell_s37",
+    "argv": ["node", "-e", "process.stdout.write('workspace_ok')"]
+  },
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_shell_s37/vision.md",
+      "content": "---\nproject_id: test_shell_s37\nproject_name: Test Shell S37\ndomain: test\nvision_version: 1\nvision_locked: true\nvision_locked_at: 2026-05-09T00:00:00.000Z\nlocked_by_role: owner\namendments_history: []\ngoals:\n  primary: test\n  secondary: []\nconstraints: []\nnon_goals: []\n---\n\n# Project Vision: Test Shell S37\n"
+    }
+  ],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "stdout",    "expected": "workspace_ok" },
+    { "type": "state_field_equals", "field": "exit_code", "expected": 0 },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

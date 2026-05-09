@@ -1,0 +1,23 @@
+{
+  "id": "S36",
+  "name": "shell.run_in_workspace denied when vision_locked=false",
+  "type": "direct_tool",
+  "permission": "WORKSPACE_WRITE",
+  "tool": "shell.run_in_workspace",
+  "input": {
+    "project_id": "test_shell_s36",
+    "argv": ["node", "--version"]
+  },
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_shell_s36/vision.md",
+      "content": "---\nproject_id: test_shell_s36\nproject_name: Test Shell S36\ndomain: test\nvision_version: 1\nvision_locked: false\nvision_locked_at: null\nlocked_by_role: null\namendments_history: []\ngoals:\n  primary: test\n  secondary: []\nconstraints: []\nnon_goals: []\n---\n\n# Project Vision: Test Shell S36\n"
+    }
+  ],
+  "assertions": [
+    { "type": "status_equals",      "expected": "DENIED" },
+    { "type": "state_field_equals", "field": "reason", "expected": "VISION_NOT_LOCKED" },
+    { "type": "state_field_equals", "field": "detail", "expected": null },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

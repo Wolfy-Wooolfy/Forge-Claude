@@ -45,15 +45,15 @@ function printSummary() {
   console.log("\n── PHASE-5 Self-Test Harness Meta Smoke Test ────────────────────\n");
 
   // ── M1: scenario files exist and are valid JSON ───────────────────────────
-  console.log("M1: 35 scenario JSON files present and parse");
+  console.log("M1: 47 scenario JSON files present and parse");
   {
     const scenDir = path.join(ROOT, "code", "src", "testing", "scenarios");
     const files   = fs.existsSync(scenDir)
       ? fs.readdirSync(scenDir).filter((f) => f.endsWith(".json")).sort()
       : [];
 
-    check("M1 exactly 35 scenario files",
-      files.length === 35,
+    check("M1 exactly 47 scenario files",
+      files.length === 47,
       "found " + files.length);
 
     let allParsed = true;
@@ -72,9 +72,9 @@ function printSummary() {
         return JSON.parse(fs.readFileSync(path.join(scenDir, f), "utf8")).id;
       } catch { return null; }
     });
-    const expectedIds = ["S01","S02","S03","S04","S05","S06","S07","S08","S09","S10","S11","S12","S13","S14","S15","S16","S17","S18","S19","S20","S21","S22","S23","S24","S25","S26","S27","S28","S29","S30","S31","S32","S33","S34","S35"];
+    const expectedIds = ["S01","S02","S03","S04","S05","S06","S07","S08","S09","S10","S11","S12","S13","S14","S15","S16","S17","S18","S19","S20","S21","S22","S23","S24","S25","S26","S27","S28","S29","S30","S31","S32","S33","S34","S35","S36","S37","S38","S39","S40","S41","S42","S43","S44","S45","S46","S47"];
     const allIds = expectedIds.every((id) => ids.includes(id));
-    check("M1 all expected IDs present (S01–S35)", allIds,
+    check("M1 all expected IDs present (S01–S47)", allIds,
       "missing: " + expectedIds.filter((id) => !ids.includes(id)).join(", "));
   }
 
@@ -132,28 +132,29 @@ function printSummary() {
   }
 
   // ── M3: assertion registry loads all types ─────────────────────────────────
-  console.log("\nM3: assertion registry loads 8 assertion types");
+  console.log("\nM3: assertion registry loads 9 assertion types");
   {
     const assertDir  = path.join(ROOT, "code", "src", "testing", "assertions");
     const jsFiles    = fs.existsSync(assertDir)
       ? fs.readdirSync(assertDir).filter((f) => f.endsWith(".js") && f !== "_registry.js")
       : [];
 
-    check("M3 8 assertion files present",
-      jsFiles.length === 8,
+    check("M3 9 assertion files present",
+      jsFiles.length === 9,
       "found " + jsFiles.length + ": " + jsFiles.join(", "));
 
     const { runAssertion } = require(path.join(assertDir, "_registry"));
     const knownTypes = [
       "status_equals", "response_contains", "state_field_equals", "tool_called",
-      "tool_not_called", "active_state", "artifact_exists", "audit_count"
+      "tool_not_called", "active_state", "artifact_exists", "audit_count",
+      "state_field_exists"
     ];
     const allLoaded = knownTypes.every((type) => {
-      const r = runAssertion({ type, expected: "__noop__" }, {}, { root: ROOT });
+      const r = runAssertion({ type, expected: "__noop__", field: "x" }, {}, { root: ROOT });
       return typeof r.detail === "string" &&
              !r.detail.startsWith("unknown assertion type:");
     });
-    check("M3 all 8 assertion types run without 'unknown type' error", allLoaded);
+    check("M3 all 9 assertion types run without 'unknown type' error", allLoaded);
   }
 
   // ── M4: runScenarios returns stable report schema ─────────────────────────
@@ -176,8 +177,8 @@ function printSummary() {
       report.counts && typeof report.counts.pass === "number",
       "got " + JSON.stringify(report.counts));
 
-    check("M4 report has 35 scenarios",
-      Array.isArray(report.scenarios) && report.scenarios.length === 35,
+    check("M4 report has 47 scenarios",
+      Array.isArray(report.scenarios) && report.scenarios.length === 47,
       "got " + (report.scenarios ? report.scenarios.length : "no array"));
   }
 

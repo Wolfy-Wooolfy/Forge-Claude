@@ -9,6 +9,7 @@ const { checkHardDeny, checkScope }   = require("./permissionRules");
 const { getDefaultPrompter }          = require("./permissionPrompter");
 const { appendAuditEntry }            = require("../audit/toolAuditLog");
 const { createVisionLockRule }        = require("./rules/vision_lock_rule");
+const { createShellVisionLockRule }   = require("./rules/shell_vision_lock_rule");
 
 const PERMISSION_AUDIT_REL = path.join("artifacts", "audit", "permission_audit.jsonl");
 
@@ -48,6 +49,7 @@ function createPolicy(options) {
   const on_decision     = opts.on_decision       || null; // optional callback
 
   const _visionRules    = [createVisionLockRule({ root })];
+  const _shellVisionRules = [createShellVisionLockRule({ root })];
 
   // ── authorize ──────────────────────────────────────────────────────────────
 
@@ -81,6 +83,14 @@ function createPolicy(options) {
       const vl = rule.check(tool, input, ctx || {});
       if (vl.denied) {
         return emit({ allow: false, reason: vl.reason }, "vision_lock");
+      }
+    }
+
+    // Step 1.6 — Shell vision lock rules (shell command project gate)
+    for (const rule of _shellVisionRules) {
+      const sv = rule.check(tool, input, ctx || {});
+      if (sv.denied) {
+        return emit({ allow: false, reason: sv.reason }, "shell_vision_lock");
       }
     }
 

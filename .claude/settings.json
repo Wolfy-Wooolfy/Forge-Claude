@@ -8,10 +8,8 @@
       "Bash(node bin/*)",
       "Bash(node verify/*)",
       "Bash(node code/*)",
-
       "Bash(npm *)",
       "Bash(npx *)",
-
       "Bash(git status)",
       "Bash(git status *)",
       "Bash(git diff *)",
@@ -29,7 +27,6 @@
       "Bash(git rm *)",
       "Bash(git ls-files *)",
       "Bash(git blame *)",
-
       "Bash(grep *)",
       "Bash(ls *)",
       "Bash(ls)",
@@ -71,33 +68,27 @@
       "Bash(realpath *)",
       "Bash(basename *)",
       "Bash(dirname *)",
-
       "Bash(python3 *)",
       "Bash(python *)",
-
       "PowerShell(*)",
-      "PowerShell(Get-ChildItem *)",
-      "PowerShell(Get-Content *)",
-      "PowerShell(New-Item *)",
-      "PowerShell(Select-Object *)",
-      "PowerShell(Measure-Object *)",
-      "PowerShell(Sort-Object *)",
-      "PowerShell(Where-Object *)",
-      "PowerShell(ForEach-Object *)",
-
       "Bash(OPENAI_API_KEY=* node *)",
       "Bash(NODE_ENV=* node *)",
       "Bash(PERMISSION_MODE=* node *)",
-
       "Bash(echo *exit*)",
-
+      "Bash(for * do *)",
       "Read(//tmp/**)",
       "Read(/tmp/**)",
       "Edit",
       "Write",
       "Read",
       "Glob",
-      "Grep"
+      "Grep",
+      "Bash(git --version)",
+      "Bash(docker --version)",
+      "Bash(cargo --version)",
+      "Bash(go version *)",
+      "Bash(ruby --version)",
+      "Bash(php --version)"
     ],
     "deny": [
       "Bash(git commit*)",
@@ -111,51 +102,65 @@
       "Bash(git filter-branch*)",
       "Bash(git tag *)",
       "Bash(git push --force*)",
-
       "Bash(rm -rf *)",
       "Bash(rm -fr *)",
       "Bash(rm -r *)",
       "Bash(rmdir /s*)",
       "Bash(del /f*)",
       "Bash(del /s*)",
-
       "Bash(npm publish*)",
       "Bash(npm install -g*)",
       "Bash(npm uninstall*)",
       "Bash(npm unpublish*)",
       "Bash(npm version*)",
       "Bash(npm link*)",
-
       "Bash(curl * | bash*)",
       "Bash(curl * | sh*)",
       "Bash(wget * | bash*)",
       "Bash(wget * | sh*)",
       "Bash(curl -s * | bash*)",
       "Bash(curl -s * | sh*)",
-
       "Bash(sudo *)",
       "Bash(su *)",
       "Bash(chmod 777*)",
       "Bash(chown *)",
       "Bash(chmod -R *)",
-
       "Bash(>* /dev/*)",
-      "Bash(:(){ *)",
       "Bash(dd *)",
       "Bash(mkfs*)",
       "Bash(format *)",
       "Bash(fdisk *)",
-
       "PowerShell(Remove-Item -Recurse -Force *)",
       "PowerShell(Remove-Item -Force -Recurse *)",
       "PowerShell(Format-Volume *)",
       "PowerShell(Set-ExecutionPolicy*)",
-
       "Bash(Forge-Claude\\.git*)",
       "Bash(rm * .git*)"
     ],
     "additionalDirectories": [
       "\\tmp"
+    ]
+  },
+  "hooks": {
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"d:\\S\\Halo\\Tech\\Forge-Claude\\.claude\\notify-telegram.js\" Notification"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"d:\\S\\Halo\\Tech\\Forge-Claude\\.claude\\notify-telegram.js\" Stop"
+          }
+        ]
+      }
     ]
   }
 }

@@ -1,0 +1,17 @@
+{
+  "id": "S43",
+  "name": "env.detect_one with detector_id:os returns detected:true and platform field",
+  "type": "direct_tool",
+  "permission": "READ_ONLY",
+  "tool": "env.detect_one",
+  "input": {
+    "detector_id": "os"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "id",       "expected": "os" },
+    { "type": "state_field_equals", "field": "detected", "expected": true },
+    { "type": "state_field_exists", "field": "data.platform" },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}
