@@ -1,0 +1,13 @@
+{
+  "id": "S30",
+  "name": "fs.delete_dir rejects path outside artifacts/projects/ — deny-by-default",
+  "type": "direct_tool",
+  "permission": "WORKSPACE_WRITE",
+  "tool": "fs.delete_dir",
+  "input": {
+    "path": "artifacts"
+  },
+  "assertions": [
+    { "type": "status_equals", "expected": "DENIED" }
+  ]
+}

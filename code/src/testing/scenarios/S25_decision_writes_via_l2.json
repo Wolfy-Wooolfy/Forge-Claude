@@ -1,0 +1,36 @@
+{
+  "id": "S25",
+  "name": "/api/ai/decision end-to-end write via L2 Tool Runtime",
+  "type": "apiserver",
+  "permission": "WORKSPACE_WRITE",
+  "project_id": "test_apiserver_s25",
+  "fixture": {
+    "requirement_completeness": true,
+    "active_runtime_state": "DOCUMENTATION_COMPLETE"
+  },
+  "method": "POST",
+  "endpoint": "/api/ai/decision",
+  "body": {
+    "request": "add login button",
+    "approver_role": "cto",
+    "project_id": "test_apiserver_s25",
+    "draft": {
+      "project_id": "test_apiserver_s25",
+      "files": [
+        {
+          "path": "web/index.html",
+          "content": "<html><body><button>Login</button></body></html>",
+          "allow_overwrite": true
+        }
+      ],
+      "summary": "Add login button to index page"
+    }
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "PASS" },
+    { "type": "state_field_equals", "field": "ok",         "expected": true },
+    { "type": "state_field_equals", "field": "entry_type", "expected": "DECISION_PACKET" },
+    { "type": "artifact_exists",    "path": "artifacts/projects/test_apiserver_s25/decisions/decision_packet.json" },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

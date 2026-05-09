@@ -1,0 +1,18 @@
+{
+  "id": "S27",
+  "name": "/api/projects/create write path via L2 Tool Runtime",
+  "type": "apiserver",
+  "permission": "WORKSPACE_WRITE",
+  "method": "POST",
+  "endpoint": "/api/projects/create",
+  "body": {
+    "project_name": "Test Apiserver S27"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "PASS" },
+    { "type": "state_field_equals", "field": "ok",      "expected": true },
+    { "type": "state_field_equals", "field": "created", "expected": true },
+    { "type": "artifact_exists",    "path": "artifacts/projects/test_apiserver_s27/project_state.json" },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

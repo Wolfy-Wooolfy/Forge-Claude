@@ -1,0 +1,23 @@
+{
+  "id": "S28",
+  "name": "/api/ai/propose write path via L2 Tool Runtime",
+  "type": "apiserver",
+  "permission": "WORKSPACE_WRITE",
+  "project_id": "test_apiserver_s28",
+  "fixture": {
+    "active_runtime_state": "IDEATION",
+    "requirement_completeness": true
+  },
+  "method": "POST",
+  "endpoint": "/api/ai/propose",
+  "body": {
+    "request": "create a new navigation menu",
+    "project_id": "test_apiserver_s28"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "PASS" },
+    { "type": "state_field_equals", "field": "ok",   "expected": true },
+    { "type": "state_field_equals", "field": "mode", "expected": "PROPOSAL" },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

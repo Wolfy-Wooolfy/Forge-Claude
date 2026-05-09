@@ -565,6 +565,122 @@ async function _runConversation(scenario, root) {
   return result;
 }
 
+// ── Result normalizer: apiserver ─────────────────────────────────────────────
+
+function _normalizeApiserverResult(httpResponseBody, httpStatus, audit) {
+  const ok = !!(httpResponseBody && httpResponseBody.ok !== false &&
+                httpStatus >= 200 && httpStatus < 300);
+  return {
+    status: ok ? "PASS" : "FAIL",
+    output: {
+      response:   "",
+      tool_calls: [],
+      state:      Object.assign({ ok: false }, httpResponseBody || {})
+    },
+    audit: audit || []
+  };
+}
+
+// ── Dispatch: apiserver ───────────────────────────────────────────────────────
+
+async function _runApiserver(scenario, root) {
+  const { resetDefaultRegistry } = require(
+    path.join(root, "code", "src", "runtime", "tools", "_registry")
+  );
+  const { resetDefaultPolicy } = require(
+    path.join(root, "code", "src", "runtime", "permission", "permissionPolicy")
+  );
+  const { readEntries } = require(
+    path.join(root, "code", "src", "runtime", "audit", "toolAuditLog")
+  );
+
+  const permission = scenario.permission || "WORKSPACE_WRITE";
+  const savedMode  = process.env.FORGE_PERMISSION_MODE;
+  process.env.FORGE_PERMISSION_MODE = permission;
+  resetDefaultRegistry();
+  resetDefaultPolicy();
+
+  const projectId  = scenario.project_id || ("test_apiserver_" + scenario.id.toLowerCase());
+  const projectDir = path.join(root, "artifacts", "projects", projectId);
+  const fixturePath = path.join(projectDir, "project_state.json");
+  let fixtureCreated = false;
+
+  if (scenario.fixture && !fs.existsSync(fixturePath)) {
+    fs.mkdirSync(projectDir, { recursive: true });
+    fs.writeFileSync(fixturePath, JSON.stringify(
+      Object.assign(
+        {
+          project_name:         "Apiserver Test " + scenario.id,
+          current_state:        "DISCUSSION",
+          active_runtime_state: "DISCUSSION",
+          user_goal:            "",
+          _version:             1,
+          created_at:           new Date().toISOString()
+        },
+        scenario.fixture,
+        { project_id: projectId }
+      ),
+      null, 2
+    ));
+    fixtureCreated = true;
+  }
+
+  let instance = null;
+  let actualPort = null;
+  const startTs = new Date().toISOString();
+  let httpBody   = null;
+  let httpStatus = 500;
+
+  try {
+    const { createWorkspaceApiServer } = require(
+      path.join(root, "code", "src", "workspace", "apiServer")
+    );
+    instance = createWorkspaceApiServer({ root, port: 0 });
+
+    await new Promise((resolve) => instance.server.listen(0, resolve));
+    actualPort = instance.server.address().port;
+
+    const method   = (scenario.method || "POST").toUpperCase();
+    const endpoint = scenario.endpoint || "/health";
+    const bodyStr  = scenario.body ? JSON.stringify(scenario.body) : null;
+
+    const resp = await _httpFetch(
+      "http://127.0.0.1:" + actualPort + endpoint,
+      {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body:    bodyStr
+      }
+    );
+    httpStatus = resp.status;
+    httpBody   = await resp.json().catch(() => ({}));
+  } catch (err) {
+    httpBody   = { ok: false, error: err.message };
+    httpStatus = 500;
+  } finally {
+    if (instance && instance.server) {
+      await new Promise((resolve) => instance.server.close(resolve));
+    }
+    if (savedMode !== undefined) process.env.FORGE_PERMISSION_MODE = savedMode;
+    else delete process.env.FORGE_PERMISSION_MODE;
+    resetDefaultRegistry();
+    resetDefaultPolicy();
+  }
+
+  const newAudit = readEntries(root, { since_ts: startTs });
+  const result   = _normalizeApiserverResult(httpBody, httpStatus, newAudit);
+
+  Object.defineProperty(result, "_cleanup", {
+    value: () => {
+      try { fs.rmSync(projectDir, { recursive: true, force: true }); } catch { /* best-effort */ }
+    },
+    enumerable: false,
+    writable:   false
+  });
+
+  return result;
+}
+
 // ── Single scenario runner ────────────────────────────────────────────────────
 
 async function _runOne(scenario, root) {
@@ -591,6 +707,8 @@ async function _runOne(scenario, root) {
       execResult = await _runConversation(scenario, root);
     } else if (scenario.type === "direct_engine") {
       execResult = await _runDirectEngine(scenario, root);
+    } else if (scenario.type === "apiserver") {
+      execResult = await _runApiserver(scenario, root);
     } else {
       throw new Error("unknown scenario type: " + scenario.type);
     }

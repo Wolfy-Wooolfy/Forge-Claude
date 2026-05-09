@@ -1,0 +1,22 @@
+{
+  "id": "S29",
+  "name": "/api/projects/delete uses fs.delete_dir L2 tool",
+  "type": "apiserver",
+  "permission": "WORKSPACE_WRITE",
+  "project_id": "test_apiserver_s29",
+  "fixture": {
+    "active_runtime_state": "DISCUSSION"
+  },
+  "method": "POST",
+  "endpoint": "/api/projects/delete",
+  "body": {
+    "project_id": "test_apiserver_s29"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "PASS" },
+    { "type": "state_field_equals", "field": "ok",         "expected": true },
+    { "type": "state_field_equals", "field": "deleted",    "expected": true },
+    { "type": "state_field_equals", "field": "project_id", "expected": "test_apiserver_s29" },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "id": "S26",
+  "name": "/api/projects/activate write paths via L2 Tool Runtime",
+  "type": "apiserver",
+  "permission": "WORKSPACE_WRITE",
+  "project_id": "test_apiserver_s26",
+  "fixture": {
+    "active_runtime_state": "DISCUSSION"
+  },
+  "method": "POST",
+  "endpoint": "/api/projects/activate",
+  "body": {
+    "project_id": "test_apiserver_s26"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "PASS" },
+    { "type": "state_field_equals", "field": "ok",                "expected": true },
+    { "type": "state_field_equals", "field": "active_project_id", "expected": "test_apiserver_s26" },
+    { "type": "artifact_exists",    "path": "artifacts/projects/test_apiserver_s26/project_state.json" },
+    { "type": "audit_count",        "min": 2 }
+  ]
+}

@@ -3,7 +3,7 @@
 const fs   = require("fs");
 const path = require("path");
 
-const { defineTool, ok, failed, previewed } = require("./_contract");
+const { defineTool, ok, denied, failed, previewed } = require("./_contract");
 
 // ── Path safety helper ────────────────────────────────────────────────────────
 
@@ -207,7 +207,7 @@ const delete_dir = defineTool({
     if (!safe) return Promise.resolve(failed("PATH_OUTSIDE_ROOT", "Path resolves outside workspace root"));
     const projectsBase = path.resolve(root, "artifacts", "projects") + path.sep;
     if (!abs.startsWith(projectsBase)) {
-      return Promise.resolve(failed("PATH_OUTSIDE_PROJECTS",
+      return Promise.resolve(denied("PATH_OUTSIDE_PROJECTS",
         "fs.delete_dir only operates within artifacts/projects/"));
     }
     const fileCount = fs.existsSync(abs) ? _countFiles(abs) : 0;
@@ -221,7 +221,7 @@ const delete_dir = defineTool({
     // Condition 2: deny-by-default — only artifacts/projects/ even in DANGER mode
     const projectsBase = path.resolve(root, "artifacts", "projects") + path.sep;
     if (!abs.startsWith(projectsBase)) {
-      return failed("PATH_OUTSIDE_PROJECTS",
+      return denied("PATH_OUTSIDE_PROJECTS",
         "fs.delete_dir only operates within artifacts/projects/: " + input.path);
     }
 
