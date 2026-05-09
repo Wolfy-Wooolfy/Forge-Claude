@@ -378,13 +378,55 @@ async function _runDirectEngine(scenario, root) {
         path.join(root, "code", "src", "ai_os", "deliveryPackageBuilder")
       );
       engine = createDeliveryPackageBuilder({ root });
+    } else if (scenario.engine === "discussionLoopGate") {
+      const { createDiscussionLoopGate } = require(
+        path.join(root, "code", "src", "ai_os", "discussionLoopGate")
+      );
+      engine = createDiscussionLoopGate({ root });
+    } else if (scenario.engine === "languageDetectionCompliance") {
+      const { createLanguageDetectionCompliance } = require(
+        path.join(root, "code", "src", "ai_os", "languageDetectionCompliance")
+      );
+      engine = createLanguageDetectionCompliance({ root });
+    } else if (scenario.engine === "projectReviewEngine") {
+      const { createProjectReviewEngine } = require(
+        path.join(root, "code", "src", "ai_os", "projectReviewEngine")
+      );
+      engine = createProjectReviewEngine({ root });
+    } else if (scenario.engine === "refinementLoopOrchestrator") {
+      const { createRefinementLoopOrchestrator } = require(
+        path.join(root, "code", "src", "ai_os", "refinementLoopOrchestrator")
+      );
+      engine = createRefinementLoopOrchestrator({ root });
+    } else if (scenario.engine === "uxValidator") {
+      const { createUxValidator } = require(
+        path.join(root, "code", "src", "ai_os", "uxValidator")
+      );
+      engine = createUxValidator({ root });
+    } else if (scenario.engine === "verificationLoop") {
+      const { createVerificationLoop } = require(
+        path.join(root, "code", "src", "ai_os", "verificationLoop")
+      );
+      engine = createVerificationLoop({ root });
     } else {
       throw new Error("unknown engine: " + scenario.engine);
     }
 
-    const input = Object.assign({}, scenario.input || {}, { project_id: projectId });
-    raw = await engine[scenario.method](input);
-    raw = Object.assign({}, raw || {});
+    const methodFn = engine[scenario.method];
+    if (typeof methodFn !== "function") {
+      throw new Error("engine method not found: " + scenario.method);
+    }
+
+    // Support positional-args via _args array in scenario.input (for methods like validateResponse(projectId, text))
+    const scenInput = scenario.input || {};
+    let methodResult;
+    if (Array.isArray(scenInput._args)) {
+      methodResult = await methodFn.apply(engine, scenInput._args);
+    } else {
+      const input = Object.assign({}, scenInput, { project_id: projectId });
+      methodResult = await methodFn.call(engine, input);
+    }
+    raw = Object.assign({}, methodResult || {});
   } catch (err) {
     raw = { ok: false, mode: "BLOCKED", reason: err.message };
   } finally {

@@ -1,21 +1,29 @@
 "use strict";
 
-const fs = require("fs");
+const fs   = require("fs");
 const path = require("path");
-const ProjectReviewProvider = require("../providers/projectReviewProvider");
+const ProjectReviewProvider  = require("../providers/projectReviewProvider");
+const { getDefaultRegistry } = require("../runtime/tools/_registry");
 
 function createProjectReviewEngine(options = {}) {
-  const root = path.resolve(options.root || process.cwd());
+  const root         = path.resolve(options.root || process.cwd());
   const projectsRoot = path.resolve(root, "artifacts/projects");
 
-  function ensureDir(dirPath) { fs.mkdirSync(dirPath, { recursive: true }); }
   function readJsonSafe(filePath, fallback) {
     try { return fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath, "utf8")) : fallback; }
     catch (err) { return fallback; }
   }
-  function writeJson(filePath, payload) {
-    ensureDir(path.dirname(filePath));
-    fs.writeFileSync(filePath, JSON.stringify(payload, null, 2), "utf8");
+  async function writeJson(filePath, payload) {
+    const reg     = getDefaultRegistry();
+    const relPath = path.relative(root, filePath).split(path.sep).join("/");
+    const r       = await reg.invoke("fs.write_file", { path: relPath, content: JSON.stringify(payload, null, 2) }, { root });
+    if (r.status !== "SUCCESS") {
+      throw new Error("writeJson failed [" + relPath + "]: " + (r.metadata && r.metadata.reason));
+    }
+  }
+  async function tryWriteJson(filePath, payload, label) {
+    try { await writeJson(filePath, payload); }
+    catch (err) { console.warn("[projectReviewEngine] " + label + " write skipped: " + err.message); }
   }
   function nowIso() { return new Date().toISOString(); }
   function normalizeProjectId(value) {
@@ -108,7 +116,7 @@ function createProjectReviewEngine(options = {}) {
 
     if (projectId) {
       const reviewPath = path.join(aiOsRoot(projectId), "project_review_report.json");
-      writeJson(reviewPath, { review, reviewed_at: nowIso(), review_goal: reviewGoal });
+      await tryWriteJson(reviewPath, { review, reviewed_at: nowIso(), review_goal: reviewGoal }, "project review report");
     }
 
     return {

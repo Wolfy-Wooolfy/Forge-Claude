@@ -1,0 +1,21 @@
+{
+  "id": "S21",
+  "name": "languageDetectionCompliance.validateLanguageConsistency persists compliance log via L2",
+  "type": "direct_engine",
+  "permission": "WORKSPACE_WRITE",
+  "engine": "languageDetectionCompliance",
+  "method": "validateLanguageConsistency",
+  "fixture": {
+    "project_name": "Test LangCompliance S21",
+    "active_runtime_state": "DISCUSSION",
+    "user_language": "ar"
+  },
+  "input": {
+    "_args": ["test_engine_s21", "هذه استجابة باللغة العربية للتحقق من الاتساق", "ar"]
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "PASS" },
+    { "type": "state_field_equals", "field": "ok", "expected": true },
+    { "type": "artifact_exists",    "path": "artifacts/projects/test_engine_s21/ai_os/language_compliance.json" }
+  ]
+}

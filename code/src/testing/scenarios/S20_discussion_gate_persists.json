@@ -1,0 +1,26 @@
+{
+  "id": "S20",
+  "name": "discussionLoopGate.assertDiscussionComplete persists gate JSON via L2",
+  "type": "direct_engine",
+  "permission": "WORKSPACE_WRITE",
+  "engine": "discussionLoopGate",
+  "method": "assertDiscussionComplete",
+  "fixture": {
+    "project_name": "Test Gate S20",
+    "active_runtime_state": "DISCUSSION",
+    "user_goal": "نظام إدارة مهام بسيط",
+    "requirement_domain": "productivity",
+    "requirement_completeness": true,
+    "open_questions": [],
+    "requirement_model": { "users": "individuals" }
+  },
+  "input": {
+    "project_id": "test_engine_s20"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "PASS" },
+    { "type": "state_field_equals", "field": "ok",   "expected": true },
+    { "type": "state_field_equals", "field": "mode", "expected": "DISCUSSION_COMPLETE" },
+    { "type": "artifact_exists",    "path": "artifacts/projects/test_engine_s20/ai_os/discussion_loop_gate.json" }
+  ]
+}

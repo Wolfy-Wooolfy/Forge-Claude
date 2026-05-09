@@ -1,8 +1,9 @@
 "use strict";
 
-const fs = require("fs");
+const fs   = require("fs");
 const path = require("path");
 const DocumentationReviewProvider = require("../providers/documentationReviewProvider");
+const { getDefaultRegistry }      = require("../runtime/tools/_registry");
 
 const REQUIRED_DOC_SECTIONS = [
   "overview", "goal", "requirement", "option", "scope", "plan"
@@ -12,14 +13,21 @@ function createVerificationLoop(options = {}) {
   const root = path.resolve(options.root || process.cwd());
   const projectsRoot = path.resolve(root, "artifacts/projects");
 
-  function ensureDir(dirPath) { fs.mkdirSync(dirPath, { recursive: true }); }
   function readJsonSafe(filePath, fallback) {
     try { return fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath, "utf8")) : fallback; }
     catch (err) { return fallback; }
   }
-  function writeJson(filePath, payload) {
-    ensureDir(path.dirname(filePath));
-    fs.writeFileSync(filePath, JSON.stringify(payload, null, 2), "utf8");
+  async function writeJson(filePath, payload) {
+    const reg     = getDefaultRegistry();
+    const relPath = path.relative(root, filePath).split(path.sep).join("/");
+    const r       = await reg.invoke("fs.write_file", { path: relPath, content: JSON.stringify(payload, null, 2) }, { root });
+    if (r.status !== "SUCCESS") {
+      throw new Error("writeJson failed [" + relPath + "]: " + (r.metadata && r.metadata.reason));
+    }
+  }
+  async function tryWriteJson(filePath, payload, label) {
+    try { await writeJson(filePath, payload); }
+    catch (err) { console.warn("[verificationLoop] " + label + " write skipped: " + err.message); }
   }
   function nowIso() { return new Date().toISOString(); }
   function normalizeProjectId(value) {
@@ -120,7 +128,7 @@ function createVerificationLoop(options = {}) {
     return { passed: issues.length === 0, issues };
   }
 
-  function attemptSelfCorrection(projectId, state, l1Issues, l2Issues) {
+  async function attemptSelfCorrection(projectId, state, l1Issues, l2Issues) {
     const corrections = [];
 
     // Auto-correct: set documentation_state to DRAFT_READY if draft exists
@@ -139,7 +147,7 @@ function createVerificationLoop(options = {}) {
     }
 
     if (mutated) {
-      writeJson(statePath, { ...state, last_updated_at: nowIso() });
+      await writeJson(statePath, { ...state, last_updated_at: nowIso() });
     }
 
     return corrections;
@@ -168,7 +176,7 @@ function createVerificationLoop(options = {}) {
 
     // Self-correction pass: attempt to fix auto-correctable issues before escalating
     if ((!l1.passed || !l2.passed) && selfCorrectionLog.length < maxSelfCorrections) {
-      const corrections = attemptSelfCorrection(projectId, state, l1.issues, l2.issues);
+      const corrections = await attemptSelfCorrection(projectId, state, l1.issues, l2.issues);
       if (corrections.length > 0) {
         selfCorrectionLog.push({ attempt: 1, corrections, attempted_at: nowIso() });
         // Reload state and re-run structural check after corrections
@@ -208,7 +216,7 @@ function createVerificationLoop(options = {}) {
     };
 
     const verifyPath = path.join(aiOsRoot(projectId), "verification_result.json");
-    writeJson(verifyPath, result);
+    await tryWriteJson(verifyPath, result, "verification result");
 
     return result;
   }

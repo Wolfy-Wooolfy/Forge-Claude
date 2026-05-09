@@ -3435,13 +3435,13 @@ function buildExecutionPackage(packet) {
       // --- AI OS extended routes ---
       if (req.method === "POST" && pathname === "/api/ai-os/discussion/gate") {
         const body = await readBody(req);
-        sendJson(res, 200, discussionLoopGate.assertDiscussionComplete(body));
+        sendJson(res, 200, await discussionLoopGate.assertDiscussionComplete(body));
         return;
       }
 
       if (req.method === "POST" && pathname === "/api/ai-os/discussion/record") {
         const body = await readBody(req);
-        sendJson(res, 200, discussionLoopGate.recordDiscussionIteration(body.project_id, body));
+        sendJson(res, 200, await discussionLoopGate.recordDiscussionIteration(body.project_id, body));
         return;
       }
 
@@ -3459,13 +3459,13 @@ function buildExecutionPackage(packet) {
 
       if (req.method === "POST" && pathname === "/api/ai-os/language-compliance") {
         const body = await readBody(req);
-        sendJson(res, 200, languageDetectionCompliance.runComplianceReport(body.project_id));
+        sendJson(res, 200, await languageDetectionCompliance.runComplianceReport(body.project_id));
         return;
       }
 
       if (req.method === "POST" && pathname === "/api/ai-os/ux-validate") {
         const body = await readBody(req);
-        sendJson(res, 200, uxValidator.validateResponse(body.project_id, body.response));
+        sendJson(res, 200, await uxValidator.validateResponse(body.project_id, body.response));
         return;
       }
 

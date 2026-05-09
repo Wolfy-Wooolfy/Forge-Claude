@@ -1,0 +1,41 @@
+{
+  "id": "S23",
+  "name": "refinementLoopOrchestrator.runIdeationLoop persists ideation log via L2",
+  "type": "direct_engine",
+  "permission": "WORKSPACE_WRITE",
+  "engine": "refinementLoopOrchestrator",
+  "method": "runIdeationLoop",
+  "fixture": {
+    "project_name": "Test Refinement S23",
+    "active_runtime_state": "IDEATION",
+    "user_goal": "نظام إدارة مهام بسيط",
+    "requirement_domain": "productivity",
+    "requirement_model": {}
+  },
+  "mock": {
+    "tool_name": "expand_idea",
+    "args": {
+      "expanded_summary": "نظام مهام",
+      "missing_components": [],
+      "suggested_directions": [{ "direction": "ويب", "description": "تطبيق", "pros": ["سهل"], "cons": [] }],
+      "improvement_proposals": [{ "area": "UX", "proposal": "بسيط", "reasoning": "سهولة الاستخدام" }],
+      "readiness_assessment": { "ready_for_options": true, "blocking_gaps": [] },
+      "follow_up_question": "",
+      "suggested_answers": [],
+      "detected_domain": "productivity",
+      "pivot_detected": false,
+      "domain_confidence": 0.9,
+      "name_goal_mismatch": false
+    }
+  },
+  "input": {
+    "project_id": "test_engine_s23",
+    "refinement_input": "نظام بسيط لإدارة المهام",
+    "single_pass": true
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "PASS" },
+    { "type": "state_field_equals", "field": "ok",   "expected": true },
+    { "type": "artifact_exists",    "path": "artifacts/projects/test_engine_s23/ai_os/ideation_log.json" }
+  ]
+}

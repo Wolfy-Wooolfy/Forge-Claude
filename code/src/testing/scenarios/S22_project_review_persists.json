@@ -1,0 +1,33 @@
+{
+  "id": "S22",
+  "name": "projectReviewEngine.reviewProject persists review report via L2",
+  "type": "direct_engine",
+  "permission": "WORKSPACE_WRITE",
+  "engine": "projectReviewEngine",
+  "method": "reviewProject",
+  "fixture": {
+    "project_name": "Test ProjectReview S22",
+    "active_runtime_state": "DOCUMENTATION_REVIEW",
+    "user_goal": "نظام إدارة مهام بسيط",
+    "requirement_domain": "productivity",
+    "requirement_completeness": true
+  },
+  "mock": {
+    "content": {
+      "summary": "Project review complete — all sections coherent",
+      "recommendations": [],
+      "score": 0.9,
+      "approved": true
+    }
+  },
+  "input": {
+    "project_id": "test_engine_s22",
+    "project_content": "A simple task management system with create, complete, and reminder features."
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "PASS" },
+    { "type": "state_field_equals", "field": "ok",   "expected": true },
+    { "type": "state_field_equals", "field": "mode", "expected": "REVIEW_COMPLETE" },
+    { "type": "artifact_exists",    "path": "artifacts/projects/test_engine_s22/ai_os/project_review_report.json" }
+  ]
+}

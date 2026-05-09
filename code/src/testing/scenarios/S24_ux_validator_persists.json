@@ -1,0 +1,19 @@
+{
+  "id": "S24",
+  "name": "uxValidator.validateResponse persists ux validation log via L2",
+  "type": "direct_engine",
+  "permission": "WORKSPACE_WRITE",
+  "engine": "uxValidator",
+  "method": "validateResponse",
+  "fixture": {
+    "project_name": "Test UxValidator S24"
+  },
+  "input": {
+    "_args": ["test_engine_s24", "هذه استجابة واضحة ومفيدة بدون أي JSON خام."]
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "PASS" },
+    { "type": "state_field_equals", "field": "ok",   "expected": true },
+    { "type": "artifact_exists",    "path": "artifacts/projects/test_engine_s24/ai_os/ux_validation_log.json" }
+  ]
+}
