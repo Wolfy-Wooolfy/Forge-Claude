@@ -2,21 +2,31 @@
   "schema_version": "2.0",
   "status_type": "LIVE",
   "current_stage": "A",
-  "overall_progress_percent": 98,
+  "overall_progress_percent": 99,
   "stage_progress_percent": 100,
-  "current_task": "PHASE-5-CLOSED",
-  "next_phase": "PHASE-5.1",
-  "next_step": "Begin PHASE-5.1: Complexity Review checkpoint. Evaluate Lean v2 exit decision.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-20260508-phase-5-self-test-harness.md",
+  "current_task": "PHASE-5.1-CLOSED",
+  "next_phase": "PHASE-6",
+  "next_step": "Begin PHASE-6: apiServer migration. Pre-PHASE-6 cleanup: (a) remove pipeline_tools.js per FINDINGS-WARN-1, (b) add S13 TEST mode scenario per FINDINGS-WARN-2.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-20260509-phase-5.1-complexity-review-and-lean-v2-exit.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
     "approval_decision": "DECISION-20260508-phase-0-closure-and-blueprint-prep.md",
     "approval_status": "OWNER_APPROVED_2026-05-08"
   },
-  "lean_v2_exit_status": "BEFORE_EXIT",
+  "lean_v2_exit_status": "EXIT_NOT_TAKEN",
   "lean_v2_exit_phase": "PHASE-5.1",
+  "lean_v2_exit_decision_at": "2026-05-09T07:26:04.487Z",
   "phases_post_exit_assumed": false,
+  "complexity_review": {
+    "verdict": "CONTINUE",
+    "report_path": "artifacts/audit/complexity_review_post_phase_5.md",
+    "completed_at": "2026-05-09T07:26:04.487Z",
+    "warnings_to_address_in_phase_6": [
+      "FINDINGS-WARN-1",
+      "FINDINGS-WARN-2"
+    ]
+  },
   "phase_0_5_sweep": {
     "sweep_artifact": "artifacts/audit/blueprint_contradiction_sweep.md",
     "total_files_read": 114,
@@ -56,7 +66,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-05-08T18:15:46.595Z",
+    "last_doctor_run": "2026-05-09T07:11:21.841Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
@@ -69,7 +79,7 @@
     "tools_registered_count": 23,
     "active_permission_mode": "WORKSPACE_WRITE",
     "permission_policy_installed": true,
-    "note": "PHASE-5 complete. Harness: 8 PASS / 4 SKIP (conversation engine not wired). W-03 isolation confirmed by S12. Scenarios 6,7,9,11 SKIP until PHASE-6+ wires conversation engine.",
+    "note": "PHASE-5.1 closed. Lean v2 Exit NOT taken — owner decision CONTINUE to PHASE-6. WARN-1: pipeline_tools.js dead weight (213 LOC, 0 callers). WARN-2: TEST mode has zero scenario coverage. Both to be addressed pre-PHASE-6.",
     "last_doctor_counts": {
       "pass": 12,
       "warn": 2,
