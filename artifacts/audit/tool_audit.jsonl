@@ -1,0 +1,498 @@
+{"ts":"2026-05-08T17:03:58.701Z","tool":"nonexistent.tool","status":"FAILED","reason":"TOOL_NOT_FOUND","input_summary":{}}
+{"ts":"2026-05-08T17:03:58.714Z","tool":"fs.read_file","status":"FAILED","reason":"INVALID_INPUT","input_summary":{}}
+{"ts":"2026-05-08T17:03:58.715Z","tool":"fs.read_file","status":"FAILED","reason":"INVALID_INPUT","input_summary":{"path":"progress/status.json"}}
+{"ts":"2026-05-08T17:03:58.715Z","tool":"fs.read_file","status":"FAILED","reason":"INVALID_INPUT","input_summary":{"path":"../../../../../../etc/passwd"}}
+{"ts":"2026-05-08T17:03:58.716Z","tool":"shell.run","status":"FAILED","reason":"INVALID_INPUT","input_summary":{"argv":"[array len=3]"}}
+{"ts":"2026-05-08T17:03:58.716Z","tool":"http.get","status":"FAILED","reason":"INVALID_INPUT","input_summary":{"url":"https://malicious.example.com/payload"}}
+{"ts":"2026-05-08T17:03:58.718Z","tool":"fs.write_file","status":"FAILED","reason":"INVALID_INPUT","input_summary":{"path":"artifacts\\tmp_smoke_s11_1778259838717.txt","content":"preview test"}}
+{"ts":"2026-05-08T17:03:58.720Z","tool":"fs.read_file","status":"FAILED","reason":"INVALID_INPUT","input_summary":{"path":"C:\\Users\\Khaled\\AppData\\Local\\Temp\\forge_smoke_s12_1778259838718.json"}}
+{"ts":"2026-05-08T17:05:34.497Z","tool":"nonexistent.tool","status":"FAILED","reason":"TOOL_NOT_FOUND","input_summary":{}}
+{"ts":"2026-05-08T17:05:34.498Z","tool":"fs.read_file","status":"FAILED","reason":"INVALID_INPUT","input_summary":{}}
+{"ts":"2026-05-08T17:05:34.499Z","tool":"fs.read_file","status":"SUCCESS","reason":null,"input_summary":{"path":"progress/status.json"}}
+{"ts":"2026-05-08T17:05:34.500Z","tool":"fs.read_file","status":"FAILED","reason":"PATH_OUTSIDE_ROOT","input_summary":{"path":"../../../../../../etc/passwd"}}
+{"ts":"2026-05-08T17:05:34.500Z","tool":"shell.run","status":"FAILED","reason":"HARD_DENY","input_summary":{"argv":"[array len=3]"}}
+{"ts":"2026-05-08T17:05:34.501Z","tool":"http.get","status":"FAILED","reason":"HOST_NOT_ALLOWED","input_summary":{"url":"https://malicious.example.com/payload"}}
+{"ts":"2026-05-08T17:05:34.501Z","tool":"fs.write_file","status":"PREVIEWED","reason":null,"input_summary":{"path":"artifacts\\tmp_smoke_s11_1778259934501.txt","content":"preview test"}}
+{"ts":"2026-05-08T17:05:34.502Z","tool":"fs.read_file","status":"FAILED","reason":"PATH_OUTSIDE_ROOT","input_summary":{"path":"C:\\Users\\Khaled\\AppData\\Local\\Temp\\forge_smoke_s12_1778259934501.json"}}
+{"ts":"2026-05-08T17:08:18.468Z","tool":"nonexistent.tool","status":"FAILED","reason":"TOOL_NOT_FOUND","input_summary":{}}
+{"ts":"2026-05-08T17:08:18.469Z","tool":"fs.read_file","status":"FAILED","reason":"INVALID_INPUT","input_summary":{}}
+{"ts":"2026-05-08T17:08:18.470Z","tool":"fs.read_file","status":"SUCCESS","reason":null,"input_summary":{"path":"progress/status.json"}}
+{"ts":"2026-05-08T17:08:18.470Z","tool":"fs.read_file","status":"FAILED","reason":"PATH_OUTSIDE_ROOT","input_summary":{"path":"../../../../../../etc/passwd"}}
+{"ts":"2026-05-08T17:08:18.471Z","tool":"shell.run","status":"FAILED","reason":"HARD_DENY","input_summary":{"argv":"[array len=3]"}}
+{"ts":"2026-05-08T17:08:18.471Z","tool":"http.get","status":"FAILED","reason":"HOST_NOT_ALLOWED","input_summary":{"url":"https://malicious.example.com/payload"}}
+{"ts":"2026-05-08T17:08:18.471Z","tool":"fs.write_file","status":"PREVIEWED","reason":null,"input_summary":{"path":"artifacts\\tmp_smoke_s11_1778260098471.txt","content":"preview test"}}
+{"ts":"2026-05-08T17:08:18.472Z","tool":"fs.read_file","status":"FAILED","reason":"PATH_OUTSIDE_ROOT","input_summary":{"path":"C:\\Users\\Khaled\\AppData\\Local\\Temp\\forge_smoke_s12_1778260098472.json"}}
+{"ts":"2026-05-08T17:09:21.669Z","tool":"nonexistent.tool","status":"FAILED","reason":"TOOL_NOT_FOUND","input_summary":{}}
+{"ts":"2026-05-08T17:09:21.670Z","tool":"fs.read_file","status":"FAILED","reason":"INVALID_INPUT","input_summary":{}}
+{"ts":"2026-05-08T17:09:21.671Z","tool":"fs.read_file","status":"SUCCESS","reason":null,"input_summary":{"path":"progress/status.json"}}
+{"ts":"2026-05-08T17:09:21.671Z","tool":"fs.read_file","status":"FAILED","reason":"PATH_OUTSIDE_ROOT","input_summary":{"path":"../../../../../../etc/passwd"}}
+{"ts":"2026-05-08T17:09:21.672Z","tool":"shell.run","status":"FAILED","reason":"HARD_DENY","input_summary":{"argv":"[array len=3]"}}
+{"ts":"2026-05-08T17:09:21.672Z","tool":"http.get","status":"FAILED","reason":"HOST_NOT_ALLOWED","input_summary":{"url":"https://malicious.example.com/payload"}}
+{"ts":"2026-05-08T17:09:21.673Z","tool":"fs.write_file","status":"PREVIEWED","reason":null,"input_summary":{"path":"artifacts\\tmp_smoke_s11_1778260161672.txt","content":"preview test"}}
+{"ts":"2026-05-08T17:09:21.674Z","tool":"fs.read_file","status":"FAILED","reason":"PATH_OUTSIDE_ROOT","input_summary":{"path":"C:\\Users\\Khaled\\AppData\\Local\\Temp\\forge_smoke_s12_1778260161673.json"}}
+{"ts":"2026-05-08T17:09:46.716Z","tool":"nonexistent.tool","status":"FAILED","reason":"TOOL_NOT_FOUND","input_summary":{}}
+{"ts":"2026-05-08T17:09:46.723Z","tool":"fs.read_file","status":"FAILED","reason":"INVALID_INPUT","input_summary":{}}
+{"ts":"2026-05-08T17:09:46.724Z","tool":"fs.read_file","status":"SUCCESS","reason":null,"input_summary":{"path":"progress/status.json"}}
+{"ts":"2026-05-08T17:09:46.724Z","tool":"fs.read_file","status":"FAILED","reason":"PATH_OUTSIDE_ROOT","input_summary":{"path":"../../../../../../etc/passwd"}}
+{"ts":"2026-05-08T17:09:46.725Z","tool":"shell.run","status":"FAILED","reason":"HARD_DENY","input_summary":{"argv":"[array len=3]"}}
+{"ts":"2026-05-08T17:09:46.725Z","tool":"http.get","status":"FAILED","reason":"HOST_NOT_ALLOWED","input_summary":{"url":"https://malicious.example.com/payload"}}
+{"ts":"2026-05-08T17:09:46.725Z","tool":"fs.write_file","status":"PREVIEWED","reason":null,"input_summary":{"path":"artifacts\\tmp_smoke_s11_1778260186725.txt","content":"preview test"}}
+{"ts":"2026-05-08T17:09:46.726Z","tool":"fs.read_file","status":"FAILED","reason":"PATH_OUTSIDE_ROOT","input_summary":{"path":"C:\\Users\\Khaled\\AppData\\Local\\Temp\\forge_smoke_s12_1778260186726.json"}}
+{"ts":"2026-05-08T17:09:46.810Z","tool":"nonexistent.tool","status":"FAILED","reason":"TOOL_NOT_FOUND","input_summary":{}}
+{"ts":"2026-05-08T17:09:46.811Z","tool":"fs.read_file","status":"FAILED","reason":"INVALID_INPUT","input_summary":{}}
+{"ts":"2026-05-08T17:09:46.812Z","tool":"fs.read_file","status":"SUCCESS","reason":null,"input_summary":{"path":"progress/status.json"}}
+{"ts":"2026-05-08T17:09:46.812Z","tool":"fs.read_file","status":"FAILED","reason":"PATH_OUTSIDE_ROOT","input_summary":{"path":"../../../../../../etc/passwd"}}
+{"ts":"2026-05-08T17:09:46.812Z","tool":"shell.run","status":"FAILED","reason":"HARD_DENY","input_summary":{"argv":"[array len=3]"}}
+{"ts":"2026-05-08T17:09:46.813Z","tool":"http.get","status":"FAILED","reason":"HOST_NOT_ALLOWED","input_summary":{"url":"https://malicious.example.com/payload"}}
+{"ts":"2026-05-08T17:09:46.813Z","tool":"fs.write_file","status":"PREVIEWED","reason":null,"input_summary":{"path":"artifacts\\tmp_smoke_s11_1778260186813.txt","content":"preview test"}}
+{"ts":"2026-05-08T17:09:46.814Z","tool":"fs.read_file","status":"FAILED","reason":"PATH_OUTSIDE_ROOT","input_summary":{"path":"C:\\Users\\Khaled\\AppData\\Local\\Temp\\forge_smoke_s12_1778260186813.json"}}
+{"ts":"2026-05-08T17:45:13.002Z","tool":"nonexistent.tool","status":"FAILED","reason":"TOOL_NOT_FOUND","input_summary":{}}
+{"ts":"2026-05-08T17:45:13.005Z","tool":"fs.read_file","status":"FAILED","reason":"INVALID_INPUT","input_summary":{}}
+{"ts":"2026-05-08T17:45:13.009Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-08T17:45:13.010Z","tool":"fs.read_file","status":"SUCCESS","reason":null,"input_summary":{"path":"progress/status.json"}}
+{"ts":"2026-05-08T17:45:13.011Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-08T17:45:13.012Z","tool":"fs.read_file","status":"FAILED","reason":"PATH_OUTSIDE_ROOT","input_summary":{"path":"../../../../../../etc/passwd"}}
+{"ts":"2026-05-08T17:45:13.013Z","kind":"permission","tool":"shell.run","required_mode":"DANGER_FULL_ACCESS","active_mode":"WORKSPACE_WRITE","stage":"hard_deny","allow":false,"reason":"HARD_DENY_DESTRUCTIVE_SHELL"}
+{"ts":"2026-05-08T17:45:13.014Z","tool":"shell.run","status":"DENIED","reason":"HARD_DENY_DESTRUCTIVE_SHELL","input_summary":{"argv":"[array len=3]"}}
+{"ts":"2026-05-08T17:45:13.017Z","kind":"permission","tool":"http.get","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-08T17:45:13.018Z","tool":"http.get","status":"FAILED","reason":"HOST_NOT_ALLOWED","input_summary":{"url":"https://malicious.example.com/payload"}}
+{"ts":"2026-05-08T17:45:13.020Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-08T17:45:13.021Z","tool":"fs.write_file","status":"PREVIEWED","reason":null,"input_summary":{"path":"artifacts\\tmp_smoke_s11_1778262313018.txt","content":"preview test"}}
+{"ts":"2026-05-08T17:45:13.024Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"hard_deny","allow":false,"reason":"HARD_DENY_SYSTEM_PATH"}
+{"ts":"2026-05-08T17:45:13.024Z","tool":"fs.read_file","status":"DENIED","reason":"HARD_DENY_SYSTEM_PATH","input_summary":{"path":"C:\\Users\\Khaled\\AppData\\Local\\Temp\\forge_smoke_s12_1778262313021.json"}}
+{"ts":"2026-05-08T17:46:12.062Z","tool":"nonexistent.tool","status":"FAILED","reason":"TOOL_NOT_FOUND","input_summary":{}}
+{"ts":"2026-05-08T17:46:12.065Z","tool":"fs.read_file","status":"FAILED","reason":"INVALID_INPUT","input_summary":{}}
+{"ts":"2026-05-08T17:46:12.068Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-08T17:46:12.070Z","tool":"fs.read_file","status":"SUCCESS","reason":null,"input_summary":{"path":"progress/status.json"}}
+{"ts":"2026-05-08T17:46:12.071Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-08T17:46:12.072Z","tool":"fs.read_file","status":"FAILED","reason":"PATH_OUTSIDE_ROOT","input_summary":{"path":"../../../../../../etc/passwd"}}
+{"ts":"2026-05-08T17:46:12.073Z","kind":"permission","tool":"shell.run","required_mode":"DANGER_FULL_ACCESS","active_mode":"WORKSPACE_WRITE","stage":"hard_deny","allow":false,"reason":"HARD_DENY_DESTRUCTIVE_SHELL"}
+{"ts":"2026-05-08T17:46:12.074Z","tool":"shell.run","status":"DENIED","reason":"HARD_DENY_DESTRUCTIVE_SHELL","input_summary":{"argv":"[array len=3]"}}
+{"ts":"2026-05-08T17:46:12.077Z","kind":"permission","tool":"http.get","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-08T17:46:12.079Z","tool":"http.get","status":"FAILED","reason":"HOST_NOT_ALLOWED","input_summary":{"url":"https://malicious.example.com/payload"}}
+{"ts":"2026-05-08T17:46:12.081Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-08T17:46:12.081Z","tool":"fs.write_file","status":"PREVIEWED","reason":null,"input_summary":{"path":"artifacts\\tmp_smoke_s11_1778262372079.txt","content":"preview test"}}
+{"ts":"2026-05-08T17:46:12.085Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"hard_deny","allow":false,"reason":"HARD_DENY_SYSTEM_PATH"}
+{"ts":"2026-05-08T17:46:12.085Z","tool":"fs.read_file","status":"DENIED","reason":"HARD_DENY_SYSTEM_PATH","input_summary":{"path":"C:\\Users\\Khaled\\AppData\\Local\\Temp\\forge_smoke_s12_1778262372082.json"}}
+{"ts":"2026-05-08T18:05:22.845Z","tool":"nonexistent.tool","status":"FAILED","reason":"TOOL_NOT_FOUND","input_summary":{}}
+{"ts":"2026-05-08T18:05:22.849Z","tool":"fs.read_file","status":"FAILED","reason":"INVALID_INPUT","input_summary":{}}
+{"ts":"2026-05-08T18:05:22.854Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-08T18:05:22.855Z","tool":"fs.read_file","status":"SUCCESS","reason":null,"input_summary":{"path":"progress/status.json"}}
+{"ts":"2026-05-08T18:05:22.857Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-08T18:05:22.858Z","tool":"fs.read_file","status":"FAILED","reason":"PATH_OUTSIDE_ROOT","input_summary":{"path":"../../../../../../etc/passwd"}}
+{"ts":"2026-05-08T18:05:22.859Z","kind":"permission","tool":"shell.run","required_mode":"DANGER_FULL_ACCESS","active_mode":"WORKSPACE_WRITE","stage":"hard_deny","allow":false,"reason":"HARD_DENY_DESTRUCTIVE_SHELL"}
+{"ts":"2026-05-08T18:05:22.860Z","tool":"shell.run","status":"DENIED","reason":"HARD_DENY_DESTRUCTIVE_SHELL","input_summary":{"argv":"[array len=3]"}}
+{"ts":"2026-05-08T18:05:22.863Z","kind":"permission","tool":"http.get","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-08T18:05:22.864Z","tool":"http.get","status":"FAILED","reason":"HOST_NOT_ALLOWED","input_summary":{"url":"https://malicious.example.com/payload"}}
+{"ts":"2026-05-08T18:05:22.866Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-08T18:05:22.867Z","tool":"fs.write_file","status":"PREVIEWED","reason":null,"input_summary":{"path":"artifacts\\tmp_smoke_s11_1778263522864.txt","content":"preview test"}}
+{"ts":"2026-05-08T18:05:22.871Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"hard_deny","allow":false,"reason":"HARD_DENY_SYSTEM_PATH"}
+{"ts":"2026-05-08T18:05:22.871Z","tool":"fs.read_file","status":"DENIED","reason":"HARD_DENY_SYSTEM_PATH","input_summary":{"path":"C:\\Users\\Khaled\\AppData\\Local\\Temp\\forge_smoke_s12_1778263522867.json"}}
+{"ts":"2026-05-08T18:15:52.369Z","tool":"nonexistent.tool","status":"FAILED","reason":"TOOL_NOT_FOUND","input_summary":{}}
+{"ts":"2026-05-08T18:15:52.373Z","tool":"fs.read_file","status":"FAILED","reason":"INVALID_INPUT","input_summary":{}}
+{"ts":"2026-05-08T18:15:52.377Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-08T18:15:52.379Z","tool":"fs.read_file","status":"SUCCESS","reason":null,"input_summary":{"path":"progress/status.json"}}
+{"ts":"2026-05-08T18:15:52.381Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-08T18:15:52.382Z","tool":"fs.read_file","status":"FAILED","reason":"PATH_OUTSIDE_ROOT","input_summary":{"path":"../../../../../../etc/passwd"}}
+{"ts":"2026-05-08T18:15:52.386Z","kind":"permission","tool":"shell.run","required_mode":"DANGER_FULL_ACCESS","active_mode":"WORKSPACE_WRITE","stage":"hard_deny","allow":false,"reason":"HARD_DENY_DESTRUCTIVE_SHELL"}
+{"ts":"2026-05-08T18:15:52.387Z","tool":"shell.run","status":"DENIED","reason":"HARD_DENY_DESTRUCTIVE_SHELL","input_summary":{"argv":"[array len=3]"}}
+{"ts":"2026-05-08T18:15:52.389Z","kind":"permission","tool":"http.get","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-08T18:15:52.390Z","tool":"http.get","status":"FAILED","reason":"HOST_NOT_ALLOWED","input_summary":{"url":"https://malicious.example.com/payload"}}
+{"ts":"2026-05-08T18:15:52.393Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-08T18:15:52.394Z","tool":"fs.write_file","status":"PREVIEWED","reason":null,"input_summary":{"path":"artifacts\\tmp_smoke_s11_1778264152391.txt","content":"preview test"}}
+{"ts":"2026-05-08T18:15:52.399Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"hard_deny","allow":false,"reason":"HARD_DENY_SYSTEM_PATH"}
+{"ts":"2026-05-08T18:15:52.400Z","tool":"fs.read_file","status":"DENIED","reason":"HARD_DENY_SYSTEM_PATH","input_summary":{"path":"C:\\Users\\Khaled\\AppData\\Local\\Temp\\forge_smoke_s12_1778264152395.json"}}
+{"ts":"2026-05-08T19:33:04.612Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"scope","allow":false,"reason":"SCOPE_UNKNOWN_PATH"}
+{"ts":"2026-05-08T19:33:04.613Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_UNKNOWN_PATH","input_summary":{"path":"tmp/forge-self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-08T19:33:04.614Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-08T19:33:04.614Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"tmp/forge-self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-08T19:33:04.615Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"scope","allow":false,"reason":"SCOPE_UNKNOWN_PATH"}
+{"ts":"2026-05-08T19:33:04.615Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_UNKNOWN_PATH","input_summary":{"path":"tmp/forge-self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-08T19:33:04.673Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-08T19:33:04.673Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"tmp/forge-self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-08T19:34:05.205Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-08T19:34:05.206Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-08T19:34:05.207Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-08T19:34:05.208Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-08T19:34:05.209Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-08T19:34:05.209Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-08T19:34:05.266Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-08T19:34:05.267Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-08T19:34:34.417Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-08T19:34:34.418Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-08T19:34:34.419Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-08T19:34:34.419Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-08T19:34:34.420Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-08T19:34:34.421Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-08T19:34:34.479Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-08T19:34:34.480Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-08T19:34:48.175Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-08T19:34:48.175Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-08T19:34:48.177Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-08T19:34:48.177Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-08T19:34:48.178Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-08T19:34:48.179Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-08T19:34:48.240Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-08T19:34:48.240Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-08T19:34:48.270Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-08T19:34:48.270Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-08T19:34:48.272Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-08T19:34:48.272Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-08T19:34:48.273Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-08T19:34:48.273Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-08T19:34:48.322Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-08T19:34:48.322Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-08T19:34:48.339Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-08T19:34:48.339Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-08T19:34:48.340Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-08T19:34:48.340Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-08T19:34:48.341Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-08T19:34:48.341Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-08T19:34:48.383Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-08T19:34:48.383Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-08T19:35:23.250Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-08T19:35:23.251Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-08T19:35:23.252Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-08T19:35:23.252Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-08T19:35:23.254Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-08T19:35:23.254Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-08T19:35:23.311Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-08T19:35:23.311Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-08T19:35:23.330Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-08T19:35:23.331Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-08T19:35:23.332Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-08T19:35:23.332Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-08T19:35:23.333Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-08T19:35:23.333Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-08T19:35:23.373Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-08T19:35:23.373Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-08T19:35:23.388Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-08T19:35:23.389Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-08T19:35:23.390Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-08T19:35:23.390Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-08T19:35:23.391Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-08T19:35:23.391Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-08T19:35:23.432Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-08T19:35:23.432Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-08T19:35:28.762Z","tool":"nonexistent.tool","status":"FAILED","reason":"TOOL_NOT_FOUND","input_summary":{}}
+{"ts":"2026-05-08T19:35:28.763Z","tool":"fs.read_file","status":"FAILED","reason":"INVALID_INPUT","input_summary":{}}
+{"ts":"2026-05-08T19:35:28.764Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-08T19:35:28.765Z","tool":"fs.read_file","status":"SUCCESS","reason":null,"input_summary":{"path":"progress/status.json"}}
+{"ts":"2026-05-08T19:35:28.765Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-08T19:35:28.765Z","tool":"fs.read_file","status":"FAILED","reason":"PATH_OUTSIDE_ROOT","input_summary":{"path":"../../../../../../etc/passwd"}}
+{"ts":"2026-05-08T19:35:28.766Z","kind":"permission","tool":"shell.run","required_mode":"DANGER_FULL_ACCESS","active_mode":"WORKSPACE_WRITE","stage":"hard_deny","allow":false,"reason":"HARD_DENY_DESTRUCTIVE_SHELL"}
+{"ts":"2026-05-08T19:35:28.766Z","tool":"shell.run","status":"DENIED","reason":"HARD_DENY_DESTRUCTIVE_SHELL","input_summary":{"argv":"[array len=3]"}}
+{"ts":"2026-05-08T19:35:28.767Z","kind":"permission","tool":"http.get","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-08T19:35:28.768Z","tool":"http.get","status":"FAILED","reason":"HOST_NOT_ALLOWED","input_summary":{"url":"https://malicious.example.com/payload"}}
+{"ts":"2026-05-08T19:35:28.768Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-08T19:35:28.769Z","tool":"fs.write_file","status":"PREVIEWED","reason":null,"input_summary":{"path":"artifacts\\tmp_smoke_s11_1778268928768.txt","content":"preview test"}}
+{"ts":"2026-05-08T19:35:28.770Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"hard_deny","allow":false,"reason":"HARD_DENY_SYSTEM_PATH"}
+{"ts":"2026-05-08T19:35:28.770Z","tool":"fs.read_file","status":"DENIED","reason":"HARD_DENY_SYSTEM_PATH","input_summary":{"path":"C:\\Users\\Khaled\\AppData\\Local\\Temp\\forge_smoke_s12_1778268928769.json"}}
+{"ts":"2026-05-09T07:02:17.143Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T07:02:17.156Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-09T07:02:17.237Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:02:17.237Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-09T07:02:17.242Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-09T07:02:17.243Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-09T07:02:17.482Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:02:17.482Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-09T07:02:43.672Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T07:02:43.673Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-09T07:02:43.674Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:02:43.675Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-09T07:02:43.676Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-09T07:02:43.676Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-09T07:02:43.731Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:02:43.731Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-09T07:02:49.613Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T07:02:49.614Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-09T07:02:49.615Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:02:49.616Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-09T07:02:49.617Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-09T07:02:49.617Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-09T07:02:49.670Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:02:49.670Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-09T07:02:49.685Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T07:02:49.686Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-09T07:02:49.687Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:02:49.688Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-09T07:02:49.689Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-09T07:02:49.689Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-09T07:02:49.732Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:02:49.732Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-09T07:02:49.748Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T07:02:49.749Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-09T07:02:49.750Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:02:49.750Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-09T07:02:49.752Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-09T07:02:49.752Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-09T07:02:49.789Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:02:49.789Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-09T07:11:22.290Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T07:11:22.325Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-09T07:11:22.330Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:11:22.331Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-09T07:11:22.335Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-09T07:11:22.335Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-09T07:11:22.400Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:11:22.400Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-09T07:11:29.258Z","tool":"nonexistent.tool","status":"FAILED","reason":"TOOL_NOT_FOUND","input_summary":{}}
+{"ts":"2026-05-09T07:11:29.259Z","tool":"fs.read_file","status":"FAILED","reason":"INVALID_INPUT","input_summary":{}}
+{"ts":"2026-05-09T07:11:29.260Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-09T07:11:29.261Z","tool":"fs.read_file","status":"SUCCESS","reason":null,"input_summary":{"path":"progress/status.json"}}
+{"ts":"2026-05-09T07:11:29.262Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-09T07:11:29.262Z","tool":"fs.read_file","status":"FAILED","reason":"PATH_OUTSIDE_ROOT","input_summary":{"path":"../../../../../../etc/passwd"}}
+{"ts":"2026-05-09T07:11:29.262Z","kind":"permission","tool":"shell.run","required_mode":"DANGER_FULL_ACCESS","active_mode":"WORKSPACE_WRITE","stage":"hard_deny","allow":false,"reason":"HARD_DENY_DESTRUCTIVE_SHELL"}
+{"ts":"2026-05-09T07:11:29.262Z","tool":"shell.run","status":"DENIED","reason":"HARD_DENY_DESTRUCTIVE_SHELL","input_summary":{"argv":"[array len=3]"}}
+{"ts":"2026-05-09T07:11:29.263Z","kind":"permission","tool":"http.get","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-09T07:11:29.263Z","tool":"http.get","status":"FAILED","reason":"HOST_NOT_ALLOWED","input_summary":{"url":"https://malicious.example.com/payload"}}
+{"ts":"2026-05-09T07:11:29.264Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T07:11:29.264Z","tool":"fs.write_file","status":"PREVIEWED","reason":null,"input_summary":{"path":"artifacts\\tmp_smoke_s11_1778310689263.txt","content":"preview test"}}
+{"ts":"2026-05-09T07:11:29.266Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"hard_deny","allow":false,"reason":"HARD_DENY_SYSTEM_PATH"}
+{"ts":"2026-05-09T07:11:29.266Z","tool":"fs.read_file","status":"DENIED","reason":"HARD_DENY_SYSTEM_PATH","input_summary":{"path":"C:\\Users\\Khaled\\AppData\\Local\\Temp\\forge_smoke_s12_1778310689264.json"}}
+{"ts":"2026-05-09T07:11:30.025Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T07:11:30.026Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-09T07:11:30.028Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:11:30.028Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-09T07:11:30.029Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-09T07:11:30.029Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-09T07:11:30.085Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:11:30.085Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-09T07:11:30.105Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T07:11:30.106Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-09T07:11:30.108Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:11:30.108Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-09T07:11:30.109Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-09T07:11:30.109Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-09T07:11:30.149Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:11:30.149Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-09T07:11:30.165Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T07:11:30.166Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-09T07:11:30.167Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:11:30.168Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-09T07:11:30.169Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-09T07:11:30.169Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-09T07:11:30.208Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:11:30.208Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-09T07:33:12.171Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T07:33:12.173Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-09T07:33:12.174Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:33:12.175Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-09T07:33:12.176Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-09T07:33:12.176Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-09T07:33:12.231Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:33:12.231Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-09T07:33:16.081Z","tool":"nonexistent.tool","status":"FAILED","reason":"TOOL_NOT_FOUND","input_summary":{}}
+{"ts":"2026-05-09T07:33:16.083Z","tool":"fs.read_file","status":"FAILED","reason":"INVALID_INPUT","input_summary":{}}
+{"ts":"2026-05-09T07:33:16.084Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-09T07:33:16.084Z","tool":"fs.read_file","status":"SUCCESS","reason":null,"input_summary":{"path":"progress/status.json"}}
+{"ts":"2026-05-09T07:33:16.085Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-09T07:33:16.085Z","tool":"fs.read_file","status":"FAILED","reason":"PATH_OUTSIDE_ROOT","input_summary":{"path":"../../../../../../etc/passwd"}}
+{"ts":"2026-05-09T07:33:16.086Z","kind":"permission","tool":"shell.run","required_mode":"DANGER_FULL_ACCESS","active_mode":"WORKSPACE_WRITE","stage":"hard_deny","allow":false,"reason":"HARD_DENY_DESTRUCTIVE_SHELL"}
+{"ts":"2026-05-09T07:33:16.086Z","tool":"shell.run","status":"DENIED","reason":"HARD_DENY_DESTRUCTIVE_SHELL","input_summary":{"argv":"[array len=3]"}}
+{"ts":"2026-05-09T07:33:16.087Z","kind":"permission","tool":"http.get","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-09T07:33:16.087Z","tool":"http.get","status":"FAILED","reason":"HOST_NOT_ALLOWED","input_summary":{"url":"https://malicious.example.com/payload"}}
+{"ts":"2026-05-09T07:33:16.088Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T07:33:16.088Z","tool":"fs.write_file","status":"PREVIEWED","reason":null,"input_summary":{"path":"artifacts\\tmp_smoke_s11_1778311996087.txt","content":"preview test"}}
+{"ts":"2026-05-09T07:33:16.090Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"hard_deny","allow":false,"reason":"HARD_DENY_SYSTEM_PATH"}
+{"ts":"2026-05-09T07:33:16.091Z","tool":"fs.read_file","status":"DENIED","reason":"HARD_DENY_SYSTEM_PATH","input_summary":{"path":"C:\\Users\\Khaled\\AppData\\Local\\Temp\\forge_smoke_s12_1778311996088.json"}}
+{"ts":"2026-05-09T07:33:20.784Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T07:33:20.786Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-09T07:33:20.788Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:33:20.788Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-09T07:33:20.790Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-09T07:33:20.790Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-09T07:33:20.844Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:33:20.844Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-09T07:33:20.865Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T07:33:20.866Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-09T07:33:20.868Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:33:20.868Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-09T07:33:20.870Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-09T07:33:20.870Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-09T07:33:20.907Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:33:20.907Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-09T07:33:20.923Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T07:33:20.924Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-09T07:33:20.925Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:33:20.926Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-09T07:33:20.927Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-09T07:33:20.927Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-09T07:33:20.965Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:33:20.966Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-09T07:40:37.168Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T07:40:37.169Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-09T07:40:37.172Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:40:37.172Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-09T07:40:37.173Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-09T07:40:37.174Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-09T07:40:37.228Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:40:37.228Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-09T07:40:37.229Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"TEST","stage":"test_mode","allow":true,"reason":"TEST_MODE_ALLOWED"}
+{"ts":"2026-05-09T07:40:37.262Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s13_test_mode.txt","content":"TEST mode workspace write"}}
+{"ts":"2026-05-09T07:40:43.000Z","tool":"nonexistent.tool","status":"FAILED","reason":"TOOL_NOT_FOUND","input_summary":{}}
+{"ts":"2026-05-09T07:40:43.001Z","tool":"fs.read_file","status":"FAILED","reason":"INVALID_INPUT","input_summary":{}}
+{"ts":"2026-05-09T07:40:43.002Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-09T07:40:43.003Z","tool":"fs.read_file","status":"SUCCESS","reason":null,"input_summary":{"path":"progress/status.json"}}
+{"ts":"2026-05-09T07:40:43.003Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-09T07:40:43.003Z","tool":"fs.read_file","status":"FAILED","reason":"PATH_OUTSIDE_ROOT","input_summary":{"path":"../../../../../../etc/passwd"}}
+{"ts":"2026-05-09T07:40:43.004Z","kind":"permission","tool":"shell.run","required_mode":"DANGER_FULL_ACCESS","active_mode":"WORKSPACE_WRITE","stage":"hard_deny","allow":false,"reason":"HARD_DENY_DESTRUCTIVE_SHELL"}
+{"ts":"2026-05-09T07:40:43.004Z","tool":"shell.run","status":"DENIED","reason":"HARD_DENY_DESTRUCTIVE_SHELL","input_summary":{"argv":"[array len=3]"}}
+{"ts":"2026-05-09T07:40:43.004Z","kind":"permission","tool":"http.get","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-09T07:40:43.005Z","tool":"http.get","status":"FAILED","reason":"HOST_NOT_ALLOWED","input_summary":{"url":"https://malicious.example.com/payload"}}
+{"ts":"2026-05-09T07:40:43.006Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T07:40:43.006Z","tool":"fs.write_file","status":"PREVIEWED","reason":null,"input_summary":{"path":"artifacts\\tmp_smoke_s11_1778312443006.txt","content":"preview test"}}
+{"ts":"2026-05-09T07:40:43.008Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"hard_deny","allow":false,"reason":"HARD_DENY_SYSTEM_PATH"}
+{"ts":"2026-05-09T07:40:43.008Z","tool":"fs.read_file","status":"DENIED","reason":"HARD_DENY_SYSTEM_PATH","input_summary":{"path":"C:\\Users\\Khaled\\AppData\\Local\\Temp\\forge_smoke_s12_1778312443007.json"}}
+{"ts":"2026-05-09T07:40:43.874Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T07:40:43.875Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-09T07:40:43.877Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:40:43.878Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-09T07:40:43.879Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-09T07:40:43.880Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-09T07:40:43.934Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:40:43.934Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-09T07:40:43.935Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"TEST","stage":"test_mode","allow":true,"reason":"TEST_MODE_ALLOWED"}
+{"ts":"2026-05-09T07:40:43.936Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s13_test_mode.txt","content":"TEST mode workspace write"}}
+{"ts":"2026-05-09T07:40:43.956Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T07:40:43.956Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-09T07:40:43.958Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:40:43.958Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-09T07:40:43.960Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-09T07:40:43.960Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-09T07:40:43.999Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:40:43.999Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-09T07:40:44.001Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"TEST","stage":"test_mode","allow":true,"reason":"TEST_MODE_ALLOWED"}
+{"ts":"2026-05-09T07:40:44.001Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s13_test_mode.txt","content":"TEST mode workspace write"}}
+{"ts":"2026-05-09T07:40:44.017Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T07:40:44.017Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-09T07:40:44.019Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:40:44.019Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-09T07:40:44.020Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-09T07:40:44.020Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-09T07:40:44.058Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:40:44.059Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-09T07:40:44.060Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"TEST","stage":"test_mode","allow":true,"reason":"TEST_MODE_ALLOWED"}
+{"ts":"2026-05-09T07:40:44.061Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s13_test_mode.txt","content":"TEST mode workspace write"}}
+{"ts":"2026-05-09T07:54:06.669Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T07:54:06.671Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-09T07:54:06.672Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:54:06.673Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-09T07:54:06.674Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-09T07:54:06.675Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-09T07:54:06.730Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:54:06.730Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-09T07:54:06.732Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"TEST","stage":"test_mode","allow":true,"reason":"TEST_MODE_ALLOWED"}
+{"ts":"2026-05-09T07:54:06.732Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s13_test_mode.txt","content":"TEST mode workspace write"}}
+{"ts":"2026-05-09T07:54:08.699Z","tool":"nonexistent.tool","status":"FAILED","reason":"TOOL_NOT_FOUND","input_summary":{}}
+{"ts":"2026-05-09T07:54:08.700Z","tool":"fs.read_file","status":"FAILED","reason":"INVALID_INPUT","input_summary":{}}
+{"ts":"2026-05-09T07:54:08.701Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-09T07:54:08.702Z","tool":"fs.read_file","status":"SUCCESS","reason":null,"input_summary":{"path":"progress/status.json"}}
+{"ts":"2026-05-09T07:54:08.702Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-09T07:54:08.702Z","tool":"fs.read_file","status":"FAILED","reason":"PATH_OUTSIDE_ROOT","input_summary":{"path":"../../../../../../etc/passwd"}}
+{"ts":"2026-05-09T07:54:08.703Z","kind":"permission","tool":"shell.run","required_mode":"DANGER_FULL_ACCESS","active_mode":"WORKSPACE_WRITE","stage":"hard_deny","allow":false,"reason":"HARD_DENY_DESTRUCTIVE_SHELL"}
+{"ts":"2026-05-09T07:54:08.703Z","tool":"shell.run","status":"DENIED","reason":"HARD_DENY_DESTRUCTIVE_SHELL","input_summary":{"argv":"[array len=3]"}}
+{"ts":"2026-05-09T07:54:08.703Z","kind":"permission","tool":"http.get","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-09T07:54:08.704Z","tool":"http.get","status":"FAILED","reason":"HOST_NOT_ALLOWED","input_summary":{"url":"https://malicious.example.com/payload"}}
+{"ts":"2026-05-09T07:54:08.705Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T07:54:08.705Z","tool":"fs.write_file","status":"PREVIEWED","reason":null,"input_summary":{"path":"artifacts\\tmp_smoke_s11_1778313248704.txt","content":"preview test"}}
+{"ts":"2026-05-09T07:54:08.707Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"hard_deny","allow":false,"reason":"HARD_DENY_SYSTEM_PATH"}
+{"ts":"2026-05-09T07:54:08.708Z","tool":"fs.read_file","status":"DENIED","reason":"HARD_DENY_SYSTEM_PATH","input_summary":{"path":"C:\\Users\\Khaled\\AppData\\Local\\Temp\\forge_smoke_s12_1778313248706.json"}}
+{"ts":"2026-05-09T07:54:09.457Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T07:54:09.458Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-09T07:54:09.461Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:54:09.461Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-09T07:54:09.463Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-09T07:54:09.463Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-09T07:54:09.519Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:54:09.519Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-09T07:54:09.521Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"TEST","stage":"test_mode","allow":true,"reason":"TEST_MODE_ALLOWED"}
+{"ts":"2026-05-09T07:54:09.521Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s13_test_mode.txt","content":"TEST mode workspace write"}}
+{"ts":"2026-05-09T07:54:09.541Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T07:54:09.541Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-09T07:54:09.543Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:54:09.543Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-09T07:54:09.545Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-09T07:54:09.545Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-09T07:54:09.583Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:54:09.584Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-09T07:54:09.585Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"TEST","stage":"test_mode","allow":true,"reason":"TEST_MODE_ALLOWED"}
+{"ts":"2026-05-09T07:54:09.586Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s13_test_mode.txt","content":"TEST mode workspace write"}}
+{"ts":"2026-05-09T07:54:09.602Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T07:54:09.602Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-09T07:54:09.604Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:54:09.604Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-09T07:54:09.606Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-09T07:54:09.606Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-09T07:54:09.646Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:54:09.646Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-09T07:54:09.648Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"TEST","stage":"test_mode","allow":true,"reason":"TEST_MODE_ALLOWED"}
+{"ts":"2026-05-09T07:54:09.648Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s13_test_mode.txt","content":"TEST mode workspace write"}}
+{"ts":"2026-05-09T07:54:31.054Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T07:54:31.055Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-09T07:54:31.057Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:54:31.057Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-09T07:54:31.059Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-09T07:54:31.059Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-09T07:54:31.116Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T07:54:31.116Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-09T07:54:31.118Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"TEST","stage":"test_mode","allow":true,"reason":"TEST_MODE_ALLOWED"}
+{"ts":"2026-05-09T07:54:31.118Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s13_test_mode.txt","content":"TEST mode workspace write"}}
+{"ts":"2026-05-09T08:20:06.116Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T08:20:06.155Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-09T08:20:06.161Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T08:20:06.161Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-09T08:20:10.849Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-09T08:20:10.849Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-09T08:20:12.537Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T08:20:12.537Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-09T08:20:12.540Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"TEST","stage":"test_mode","allow":true,"reason":"TEST_MODE_ALLOWED"}
+{"ts":"2026-05-09T08:20:12.541Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s13_test_mode.txt","content":"TEST mode workspace write"}}
+{"ts":"2026-05-09T08:22:59.116Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T08:22:59.116Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/projects/test_readonly_confirm/project_state.json","content":"{\n  \"project_id\": \"test_readonly_confirm\",\n  \"project_name\": \"ReadOnly Confirm T…"}}
+{"ts":"2026-05-09T08:23:16.836Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T08:23:16.836Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/projects/test_readonly_confirm/project_state.json","content":"{\n  \"project_id\": \"test_readonly_confirm\",\n  \"project_name\": \"ReadOnly Confirm T…"}}
+{"ts":"2026-05-09T08:23:29.590Z","tool":"nonexistent.tool","status":"FAILED","reason":"TOOL_NOT_FOUND","input_summary":{}}
+{"ts":"2026-05-09T08:23:29.591Z","tool":"fs.read_file","status":"FAILED","reason":"INVALID_INPUT","input_summary":{}}
+{"ts":"2026-05-09T08:23:29.592Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-09T08:23:29.592Z","tool":"fs.read_file","status":"SUCCESS","reason":null,"input_summary":{"path":"progress/status.json"}}
+{"ts":"2026-05-09T08:23:29.593Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-09T08:23:29.593Z","tool":"fs.read_file","status":"FAILED","reason":"PATH_OUTSIDE_ROOT","input_summary":{"path":"../../../../../../etc/passwd"}}
+{"ts":"2026-05-09T08:23:29.593Z","kind":"permission","tool":"shell.run","required_mode":"DANGER_FULL_ACCESS","active_mode":"WORKSPACE_WRITE","stage":"hard_deny","allow":false,"reason":"HARD_DENY_DESTRUCTIVE_SHELL"}
+{"ts":"2026-05-09T08:23:29.594Z","tool":"shell.run","status":"DENIED","reason":"HARD_DENY_DESTRUCTIVE_SHELL","input_summary":{"argv":"[array len=3]"}}
+{"ts":"2026-05-09T08:23:29.595Z","kind":"permission","tool":"http.get","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-09T08:23:29.595Z","tool":"http.get","status":"FAILED","reason":"HOST_NOT_ALLOWED","input_summary":{"url":"https://malicious.example.com/payload"}}
+{"ts":"2026-05-09T08:23:29.596Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T08:23:29.596Z","tool":"fs.write_file","status":"PREVIEWED","reason":null,"input_summary":{"path":"artifacts\\tmp_smoke_s11_1778315009595.txt","content":"preview test"}}
+{"ts":"2026-05-09T08:23:29.598Z","kind":"permission","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"hard_deny","allow":false,"reason":"HARD_DENY_SYSTEM_PATH"}
+{"ts":"2026-05-09T08:23:29.598Z","tool":"fs.read_file","status":"DENIED","reason":"HARD_DENY_SYSTEM_PATH","input_summary":{"path":"C:\\Users\\Khaled\\AppData\\Local\\Temp\\forge_smoke_s12_1778315009596.json"}}
+{"ts":"2026-05-09T08:23:50.276Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T08:23:50.277Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-09T08:23:50.280Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T08:23:50.280Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-09T08:23:52.407Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-09T08:23:52.407Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-09T08:23:52.674Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T08:23:52.674Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-09T08:23:52.676Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"TEST","stage":"test_mode","allow":true,"reason":"TEST_MODE_ALLOWED"}
+{"ts":"2026-05-09T08:23:52.677Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s13_test_mode.txt","content":"TEST mode workspace write"}}
+{"ts":"2026-05-09T08:23:52.692Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T08:23:52.692Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-09T08:23:52.694Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T08:23:52.694Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-09T08:23:53.192Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-09T08:23:53.192Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-09T08:23:53.391Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T08:23:53.392Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-09T08:23:53.393Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"TEST","stage":"test_mode","allow":true,"reason":"TEST_MODE_ALLOWED"}
+{"ts":"2026-05-09T08:23:53.394Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s13_test_mode.txt","content":"TEST mode workspace write"}}
+{"ts":"2026-05-09T08:23:53.407Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"WORKSPACE_WRITE","stage":"mode_satisfied","allow":true,"reason":"MODE_SATISFIED"}
+{"ts":"2026-05-09T08:23:53.408Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s04.txt","content":"S04 self-test write — WORKSPACE_WRITE allows file creation"}}
+{"ts":"2026-05-09T08:23:53.411Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T08:23:53.411Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s05.txt","content":"S05 self-test write — should be denied"}}
+{"ts":"2026-05-09T08:23:55.898Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"PROMPT","stage":"prompt","allow":false,"reason":"TEST_AUTO_DENY"}
+{"ts":"2026-05-09T08:23:55.898Z","tool":"fs.write_file","status":"DENIED","reason":"TEST_AUTO_DENY","input_summary":{"path":"artifacts/self-test/s08.txt","content":"S08 self-test write — should be denied by PROMPT auto-deny"}}
+{"ts":"2026-05-09T08:23:56.100Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"READ_ONLY","stage":"scope","allow":false,"reason":"SCOPE_READ_ONLY"}
+{"ts":"2026-05-09T08:23:56.100Z","tool":"fs.write_file","status":"DENIED","reason":"SCOPE_READ_ONLY","input_summary":{"path":"artifacts/self-test/s12.txt","content":"S12 W-03 test — this write must be DENIED despite FORGE_DECISION_OVERRIDE=APPROV…"}}
+{"ts":"2026-05-09T08:23:56.102Z","kind":"permission","tool":"fs.write_file","required_mode":"WORKSPACE_WRITE","active_mode":"TEST","stage":"test_mode","allow":true,"reason":"TEST_MODE_ALLOWED"}
+{"ts":"2026-05-09T08:23:56.103Z","tool":"fs.write_file","status":"SUCCESS","reason":null,"input_summary":{"path":"artifacts/self-test/s13_test_mode.txt","content":"TEST mode workspace write"}}
