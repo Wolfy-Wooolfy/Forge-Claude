@@ -198,6 +198,16 @@ function createConversationEngine(options = {}) {
     updatedState.last_updated_at = nowIso();
     await saveState(projectId, updatedState);
 
+    if (targetState === "OPTION_DECISION") {
+      try {
+        const { createVisionEngine } = require("./visionEngine");
+        const ve = createVisionEngine({ root });
+        await ve.lockVision(projectId, "owner");
+      } catch (err) {
+        console.warn("[conversationEngine] vision lock failed:", err.message);
+      }
+    }
+
     const convMsg = await generateConversationalMessage(
       `TRANSITION_CONFIRMED_TO_${targetState}`,
       { from: state.active_runtime_state, to: targetState },

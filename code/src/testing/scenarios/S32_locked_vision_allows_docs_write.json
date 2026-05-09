@@ -1,0 +1,23 @@
+{
+  "id": "S32",
+  "name": "fs.write_file succeeds when vision_locked=true",
+  "type": "direct_tool",
+  "permission": "WORKSPACE_WRITE",
+  "tool": "fs.write_file",
+  "input": {
+    "path": "artifacts/projects/test_vision_s32/docs/test.md",
+    "content": "# test"
+  },
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_vision_s32/vision.md",
+      "content": "---\nproject_id: test_vision_s32\nproject_name: Test S32\ndomain: test\nvision_version: 1\nvision_locked: true\nvision_locked_at: 2026-05-09T00:00:00.000Z\nlocked_by_role: owner\namendments_history: []\ngoals:\n  primary: test\n  secondary: []\nconstraints: []\nnon_goals: []\n---\n\n# Project Vision: Test S32\n"
+    }
+  ],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "bytes_written", "expected": 6 },
+    { "type": "artifact_exists",    "path": "artifacts/projects/test_vision_s32/docs/test.md" },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

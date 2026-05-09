@@ -49,13 +49,19 @@ const _autoDenyPrompter = {
 // ── Result normalizers ─────────────────────────────────────────────────────────
 
 function _normalizeToolResult(raw, audit) {
+  const rawOutput = raw && raw.output;
+  let state;
+  if (rawOutput !== null && rawOutput !== undefined) {
+    state = rawOutput;
+  } else if (raw && raw.metadata && typeof raw.metadata === "object") {
+    // DENIED/FAILED: promote metadata fields (reason, detail) into state for assertion access
+    state = raw.metadata;
+  } else {
+    state = {};
+  }
   return {
     status: raw && raw.status ? String(raw.status) : "FAILED",
-    output: {
-      response:   "",
-      tool_calls: [],
-      state:      (raw && raw.output) || {}
-    },
+    output: { response: "", tool_calls: [], state },
     audit: audit || []
   };
 }
@@ -193,6 +199,20 @@ async function _runDirectTool(scenario, root) {
 
   const prompter = (scenario.permission === "PROMPT") ? _autoDenyPrompter : undefined;
 
+  // Create fixture_files before policy/registry so they exist during authorization
+  const cleanupDirs = new Set();
+  if (Array.isArray(scenario.fixture_files)) {
+    for (const ff of scenario.fixture_files) {
+      if (!ff || typeof ff.path !== "string" || typeof ff.content !== "string") continue;
+      const abs = path.join(root, ff.path);
+      fs.mkdirSync(path.dirname(abs), { recursive: true });
+      fs.writeFileSync(abs, ff.content, "utf8");
+      const rel = ff.path.replace(/\\/g, "/");
+      const m = rel.match(/^artifacts\/projects\/([^/]+)\//);
+      if (m) cleanupDirs.add(path.join(root, "artifacts", "projects", m[1]));
+    }
+  }
+
   const policy = createPolicy({
     root,
     active_mode: scenario.permission,
@@ -220,7 +240,21 @@ async function _runDirectTool(scenario, root) {
   }
 
   const newAudit = readEntries(root, { since_ts: startTs });
-  return _normalizeToolResult(raw, newAudit);
+  const result   = _normalizeToolResult(raw, newAudit);
+
+  if (cleanupDirs.size > 0) {
+    Object.defineProperty(result, "_cleanup", {
+      value: () => {
+        for (const dir of cleanupDirs) {
+          try { fs.rmSync(dir, { recursive: true, force: true }); } catch { /* best-effort */ }
+        }
+      },
+      enumerable: false,
+      writable:   false
+    });
+  }
+
+  return result;
 }
 
 // ── Dispatch: direct_doctor ───────────────────────────────────────────────────

@@ -1,0 +1,170 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node *)",
+      "Bash(node)",
+      "Bash(node --check *)",
+      "Bash(node -e *)",
+      "Bash(node bin/*)",
+      "Bash(node verify/*)",
+      "Bash(node code/*)",
+
+      "Bash(npm *)",
+      "Bash(npx *)",
+
+      "Bash(git status)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git diff)",
+      "Bash(git log *)",
+      "Bash(git log)",
+      "Bash(git show *)",
+      "Bash(git show)",
+      "Bash(git add *)",
+      "Bash(git add)",
+      "Bash(git restore *)",
+      "Bash(git checkout *)",
+      "Bash(git branch *)",
+      "Bash(git stash *)",
+      "Bash(git rm *)",
+      "Bash(git ls-files *)",
+      "Bash(git blame *)",
+
+      "Bash(grep *)",
+      "Bash(ls *)",
+      "Bash(ls)",
+      "Bash(dir *)",
+      "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(wc *)",
+      "Bash(find *)",
+      "Bash(mkdir *)",
+      "Bash(cd *)",
+      "Bash(echo *)",
+      "Bash(sed *)",
+      "Bash(awk *)",
+      "Bash(diff *)",
+      "Bash(touch *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "Bash(test *)",
+      "Bash(true)",
+      "Bash(false)",
+      "Bash(xargs *)",
+      "Bash(sort *)",
+      "Bash(uniq *)",
+      "Bash(tr *)",
+      "Bash(cut *)",
+      "Bash(comm *)",
+      "Bash(tee *)",
+      "Bash(which *)",
+      "Bash(type *)",
+      "Bash(printf *)",
+      "Bash(date *)",
+      "Bash(env *)",
+      "Bash(pwd)",
+      "Bash(file *)",
+      "Bash(stat *)",
+      "Bash(md5sum *)",
+      "Bash(sha256sum *)",
+      "Bash(realpath *)",
+      "Bash(basename *)",
+      "Bash(dirname *)",
+
+      "Bash(python3 *)",
+      "Bash(python *)",
+
+      "PowerShell(*)",
+
+      "Bash(OPENAI_API_KEY=* node *)",
+      "Bash(NODE_ENV=* node *)",
+      "Bash(PERMISSION_MODE=* node *)",
+
+      "Bash(echo *exit*)",
+      "Bash(for * do *)",
+
+      "Read(//tmp/**)",
+      "Read(/tmp/**)",
+      "Edit",
+      "Write",
+      "Read",
+      "Glob",
+      "Grep"
+    ],
+    "deny": [
+      "Bash(git commit*)",
+      "Bash(git commit -m*)",
+      "Bash(git commit *)",
+      "Bash(git push*)",
+      "Bash(git push *)",
+      "Bash(git reset --hard*)",
+      "Bash(git rebase*)",
+      "Bash(git reflog expire*)",
+      "Bash(git filter-branch*)",
+      "Bash(git tag *)",
+      "Bash(git push --force*)",
+
+      "Bash(rm -rf *)",
+      "Bash(rm -fr *)",
+      "Bash(rm -r *)",
+      "Bash(rmdir /s*)",
+      "Bash(del /f*)",
+      "Bash(del /s*)",
+
+      "Bash(npm publish*)",
+      "Bash(npm install -g*)",
+      "Bash(npm uninstall*)",
+      "Bash(npm unpublish*)",
+      "Bash(npm version*)",
+      "Bash(npm link*)",
+
+      "Bash(curl * | bash*)",
+      "Bash(curl * | sh*)",
+      "Bash(wget * | bash*)",
+      "Bash(wget * | sh*)",
+
+      "Bash(sudo *)",
+      "Bash(su *)",
+      "Bash(chmod 777*)",
+      "Bash(chown *)",
+      "Bash(chmod -R *)",
+
+      "Bash(>* /dev/*)",
+      "Bash(:(){ *)",
+      "Bash(dd *)",
+      "Bash(mkfs*)",
+      "Bash(format *)",
+      "Bash(fdisk *)",
+
+      "PowerShell(Remove-Item -Recurse -Force *)",
+      "PowerShell(Format-Volume *)",
+      "PowerShell(Set-ExecutionPolicy*)"
+    ],
+    "additionalDirectories": [
+      "\\tmp"
+    ]
+  },
+  "hooks": {
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"d:\\S\\Halo\\Tech\\Forge-Claude\\.claude\\notify-telegram.js\" Notification"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"d:\\S\\Halo\\Tech\\Forge-Claude\\.claude\\notify-telegram.js\" Stop"
+          }
+        ]
+      }
+    ]
+  }
+}

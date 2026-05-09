@@ -10,14 +10,16 @@ module.exports = {
    * Passes if the file at <root>/<assertion.path> exists.
    */
   run(assertion, result, ctx) {
-    const root     = ctx && ctx.root ? ctx.root : process.cwd();
-    const fullPath = path.join(root, assertion.path);
-    const exists   = fs.existsSync(fullPath);
+    const root       = ctx && ctx.root ? ctx.root : process.cwd();
+    const fullPath   = path.join(root, assertion.path);
+    const exists     = fs.existsSync(fullPath);
+    const shouldExist = assertion.expected !== false;
+    const passed      = shouldExist ? exists : !exists;
     return {
-      passed: exists,
-      detail: exists
-        ? "file exists: " + assertion.path
-        : "file NOT found: " + assertion.path
+      passed,
+      detail: passed
+        ? (shouldExist ? "file exists: " + assertion.path : "file correctly absent: " + assertion.path)
+        : (shouldExist ? "file NOT found: " + assertion.path : "file unexpectedly exists: " + assertion.path)
     };
   }
 };

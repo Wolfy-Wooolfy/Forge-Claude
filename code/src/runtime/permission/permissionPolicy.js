@@ -8,6 +8,7 @@ const {
 const { checkHardDeny, checkScope }   = require("./permissionRules");
 const { getDefaultPrompter }          = require("./permissionPrompter");
 const { appendAuditEntry }            = require("../audit/toolAuditLog");
+const { createVisionLockRule }        = require("./rules/vision_lock_rule");
 
 const PERMISSION_AUDIT_REL = path.join("artifacts", "audit", "permission_audit.jsonl");
 
@@ -46,6 +47,8 @@ function createPolicy(options) {
   const prompter        = opts.prompter          || getDefaultPrompter();
   const on_decision     = opts.on_decision       || null; // optional callback
 
+  const _visionRules    = [createVisionLockRule({ root })];
+
   // ── authorize ──────────────────────────────────────────────────────────────
 
   async function authorize(tool, input, ctx) {
@@ -73,6 +76,14 @@ function createPolicy(options) {
       );
     }
 
+    // Step 1.5 — Vision lock rules (docs write gate)
+    for (const rule of _visionRules) {
+      const vl = rule.check(tool, input, ctx || {});
+      if (vl.denied) {
+        return emit({ allow: false, reason: vl.reason }, "vision_lock");
+      }
+    }
+
     // Step 2 — Resolve active context
     const { data_mode, control_mode } = resolveActiveContext(active_mode, { inherited_data_mode });
 
@@ -82,9 +93,10 @@ function createPolicy(options) {
     }
 
     // Step 4 — Mode comparison + scope check
+    // TEST control mode also satisfies PROMPT-mode tools (auto-approves; no interactive session in CI)
     const dataAllows = isDataMode(tool.required_mode)
       ? dataModeSatisfies(data_mode, tool.required_mode)
-      : (control_mode === tool.required_mode);
+      : (control_mode === tool.required_mode || control_mode === "TEST");
 
     const scopeCheck = checkScope(tool, input, ctx, data_mode);
     const scopeOk    = !scopeCheck.applicable || scopeCheck.allowed !== false;

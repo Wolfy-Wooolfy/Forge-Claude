@@ -1,0 +1,25 @@
+{
+  "id": "S34",
+  "name": "vision.propose_amendment returns PROPOSED without changing vision_version",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "vision.propose_amendment",
+  "input": {
+    "project_id": "test_vision_s34",
+    "summary": "Test proposal",
+    "details": "This is a test proposal",
+    "proposed_by_role": "owner"
+  },
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_vision_s34/vision.md",
+      "content": "---\nproject_id: test_vision_s34\nproject_name: Test S34\ndomain: test\nvision_version: 1\nvision_locked: true\nvision_locked_at: 2026-05-09T00:00:00.000Z\nlocked_by_role: owner\namendments_history: []\ngoals:\n  primary: test\n  secondary: []\nconstraints: []\nnon_goals: []\n---\n\n# Project Vision: Test S34\n"
+    }
+  ],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "ok",     "expected": true },
+    { "type": "state_field_equals", "field": "status", "expected": "PROPOSED" },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

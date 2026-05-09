@@ -190,4 +190,10 @@ Those derived artifacts MUST be:
 
 ---
 
+## Addendum — PHASE-7-A: Vision Authority System (2026-05-09)
+
+As of PHASE-7-A, the Vision is no longer a static reference document only. Each project in Forge maintains a **machine-readable vision** stored at `artifacts/projects/<id>/vision.md` (YAML frontmatter + Markdown body). The Vision Authority System enforces that once a project vision is locked, all writes to project docs require the lock to be in place. This turns the vision from a human-readable anchor into a runtime enforcement gate managed by `visionEngine.js`.
+
+---
+
 **END OF DOCUMENT**

@@ -1,0 +1,24 @@
+{
+  "id": "S35",
+  "name": "vision.approve_amendment on already-approved returns AMENDMENT_NOT_PROPOSABLE",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "vision.approve_amendment",
+  "input": {
+    "project_id": "test_vision_s35",
+    "amendment_id": "amend-001",
+    "approved_by_role": "owner"
+  },
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_vision_s35/vision.md",
+      "content": "---\nproject_id: test_vision_s35\nproject_name: Test S35\ndomain: test\nvision_version: 2\nvision_locked: true\nvision_locked_at: 2026-05-09T00:00:00.000Z\nlocked_by_role: owner\namendments_history: [{\"amendment_id\":\"amend-001\",\"status\":\"APPROVED\",\"proposed_at\":\"2026-05-09T00:00:00.000Z\",\"proposed_by_role\":\"owner\",\"summary\":\"Test amendment\",\"approved_at\":\"2026-05-09T01:00:00.000Z\",\"approved_by_role\":\"owner\"}]\ngoals:\n  primary: test\n  secondary: []\nconstraints: []\nnon_goals: []\n---\n\n# Project Vision: Test S35\n"
+    }
+  ],
+  "assertions": [
+    { "type": "status_equals",      "expected": "FAILED" },
+    { "type": "state_field_equals", "field": "reason", "expected": "AMENDMENT_NOT_PROPOSABLE" },
+    { "type": "state_field_equals", "field": "detail", "expected": "amendment amend-001 is not in PROPOSED status" },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

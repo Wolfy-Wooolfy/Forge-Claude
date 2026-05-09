@@ -1,0 +1,24 @@
+{
+  "id": "S33",
+  "name": "vision.approve_amendment increments vision_version from 1 to 2",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "vision.approve_amendment",
+  "input": {
+    "project_id": "test_vision_s33",
+    "amendment_id": "amend-001",
+    "approved_by_role": "owner"
+  },
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_vision_s33/vision.md",
+      "content": "---\nproject_id: test_vision_s33\nproject_name: Test S33\ndomain: test\nvision_version: 1\nvision_locked: true\nvision_locked_at: 2026-05-09T00:00:00.000Z\nlocked_by_role: owner\namendments_history: [{\"amendment_id\":\"amend-001\",\"status\":\"PROPOSED\",\"proposed_at\":\"2026-05-09T00:00:00.000Z\",\"proposed_by_role\":\"owner\",\"summary\":\"Test amendment\",\"approved_at\":null,\"approved_by_role\":null}]\ngoals:\n  primary: test\n  secondary: []\nconstraints: []\nnon_goals: []\n---\n\n# Project Vision: Test S33\n"
+    }
+  ],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "ok",            "expected": true },
+    { "type": "state_field_equals", "field": "vision_version", "expected": 2 },
+    { "type": "state_field_equals", "field": "amendment_id",  "expected": "amend-001" }
+  ]
+}

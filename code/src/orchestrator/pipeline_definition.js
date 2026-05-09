@@ -1,3 +1,19 @@
+const path = require("path");
+
+// Lazy-initialized visionEngine + gate for VISION_COMPLIANCE.run()
+let _ve  = null;
+let _vcg = null;
+function _getVisionGate(root) {
+  const r = root || process.cwd();
+  if (!_ve || !_vcg) {
+    const { createVisionEngine }       = require(path.join(r, "code/src/ai_os/visionEngine"));
+    const { createVisionComplianceGate } = require(path.join(r, "code/src/modules/visionComplianceGate"));
+    _ve  = createVisionEngine({ root: r });
+    _vcg = createVisionComplianceGate({ visionEngine: _ve });
+  }
+  return _vcg;
+}
+
 const pipeline = [
   {
     module_id: "INTAKE",
@@ -75,7 +91,11 @@ const pipeline = [
     task_name: "TASK-067: ENFORCE FULL VISION RUNTIME",
     ordinal_position: 11,
     required_previous_module: "CLOSURE",
-    terminal_flag: false
+    terminal_flag: false,
+    async run(ctx) {
+      const gate = _getVisionGate(ctx && ctx.root);
+      return gate.assertVisionLocked(ctx && ctx.project_id);
+    }
   },
   {
     module_id: "AI_SYSTEM_ALIGNMENT",
