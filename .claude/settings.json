@@ -115,7 +115,8 @@
       "Bash(node -e \"const s=require\\('./progress/status.json'\\); console.log\\('current_task:', s.current_task\\); console.log\\('next_phase:', s.next_phase\\); console.log\\('warnings:', s.complexity_review.warnings_to_address_in_phase_6\\);\")",
       "Bash(Get-ChildItem \"d:\\\\S\\\\Halo\\\\Tech\\\\Forge-Claude\\\\artifacts\\\\decisions\")",
       "Bash(Sort-Object Name)",
-      "Bash(Select-Object -Last 5 -ExpandProperty Name)"
+      "Bash(Select-Object -Last 5 -ExpandProperty Name)",
+      "Bash(node -e \"const fs=require\\('fs'\\),p='artifacts/projects'; if\\(fs.existsSync\\(p\\)\\){const d=fs.readdirSync\\(p\\).filter\\(x=>x.includes\\('test_conv'\\)\\);console.log\\(d.length>0?d.join\\(','\\):'\\(clean\\)'\\);}else{console.log\\('\\(no projects dir\\)'\\);};\")"
     ],
     "additionalDirectories": [
       "\\tmp"
