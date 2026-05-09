@@ -4,10 +4,10 @@
   "current_stage": "A",
   "overall_progress_percent": 99,
   "stage_progress_percent": 100,
-  "current_task": "PHASE-6.A-CLOSED",
-  "next_phase": "PHASE-6.B",
-  "next_step": "Begin PHASE-6.B: author real assertions for S06-S11 (FINDINGS-WARN-3), then apiServer endpoint audit and migration.",
-  "last_completed_artifact": "artifacts/decisions/PHASE-6.A-exit-report.md",
+  "current_task": "PHASE-6.B.1-CLOSED",
+  "next_phase": "PHASE-6.B.2",
+  "next_step": "Begin PHASE-6.B.2: write conversation_history from processMessage; address FINDINGS-WARN-4.",
+  "last_completed_artifact": "artifacts/decisions/PHASE-6.B.1-exit-report.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -25,7 +25,7 @@
     "warnings_to_address_in_phase_6": [
       "FINDINGS-WARN-1",
       "FINDINGS-WARN-2",
-      "FINDINGS-WARN-3"
+      "FINDINGS-WARN-4"
     ]
   },
   "phase_0_5_sweep": {
@@ -72,7 +72,7 @@
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
     "self_test_last_run": "2026-05-09",
-    "self_test_last_result": "13 passed, 0 failed, 0 skipped (13 total)",
+    "self_test_last_result": "13 passed, 0 failed, 0 skipped (13 total) — 4 conversation scenarios now have real assertions",
     "self_test_scenarios_pass": 13,
     "self_test_scenarios_skip": 0,
     "self_test_scenarios_fail": 0,
@@ -80,7 +80,7 @@
     "tools_registered_count": 20,
     "active_permission_mode": "WORKSPACE_WRITE",
     "permission_policy_installed": true,
-    "note": "PHASE-6.A closed. 3 engines migrated to L2 Tool Runtime. Conversation dispatch wired in scenario_runner. §3.6 L3 gating confirmed via audit log. FINDINGS-WARN-3: S06-S11 assertions empty — trivial PASS. Next: PHASE-6.B (real assertions + apiServer audit).",
+    "note": "PHASE-6.B.1 closed. Conversation scenarios S06/S07/S09/S11 now have real assertions (prev empty). Bug-8 fixed (status hardcoding in _normalizeConversationResult). turns array supported in _runConversation. FINDINGS-WARN-3 resolved. FINDINGS-WARN-4 logged (conversation_history not written — deferred to PHASE-6.B.2). Next: PHASE-6.B.2.",
     "last_doctor_counts": {
       "pass": 12,
       "warn": 2,

@@ -2,11 +2,20 @@
   "id": "S11",
   "name": "multi-turn conversation state preserved across turns via conversationEngine",
   "type": "conversation",
+  "permission": "WORKSPACE_WRITE",
   "input": {
+    "user_language": "ar",
     "turns": [
       { "role": "user", "message": "اسمي خالد" },
       { "role": "user", "message": "ما اسمي؟" }
     ]
   },
-  "assertions": []
+  "assertions": [
+    { "type": "status_equals",      "expected": "PASS" },
+    { "type": "state_field_equals", "field": "ok",            "expected": true },
+    { "type": "state_field_equals", "field": "mode",          "expected": "MESSAGE_PROCESSED" },
+    { "type": "state_field_equals", "field": "current_state", "expected": "DISCUSSION" },
+    { "type": "state_field_equals", "field": "project_id",    "expected": "test_conv_s11" },
+    { "type": "state_field_equals", "field": "turn_count",    "expected": 2 }
+  ]
 }

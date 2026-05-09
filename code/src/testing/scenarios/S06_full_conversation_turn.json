@@ -2,8 +2,16 @@
   "id": "S06",
   "name": "full conversation turn through conversationEngine",
   "type": "conversation",
+  "permission": "WORKSPACE_WRITE",
   "input": {
-    "message": "مرحبا، أريد بناء تطبيق"
+    "message": "مرحبا، أريد بناء تطبيق",
+    "user_language": "ar"
   },
-  "assertions": []
+  "assertions": [
+    { "type": "status_equals",      "expected": "PASS" },
+    { "type": "state_field_equals", "field": "ok",            "expected": true },
+    { "type": "state_field_equals", "field": "mode",          "expected": "MESSAGE_PROCESSED" },
+    { "type": "state_field_equals", "field": "current_state", "expected": "DISCUSSION" },
+    { "type": "state_field_equals", "field": "project_id",    "expected": "test_conv_s06" }
+  ]
 }

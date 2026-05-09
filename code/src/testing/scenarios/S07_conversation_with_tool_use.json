@@ -1,9 +1,17 @@
 {
   "id": "S07",
-  "name": "conversation turn results in tool invocation through conversationEngine",
+  "name": "conversation turn falls back gracefully when provider has no API key",
   "type": "conversation",
+  "permission": "WORKSPACE_WRITE",
   "input": {
-    "message": "احفظ هذه الملاحظة: فكرة رائعة"
+    "message": "احفظ هذه الملاحظة: فكرة رائعة",
+    "user_language": "ar"
   },
-  "assertions": []
+  "assertions": [
+    { "type": "status_equals",      "expected": "PASS" },
+    { "type": "state_field_equals", "field": "ok",            "expected": true },
+    { "type": "state_field_equals", "field": "mode",          "expected": "MESSAGE_PROCESSED" },
+    { "type": "state_field_equals", "field": "current_state", "expected": "DISCUSSION" },
+    { "type": "state_field_equals", "field": "reason",        "expected": null }
+  ]
 }

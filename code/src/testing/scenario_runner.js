@@ -90,17 +90,19 @@ function _normalizeDoctorResult(raw) {
 }
 
 function _normalizeConversationResult(raw, audit) {
+  const ok = !!(raw && raw.ok);
   return {
-    status: "PASS",
+    status: ok ? "PASS" : "FAIL",
     output: {
       response:   (raw && raw.message) || "",
       tool_calls: [],
       state: {
-        ok:            !!(raw && raw.ok),
+        ok,
         mode:          (raw && raw.mode)          || "UNKNOWN",
         current_state: (raw && raw.current_state) || null,
         project_id:    (raw && raw.project_id)    || null,
-        reason:        (raw && raw.reason)         || null
+        reason:        (raw && raw.reason)        || null,
+        turn_count:    (raw && raw.turn_count)    || 1
       }
     },
     audit: audit || []
@@ -288,13 +290,41 @@ async function _runConversation(scenario, root) {
       path.join(root, "code", "src", "ai_os", "conversationEngine")
     );
     const engine = createConversationEngine({ root });
-    raw = await engine.processMessage({
-      project_id:    projectId,
-      message:       (scenario.input && scenario.input.message) || "",
-      user_language: (scenario.input && scenario.input.user_language) || "ar"
-    });
+
+    const turns = Array.isArray(scenario.input && scenario.input.turns)
+      ? scenario.input.turns
+      : null;
+
+    if (turns && turns.length > 0) {
+      let lastResult = null;
+      let allOk = true;
+      for (const turn of turns) {
+        if (!turn || turn.role !== "user") continue;
+        const r = await engine.processMessage({
+          project_id:    projectId,
+          message:       String(turn.message || ""),
+          user_language: (scenario.input && scenario.input.user_language) || "ar"
+        });
+        lastResult = r;
+        if (!r || r.ok !== true) allOk = false;
+      }
+      raw = Object.assign({}, lastResult || {}, {
+        ok:         allOk,
+        turn_count: turns.length,
+        project_id: projectId
+      });
+    } else if (scenario.input && typeof scenario.input.message === "string") {
+      raw = await engine.processMessage({
+        project_id:    projectId,
+        message:       scenario.input.message,
+        user_language: (scenario.input && scenario.input.user_language) || "ar"
+      });
+      raw = Object.assign({ turn_count: 1 }, raw || {});
+    } else {
+      raw = { ok: false, mode: "BLOCKED", reason: "NO_INPUT", turn_count: 0 };
+    }
   } catch (err) {
-    raw = { ok: false, mode: "BLOCKED", reason: err.message };
+    raw = { ok: false, mode: "BLOCKED", reason: err.message, turn_count: 0 };
   } finally {
     if (savedMode !== undefined) process.env.FORGE_PERMISSION_MODE = savedMode;
     else delete process.env.FORGE_PERMISSION_MODE;

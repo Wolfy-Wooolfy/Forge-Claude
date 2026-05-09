@@ -1,9 +1,16 @@
 {
   "id": "S09",
-  "name": "DANGER_FULL_ACCESS mode allows shell command through conversationEngine",
+  "name": "DANGER_FULL_ACCESS does not change conversation engine output shape",
   "type": "conversation",
+  "permission": "DANGER_FULL_ACCESS",
   "input": {
-    "message": "run: echo hello"
+    "message": "run: echo hello",
+    "user_language": "ar"
   },
-  "assertions": []
+  "assertions": [
+    { "type": "status_equals",      "expected": "PASS" },
+    { "type": "state_field_equals", "field": "ok",            "expected": true },
+    { "type": "state_field_equals", "field": "mode",          "expected": "MESSAGE_PROCESSED" },
+    { "type": "state_field_equals", "field": "current_state", "expected": "DISCUSSION" }
+  ]
 }
