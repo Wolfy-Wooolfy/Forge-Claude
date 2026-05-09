@@ -1008,13 +1008,9 @@ ${trimmedExisting}`
     return null;
   }
 
-  function buildAiAnalysisArtifacts(requestText) {
+  async function buildAiAnalysisArtifacts(requestText) {
     const sessionId = `ai_analysis_${Date.now()}`;
     const createdAt = new Date().toISOString();
-
-    ensureDir(aiConversationsRoot);
-    ensureDir(aiContextRoot);
-    ensureDir(aiAnalysisRoot);
 
     const selectedPaths = [
       "progress/status.json",
@@ -1114,9 +1110,9 @@ ${trimmedExisting}`
     const contextRel = `artifacts/ai/context/${sessionId}.context.json`;
     const analysisRel = `artifacts/ai/analysis/${sessionId}.analysis.json`;
 
-    fs.writeFileSync(path.resolve(root, conversationRel), JSON.stringify(conversationArtifact, null, 2));
-    fs.writeFileSync(path.resolve(root, contextRel), JSON.stringify(contextArtifact, null, 2));
-    fs.writeFileSync(path.resolve(root, analysisRel), JSON.stringify(analysisArtifact, null, 2));
+    await tryWriteJson(path.resolve(root, conversationRel), conversationArtifact);
+    await tryWriteJson(path.resolve(root, contextRel), contextArtifact);
+    await tryWriteJson(path.resolve(root, analysisRel), analysisArtifact);
 
     return {
       ok: true,
@@ -1131,7 +1127,7 @@ ${trimmedExisting}`
     };
   }
 
-  function buildAiProposalArtifacts(requestText, providerOutput = null, projectIdInput = "") {
+  async function buildAiProposalArtifacts(requestText, providerOutput = null, projectIdInput = "") {
     const proposalId = `ai_proposal_${Date.now()}`;
     const createdAt = new Date().toISOString();
 
@@ -1142,9 +1138,6 @@ ${trimmedExisting}`
 
     const aiProposalsRoot = path.resolve(root, "artifacts", "projects", projectId, "ai", "proposals");
     const aiDraftsRoot = path.resolve(root, "artifacts", "projects", projectId, "ai", "drafts");
-
-    ensureDir(aiProposalsRoot);
-    ensureDir(aiDraftsRoot);
 
     const projectFiles = scanProjectFiles();
     const resolvedTargetFile = resolveTargetFileForRequest(requestText, projectFiles);
@@ -1307,11 +1300,11 @@ ${trimmedExisting}`
     const proposalRel = `artifacts/projects/${projectId}/ai/proposals/${proposalId}.proposal.json`;
     const draftRel = `artifacts/projects/${projectId}/ai/drafts/${proposalId}.draft.json`;
 
-    fs.writeFileSync(path.resolve(root, proposalRel), JSON.stringify(proposalArtifact, null, 2));
-    fs.writeFileSync(path.resolve(root, draftRel), JSON.stringify(draftArtifact, null, 2));
+    await writeJson(path.resolve(root, proposalRel), proposalArtifact);
+    await writeJson(path.resolve(root, draftRel), draftArtifact);
 
-    writeActiveProject(projectId);
-    persistProjectState(projectId, {
+    await writeActiveProject(projectId);
+    await persistProjectState(projectId, {
       user_goal: requestText,
       technical_goal: requestText,
       current_phase: "DOCS_DRAFTING",
@@ -1378,13 +1371,12 @@ ${trimmedExisting}`
     return "default_project";
   }
 
-  function writeActiveProject(projectIdInput) {
+  async function writeActiveProject(projectIdInput) {
     const projectId = normalizeProjectId(projectIdInput);
-    ensureDir(projectsRoot);
-    fs.writeFileSync(activeProjectPath, JSON.stringify({
+    await writeJson(activeProjectPath, {
       project_id: projectId,
       updated_at: new Date().toISOString()
-    }, null, 2));
+    });
     return projectId;
   }
 
@@ -1562,15 +1554,12 @@ ${trimmedExisting}`
     return state;
   }
 
-  function persistProjectState(projectIdInput, overrides = {}) {
+  async function persistProjectState(projectIdInput, overrides = {}) {
     const projectId = normalizeProjectId(projectIdInput);
     const state = buildProjectState(projectId, overrides);
     const projectStateAbs = getProjectStateAbs(projectId);
 
-    ensureDir(path.dirname(projectStateAbs));
-    fs.writeFileSync(projectStateAbs, JSON.stringify(state, null, 2));
-
-    ensureDir(projectsRoot);
+    await writeJson(projectStateAbs, state);
 
     const registry = {
       active_project_id: readActiveProjectId(),
@@ -1590,7 +1579,7 @@ ${trimmedExisting}`
       })
     };
 
-    fs.writeFileSync(projectRegistryPath, JSON.stringify(registry, null, 2));
+    await writeJson(projectRegistryPath, registry);
 
     return state;
   }
@@ -1625,14 +1614,12 @@ ${trimmedExisting}`
     };
   }
 
-  function listProjects() {
-    ensureDir(projectsRoot);
-
+  async function listProjects() {
     if (!fs.existsSync(activeProjectPath)) {
-      writeActiveProject("default_project");
+      await writeActiveProject("default_project");
     }
 
-    const items = listKnownProjectIds().map((projectId) => persistProjectState(projectId));
+    const items = await Promise.all(listKnownProjectIds().map((projectId) => persistProjectState(projectId)));
 
     return {
       active_project_id: readActiveProjectId(),
@@ -1640,7 +1627,7 @@ ${trimmedExisting}`
     };
   }
 
-  function createProject(body = {}) {
+  async function createProject(body = {}) {
     const projectName = normalizeProjectName(body.project_name);
     const baseProjectId = buildProjectId(body.project_id, projectName);
 
@@ -1652,9 +1639,9 @@ ${trimmedExisting}`
       suffix += 1;
     }
 
-    writeActiveProject(projectId);
+    await writeActiveProject(projectId);
 
-    const state = persistProjectState(projectId, {
+    const state = await persistProjectState(projectId, {
       project_name: projectName,
       project_status: "ACTIVE"
     });
@@ -1667,7 +1654,7 @@ ${trimmedExisting}`
     };
   }
 
-  function deleteProject(body = {}) {
+  async function deleteProject(body = {}) {
     const projectId = normalizeProjectId(body.project_id || "");
     if (!projectId || projectId === "default_project") {
       return { ok: false, reason: "CANNOT_DELETE_DEFAULT_PROJECT" };
@@ -1676,11 +1663,16 @@ ${trimmedExisting}`
     if (!fs.existsSync(projectRoot)) {
       return { ok: false, reason: "PROJECT_NOT_FOUND" };
     }
-    fs.rmSync(projectRoot, { recursive: true, force: true });
-    if (readActiveProjectId() === projectId) {
-      writeActiveProject("default_project");
+    const reg = getDefaultRegistry();
+    const relPath = path.relative(root, projectRoot).split(path.sep).join("/");
+    const dr = await reg.invoke("fs.delete_dir", { path: relPath }, { root });
+    if (dr.status !== "SUCCESS") {
+      return { ok: false, reason: (dr.metadata && dr.metadata.reason) || "DELETE_FAILED" };
     }
-    persistProjectState("default_project");
+    if (readActiveProjectId() === projectId) {
+      await writeActiveProject("default_project");
+    }
+    await persistProjectState("default_project");
     return { ok: true, deleted: true, project_id: projectId };
   }
 
@@ -1704,10 +1696,8 @@ ${trimmedExisting}`
     return path.resolve(root, getProjectExecutionPackageRel(projectIdInput));
   }
 
-  function writeDecisionLinkArtifact(proposalId, decisionPacketId, projectIdInput = "") {
+  async function writeDecisionLinkArtifact(proposalId, decisionPacketId, projectIdInput = "") {
     const projectId = normalizeProjectId(projectIdInput);
-    const linkRoot = getProjectDecisionLinksRoot(projectId);
-    ensureDir(linkRoot);
 
     const link = {
       link_id: `ai_decision_link_${Date.now()}`,
@@ -1719,17 +1709,14 @@ ${trimmedExisting}`
     };
 
     const rel = getProjectDecisionLinksRel(projectId, link.link_id);
-    fs.writeFileSync(path.resolve(root, rel), JSON.stringify(link, null, 2));
+    await writeJson(path.resolve(root, rel), link);
 
     return rel;
   }
 
-  function appendDecisionLog(entry) {
+  async function appendDecisionLog(entry) {
     const logPath = path.join(llmRoot, "decision_log.json");
-    const current = readJsonSafe(logPath, []);
-    const items = Array.isArray(current) ? current : [];
-    items.push(entry);
-    fs.writeFileSync(logPath, JSON.stringify(items, null, 2));
+    await tryAppendArrayJson(logPath, entry);
   }
 
   function renderDecisionPacketMd(packet) {
@@ -1915,7 +1902,7 @@ function buildExecutionPackage(packet) {
       });
   }
 
-  function createDecisionPacket(draft, userRequest, approverRole) {
+  async function createDecisionPacket(draft, userRequest, approverRole) {
     const normalizedFiles = normalizeDraftFiles(draft.files);
     const batchPolicy = assertDecisionBatchAllowed(normalizedFiles);
     const fileRoleRequirements = resolveFileRoleRequirements(normalizedFiles);
@@ -1938,18 +1925,11 @@ function buildExecutionPackage(packet) {
       };
     });
 
-    ensureDir(path.join(llmRoot, "requests"));
-    ensureDir(path.join(llmRoot, "responses"));
-    ensureDir(path.join(llmRoot, "metadata"));
-
     const decisionPacketId = `workspace_decision_${Date.now()}`;
     const workspaceId = "personal";
     const projectId = normalizeProjectId(draft.project_id);
 
     const projectDecisionsRoot = path.resolve(root, "artifacts", "projects", projectId, "decisions");
-    ensureDir(projectDecisionsRoot);
-
-
 
     const requestPath = path.join(llmRoot, "requests", `${decisionPacketId}.request.json`);
     const responsePath = path.join(llmRoot, "responses", `${decisionPacketId}.response.json`);
@@ -1999,7 +1979,7 @@ function buildExecutionPackage(packet) {
       }))
     };
 
-    fs.writeFileSync(requestPath, JSON.stringify({
+    await writeJson(requestPath, {
       request: userRequest || "",
       approver_role: approvedByRole,
       required_roles: approvalPolicy.required_roles,
@@ -2010,24 +1990,23 @@ function buildExecutionPackage(packet) {
       approved_at: new Date().toISOString(),
       workspace_id: workspaceId,
       project_id: projectId
-    }, null, 2));
+    });
 
-    fs.writeFileSync(responsePath, JSON.stringify({
+    await writeJson(responsePath, {
       summary: typeof draft.summary === "string" ? draft.summary : "Decision packet created successfully.",
       files: normalizedFiles.map((file) => ({
         path: file.path,
         content: file.content
       }))
-    }, null, 2));
+    });
 
-    fs.writeFileSync(decisionPacketJsonAbs, JSON.stringify(packet, null, 2));
-    fs.writeFileSync(decisionPacketMdAbs, renderDecisionPacketMd(packet));
+    await writeJson(decisionPacketJsonAbs, packet);
+    await writeFile(decisionPacketMdAbs, renderDecisionPacketMd(packet));
 
     const executionPackageAbs = getProjectExecutionPackageAbs(projectId);
     const executionPackage = buildExecutionPackage(packet);
 
-    fs.mkdirSync(path.dirname(executionPackageAbs), { recursive: true });
-    fs.writeFileSync(executionPackageAbs, JSON.stringify(executionPackage, null, 2));
+    await writeJson(executionPackageAbs, executionPackage);
 
     const result = {
       ok: true,
@@ -2053,10 +2032,10 @@ function buildExecutionPackage(packet) {
       diffs
     };
 
-    fs.writeFileSync(metadataPath, JSON.stringify(result, null, 2));
+    await writeJson(metadataPath, result);
 
-    writeActiveProject(projectId);
-    persistProjectState(projectId, {
+    await writeActiveProject(projectId);
+    await persistProjectState(projectId, {
       current_phase: "EXECUTION_READY",
       active_runtime_state: "EXECUTION_PREPARATION",
       documentation_state: "APPROVED",
@@ -2065,7 +2044,7 @@ function buildExecutionPackage(packet) {
       accepted_options: ["OPTION-APPROVE-WORKSPACE-DRAFT"]
     });
 
-    appendDecisionLog({
+    await appendDecisionLog({
       timestamp: new Date().toISOString(),
       type: "DECISION_PACKET",
       decision_packet_id: decisionPacketId,
@@ -2144,7 +2123,7 @@ function buildExecutionPackage(packet) {
       return;
     }
 
-    const result = createDecisionPacket(draft, userRequest, approverRole);
+    const result = await createDecisionPacket(draft, userRequest, approverRole);
 
     const proposalId =
       body && typeof body.proposal_id === "string"
@@ -2152,7 +2131,7 @@ function buildExecutionPackage(packet) {
         : "";
 
     if (proposalId && result && result.decision_packet_id) {
-      const linkPath = writeDecisionLinkArtifact(
+      const linkPath = await writeDecisionLinkArtifact(
         proposalId,
         result.decision_packet_id,
         result.project_id
@@ -2180,7 +2159,7 @@ function buildExecutionPackage(packet) {
 
   async function handleAnalyze(body, res) {
     const requestText = typeof body.request === "string" ? body.request.trim() : "";
-    const result = buildAiAnalysisArtifacts(requestText);
+    const result = await buildAiAnalysisArtifacts(requestText);
     sendJson(res, 200, result);
   }
 
@@ -2439,7 +2418,7 @@ function buildExecutionPackage(packet) {
       }
     });
 
-    const result = buildAiProposalArtifacts(
+    const result = await buildAiProposalArtifacts(
       interpretation.normalized_request,
       providerResult.output || null,
       projectId
@@ -2675,23 +2654,23 @@ function buildExecutionPackage(packet) {
       }
 
       if (req.method === "GET" && pathname === "/api/projects") {
-        sendJson(res, 200, listProjects());
+        sendJson(res, 200, await listProjects());
         return;
       }
 
       if (req.method === "POST" && pathname === "/api/projects/create") {
         const body = await readBody(req);
-        const result = createProject(body);
+        const result = await createProject(body);
         sendJson(res, 200, result);
         return;
       }
 
       if (req.method === "POST" && pathname === "/api/projects/activate") {
         const body = await readBody(req);
-        const projectId = writeActiveProject(
+        const projectId = await writeActiveProject(
           typeof body.project_id === "string" ? body.project_id.trim() : ""
         );
-        const state = persistProjectState(projectId);
+        const state = await persistProjectState(projectId);
         sendJson(res, 200, {
           ok: true,
           active_project_id: projectId,
@@ -2702,7 +2681,7 @@ function buildExecutionPackage(packet) {
 
       if (req.method === "POST" && pathname === "/api/projects/delete") {
         const body = await readBody(req);
-        const result = deleteProject(body);
+        const result = await deleteProject(body);
         sendJson(res, result.ok ? 200 : 400, result);
         return;
       }

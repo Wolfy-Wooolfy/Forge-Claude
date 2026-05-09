@@ -165,7 +165,80 @@ const delete_file = defineTool({
   }
 });
 
-// ── 5. fs.list_dir ────────────────────────────────────────────────────────────
+// ── 5. fs.delete_dir ─────────────────────────────────────────────────────────
+// Condition 1: required_mode WORKSPACE_WRITE (enforced by L3 registry).
+// Condition 2: deny-by-default path guard — only artifacts/projects/ subtree.
+// Condition 3: preview support — returns { would_delete, file_count } without deleting.
+
+function _countFiles(dirPath) {
+  let count = 0;
+  try {
+    for (const entry of fs.readdirSync(dirPath, { withFileTypes: true })) {
+      const child = path.join(dirPath, entry.name);
+      count += entry.isDirectory() ? _countFiles(child) : 1;
+    }
+  } catch (_e) {/* ignore unreadable dirs */}
+  return count;
+}
+
+const delete_dir = defineTool({
+  name: "fs.delete_dir",
+  description: "Recursively delete a project directory. Restricted to artifacts/projects/ subtree.",
+  required_mode: "WORKSPACE_WRITE",
+  input_schema: {
+    type: "object",
+    properties: {
+      path:    { type: "string" },
+      preview: { type: "boolean" }
+    },
+    required: ["path"]
+  },
+  output_schema: {
+    type: "object",
+    properties: {
+      deleted:      { type: "boolean" },
+      would_delete: { type: "string" },
+      file_count:   { type: "number" }
+    }
+  },
+  preview(input, ctx) {
+    const root = (ctx && ctx.root) || process.cwd();
+    const { safe, abs } = safeResolve(root, input.path);
+    if (!safe) return Promise.resolve(failed("PATH_OUTSIDE_ROOT", "Path resolves outside workspace root"));
+    const projectsBase = path.resolve(root, "artifacts", "projects") + path.sep;
+    if (!abs.startsWith(projectsBase)) {
+      return Promise.resolve(failed("PATH_OUTSIDE_PROJECTS",
+        "fs.delete_dir only operates within artifacts/projects/"));
+    }
+    const fileCount = fs.existsSync(abs) ? _countFiles(abs) : 0;
+    return Promise.resolve(previewed({ would_delete: abs, file_count: fileCount }));
+  },
+  async execute(input, ctx) {
+    const root = (ctx && ctx.root) || process.cwd();
+    const { safe, abs } = safeResolve(root, input.path);
+    if (!safe) return failed("PATH_OUTSIDE_ROOT", "Path resolves outside workspace root: " + input.path);
+
+    // Condition 2: deny-by-default — only artifacts/projects/ even in DANGER mode
+    const projectsBase = path.resolve(root, "artifacts", "projects") + path.sep;
+    if (!abs.startsWith(projectsBase)) {
+      return failed("PATH_OUTSIDE_PROJECTS",
+        "fs.delete_dir only operates within artifacts/projects/: " + input.path);
+    }
+
+    if (input.preview === true) {
+      const fileCount = fs.existsSync(abs) ? _countFiles(abs) : 0;
+      return previewed({ would_delete: abs, file_count: fileCount });
+    }
+
+    if (!fs.existsSync(abs)) return failed("DIR_NOT_FOUND", "Directory not found: " + input.path);
+
+    const fileCount = _countFiles(abs);
+    fs.rmSync(abs, { recursive: true, force: true });
+    return ok({ deleted: true, would_delete: abs, file_count: fileCount });
+  }
+});
+
+// ── 6. fs.list_dir ────────────────────────────────────────────────────────────
 
 const list_dir = defineTool({
   name: "fs.list_dir",
@@ -317,5 +390,5 @@ function _walkGlob(base, current, parts, results, root) {
 // ── Export ────────────────────────────────────────────────────────────────────
 
 module.exports = {
-  tools: [read_file, write_file, append_file, delete_file, list_dir, exists, glob]
+  tools: [read_file, write_file, append_file, delete_file, delete_dir, list_dir, exists, glob]
 };
