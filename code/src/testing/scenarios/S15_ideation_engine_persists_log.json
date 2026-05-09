@@ -1,0 +1,43 @@
+{
+  "id": "S15",
+  "name": "ideationEngine.expandIdea persists ideation_log.json via L2 Tool Runtime",
+  "type": "direct_engine",
+  "permission": "WORKSPACE_WRITE",
+  "engine": "ideationEngine",
+  "method": "expandIdea",
+  "fixture": {
+    "project_name": "Test Ideation S15",
+    "current_state": "DISCUSSION",
+    "active_runtime_state": "DISCUSSION",
+    "user_goal": "بناء نظام إدارة مهام",
+    "requirement_domain": "productivity",
+    "domain_locked": false,
+    "domain_lock_intent": "FLEXIBLE",
+    "requirement_model": {}
+  },
+  "mock": {
+    "tool_name": "expand_idea",
+    "args": {
+      "expanded_summary": "نظام إدارة مهام متكامل مع تتبع التقدم",
+      "missing_components": ["تتبع الوقت", "التقارير", "التعاون الجماعي"],
+      "suggested_directions": [],
+      "improvement_proposals": [],
+      "readiness_assessment": { "ready_for_options": false, "blocking_gaps": ["حجم الفريق"] },
+      "follow_up_question": "هل تحتاج دعماً للفريق أم للاستخدام الفردي؟",
+      "suggested_answers": [],
+      "detected_domain": "productivity",
+      "pivot_detected": false,
+      "domain_confidence": 0.95,
+      "name_goal_mismatch": false
+    }
+  },
+  "input": {
+    "refinement_input": "أريد إضافة ميزة التقارير الأسبوعية"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "PASS" },
+    { "type": "state_field_equals", "field": "ok",   "expected": true },
+    { "type": "state_field_equals", "field": "mode", "expected": "IDEATION_IN_PROGRESS" },
+    { "type": "artifact_exists",    "path": "artifacts/projects/test_engine_s15/ai_os/ideation_log.json" }
+  ]
+}

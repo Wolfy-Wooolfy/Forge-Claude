@@ -248,6 +248,150 @@ async function _runDirectDoctor(scenario, root) {
   return _normalizeDoctorResult(raw);
 }
 
+// ── Result normalizer: direct_engine ─────────────────────────────────────────
+
+function _normalizeEngineResult(raw, audit) {
+  const ok = !!(raw && raw.ok);
+  return {
+    status: ok ? "PASS" : "FAIL",
+    output: {
+      response:   "",
+      tool_calls: [],
+      state:      Object.assign(
+        { ok: false, mode: "UNKNOWN", reason: null },
+        raw || {}
+      )
+    },
+    audit: audit || []
+  };
+}
+
+// ── Dispatch: direct_engine ───────────────────────────────────────────────────
+
+async function _runDirectEngine(scenario, root) {
+  const { resetDefaultRegistry } = require(
+    path.join(root, "code", "src", "runtime", "tools", "_registry")
+  );
+  const { resetDefaultPolicy } = require(
+    path.join(root, "code", "src", "runtime", "permission", "permissionPolicy")
+  );
+  const { readEntries } = require(
+    path.join(root, "code", "src", "runtime", "audit", "toolAuditLog")
+  );
+
+  const permission = scenario.permission || "WORKSPACE_WRITE";
+  const savedMode  = process.env.FORGE_PERMISSION_MODE;
+  process.env.FORGE_PERMISSION_MODE = permission;
+  resetDefaultRegistry();
+  resetDefaultPolicy();
+
+  const projectId   = "test_engine_" + scenario.id.toLowerCase();
+  const projectDir  = path.join(root, "artifacts", "projects", projectId);
+  const fixturePath = path.join(projectDir, "project_state.json");
+  let fixtureCreated = false;
+
+  if (!fs.existsSync(fixturePath)) {
+    fs.mkdirSync(projectDir, { recursive: true });
+    const fixtureData = scenario.fixture || {};
+    fs.writeFileSync(fixturePath, JSON.stringify(
+      Object.assign(
+        {
+          project_name:         "Engine Test " + scenario.id,
+          current_state:        "DISCUSSION",
+          active_runtime_state: "DISCUSSION",
+          user_goal:            "",
+          _version:             1,
+          created_at:           new Date().toISOString()
+        },
+        fixtureData,
+        { project_id: projectId }
+      ),
+      null, 2
+    ));
+    fixtureCreated = true;
+  }
+
+  let mockSvc   = null;
+  let origFetch = null;
+  const savedEnv = scenario.mock ? { OPENAI_API_KEY: process.env.OPENAI_API_KEY } : null;
+
+  if (scenario.mock) {
+    const { MockOpenAiService } = require("./mock_openai_service");
+    const mockMap = {};
+    mockMap[scenario.id] = scenario.mock;
+    mockSvc = await MockOpenAiService.start(mockMap);
+
+    origFetch = globalThis.fetch;
+    const mockTarget = mockSvc.url + "/v1/chat/completions";
+
+    globalThis.fetch = async function _forgeMockedFetch(url, init) {
+      if (typeof url === "string" && url.includes("api.openai.com")) {
+        let body = {};
+        try { body = JSON.parse((init && init.body) || "{}"); } catch { body = {}; }
+        body._forge_scenario_id = scenario.id;
+        return _httpFetch(mockTarget, Object.assign({}, init, { body: JSON.stringify(body) }));
+      }
+      if (typeof origFetch === "function") return origFetch(url, init);
+      return _httpFetch(String(url), init);
+    };
+
+    process.env.OPENAI_API_KEY = "sk-mock-engine-" + scenario.id.toLowerCase() + "-0000";
+  }
+
+  const startTs = new Date().toISOString();
+  let raw;
+
+  try {
+    let engine;
+    if (scenario.engine === "ideationEngine") {
+      const { createIdeationEngine } = require(
+        path.join(root, "code", "src", "ai_os", "ideationEngine")
+      );
+      engine = createIdeationEngine({ root });
+    } else if (scenario.engine === "businessAnalysisEngine") {
+      const { createBusinessAnalysisEngine } = require(
+        path.join(root, "code", "src", "ai_os", "businessAnalysisEngine")
+      );
+      engine = createBusinessAnalysisEngine({ root });
+    } else {
+      throw new Error("unknown engine: " + scenario.engine);
+    }
+
+    const input = Object.assign({}, scenario.input || {}, { project_id: projectId });
+    raw = await engine[scenario.method](input);
+    raw = Object.assign({}, raw || {});
+  } catch (err) {
+    raw = { ok: false, mode: "BLOCKED", reason: err.message };
+  } finally {
+    if (savedMode !== undefined) process.env.FORGE_PERMISSION_MODE = savedMode;
+    else delete process.env.FORGE_PERMISSION_MODE;
+    resetDefaultRegistry();
+    resetDefaultPolicy();
+
+    if (mockSvc) {
+      globalThis.fetch = origFetch;
+      await mockSvc.close();
+      if (savedEnv.OPENAI_API_KEY !== undefined) process.env.OPENAI_API_KEY = savedEnv.OPENAI_API_KEY;
+      else delete process.env.OPENAI_API_KEY;
+    }
+  }
+
+  const newAudit = readEntries(root, { since_ts: startTs });
+  const result   = _normalizeEngineResult(raw, newAudit);
+
+  if (fixtureCreated) {
+    Object.defineProperty(result, "_cleanup", {
+      value: () => {
+        try { fs.rmSync(projectDir, { recursive: true, force: true }); } catch { /* best-effort */ }
+      },
+      enumerable: false,
+      writable:   false
+    });
+  }
+
+  return result;
+}
+
 // ── Dispatch: conversation ────────────────────────────────────────────────────
 
 async function _runConversation(scenario, root) {
@@ -378,6 +522,8 @@ async function _runOne(scenario, root) {
       execResult = await _runDirectDoctor(scenario, root);
     } else if (scenario.type === "conversation") {
       execResult = await _runConversation(scenario, root);
+    } else if (scenario.type === "direct_engine") {
+      execResult = await _runDirectEngine(scenario, root);
     } else {
       throw new Error("unknown scenario type: " + scenario.type);
     }

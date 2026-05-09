@@ -1,0 +1,41 @@
+{
+  "id": "S16",
+  "name": "businessAnalysisEngine.analyzeProject persists business_analysis_log.json via L2 Tool Runtime",
+  "type": "direct_engine",
+  "permission": "WORKSPACE_WRITE",
+  "engine": "businessAnalysisEngine",
+  "method": "analyzeProject",
+  "fixture": {
+    "project_name": "Test Business Analysis S16",
+    "current_state": "DISCUSSION",
+    "active_runtime_state": "DISCUSSION",
+    "user_goal": "بناء منصة تجارة إلكترونية متخصصة",
+    "requirement_domain": "ecommerce",
+    "requirement_completeness": true,
+    "requirement_model": { "core_features": ["cart", "payments", "catalog"] }
+  },
+  "mock": {
+    "content": {
+      "domain": "ecommerce",
+      "monetization_options": [
+        { "model": "Commission", "description": "عمولة على كل بيع", "estimated_revenue_level": "HIGH", "risk": "تنافسية عالية" }
+      ],
+      "risks": [
+        { "risk": "المنافسة", "severity": "HIGH", "mitigation": "التمييز بالتخصص" }
+      ],
+      "feasibility": { "rating": "HIGH", "reasoning": "سوق التجارة الإلكترونية متنامٍ" },
+      "profitability_estimate": { "level": "MEDIUM", "key_factors": ["حجم الحركة", "معدل التحويل"], "time_to_revenue": "6-12 شهر" },
+      "recommendation": { "preferred_direction": "منصة متخصصة في فئة معينة", "rationale": "أقل تنافسية من المنصات العامة", "alternatives": [] },
+      "certainty_notes": "تقديرات مبنية على بيانات السوق الإقليمي"
+    }
+  },
+  "input": {
+    "question": "ما هي فرص الربح وخيارات تحقيق الدخل؟"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "PASS" },
+    { "type": "state_field_equals", "field": "ok",   "expected": true },
+    { "type": "state_field_equals", "field": "mode", "expected": "BUSINESS_ANALYSIS_COMPLETE" },
+    { "type": "artifact_exists",    "path": "artifacts/projects/test_engine_s16/ai_os/business_analysis_log.json" }
+  ]
+}

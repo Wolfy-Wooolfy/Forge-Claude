@@ -1,0 +1,40 @@
+{
+  "id": "S14",
+  "name": "ideationExpansionProvider returns valid expansion tool-call shape",
+  "type": "direct_provider",
+  "provider": "ideationExpansionProvider",
+  "mock": {
+    "tool_name": "expand_idea",
+    "args": {
+      "expanded_summary": "نظام CRM متكامل لإدارة علاقات العملاء",
+      "missing_components": ["واجهة المستخدم", "قاعدة البيانات", "نظام التقارير"],
+      "suggested_directions": [],
+      "improvement_proposals": [],
+      "readiness_assessment": { "ready_for_options": false, "blocking_gaps": ["تحديد الجمهور المستهدف"] },
+      "follow_up_question": "من هو الجمهور المستهدف لنظام CRM هذا؟",
+      "suggested_answers": [],
+      "detected_domain": "CRM",
+      "pivot_detected": false,
+      "domain_confidence": 0.9,
+      "name_goal_mismatch": false
+    }
+  },
+  "input": {
+    "task_id": "s14_test",
+    "context": {
+      "project_name": "test_crm",
+      "user_goal": "بناء نظام CRM",
+      "refinement_input": "أريد إضافة ميزة تتبع العملاء",
+      "previous_domain": "CRM",
+      "domain_locked": false,
+      "domain_lock_intent": "FLEXIBLE",
+      "requirement_model": {},
+      "conversation_history": []
+    }
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "detected_domain", "expected": "CRM" },
+    { "type": "state_field_equals", "field": "pivot_detected",  "expected": false }
+  ]
+}

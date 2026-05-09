@@ -11,9 +11,13 @@ const http = require("http");
  *   // svc.port → number
  *   // svc.close() → Promise<void>
  *
- * `responses` is a map: { "<scenario_id>": { tool_name, args_object } }
+ * `responses` is a map: { "<scenario_id>": mockEntry }
  * The scenario ID is passed in each request body as `_forge_scenario_id`.
  * Falls back to the first entry in the map if no match.
+ *
+ * mockEntry shapes:
+ *   tool_calls mode: { tool_name, args }       → choices[0].message.tool_calls
+ *   content mode:    { content }               → choices[0].message.content (json_object)
  */
 
 class MockOpenAiService {
@@ -66,9 +70,14 @@ class MockOpenAiService {
           return;
         }
 
-        const toolName = mockEntry.tool_name;
-        const argsStr  = JSON.stringify(mockEntry.args || {});
-        const payload  = this._buildResponse(toolName, argsStr);
+        let payload;
+        if (mockEntry.content !== undefined) {
+          payload = this._buildContentResponse(mockEntry.content);
+        } else {
+          const toolName = mockEntry.tool_name;
+          const argsStr  = JSON.stringify(mockEntry.args || {});
+          payload = this._buildToolCallResponse(toolName, argsStr);
+        }
 
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify(payload));
@@ -84,7 +93,7 @@ class MockOpenAiService {
     return keys.length > 0 ? this._responses[keys[0]] : null;
   }
 
-  _buildResponse(toolName, argsStr) {
+  _buildToolCallResponse(toolName, argsStr) {
     return {
       id:      "mock-chatcmpl-" + Date.now(),
       object:  "chat.completion",
@@ -108,6 +117,27 @@ class MockOpenAiService {
             ]
           },
           finish_reason: "tool_calls"
+        }
+      ],
+      usage: { prompt_tokens: 10, completion_tokens: 10, total_tokens: 20 }
+    };
+  }
+
+  _buildContentResponse(contentBody) {
+    return {
+      id:      "mock-chatcmpl-" + Date.now(),
+      object:  "chat.completion",
+      created: Math.floor(Date.now() / 1000),
+      model:   "mock-gpt",
+      choices: [
+        {
+          index:   0,
+          message: {
+            role:       "assistant",
+            content:    JSON.stringify(contentBody),
+            tool_calls: []
+          },
+          finish_reason: "stop"
         }
       ],
       usage: { prompt_tokens: 10, completion_tokens: 10, total_tokens: 20 }
