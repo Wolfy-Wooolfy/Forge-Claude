@@ -1,0 +1,28 @@
+{
+  "id": "S19",
+  "name": "deliveryPackageBuilder persists runbook + package + state via L2",
+  "type": "direct_engine",
+  "permission": "WORKSPACE_WRITE",
+  "engine": "deliveryPackageBuilder",
+  "method": "buildDeliveryPackage",
+  "fixture": {
+    "project_name": "Test Delivery S19",
+    "active_runtime_state": "EXECUTION_HANDOFF_CREATED",
+    "user_goal": "نظام إدارة مهام بسيط",
+    "requirement_domain": "productivity",
+    "execution_state": "COMPLETE"
+  },
+  "input": {
+    "artifacts": [
+      { "path": "artifacts/projects/test_engine_s19/output/index.html", "name": "index.html" }
+    ],
+    "contact": "Test Owner"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "PASS" },
+    { "type": "state_field_equals", "field": "ok",   "expected": true },
+    { "type": "state_field_equals", "field": "mode", "expected": "DELIVERY_PACKAGE_READY" },
+    { "type": "artifact_exists", "path": "artifacts/projects/test_engine_s19/delivery/RUNBOOK.md" },
+    { "type": "artifact_exists", "path": "artifacts/projects/test_engine_s19/delivery/delivery_package.json" }
+  ]
+}

@@ -311,6 +311,16 @@ async function _runDirectEngine(scenario, root) {
     fixtureCreated = true;
   }
 
+  // Write pre-existing fixture files (e.g. draft.md for docReviewEngine guard)
+  if (Array.isArray(scenario.fixture_files) && scenario.fixture_files.length > 0) {
+    for (const ff of scenario.fixture_files) {
+      if (!ff || typeof ff.path !== "string" || typeof ff.content !== "string") continue;
+      const ffPath = path.join(projectDir, ff.path);
+      fs.mkdirSync(path.dirname(ffPath), { recursive: true });
+      fs.writeFileSync(ffPath, ff.content, "utf8");
+    }
+  }
+
   let mockSvc   = null;
   let origFetch = null;
   const savedEnv = scenario.mock ? { OPENAI_API_KEY: process.env.OPENAI_API_KEY } : null;
@@ -353,6 +363,21 @@ async function _runDirectEngine(scenario, root) {
         path.join(root, "code", "src", "ai_os", "businessAnalysisEngine")
       );
       engine = createBusinessAnalysisEngine({ root });
+    } else if (scenario.engine === "documentationBuildLoop") {
+      const { createDocumentationBuildLoop } = require(
+        path.join(root, "code", "src", "ai_os", "documentationBuildLoop")
+      );
+      engine = createDocumentationBuildLoop({ root });
+    } else if (scenario.engine === "documentationReviewEngine") {
+      const { createDocumentationReviewEngine } = require(
+        path.join(root, "code", "src", "ai_os", "documentationReviewEngine")
+      );
+      engine = createDocumentationReviewEngine({ root });
+    } else if (scenario.engine === "deliveryPackageBuilder") {
+      const { createDeliveryPackageBuilder } = require(
+        path.join(root, "code", "src", "ai_os", "deliveryPackageBuilder")
+      );
+      engine = createDeliveryPackageBuilder({ root });
     } else {
       throw new Error("unknown engine: " + scenario.engine);
     }

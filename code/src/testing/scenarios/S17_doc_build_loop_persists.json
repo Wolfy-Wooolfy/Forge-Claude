@@ -1,0 +1,42 @@
+{
+  "id": "S17",
+  "name": "documentationBuildLoop persists loop state + review log + report via L2",
+  "type": "direct_engine",
+  "permission": "WORKSPACE_WRITE",
+  "engine": "documentationBuildLoop",
+  "method": "runDocBuildLoop",
+  "fixture": {
+    "project_name": "Test DocBuild S17",
+    "active_runtime_state": "DOCUMENTATION",
+    "user_goal": "نظام إدارة مهام بسيط",
+    "requirement_domain": "productivity",
+    "requirement_completeness": true,
+    "requirement_model": { "users": "individuals", "core_features": ["create", "complete", "remind"] }
+  },
+  "fixture_files": [
+    {
+      "path": "ai_os/documentation/draft.md",
+      "content": "# Project Documentation Draft\n\n## Overview\nA simple task management system.\n\n## Features\n- Create tasks\n- Mark as complete\n- Set reminders\n\n## Architecture\nSingle-page web application.\n"
+    }
+  ],
+  "mock": {
+    "content": {
+      "summary": "Documentation review passed — all sections complete",
+      "issues": [],
+      "quality_gate": { "passed": true, "score": 95 },
+      "execution_ready": true,
+      "recommendations": []
+    }
+  },
+  "input": {
+    "max_iterations": 3
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "PASS" },
+    { "type": "state_field_equals", "field": "ok",   "expected": true },
+    { "type": "state_field_equals", "field": "mode", "expected": "DOCUMENTATION_BUILD_COMPLETE" },
+    { "type": "artifact_exists", "path": "artifacts/projects/test_engine_s17/ai_os/doc_build_loop_state.json" },
+    { "type": "artifact_exists", "path": "artifacts/projects/test_engine_s17/ai_os/doc_build_review_log.json" },
+    { "type": "artifact_exists", "path": "artifacts/projects/test_engine_s17/ai_os/documentation/docs_build_loop_report.md" }
+  ]
+}

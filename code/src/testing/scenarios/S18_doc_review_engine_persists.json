@@ -1,0 +1,37 @@
+{
+  "id": "S18",
+  "name": "documentationReviewEngine persists review log + report via L2",
+  "type": "direct_engine",
+  "permission": "WORKSPACE_WRITE",
+  "engine": "documentationReviewEngine",
+  "method": "reviewDocumentation",
+  "fixture": {
+    "project_name": "Test DocReview S18",
+    "active_runtime_state": "DOCUMENTATION_REVIEW",
+    "user_goal": "نظام إدارة مهام بسيط",
+    "requirement_domain": "productivity"
+  },
+  "fixture_files": [
+    {
+      "path": "ai_os/documentation/draft.md",
+      "content": "# Documentation\n\nA simple task management system with create, complete, and reminder features.\n\n## Architecture\nSingle-page web application with local storage.\n"
+    }
+  ],
+  "mock": {
+    "content": {
+      "summary": "Quality review passed — documentation is complete and coherent",
+      "issues": [],
+      "quality_gate": { "passed": true, "score": 92 },
+      "execution_ready": true,
+      "recommendations": []
+    }
+  },
+  "input": {},
+  "assertions": [
+    { "type": "status_equals",      "expected": "PASS" },
+    { "type": "state_field_equals", "field": "ok",   "expected": true },
+    { "type": "state_field_equals", "field": "mode", "expected": "REVIEW_PASSED" },
+    { "type": "artifact_exists", "path": "artifacts/projects/test_engine_s18/ai_os/documentation_review_log.json" },
+    { "type": "artifact_exists", "path": "artifacts/projects/test_engine_s18/ai_os/documentation/review_report.json" }
+  ]
+}
