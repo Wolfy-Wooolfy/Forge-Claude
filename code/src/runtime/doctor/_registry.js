@@ -20,7 +20,8 @@ const checks = [
   require("./checks/traceMatrixSize"),
   require("./checks/shellHardening"),
   require("./checks/environmentDetection"),
-  require("./checks/packageManagement")
+  require("./checks/packageManagement"),
+  require("./checks/containerRuntime")
 ];
 
 function listChecks()  { return checks.slice(); }

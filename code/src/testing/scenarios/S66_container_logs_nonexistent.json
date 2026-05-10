@@ -1,0 +1,23 @@
+{
+  "id": "S66",
+  "name": "container.logs on non-existent container returns FAILED (CONTAINER_NOT_FOUND or RUNTIME_NOT_AVAILABLE)",
+  "type": "direct_tool",
+  "permission": "READ_ONLY",
+  "tool": "container.logs",
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_container_s66/vision.md",
+      "content": "---\nproject_id: test_container_s66\nproject_name: Test Container S66\ndomain: test\nvision_version: 1\nvision_locked: true\nvision_locked_at: 2026-05-10T00:00:00.000Z\nlocked_by_role: owner\namendments_history: []\ngoals:\n  primary: test\n  secondary: []\nconstraints: []\nnon_goals: []\n---\n\n# Project Vision: Test Container S66\n"
+    }
+  ],
+  "input": {
+    "container": "forge-nonexistent-s66-xqz",
+    "project_id": "test_container_s66"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "FAILED" },
+    { "type": "state_field_exists", "field": "reason" },
+    { "type": "state_field_exists", "field": "context" },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

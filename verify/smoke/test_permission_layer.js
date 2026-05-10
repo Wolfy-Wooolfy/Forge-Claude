@@ -204,6 +204,19 @@ function printSummary() {
     delete process.env.FORGE_ALLOW_SELF_MODIFY;
   }
 
+  // ── S11: container privilege rule — Step 1.7 catches port < 1024 ─────────
+  console.log("\nS11: Step 1.7 container_privilege_rule — port 80 → DENIED PROMPT_REQUIRED");
+  {
+    const p = createPolicy({ active_mode: "WORKSPACE_WRITE", root: TMP_ROOT });
+    registry.setAuthorizeFunction((t, i, c) => p.authorize(t, i, c));
+    r = await registry.invoke("container.run",
+      { image: "nginx", project_id: "smoke_s11", ports: [{ host: 80, container: 80 }] },
+      { root: TMP_ROOT });
+    check("S11 status == DENIED",            r.status === "DENIED",               "got " + r.status);
+    check("S11 reason == PROMPT_REQUIRED",   r.metadata.reason === "PROMPT_REQUIRED",
+      "got " + r.metadata.reason);
+  }
+
   // ── Cleanup ───────────────────────────────────────────────────────────────
   try { fs.rmSync(TMP_ROOT, { recursive: true, force: true }); } catch {}
 

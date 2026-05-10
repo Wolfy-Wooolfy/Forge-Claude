@@ -1,0 +1,19 @@
+{
+  "id": "S59",
+  "name": "container.run with --privileged is HARD_DENY",
+  "type": "direct_tool",
+  "permission": "WORKSPACE_WRITE",
+  "tool": "container.run",
+  "input": {
+    "image": "alpine:latest",
+    "name": "forge-test-s59",
+    "privileged": true,
+    "project_id": "test_container_s59"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "FAILED" },
+    { "type": "state_field_equals", "field": "reason", "expected": "HARD_DENY" },
+    { "type": "state_field_exists", "field": "detail" },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

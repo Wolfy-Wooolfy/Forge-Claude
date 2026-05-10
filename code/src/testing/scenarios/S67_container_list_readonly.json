@@ -1,0 +1,23 @@
+{
+  "id": "S67",
+  "name": "container.list returns containers list (READ_ONLY, requires docker)",
+  "type": "direct_tool",
+  "permission": "READ_ONLY",
+  "requires_binary": "docker",
+  "tool": "container.list",
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_container_s67/vision.md",
+      "content": "---\nproject_id: test_container_s67\nproject_name: Test Container S67\ndomain: test\nvision_version: 1\nvision_locked: true\nvision_locked_at: 2026-05-10T00:00:00.000Z\nlocked_by_role: owner\namendments_history: []\ngoals:\n  primary: test\n  secondary: []\nconstraints: []\nnon_goals: []\n---\n\n# Project Vision: Test Container S67\n"
+    }
+  ],
+  "input": {
+    "project_id": "test_container_s67"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_exists", "field": "containers" },
+    { "type": "state_field_equals", "field": "action",   "expected": "list" },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

@@ -8,8 +8,9 @@ const {
 const { checkHardDeny, checkScope }   = require("./permissionRules");
 const { getDefaultPrompter }          = require("./permissionPrompter");
 const { appendAuditEntry }            = require("../audit/toolAuditLog");
-const { createVisionLockRule }        = require("./rules/vision_lock_rule");
-const { createShellVisionLockRule }   = require("./rules/shell_vision_lock_rule");
+const { createVisionLockRule }           = require("./rules/vision_lock_rule");
+const { createShellVisionLockRule }      = require("./rules/shell_vision_lock_rule");
+const { createContainerPrivilegeRule }   = require("./rules/container_privilege_rule");
 
 const PERMISSION_AUDIT_REL = path.join("artifacts", "audit", "permission_audit.jsonl");
 
@@ -48,8 +49,9 @@ function createPolicy(options) {
   const prompter        = opts.prompter          || getDefaultPrompter();
   const on_decision     = opts.on_decision       || null; // optional callback
 
-  const _visionRules    = [createVisionLockRule({ root })];
-  const _shellVisionRules = [createShellVisionLockRule({ root })];
+  const _visionRules          = [createVisionLockRule({ root })];
+  const _shellVisionRules     = [createShellVisionLockRule({ root })];
+  const _containerPrivRules   = [createContainerPrivilegeRule({ root })];
 
   // ── authorize ──────────────────────────────────────────────────────────────
 
@@ -91,6 +93,14 @@ function createPolicy(options) {
       const sv = rule.check(tool, input, ctx || {});
       if (sv.denied) {
         return emit({ allow: false, reason: sv.reason }, "shell_vision_lock");
+      }
+    }
+
+    // Step 1.7 — Container privilege rules (DENY-severity violations + build-specific gates)
+    for (const rule of _containerPrivRules) {
+      const cp = rule.check(tool, input, ctx || {});
+      if (cp.denied) {
+        return emit({ allow: false, reason: cp.reason, detail: cp.detail || null }, "container_privilege");
       }
     }
 

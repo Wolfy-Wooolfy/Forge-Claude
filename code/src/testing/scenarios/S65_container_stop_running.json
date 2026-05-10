@@ -1,0 +1,24 @@
+{
+  "id": "S65",
+  "name": "container.stop stops a running container (stops forge-test-s58 started by S58)",
+  "type": "direct_tool",
+  "permission": "WORKSPACE_WRITE",
+  "requires_binary": "docker",
+  "tool": "container.stop",
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_container_s58/vision.md",
+      "content": "---\nproject_id: test_container_s58\nproject_name: Test Container S58\ndomain: test\nvision_version: 1\nvision_locked: true\nvision_locked_at: 2026-05-10T00:00:00.000Z\nlocked_by_role: owner\namendments_history: []\ngoals:\n  primary: test\n  secondary: []\nconstraints: []\nnon_goals: []\n---\n\n# Project Vision: Test Container S58\n"
+    }
+  ],
+  "input": {
+    "container": "forge-test-s58",
+    "project_id": "test_container_s58"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "action",    "expected": "stop" },
+    { "type": "state_field_equals", "field": "exit_code", "expected": 0 },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "S68",
+  "name": "container.compose_config expands workspace-local compose.yml to JSON",
+  "type": "direct_tool",
+  "permission": "READ_ONLY",
+  "requires_binary": "docker",
+  "tool": "container.compose_config",
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_container_s68/vision.md",
+      "content": "---\nproject_id: test_container_s68\nproject_name: Test Container S68\ndomain: test\nvision_version: 1\nvision_locked: true\nvision_locked_at: 2026-05-10T00:00:00.000Z\nlocked_by_role: owner\namendments_history: []\ngoals:\n  primary: test\n  secondary: []\nconstraints: []\nnon_goals: []\n---\n\n# Project Vision: Test Container S68\n"
+    },
+    {
+      "path": "artifacts/projects/test_container_s68/compose.yml",
+      "content": "services:\n  web:\n    image: alpine:latest\n"
+    }
+  ],
+  "input": {
+    "compose_file": "artifacts/projects/test_container_s68/compose.yml",
+    "project_id": "test_container_s68"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_exists", "field": "services" },
+    { "type": "state_field_equals", "field": "action",   "expected": "compose_config" },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

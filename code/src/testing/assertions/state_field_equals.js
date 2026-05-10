@@ -8,7 +8,12 @@ module.exports = {
    */
   run(assertion, result) {
     const state  = (result.output && result.output.state) || {};
-    const actual = state[assertion.field];
+    const parts  = String(assertion.field).split(".");
+    let   actual = state;
+    for (const p of parts) {
+      if (actual === null || actual === undefined || typeof actual !== "object") { actual = undefined; break; }
+      actual = actual[p];
+    }
     const passed = JSON.stringify(actual) === JSON.stringify(assertion.expected);
     return {
       passed,

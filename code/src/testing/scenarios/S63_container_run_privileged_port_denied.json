@@ -1,0 +1,19 @@
+{
+  "id": "S63",
+  "name": "container.run with privileged port 80 is DENIED (PROMPT_REQUIRED, not escalated in WORKSPACE_WRITE)",
+  "type": "direct_tool",
+  "permission": "WORKSPACE_WRITE",
+  "tool": "container.run",
+  "input": {
+    "image": "alpine:latest",
+    "name": "forge-test-s63",
+    "ports": [{ "host": 80, "container": 8080 }],
+    "project_id": "test_container_s63"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "DENIED" },
+    { "type": "state_field_equals", "field": "reason", "expected": "PROMPT_REQUIRED" },
+    { "type": "state_field_exists", "field": "detail" },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

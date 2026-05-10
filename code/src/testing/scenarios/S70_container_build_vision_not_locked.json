@@ -1,0 +1,29 @@
+{
+  "id": "S70",
+  "name": "container.build is DENIED when project vision is not locked",
+  "type": "direct_tool",
+  "permission": "WORKSPACE_WRITE",
+  "tool": "container.build",
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_container_s70/vision.md",
+      "content": "---\nproject_id: test_container_s70\nproject_name: Test Container S70\ndomain: test\nvision_version: 1\nvision_locked: false\nvision_locked_at: null\nlocked_by_role: null\namendments_history: []\ngoals:\n  primary: test\n  secondary: []\nconstraints: []\nnon_goals: []\n---\n\n# Project Vision: Test Container S70\n"
+    },
+    {
+      "path": "artifacts/projects/test_container_s70/Dockerfile",
+      "content": "FROM alpine:latest\nCMD [\"/bin/sh\"]\n"
+    }
+  ],
+  "input": {
+    "dockerfile_path": "artifacts/projects/test_container_s70/Dockerfile",
+    "context_path": "artifacts/projects/test_container_s70",
+    "tag": "test:s70",
+    "project_id": "test_container_s70"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "DENIED" },
+    { "type": "state_field_equals", "field": "reason", "expected": "VISION_NOT_LOCKED" },
+    { "type": "state_field_equals", "field": "detail",  "expected": null },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

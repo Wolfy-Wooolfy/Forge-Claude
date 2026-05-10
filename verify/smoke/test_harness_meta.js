@@ -45,15 +45,15 @@ function printSummary() {
   console.log("\n── PHASE-5 Self-Test Harness Meta Smoke Test ────────────────────\n");
 
   // ── M1: scenario files exist and are valid JSON ───────────────────────────
-  console.log("M1: 57 scenario JSON files present and parse");
+  console.log("M1: 70 scenario JSON files present and parse");
   {
     const scenDir = path.join(ROOT, "code", "src", "testing", "scenarios");
     const files   = fs.existsSync(scenDir)
       ? fs.readdirSync(scenDir).filter((f) => f.endsWith(".json")).sort()
       : [];
 
-    check("M1 exactly 57 scenario files",
-      files.length === 57,
+    check("M1 exactly 70 scenario files",
+      files.length === 70,
       "found " + files.length);
 
     let allParsed = true;
@@ -72,9 +72,9 @@ function printSummary() {
         return JSON.parse(fs.readFileSync(path.join(scenDir, f), "utf8")).id;
       } catch { return null; }
     });
-    const expectedIds = ["S01","S02","S03","S04","S05","S06","S07","S08","S09","S10","S11","S12","S13","S14","S15","S16","S17","S18","S19","S20","S21","S22","S23","S24","S25","S26","S27","S28","S29","S30","S31","S32","S33","S34","S35","S36","S37","S38","S39","S40","S41","S42","S43","S44","S45","S46","S47","S48","S49","S50","S51","S52","S53","S54","S55","S56","S57"];
+    const expectedIds = ["S01","S02","S03","S04","S05","S06","S07","S08","S09","S10","S11","S12","S13","S14","S15","S16","S17","S18","S19","S20","S21","S22","S23","S24","S25","S26","S27","S28","S29","S30","S31","S32","S33","S34","S35","S36","S37","S38","S39","S40","S41","S42","S43","S44","S45","S46","S47","S48","S49","S50","S51","S52","S53","S54","S55","S56","S57","S58","S59","S60","S61","S62","S63","S64","S65","S66","S67","S68","S69","S70"];
     const allIds = expectedIds.every((id) => ids.includes(id));
-    check("M1 all expected IDs present (S01–S57)", allIds,
+    check("M1 all expected IDs present (S01–S70)", allIds,
       "missing: " + expectedIds.filter((id) => !ids.includes(id)).join(", "));
   }
 
@@ -177,26 +177,37 @@ function printSummary() {
       report.counts && typeof report.counts.pass === "number",
       "got " + JSON.stringify(report.counts));
 
-    check("M4 report has 57 scenarios",
-      Array.isArray(report.scenarios) && report.scenarios.length === 57,
+    check("M4 report has 70 scenarios",
+      Array.isArray(report.scenarios) && report.scenarios.length === 70,
       "got " + (report.scenarios ? report.scenarios.length : "no array"));
   }
 
-  // ── M5: no scenarios SKIP (all conversation types now dispatched) ─────────
-  console.log("\nM5: 0 scenarios SKIP (conversation dispatch wired in PHASE-6.A)");
+  // ── M5: non-container scenarios do not SKIP ───────────────────────────────
+  // Container scenarios (S58–S70) may SKIP when docker/podman daemon is absent.
+  console.log("\nM5: non-container scenarios do not SKIP (container SKIPs allowed)");
   {
     const { runScenarios } = require(
       path.join(ROOT, "code", "src", "testing", "scenario_runner")
     );
     const report = await runScenarios({ root: ROOT });
-    const skipIds = report.scenarios
-      .filter((s) => s.status === "SKIP")
+
+    // Container IDs that legitimately SKIP without a runtime
+    const CONTAINER_IDS = new Set(["S58","S59","S60","S61","S62","S63","S64","S65","S66","S67","S68","S69","S70"]);
+    const unexpectedSkips = report.scenarios
+      .filter((s) => s.status === "SKIP" && !CONTAINER_IDS.has(s.id))
       .map((s) => s.id)
       .sort();
 
-    check("M5 exactly 0 scenarios SKIP",
-      skipIds.length === 0,
-      "got " + skipIds.join(", "));
+    check("M5 no non-container scenarios SKIP",
+      unexpectedSkips.length === 0,
+      "unexpected SKIPs: " + unexpectedSkips.join(", "));
+
+    const containerSkips = report.scenarios
+      .filter((s) => s.status === "SKIP" && CONTAINER_IDS.has(s.id))
+      .map((s) => s.id);
+    if (containerSkips.length > 0) {
+      console.log("  INFO  " + containerSkips.length + " container scenario(s) SKIP (no docker/podman): " + containerSkips.join(", "));
+    }
   }
 
   // ── M6: no FAIL scenarios ─────────────────────────────────────────────────

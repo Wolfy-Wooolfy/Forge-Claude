@@ -1,0 +1,19 @@
+{
+  "id": "S69",
+  "name": "container.build with dockerfile outside workspace is DENIED WORKSPACE_BOUNDARY_VIOLATION",
+  "type": "direct_tool",
+  "permission": "WORKSPACE_WRITE",
+  "tool": "container.build",
+  "input": {
+    "dockerfile_path": "/etc/Dockerfile",
+    "context_path": "/etc",
+    "tag": "test:s69",
+    "project_id": "test_container_s69"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "DENIED" },
+    { "type": "state_field_equals", "field": "reason", "expected": "WORKSPACE_BOUNDARY_VIOLATION" },
+    { "type": "state_field_equals", "field": "detail",  "expected": null },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}
