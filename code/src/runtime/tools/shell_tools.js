@@ -297,10 +297,58 @@ const run_with_prompt = defineTool({
   }
 });
 
+// ── 4. shell.run_read_only ────────────────────────────────────────────────────
+
+const run_read_only = defineTool({
+  name: "shell.run_read_only",
+  description: "Run a read-only command (READ_ONLY). Env allowlist applied. Callers commit to non-destructive argv — no filesystem/state mutation. Audit log written.",
+  required_mode: "READ_ONLY",
+  input_schema: {
+    type: "object",
+    properties: {
+      argv:       { type: "array", items: { type: "string" } },
+      env:        { type: "object" },
+      timeout_ms: { type: "number" },
+      project_id: { type: "string" }
+    },
+    required: ["argv"]
+  },
+  output_schema: SHELL_OUTPUT,
+
+  preview(input) {
+    const deny = _hardDeny(input.argv);
+    if (deny) return Promise.resolve(failed("HARD_DENY", deny.detail));
+    return Promise.resolve(previewed({
+      operation:  "shell.run_read_only",
+      argv:       input.argv,
+      is_read_only: true,
+      note:       "Read-only — no state changes: " + input.argv.join(" ")
+    }));
+  },
+
+  async execute(input, ctx) {
+    const deny = _hardDeny(input.argv);
+    if (deny) return failed("HARD_DENY", deny.detail);
+    const spawnOpts = {
+      cwd: (ctx && ctx.root) || process.cwd(),
+      env: _buildSafeEnv(input.env)
+    };
+    const result = await _spawnCommand(input.argv, spawnOpts, input.timeout_ms);
+    if (result.spawn_error) return failed("EXECUTE_ERROR", result.spawn_error);
+    if (result.timed_out)   return failed("TIMEOUT", "Command timed out after " + (input.timeout_ms || DEFAULT_TIMEOUT_MS) + "ms");
+    return ok({
+      stdout:    result.stdout,
+      stderr:    result.stderr,
+      exit_code: result.exit_code,
+      timed_out: false
+    });
+  }
+});
+
 // ── Export ────────────────────────────────────────────────────────────────────
 
 module.exports = {
-  tools: [run, run_in_workspace, run_with_prompt],
+  tools: [run, run_in_workspace, run_with_prompt, run_read_only],
   HARD_DENY_ARGV0,
   HARD_DENY_PATTERNS,
   DEFAULT_TIMEOUT_MS

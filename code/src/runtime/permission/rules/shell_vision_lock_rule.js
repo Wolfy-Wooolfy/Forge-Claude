@@ -22,8 +22,9 @@ function createShellVisionLockRule({ root }) {
   function check(tool, input, ctx) {
     const name = tool && tool.name;
 
-    // shell.run_in_workspace: project_id is explicit in input
-    if (name === "shell.run_in_workspace") {
+    // shell.run_in_workspace + shell.run_read_only: project_id is explicit in input.
+    // READ operations on unlocked-vision projects also leak information (§2-DK).
+    if (name === "shell.run_in_workspace" || name === "shell.run_read_only") {
       const projectId = input && input.project_id ? String(input.project_id) : null;
       if (!projectId) return { denied: false };
       return _checkProjectId(projectId);
