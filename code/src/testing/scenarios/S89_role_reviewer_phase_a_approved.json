@@ -1,0 +1,44 @@
+{
+  "id": "S89",
+  "name": "role.invoke reviewer Phase A — clean spec returns SUCCESS with APPROVED verdict",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "role.invoke",
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_rev_s89/vision.md",
+      "content": "---\nproject_id: test_rev_s89\nproject_name: Test Rev S89\ndomain: test\nvision_version: 1\nvision_locked: false\namendments_history: []\ngoals:\n  primary: test reviewer role\n  secondary: []\nconstraints: []\nnon_goals: []\n---\n\n# Project Vision: Test Rev S89\n"
+    }
+  ],
+  "input": {
+    "role_id":    "reviewer",
+    "project_id": "test_rev_s89",
+    "provider":   "mock",
+    "model":      "mock-rev-s89",
+    "input": {
+      "phase":      "A",
+      "project_id": "test_rev_s89",
+      "spec": {
+        "scope": "Build a task management app",
+        "decisions": [{ "decision": "Use SQLite", "rationale": "Simplicity" }],
+        "acceptance_criteria": [{ "id": "AC-1", "description": "API returns 200 for valid requests" }],
+        "files_to_create": [{ "path": "src/app.js", "purpose": "Main app" }],
+        "files_to_modify": [],
+        "out_of_scope": ["Real-time sync"]
+      },
+      "design": {
+        "design_summary": "A task app",
+        "components": [{ "name": "API", "tech": "Node.js", "purpose": "Serve endpoints" }],
+        "data_flow": "Client sends request to API",
+        "technology_choices": [{ "category": "language", "choice": "JavaScript", "rationale": "team expertise" }],
+        "integration_points": [{ "name": "Database", "type": "database", "notes": "SQLite" }],
+        "identified_risks": [{ "risk": "Data loss", "severity": "MEDIUM", "mitigation": "Backups" }]
+      }
+    }
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "role_id", "expected": "reviewer" },
+    { "type": "state_field_equals", "field": "verdict",  "expected": "APPROVED" }
+  ]
+}

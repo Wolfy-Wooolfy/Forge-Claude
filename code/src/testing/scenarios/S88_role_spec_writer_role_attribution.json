@@ -1,0 +1,34 @@
+{
+  "id": "S88",
+  "name": "role.invoke spec_writer role attribution — output contains role_id field",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "role.invoke",
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_spec_s88/vision.md",
+      "content": "---\nproject_id: test_spec_s88\nproject_name: Test Spec S88\ndomain: test\nvision_version: 1\nvision_locked: false\namendments_history: []\ngoals:\n  primary: test role attribution\n  secondary: []\nconstraints: []\nnon_goals: []\n---\n\n# Project Vision: Test Spec S88\n"
+    }
+  ],
+  "input": {
+    "role_id":    "spec_writer",
+    "project_id": "test_spec_s88",
+    "provider":   "mock",
+    "model":      "mock-spec-s88",
+    "input": {
+      "project_id": "test_spec_s88",
+      "design": {
+        "design_summary": "A task app",
+        "components": [{ "name": "API", "tech": "Node.js", "purpose": "Serve endpoints" }],
+        "data_flow": "Client sends request to API",
+        "technology_choices": [{ "category": "language", "choice": "JavaScript", "rationale": "team expertise" }],
+        "integration_points": [{ "name": "Database", "type": "database", "notes": "SQLite" }],
+        "identified_risks": [{ "risk": "Data loss", "severity": "MEDIUM", "mitigation": "Backups" }]
+      }
+    }
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "role_id", "expected": "spec_writer" }
+  ]
+}

@@ -22,7 +22,8 @@ const checks = [
   require("./checks/environmentDetection"),
   require("./checks/packageManagement"),
   require("./checks/containerRuntime"),
-  require("./checks/agent_runtime")
+  require("./checks/agent_runtime"),
+  require("./checks/roles_runtime")
 ];
 
 function listChecks()  { return checks.slice(); }

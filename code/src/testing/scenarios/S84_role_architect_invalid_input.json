@@ -1,0 +1,26 @@
+{
+  "id": "S84",
+  "name": "role.invoke architect invalid input — missing intent returns FAILED INVALID_INPUT",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "role.invoke",
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_arch_s84/vision.md",
+      "content": "---\nproject_id: test_arch_s84\nproject_name: Test Arch S84\ndomain: test\nvision_version: 1\nvision_locked: false\namendments_history: []\ngoals:\n  primary: test\n  secondary: []\nconstraints: []\nnon_goals: []\n---\n\n# Project Vision: Test Arch S84\n"
+    }
+  ],
+  "input": {
+    "role_id":    "architect",
+    "project_id": "test_arch_s84",
+    "provider":   "mock",
+    "model":      "mock-arch-s84",
+    "input": {
+      "project_id": "test_arch_s84"
+    }
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "FAILED" },
+    { "type": "state_field_equals", "field": "reason", "expected": "INVALID_INPUT" }
+  ]
+}

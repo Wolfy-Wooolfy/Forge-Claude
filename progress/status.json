@@ -4,10 +4,10 @@
   "current_stage": "A",
   "overall_progress_percent": 99,
   "stage_progress_percent": 100,
-  "current_task": "PHASE-7-E-CLOSED",
-  "next_phase": "PHASE-7-F",
-  "next_step": "Begin PHASE-7-F (Agent Orchestration — multi-step agent workflows, role dispatch, result aggregation) per architecture/FORGE_V2_PHASE_ROADMAP.md. Prerequisite: PHASE-7-E CLOSED.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-20260510-1938-phase-7-E-agent-adapters.md",
+  "current_task": "PHASE-7-F-1-CLOSED",
+  "next_phase": "PHASE-7-F-2",
+  "next_step": "Begin PHASE-7-F-2 (Build & Verify Roles: Builder, Security Auditor, Test Designer, Reviewer Phase B) per architecture/VISION-PHASE-7-F.md. Prerequisite: PHASE-7-F-1 CLOSED.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-20260510-2100-phase-7-F-1-foundation-roles.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -74,18 +74,18 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-05-10T00:00:00.000Z",
+    "last_doctor_run": "2026-05-10T21:46:34.885Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
     "self_test_last_run": "2026-05-10",
-    "self_test_last_result": "77 passed, 0 failed, 5 skipped (82 total) — full PHASE-7-E coverage (5 SKIPs require docker/podman daemon)",
-    "self_test_scenarios_pass": 77,
+    "self_test_last_result": "86 passed, 0 failed, 5 skipped (91 total) — full PHASE-7-F-1 coverage (5 SKIPs require docker/podman daemon)",
+    "self_test_scenarios_pass": 86,
     "self_test_scenarios_skip": 5,
     "self_test_scenarios_fail": 0,
     "providers_registered_count": 12,
-    "tools_registered_count": 54,
-    "doctor_checks_count": 19,
+    "tools_registered_count": 55,
+    "doctor_checks_count": 20,
     "assertion_types_count": 9,
     "active_permission_mode": "WORKSPACE_WRITE",
     "permission_policy_installed": true,
@@ -95,31 +95,47 @@
     "package_management": "ENABLED",
     "container_lifecycle": "ENABLED",
     "agent_runtime": "ENABLED",
-    "note": "PHASE-7-E closed. Agent adapter contract active: 5 adapters (anthropic, openai, claude_code, aider, mock) + cost_ledger + budget_enforcer + agent_budget_rule (L3 Step 1.8) + agent_runtime doctor check. tools: 50→54. scenarios: 70→82. doctor checks: 18→19. visionSchema float fix. state_field_equals/exists bracket-notation support.",
+    "roles_runtime": "ENABLED",
+    "note": "PHASE-7-F-1 closed. Foundation roles active: architect, spec_writer, reviewer (Phase A). role.invoke L2 tool. roles_runtime doctor check. tools: 54→55. scenarios: 82→91. doctor checks: 19→20.",
     "last_doctor_counts": {
       "pass": 17,
-      "warn": 2,
+      "warn": 3,
       "fail": 0
     }
   },
   "roadmap_summary": {
     "completed": [
-      "PHASE-0", "PHASE-1", "PHASE-2", "PHASE-3", "PHASE-4",
-      "PHASE-5", "PHASE-5.1", "PHASE-6",
-      "PHASE-7-A", "PHASE-7-B",
-      "PHASE-7-C-1", "PHASE-7-C-2", "PHASE-7-C-3",
-      "PHASE-7-E"
+      "PHASE-0",
+      "PHASE-1",
+      "PHASE-2",
+      "PHASE-3",
+      "PHASE-4",
+      "PHASE-5",
+      "PHASE-5.1",
+      "PHASE-6",
+      "PHASE-7-A",
+      "PHASE-7-B",
+      "PHASE-7-C-1",
+      "PHASE-7-C-2",
+      "PHASE-7-C-3",
+      "PHASE-7-E",
+      "PHASE-7-F-1"
     ],
-    "next": "PHASE-7-F",
+    "next": "PHASE-7-F-2",
     "remaining": [
-      "PHASE-7-F",
-      "PHASE-8", "PHASE-9", "PHASE-10",
-      "PHASE-11", "PHASE-12", "PHASE-13"
+      "PHASE-7-F-2",
+      "PHASE-7-F-3",
+      "PHASE-8",
+      "PHASE-9",
+      "PHASE-10",
+      "PHASE-11",
+      "PHASE-12",
+      "PHASE-13"
     ],
     "deferred": [
       "PHASE-7-D",
       "PHASE-14"
     ]
   },
-  "last_updated": "2026-05-10T21:00:00.000Z"
+  "last_updated": "2026-05-11T00:00:00.000Z"
 }

@@ -1,0 +1,30 @@
+{
+  "id": "S83",
+  "name": "role.invoke architect basic success — valid input returns SUCCESS with design output",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "role.invoke",
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_arch_s83/vision.md",
+      "content": "---\nproject_id: test_arch_s83\nproject_name: Test Arch S83\ndomain: test\nvision_version: 1\nvision_locked: false\namendments_history: []\ngoals:\n  primary: test architect role\n  secondary: []\nconstraints: []\nnon_goals: []\n---\n\n# Project Vision: Test Arch S83\n"
+    }
+  ],
+  "input": {
+    "role_id":    "architect",
+    "project_id": "test_arch_s83",
+    "provider":   "mock",
+    "model":      "mock-arch-s83",
+    "input": {
+      "intent":     "Build a task management app with user authentication",
+      "project_id": "test_arch_s83"
+    }
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_exists", "field": "design_summary" },
+    { "type": "state_field_exists", "field": "components" },
+    { "type": "state_field_exists", "field": "identified_risks" },
+    { "type": "state_field_equals", "field": "role_id", "expected": "architect" }
+  ]
+}

@@ -60,16 +60,16 @@ function printSummary() {
       "got " + JSON.stringify(report.counts));
   }
 
-  // ── S2: report contains exactly 19 checks ────────────────────────────────
-  console.log("\nS2: report contains exactly 19 checks");
+  // ── S2: report contains exactly 20 checks ────────────────────────────────
+  console.log("\nS2: report contains exactly 20 checks");
   {
     const report = await runDoctor({ root: ROOT, write_report: false, update_status: false });
-    check("S2 checks.length == 19",
-      report.checks.length === 19,
+    check("S2 checks.length == 20",
+      report.checks.length === 20,
       "got " + report.checks.length);
-    check("S2 agent_runtime check present",
-      report.checks.some((c) => c.id === "agent_runtime"),
-      "agent_runtime not found in: " + report.checks.map((c) => c.id).join(", "));
+    check("S2 roles_runtime check present",
+      report.checks.some((c) => c.id === "roles_runtime"),
+      "roles_runtime not found in: " + report.checks.map((c) => c.id).join(", "));
   }
 
   // ── S3: every check has valid status + id + detail ────────────────────────
@@ -104,8 +104,8 @@ function printSummary() {
       update_status: false,
       skip_checks:  ["openai_api_key"]
     });
-    check("S5 skip_checks works (18 instead of 19)",
-      partial.checks.length === 18,
+    check("S5 skip_checks works (19 instead of 20)",
+      partial.checks.length === 19,
       "got " + partial.checks.length);
     check("S5 openai_api_key not in results",
       !partial.checks.find((c) => c.id === "openai_api_key"),
