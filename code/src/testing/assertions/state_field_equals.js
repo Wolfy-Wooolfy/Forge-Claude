@@ -8,7 +8,7 @@ module.exports = {
    */
   run(assertion, result) {
     const state  = (result.output && result.output.state) || {};
-    const parts  = String(assertion.field).split(".");
+    const parts  = String(assertion.field).replace(/\[(\d+)\]/g, ".$1").split(".");
     let   actual = state;
     for (const p of parts) {
       if (actual === null || actual === undefined || typeof actual !== "object") { actual = undefined; break; }

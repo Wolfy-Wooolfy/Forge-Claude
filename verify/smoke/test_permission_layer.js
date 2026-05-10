@@ -1,9 +1,9 @@
 "use strict";
 
 /**
- * Smoke test — PHASE-3 Permission/Safety Layer
- * 10 scenarios, 11 assertions. Run: node verify/smoke/test_permission_layer.js
- * Expected: 11/11 PASS (including mandatory W-03 isolation S9 + S9b)
+ * Smoke test — PHASE-3 Permission/Safety Layer + PHASE-7-E agent_budget_rule
+ * 13 scenarios, 15 assertions. Run: node verify/smoke/test_permission_layer.js
+ * Expected: 15/15 PASS (including mandatory W-03 isolation S9 + S9b)
  */
 
 const path = require("path");
@@ -214,6 +214,52 @@ function printSummary() {
       { root: TMP_ROOT });
     check("S11 status == DENIED",            r.status === "DENIED",               "got " + r.status);
     check("S11 reason == PROMPT_REQUIRED",   r.metadata.reason === "PROMPT_REQUIRED",
+      "got " + r.metadata.reason);
+  }
+
+  // ── S12: agent_budget_rule — VISION_NOT_LOCKED (Step 1.8) ────────────────
+  console.log("\nS12: Step 1.8 agent_budget_rule — unlocked vision → DENIED VISION_NOT_LOCKED");
+  {
+    fs.mkdirSync(path.join(TMP_ROOT, "artifacts", "projects", "smoke_s12"), { recursive: true });
+    fs.writeFileSync(
+      path.join(TMP_ROOT, "artifacts", "projects", "smoke_s12", "vision.md"),
+      "---\nproject_id: smoke_s12\nvision_version: 1\nvision_locked: false\namendments_history: []\ngoals:\n  primary: test\n  secondary: []\nconstraints: []\nnon_goals: []\n---\n\n# Vision smoke_s12\n",
+      "utf8"
+    );
+    const p = createPolicy({ active_mode: "TEST", root: TMP_ROOT });
+    registry.setAuthorizeFunction((t, i, c) => p.authorize(t, i, c));
+    r = await registry.invoke("agent.invoke",
+      { provider: "anthropic", model: "claude-opus-4-7", prompt: "smoke test", project_id: "smoke_s12" },
+      { root: TMP_ROOT });
+    check("S12 status == DENIED",             r.status === "DENIED",                    "got " + r.status);
+    check("S12 reason == VISION_NOT_LOCKED",  r.metadata.reason === "VISION_NOT_LOCKED",
+      "got " + r.metadata.reason);
+  }
+
+  // ── S13: agent_budget_rule — BUDGET_EXCEEDED (Step 1.8) ──────────────────
+  console.log("\nS13: Step 1.8 agent_budget_rule — 100% budget → DENIED BUDGET_EXCEEDED");
+  {
+    fs.mkdirSync(path.join(TMP_ROOT, "artifacts", "projects", "smoke_s13"), { recursive: true });
+    fs.writeFileSync(
+      path.join(TMP_ROOT, "artifacts", "projects", "smoke_s13", "vision.md"),
+      "---\nproject_id: smoke_s13\nvision_version: 1\nvision_locked: true\nvision_locked_at: 2026-05-10T00:00:00.000Z\nlocked_by_role: owner\namendments_history: []\ngoals:\n  primary: test\n  secondary: []\nconstraints: []\nnon_goals: []\nmax_total_usd: 1.00\nmax_per_iteration_usd: 0.50\n---\n\n# Vision smoke_s13\n",
+      "utf8"
+    );
+    fs.mkdirSync(path.join(TMP_ROOT, "artifacts", "agent"), { recursive: true });
+    fs.writeFileSync(
+      path.join(TMP_ROOT, "artifacts", "agent", "cost_ledger.jsonl"),
+      JSON.stringify({ invocation_id: "s13-test", project_id: "smoke_s13", provider: "anthropic",
+        model: "claude-opus-4-7", role: null, tokens_in: 0, tokens_out: 0, latency_ms: 0,
+        cost_usd_estimated: 0, cost_usd_actual: 1.00, outcome: "success" }) + "\n",
+      "utf8"
+    );
+    const p = createPolicy({ active_mode: "TEST", root: TMP_ROOT });
+    registry.setAuthorizeFunction((t, i, c) => p.authorize(t, i, c));
+    r = await registry.invoke("agent.invoke",
+      { provider: "anthropic", model: "claude-opus-4-7", prompt: "smoke test", project_id: "smoke_s13" },
+      { root: TMP_ROOT });
+    check("S13 status == DENIED",            r.status === "DENIED",                  "got " + r.status);
+    check("S13 reason == BUDGET_EXCEEDED",   r.metadata.reason === "BUDGET_EXCEEDED",
       "got " + r.metadata.reason);
   }
 

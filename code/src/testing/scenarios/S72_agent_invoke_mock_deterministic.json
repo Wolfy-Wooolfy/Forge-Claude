@@ -1,0 +1,28 @@
+{
+  "id": "S72",
+  "name": "agent.invoke with mock provider returns deterministic output",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "agent.invoke",
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_agent_s72/vision.md",
+      "content": "---\nproject_id: test_agent_s72\nproject_name: Test Agent S72\ndomain: test\nvision_version: 1\nvision_locked: true\nvision_locked_at: 2026-05-10T00:00:00.000Z\nlocked_by_role: owner\namendments_history: []\ngoals:\n  primary: test\n  secondary: []\nconstraints: []\nnon_goals: []\n---\n\n# Project Vision: Test Agent S72\n"
+    }
+  ],
+  "input": {
+    "provider":   "mock",
+    "model":      "mock",
+    "prompt":     "Test prompt for S72",
+    "project_id": "test_agent_s72"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_exists", "field": "text" },
+    { "type": "state_field_exists", "field": "tokens_in" },
+    { "type": "state_field_exists", "field": "tokens_out" },
+    { "type": "state_field_exists", "field": "cost_usd" },
+    { "type": "state_field_equals", "field": "provider",  "expected": "mock" },
+    { "type": "state_field_equals", "field": "cost_usd",  "expected": 0 }
+  ]
+}

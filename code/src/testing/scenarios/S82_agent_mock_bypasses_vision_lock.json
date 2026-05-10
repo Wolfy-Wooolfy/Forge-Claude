@@ -1,0 +1,24 @@
+{
+  "id": "S82",
+  "name": "agent.invoke mock provider + unlocked vision returns SUCCESS (mock bypass)",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "agent.invoke",
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_agent_s82/vision.md",
+      "content": "---\nproject_id: test_agent_s82\nproject_name: Test Agent S82\ndomain: test\nvision_version: 1\nvision_locked: false\namendments_history: []\ngoals:\n  primary: test\n  secondary: []\nconstraints: []\nnon_goals: []\n---\n\n# Project Vision: Test Agent S82 (NOT LOCKED — mock should still work)\n"
+    }
+  ],
+  "input": {
+    "provider":   "mock",
+    "model":      "mock",
+    "prompt":     "Mock bypass vision lock test S82",
+    "project_id": "test_agent_s82"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "provider",  "expected": "mock" },
+    { "type": "state_field_equals", "field": "cost_usd",  "expected": 0 }
+  ]
+}

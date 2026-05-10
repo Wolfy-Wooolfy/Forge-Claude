@@ -1,0 +1,23 @@
+{
+  "id": "S81",
+  "name": "agent.invoke non-mock provider + unlocked vision returns DENIED VISION_NOT_LOCKED",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "agent.invoke",
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_agent_s81/vision.md",
+      "content": "---\nproject_id: test_agent_s81\nproject_name: Test Agent S81\ndomain: test\nvision_version: 1\nvision_locked: false\namendments_history: []\ngoals:\n  primary: test\n  secondary: []\nconstraints: []\nnon_goals: []\n---\n\n# Project Vision: Test Agent S81 (NOT LOCKED)\n"
+    }
+  ],
+  "input": {
+    "provider":   "anthropic",
+    "model":      "claude-opus-4-7",
+    "prompt":     "Vision lock test S81",
+    "project_id": "test_agent_s81"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "DENIED" },
+    { "type": "state_field_equals", "field": "reason", "expected": "VISION_NOT_LOCKED" }
+  ]
+}

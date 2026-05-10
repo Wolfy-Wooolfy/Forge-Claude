@@ -1,0 +1,16 @@
+{
+  "id": "S74",
+  "name": "agent.estimate_cost returns zero cost for mock provider",
+  "type": "direct_tool",
+  "permission": "READ_ONLY",
+  "tool": "agent.estimate_cost",
+  "input": {
+    "provider": "mock",
+    "prompt":   "Estimate check S74 — determinism test"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "estimated_usd", "expected": 0 },
+    { "type": "state_field_equals", "field": "confidence",    "expected": "low" }
+  ]
+}

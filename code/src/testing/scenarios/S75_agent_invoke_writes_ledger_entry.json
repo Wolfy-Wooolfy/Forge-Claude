@@ -1,0 +1,23 @@
+{
+  "id": "S75",
+  "name": "agent.invoke writes one JSONL entry to cost ledger",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "agent.invoke",
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_agent_s75/vision.md",
+      "content": "---\nproject_id: test_agent_s75\nproject_name: Test Agent S75\ndomain: test\nvision_version: 1\nvision_locked: true\nvision_locked_at: 2026-05-10T00:00:00.000Z\nlocked_by_role: owner\namendments_history: []\ngoals:\n  primary: test\n  secondary: []\nconstraints: []\nnon_goals: []\n---\n\n# Project Vision: Test Agent S75\n"
+    }
+  ],
+  "input": {
+    "provider":   "mock",
+    "model":      "mock",
+    "prompt":     "Test ledger write S75",
+    "project_id": "test_agent_s75"
+  },
+  "assertions": [
+    { "type": "status_equals", "expected": "SUCCESS" },
+    { "type": "audit_count",   "min": 1 }
+  ]
+}

@@ -9,7 +9,7 @@ module.exports = {
    */
   run(assertion, result) {
     const state  = (result.output && result.output.state) || {};
-    const parts  = String(assertion.field).split(".");
+    const parts  = String(assertion.field).replace(/\[(\d+)\]/g, ".$1").split(".");
     let   cur    = state;
 
     for (const p of parts) {

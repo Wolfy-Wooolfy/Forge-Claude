@@ -1,0 +1,28 @@
+{
+  "id": "S79",
+  "name": "agent.invoke at budget 95% returns DENIED BUDGET_95_PCT_REQUIRES_APPROVAL (non-mock provider)",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "agent.invoke",
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_budget_s79/vision.md",
+      "content": "---\nproject_id: test_budget_s79\nproject_name: Test Budget S79\ndomain: test\nvision_version: 1\nvision_locked: true\nvision_locked_at: 2026-05-10T00:00:00.000Z\nlocked_by_role: owner\namendments_history: []\ngoals:\n  primary: test\n  secondary: []\nconstraints: []\nnon_goals: []\nmax_total_usd: 1.00\nmax_per_iteration_usd: 0.50\n---\n\n# Project Vision: Test Budget S79\n"
+    },
+    {
+      "path": "artifacts/agent/cost_ledger.jsonl",
+      "content": "{\"ts\":\"2026-05-10T00:00:00.000Z\",\"invocation_id\":\"bbb-s79\",\"project_id\":\"test_budget_s79\",\"provider\":\"anthropic\",\"model\":\"claude-opus-4-7\",\"role\":null,\"tokens_in\":0,\"tokens_out\":0,\"latency_ms\":0,\"cost_usd_estimated\":0,\"cost_usd_actual\":0.96,\"outcome\":\"success\"}\n",
+      "append": true
+    }
+  ],
+  "input": {
+    "provider":   "anthropic",
+    "model":      "claude-opus-4-7",
+    "prompt":     "Budget 95pct test S79 — this is a long prompt to ensure estimated cost pushes us over 95% threshold of the budget cap",
+    "project_id": "test_budget_s79"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "DENIED" },
+    { "type": "state_field_equals", "field": "reason", "expected": "BUDGET_95_PCT_REQUIRES_APPROVAL" }
+  ]
+}

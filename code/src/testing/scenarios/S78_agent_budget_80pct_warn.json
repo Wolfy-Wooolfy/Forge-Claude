@@ -1,0 +1,27 @@
+{
+  "id": "S78",
+  "name": "agent.invoke at budget 80% allows with BUDGET_80_PCT warn",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "agent.invoke",
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_budget_s78/vision.md",
+      "content": "---\nproject_id: test_budget_s78\nproject_name: Test Budget S78\ndomain: test\nvision_version: 1\nvision_locked: true\nvision_locked_at: 2026-05-10T00:00:00.000Z\nlocked_by_role: owner\namendments_history: []\ngoals:\n  primary: test\n  secondary: []\nconstraints: []\nnon_goals: []\nmax_total_usd: 0.01\nmax_per_iteration_usd: 0.005\n---\n\n# Project Vision: Test Budget S78\n"
+    },
+    {
+      "path": "artifacts/agent/cost_ledger.jsonl",
+      "content": "{\"ts\":\"2026-05-10T00:00:00.000Z\",\"invocation_id\":\"aaa-s78\",\"project_id\":\"test_budget_s78\",\"provider\":\"mock\",\"model\":\"mock\",\"role\":null,\"tokens_in\":0,\"tokens_out\":0,\"latency_ms\":0,\"cost_usd_estimated\":0,\"cost_usd_actual\":0.0082,\"outcome\":\"success\"}\n",
+      "append": true
+    }
+  ],
+  "input": {
+    "provider":   "mock",
+    "model":      "mock",
+    "prompt":     "Budget 80pct test S78",
+    "project_id": "test_budget_s78"
+  },
+  "assertions": [
+    { "type": "status_equals", "expected": "SUCCESS" }
+  ]
+}

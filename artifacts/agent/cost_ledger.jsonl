@@ -1,0 +1,2 @@
+{"ts":"2026-05-10T00:00:00.000Z","invocation_id":"ccc-s80","project_id":"test_budget_s80","provider":"anthropic","model":"claude-opus-4-7","role":null,"tokens_in":0,"tokens_out":0,"latency_ms":0,"cost_usd_estimated":0,"cost_usd_actual":1.00,"outcome":"success"}
+{"ts":"2026-05-10T18:18:32.810Z","invocation_id":"27df943e-938b-4d25-9604-6b01aaf6cbab","project_id":"test_agent_s82","provider":"mock","model":"mock","role":null,"tokens_in":10,"tokens_out":20,"latency_ms":0,"cost_usd_estimated":0,"cost_usd_actual":0,"outcome":"success"}

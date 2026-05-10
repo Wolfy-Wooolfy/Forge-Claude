@@ -2496,5 +2496,365 @@
     "queued_files": [
       "web/index.html"
     ]
+  },
+  {
+    "timestamp": "2026-05-10T18:01:46.836Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1778436106814",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 48,
+    "workspace_id": "personal",
+    "project_id": "test_apiserver_s25",
+    "request": "add login button",
+    "queued_files": [
+      "web/index.html"
+    ]
+  },
+  {
+    "timestamp": "2026-05-10T18:05:08.683Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1778436308667",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 48,
+    "workspace_id": "personal",
+    "project_id": "test_apiserver_s25",
+    "request": "add login button",
+    "queued_files": [
+      "web/index.html"
+    ]
+  },
+  {
+    "timestamp": "2026-05-10T18:07:40.215Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1778436460200",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 48,
+    "workspace_id": "personal",
+    "project_id": "test_apiserver_s25",
+    "request": "add login button",
+    "queued_files": [
+      "web/index.html"
+    ]
+  },
+  {
+    "timestamp": "2026-05-10T18:09:19.579Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1778436559563",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 48,
+    "workspace_id": "personal",
+    "project_id": "test_apiserver_s25",
+    "request": "add login button",
+    "queued_files": [
+      "web/index.html"
+    ]
+  },
+  {
+    "timestamp": "2026-05-10T18:12:30.613Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1778436750598",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 48,
+    "workspace_id": "personal",
+    "project_id": "test_apiserver_s25",
+    "request": "add login button",
+    "queued_files": [
+      "web/index.html"
+    ]
+  },
+  {
+    "timestamp": "2026-05-10T18:12:51.048Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1778436771033",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 48,
+    "workspace_id": "personal",
+    "project_id": "test_apiserver_s25",
+    "request": "add login button",
+    "queued_files": [
+      "web/index.html"
+    ]
+  },
+  {
+    "timestamp": "2026-05-10T18:13:03.368Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1778436783356",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 48,
+    "workspace_id": "personal",
+    "project_id": "test_apiserver_s25",
+    "request": "add login button",
+    "queued_files": [
+      "web/index.html"
+    ]
+  },
+  {
+    "timestamp": "2026-05-10T18:13:15.705Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1778436795693",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 48,
+    "workspace_id": "personal",
+    "project_id": "test_apiserver_s25",
+    "request": "add login button",
+    "queued_files": [
+      "web/index.html"
+    ]
+  },
+  {
+    "timestamp": "2026-05-10T18:14:32.430Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1778436872415",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 48,
+    "workspace_id": "personal",
+    "project_id": "test_apiserver_s25",
+    "request": "add login button",
+    "queued_files": [
+      "web/index.html"
+    ]
+  },
+  {
+    "timestamp": "2026-05-10T18:14:43.500Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1778436883487",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 48,
+    "workspace_id": "personal",
+    "project_id": "test_apiserver_s25",
+    "request": "add login button",
+    "queued_files": [
+      "web/index.html"
+    ]
+  },
+  {
+    "timestamp": "2026-05-10T18:14:54.918Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1778436894906",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 48,
+    "workspace_id": "personal",
+    "project_id": "test_apiserver_s25",
+    "request": "add login button",
+    "queued_files": [
+      "web/index.html"
+    ]
+  },
+  {
+    "timestamp": "2026-05-10T18:15:14.183Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1778436914169",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 48,
+    "workspace_id": "personal",
+    "project_id": "test_apiserver_s25",
+    "request": "add login button",
+    "queued_files": [
+      "web/index.html"
+    ]
+  },
+  {
+    "timestamp": "2026-05-10T18:15:25.991Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1778436925977",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 48,
+    "workspace_id": "personal",
+    "project_id": "test_apiserver_s25",
+    "request": "add login button",
+    "queued_files": [
+      "web/index.html"
+    ]
+  },
+  {
+    "timestamp": "2026-05-10T18:15:37.962Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1778436937950",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 48,
+    "workspace_id": "personal",
+    "project_id": "test_apiserver_s25",
+    "request": "add login button",
+    "queued_files": [
+      "web/index.html"
+    ]
+  },
+  {
+    "timestamp": "2026-05-10T18:15:56.933Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1778436956919",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 48,
+    "workspace_id": "personal",
+    "project_id": "test_apiserver_s25",
+    "request": "add login button",
+    "queued_files": [
+      "web/index.html"
+    ]
+  },
+  {
+    "timestamp": "2026-05-10T18:16:08.720Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1778436968707",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 48,
+    "workspace_id": "personal",
+    "project_id": "test_apiserver_s25",
+    "request": "add login button",
+    "queued_files": [
+      "web/index.html"
+    ]
+  },
+  {
+    "timestamp": "2026-05-10T18:16:20.827Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1778436980814",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 48,
+    "workspace_id": "personal",
+    "project_id": "test_apiserver_s25",
+    "request": "add login button",
+    "queued_files": [
+      "web/index.html"
+    ]
+  },
+  {
+    "timestamp": "2026-05-10T18:18:21.207Z",
+    "type": "DECISION_PACKET",
+    "decision_packet_id": "workspace_decision_1778437101190",
+    "approver_role": "cto",
+    "required_roles": [
+      "tech_lead",
+      "cto"
+    ],
+    "approval_policy_version": "1.1",
+    "operation_mode": "SINGLE_FILE",
+    "file_count": 1,
+    "total_bytes": 48,
+    "workspace_id": "personal",
+    "project_id": "test_apiserver_s25",
+    "request": "add login button",
+    "queued_files": [
+      "web/index.html"
+    ]
   }
 ]

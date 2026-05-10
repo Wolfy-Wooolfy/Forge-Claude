@@ -13,6 +13,7 @@ function _parseScalar(raw) {
   if (v === "true")  return true;
   if (v === "false") return false;
   if (/^-?\d+$/.test(v)) return parseInt(v, 10);
+  if (/^-?\d+\.\d+$/.test(v)) return parseFloat(v);
   // strip optional surrounding quotes
   if ((v.startsWith('"') && v.endsWith('"')) ||
       (v.startsWith("'") && v.endsWith("'"))) {

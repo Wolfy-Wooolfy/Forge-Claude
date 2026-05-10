@@ -4,23 +4,28 @@
   "current_stage": "A",
   "overall_progress_percent": 99,
   "stage_progress_percent": 100,
-  "current_task": "PHASE-7-C-3-CLOSED",
-  "next_phase": "PHASE-8",
-  "next_step": "Begin PHASE-8 (Built-Project Test Harness) — requires new decision artifact and owner approval per §11.3.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-20260510-phase-7-C-3-container-lifecycle.md",
+  "current_task": "PHASE-7-E-CLOSED",
+  "next_phase": "PHASE-7-F",
+  "next_step": "Begin PHASE-7-F (Agent Orchestration — multi-step agent workflows, role dispatch, result aggregation) per architecture/FORGE_V2_PHASE_ROADMAP.md. Prerequisite: PHASE-7-E CLOSED.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-20260510-1938-phase-7-E-agent-adapters.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
     "approval_decision": "DECISION-20260508-phase-0-closure-and-blueprint-prep.md",
     "approval_status": "OWNER_APPROVED_2026-05-08",
-    "vision_scope": "AI_CO_FOUNDER",
-    "vision_scope_decision": "DECISION-20260509-vision-shift-track-b.md",
-    "vision_scope_approved_at": "2026-05-09"
+    "vision_scope": "MULTI_AGENT_CONDUCTOR",
+    "vision_scope_decision": "DECISION-20260510-vision-shift-multi-agent-conductor.md",
+    "vision_scope_approved_at": "2026-05-10"
   },
+  "vision_authority_chain": [
+    "DECISION-20260508-phase-0-closure-and-blueprint-prep.md",
+    "DECISION-20260509-vision-shift-track-b.md",
+    "DECISION-20260510-vision-shift-multi-agent-conductor.md"
+  ],
+  "phases_post_exit_assumed": false,
   "lean_v2_exit_status": "EXIT_NOT_TAKEN",
   "lean_v2_exit_phase": "PHASE-5.1",
   "lean_v2_exit_decision_at": "2026-05-09T07:26:04.487Z",
-  "phases_post_exit_assumed": false,
   "complexity_review": {
     "verdict": "CONTINUE",
     "report_path": "artifacts/audit/complexity_review_post_phase_5.md",
@@ -69,18 +74,18 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-05-09T23:03:21.918Z",
+    "last_doctor_run": "2026-05-10T00:00:00.000Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
-    "self_test_last_run": "2026-05-09",
-    "self_test_last_result": "65 passed, 0 failed, 5 skipped (70 total) — full PHASE-7-C-3 coverage (5 SKIPs require docker/podman daemon)",
-    "self_test_scenarios_pass": 65,
+    "self_test_last_run": "2026-05-10",
+    "self_test_last_result": "77 passed, 0 failed, 5 skipped (82 total) — full PHASE-7-E coverage (5 SKIPs require docker/podman daemon)",
+    "self_test_scenarios_pass": 77,
     "self_test_scenarios_skip": 5,
     "self_test_scenarios_fail": 0,
     "providers_registered_count": 12,
-    "tools_registered_count": 50,
-    "doctor_checks_count": 18,
+    "tools_registered_count": 54,
+    "doctor_checks_count": 19,
     "assertion_types_count": 9,
     "active_permission_mode": "WORKSPACE_WRITE",
     "permission_policy_installed": true,
@@ -89,11 +94,32 @@
     "environment_detection": "ENABLED",
     "package_management": "ENABLED",
     "container_lifecycle": "ENABLED",
-    "note": "PHASE-7-C-3 closed. Container lifecycle active: 2 runtime adapters (docker/podman) + 12 container tools + _privilege_guard (inspectInput + inspectArgv + inspectComposeJson) + container_privilege_rule (L3 Step 1.7) + containerRuntime doctor check + state_field_equals dot-notation fix. tools: 37→50. scenarios: 57→70. doctor checks: 17→18.",
+    "agent_runtime": "ENABLED",
+    "note": "PHASE-7-E closed. Agent adapter contract active: 5 adapters (anthropic, openai, claude_code, aider, mock) + cost_ledger + budget_enforcer + agent_budget_rule (L3 Step 1.8) + agent_runtime doctor check. tools: 50→54. scenarios: 70→82. doctor checks: 18→19. visionSchema float fix. state_field_equals/exists bracket-notation support.",
     "last_doctor_counts": {
-      "pass": 16,
+      "pass": 17,
       "warn": 2,
       "fail": 0
     }
-  }
+  },
+  "roadmap_summary": {
+    "completed": [
+      "PHASE-0", "PHASE-1", "PHASE-2", "PHASE-3", "PHASE-4",
+      "PHASE-5", "PHASE-5.1", "PHASE-6",
+      "PHASE-7-A", "PHASE-7-B",
+      "PHASE-7-C-1", "PHASE-7-C-2", "PHASE-7-C-3",
+      "PHASE-7-E"
+    ],
+    "next": "PHASE-7-F",
+    "remaining": [
+      "PHASE-7-F",
+      "PHASE-8", "PHASE-9", "PHASE-10",
+      "PHASE-11", "PHASE-12", "PHASE-13"
+    ],
+    "deferred": [
+      "PHASE-7-D",
+      "PHASE-14"
+    ]
+  },
+  "last_updated": "2026-05-10T21:00:00.000Z"
 }

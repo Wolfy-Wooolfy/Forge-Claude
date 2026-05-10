@@ -1,0 +1,26 @@
+{
+  "id": "S77",
+  "name": "agent.read_ledger entry has all required schema fields",
+  "type": "direct_tool",
+  "permission": "READ_ONLY",
+  "tool": "agent.read_ledger",
+  "fixture_files": [
+    {
+      "path": "artifacts/agent/cost_ledger.jsonl",
+      "content": "{\"ts\":\"2026-05-10T10:01:00.000Z\",\"invocation_id\":\"s77-test-id\",\"project_id\":\"test_ledger_s77\",\"provider\":\"mock\",\"model\":\"mock-model\",\"role\":null,\"tokens_in\":10,\"tokens_out\":20,\"latency_ms\":15,\"cost_usd_estimated\":0,\"cost_usd_actual\":0,\"outcome\":\"success\"}\n"
+    }
+  ],
+  "input": {
+    "project_id": "test_ledger_s77"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_exists", "field": "entries" },
+    { "type": "state_field_equals", "field": "count",                     "expected": 1 },
+    { "type": "state_field_equals", "field": "entries[0].project_id",     "expected": "test_ledger_s77" },
+    { "type": "state_field_equals", "field": "entries[0].provider",       "expected": "mock" },
+    { "type": "state_field_equals", "field": "entries[0].model",          "expected": "mock-model" },
+    { "type": "state_field_equals", "field": "entries[0].outcome",        "expected": "success" },
+    { "type": "state_field_equals", "field": "entries[0].cost_usd_actual","expected": 0 }
+  ]
+}

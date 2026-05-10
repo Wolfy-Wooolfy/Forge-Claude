@@ -1,0 +1,15 @@
+{
+  "id": "S71",
+  "name": "agent.list_available returns 5 providers (mock always true)",
+  "type": "direct_tool",
+  "permission": "READ_ONLY",
+  "tool": "agent.list_available",
+  "fixture_files": [],
+  "input": {},
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "providers.length", "expected": 5 },
+    { "type": "state_field_equals", "field": "providers[3].name",      "expected": "mock" },
+    { "type": "state_field_equals", "field": "providers[3].available", "expected": true }
+  ]
+}

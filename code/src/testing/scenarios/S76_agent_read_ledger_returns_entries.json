@@ -1,0 +1,21 @@
+{
+  "id": "S76",
+  "name": "agent.read_ledger returns seeded entry with correct count and cost",
+  "type": "direct_tool",
+  "permission": "READ_ONLY",
+  "tool": "agent.read_ledger",
+  "fixture_files": [
+    {
+      "path": "artifacts/agent/cost_ledger.jsonl",
+      "content": "{\"ts\":\"2026-05-10T10:00:00.000Z\",\"invocation_id\":\"s76-test-id\",\"project_id\":\"test_ledger_s76\",\"provider\":\"mock\",\"model\":\"mock\",\"role\":null,\"tokens_in\":0,\"tokens_out\":0,\"latency_ms\":5,\"cost_usd_estimated\":0,\"cost_usd_actual\":0,\"outcome\":\"success\"}\n"
+    }
+  ],
+  "input": {
+    "project_id": "test_ledger_s76"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "count",      "expected": 1 },
+    { "type": "state_field_equals", "field": "total_cost", "expected": 0 }
+  ]
+}
