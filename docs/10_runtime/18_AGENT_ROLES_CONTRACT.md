@@ -362,6 +362,30 @@ Final cross-role quality gate before delivery. Hard gate: REJECTED if any preced
 
 ---
 
+## Per-Role Provider/Model Recommendations
+
+Based on PHASE-7-F-3 Live Smoke Tests + retry findings (see `DECISION-20260512-0900-phase-7-F-3-override.md`):
+
+| Role | Recommended Model | Rationale |
+|---|---|---|
+| architect | gpt-4o-mini or claude-opus-4-7 | Simple schema, JSON reliability adequate |
+| spec_writer | gpt-4o-mini or claude-opus-4-7 | Simple schema, JSON reliability adequate |
+| reviewer | gpt-4o-mini or claude-opus-4-7 | Adequate for both Phase A and Phase B |
+| builder | gpt-4o or claude-opus-4-7 | Higher quality matters for code planning |
+| **security_auditor** | **gpt-4o or claude-opus-4-7 (MINIMUM)** | **Complex nested schema; gpt-4o-mini insufficient (per retry)** |
+| test_designer | gpt-4o-mini or claude-opus-4-7 | Adequate |
+| cost_estimator | gpt-4o-mini | Cheap, simple schema |
+| environment | gpt-4o-mini | Cheap, simple schema |
+| documentation | gpt-4o-mini or gpt-4o | Either works; quality matters for user-facing docs |
+| **quality_judge** | **gpt-4o or claude-opus-4-7 (MINIMUM)** | **High-stakes synthesis** |
+| deployment | gpt-4o-mini or gpt-4o | Either works |
+
+**Default behavior:** Roles use their declared `default_model`. Vision can override per project. For production use, set `default_model` in vision to match recommendations above.
+
+**Note on JSON extraction:** All real adapters (anthropic, openai, claude_code, aider) apply `extractJsonFromResponse()` (from `_adapter_contract.js`) to strip markdown code fences before returning `output.text`. This handles models that wrap JSON in ` ```json...``` ` blocks despite "RESPOND WITH VALID JSON ONLY" in their prompt.
+
+---
+
 ## Future Roles (PHASE-11+)
 
 | Role | Phase | Status |

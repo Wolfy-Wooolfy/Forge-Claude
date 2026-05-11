@@ -98,8 +98,18 @@
     "roles_runtime": "ENABLED",
     "live_smoke_available": true,
     "live_smoke_last_run": "2026-05-11",
-    "live_smoke_last_result": "10/11 roles PASS (security_auditor: gpt-4o-mini JSON format issue); provider: openai/gpt-4o-mini",
-    "note": "PHASE-7-F-3 closed. Quality & Delivery Roles: cost_estimator, environment, documentation, deployment, quality_judge. Activity Indicator System: _activity_catalog.js, _activity_emitter.js, activity_tools.js. role.invoke emits INVOKING_ADAPTER/COMPLETED/FAILED. All 6 existing roles retrofit with PARSING_OUTPUT/VALIDATING_SCHEMA. Live smoke runner + CLI. scenarios: 103→118. tools: 55→56. assertion types: 9→10.",
+    "live_smoke_last_result": "11/11 (security_auditor retested with gpt-4o per DECISION-20260512-0900)",
+    "last_live_smoke_retry": {
+      "ts": "2026-05-12T11:00:23.000Z",
+      "role": "security_auditor",
+      "model": "gpt-4o",
+      "result": "SUCCESS",
+      "threat_level": "HIGH",
+      "findings_count": 5,
+      "decision_artifact": "DECISION-20260512-0900-phase-7-F-3-override.md"
+    },
+    "adapter_json_extraction": "ENABLED — extractJsonFromResponse in _adapter_contract.js, applied in anthropic/openai/claude_code/aider adapters (DECISION-20260512-0900 addendum)",
+    "note": "PHASE-7-F-3 closed with override. Quality & Delivery Roles: cost_estimator, environment, documentation, deployment, quality_judge. Activity Indicator System: _activity_catalog.js, _activity_emitter.js, activity_tools.js. role.invoke emits INVOKING_ADAPTER/COMPLETED/FAILED. All 6 existing roles retrofit with PARSING_OUTPUT/VALIDATING_SCHEMA. Live smoke runner + CLI. scenarios: 103→118. tools: 55→56. assertion types: 9→10. Adapter JSON fence extraction added.",
     "last_doctor_counts": {
       "pass": 17,
       "warn": 3,

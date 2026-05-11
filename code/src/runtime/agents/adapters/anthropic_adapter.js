@@ -1,6 +1,6 @@
 "use strict";
 
-const { defineAdapter, success, failed } = require("../_adapter_contract");
+const { defineAdapter, success, failed, extractJsonFromResponse } = require("../_adapter_contract");
 
 // ── Internal HTTP helper — calls http.post execute() per Track A discipline ───
 
@@ -95,7 +95,7 @@ const anthropicAdapter = defineAdapter({
     }
 
     const content = parsed.content && parsed.content[0];
-    const text    = (content && content.text) || "";
+    const text    = extractJsonFromResponse((content && content.text) || "");
     const usage   = parsed.usage || {};
     const tokens_in  = usage.input_tokens  || 0;
     const tokens_out = usage.output_tokens || 0;

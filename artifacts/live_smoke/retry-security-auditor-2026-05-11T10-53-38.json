@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "ts": "2026-05-11T10:53:38.858Z",
+  "purpose": "PHASE-7-F-3-RETRY per DECISION-20260512-0900",
+  "role_id": "security_auditor",
+  "provider": "openai",
+  "model": "gpt-4o",
+  "duration_ms": 7930,
+  "result_status": "FAILED",
+  "result_metadata": {
+    "reason": "INVALID_ROLE_OUTPUT",
+    "detail": "JSON parse failed: Unexpected token '`', \"```json\n{\n\"... is not valid JSON",
+    "context": {}
+  },
+  "assessment": {
+    "passed": false,
+    "threat_level": null,
+    "findings_count": null
+  }
+}

@@ -106,6 +106,19 @@ function estimateCost(provider, promptLength, outputTokenMultiplier) {
   return { estimated_usd: Math.round(cost * 10000) / 10000, tokens_in: tokensIn, tokens_out: tokensOut };
 }
 
+// ── JSON extraction — strips markdown fences from LLM text output ─────────────
+// Applied in real adapters (anthropic, openai, claude_code, aider) before
+// returning output.text. Protects against models that wrap JSON in ```json...```
+// even when instructed not to. Pure function — no side effects.
+
+function extractJsonFromResponse(rawText) {
+  if (!rawText || typeof rawText !== "string") return rawText;
+  let cleaned = rawText.trim();
+  cleaned = cleaned.replace(/^```(?:json|JSON)?\s*\n?/i, "");
+  cleaned = cleaned.replace(/\n?\s*```\s*$/, "");
+  return cleaned.trim();
+}
+
 module.exports = {
   defineAdapter,
   validateInput,
@@ -115,5 +128,6 @@ module.exports = {
   denied,
   VALID_PROVIDERS,
   PROVIDER_RATES,
-  estimateCost
+  estimateCost,
+  extractJsonFromResponse
 };

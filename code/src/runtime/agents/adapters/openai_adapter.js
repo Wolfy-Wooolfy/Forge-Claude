@@ -1,6 +1,6 @@
 "use strict";
 
-const { defineAdapter, success, failed } = require("../_adapter_contract");
+const { defineAdapter, success, failed, extractJsonFromResponse } = require("../_adapter_contract");
 
 const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
 
@@ -86,7 +86,7 @@ const openaiAdapter = defineAdapter({
     }
 
     const choice = parsed.choices && parsed.choices[0];
-    const text   = (choice && choice.message && choice.message.content) || "";
+    const text   = extractJsonFromResponse((choice && choice.message && choice.message.content) || "");
     const usage  = parsed.usage || {};
     const tokens_in  = usage.prompt_tokens     || 0;
     const tokens_out = usage.completion_tokens || 0;

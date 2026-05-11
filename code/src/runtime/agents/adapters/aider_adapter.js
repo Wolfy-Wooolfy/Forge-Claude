@@ -3,7 +3,7 @@
 // Aider CLI adapter — invokes `aider` binary via shell.run_in_workspace.
 // Track A discipline: no direct child_process.spawn.
 
-const { defineAdapter, success, failed } = require("../_adapter_contract");
+const { defineAdapter, success, failed, extractJsonFromResponse } = require("../_adapter_contract");
 
 let _shellTool = null;
 function _getShellTool() {
@@ -78,7 +78,7 @@ const aiderAdapter = defineAdapter({
       return failed("EXECUTE_FAILED", "aider exited " + exit_code + ": " + errMsg, {});
     }
 
-    const text       = (stdout || "").trim();
+    const text       = extractJsonFromResponse((stdout || "").trim());
     const tokens_in  = Math.ceil(input.prompt.length / 4);
     const tokens_out = Math.ceil(text.length / 4);
     const cost_usd   = (tokens_in / 1000) * 0.003 + (tokens_out / 1000) * 0.015;
