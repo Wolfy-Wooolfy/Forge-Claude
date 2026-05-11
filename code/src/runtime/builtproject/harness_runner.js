@@ -1,5 +1,28 @@
 "use strict";
 
+/**
+ * L5b Built-Project Test Harness — Scenario Runner
+ *
+ * §ARC-3 Exception: This module uses `child_process.spawn` directly for
+ * server lifecycle management (start, stdout capture, port polling, teardown).
+ *
+ * Rationale: The L2 `shell.run_in_workspace` tool is blocking (awaits exit
+ * before returning). L5b requires:
+ *   - Background process start (server keeps running during assertions)
+ *   - Streaming stdout/stderr capture (for stdout_contains assertions)
+ *   - TCP port readiness polling (with timeout)
+ *   - Direct process handle for teardown (SIGTERM / taskkill)
+ *
+ * Wrapping this lifecycle inside shell.run_in_workspace would require
+ * background-process semantics that would expand the L2 shell tool's
+ * contract well beyond its current scope and break L5b correctness.
+ *
+ * This exception is BOUNDED to this file. Other files under
+ * code/src/runtime/builtproject/ MUST NOT import child_process directly.
+ *
+ * Formal authorization: artifacts/decisions/DECISION-202605131800-phase-8-arc-3-spawn-exception.md
+ */
+
 const http = require("http");
 const { spawn } = require("child_process");
 const path = require("path");
