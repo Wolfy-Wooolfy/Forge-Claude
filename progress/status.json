@@ -4,10 +4,10 @@
   "current_stage": "A",
   "overall_progress_percent": 99,
   "stage_progress_percent": 100,
-  "current_task": "PHASE-7-F-1-CLOSED",
-  "next_phase": "PHASE-7-F-2",
-  "next_step": "Begin PHASE-7-F-2 (Build & Verify Roles: Builder, Security Auditor, Test Designer, Reviewer Phase B) per architecture/VISION-PHASE-7-F.md. Prerequisite: PHASE-7-F-1 CLOSED.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-20260510-2100-phase-7-F-1-foundation-roles.md",
+  "current_task": "PHASE-7-F-2-CLOSED",
+  "next_phase": "PHASE-7-F-3",
+  "next_step": "Begin PHASE-7-F-3 per architecture/VISION-PHASE-7-F.md. Prerequisite: PHASE-7-F-2 CLOSED.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-20260511-0930-phase-7-F-2-build-verify-roles.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -74,13 +74,13 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-05-10T21:46:34.885Z",
+    "last_doctor_run": "2026-05-11T09:30:00.000Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
-    "self_test_last_run": "2026-05-10",
-    "self_test_last_result": "86 passed, 0 failed, 5 skipped (91 total) — full PHASE-7-F-1 coverage (5 SKIPs require docker/podman daemon)",
-    "self_test_scenarios_pass": 86,
+    "self_test_last_run": "2026-05-11",
+    "self_test_last_result": "98 passed, 0 failed, 5 skipped (103 total) — full PHASE-7-F-2 coverage (5 SKIPs require docker/podman daemon)",
+    "self_test_scenarios_pass": 98,
     "self_test_scenarios_skip": 5,
     "self_test_scenarios_fail": 0,
     "providers_registered_count": 12,
@@ -96,7 +96,7 @@
     "container_lifecycle": "ENABLED",
     "agent_runtime": "ENABLED",
     "roles_runtime": "ENABLED",
-    "note": "PHASE-7-F-1 closed. Foundation roles active: architect, spec_writer, reviewer (Phase A). role.invoke L2 tool. roles_runtime doctor check. tools: 54→55. scenarios: 82→91. doctor checks: 19→20.",
+    "note": "PHASE-7-F-2 closed. Build & Verify Roles active: builder, security_auditor, test_designer + reviewer Phase B. _prompt_loader.js single source of truth. scenario_id mock keys. role.invoke gains scenario_id field. scenarios: 91→103.",
     "last_doctor_counts": {
       "pass": 17,
       "warn": 3,
@@ -119,11 +119,11 @@
       "PHASE-7-C-2",
       "PHASE-7-C-3",
       "PHASE-7-E",
-      "PHASE-7-F-1"
+      "PHASE-7-F-1",
+      "PHASE-7-F-2"
     ],
-    "next": "PHASE-7-F-2",
+    "next": "PHASE-7-F-3",
     "remaining": [
-      "PHASE-7-F-2",
       "PHASE-7-F-3",
       "PHASE-8",
       "PHASE-9",
@@ -137,5 +137,5 @@
       "PHASE-14"
     ]
   },
-  "last_updated": "2026-05-11T00:00:00.000Z"
+  "last_updated": "2026-05-11T09:30:00.000Z"
 }

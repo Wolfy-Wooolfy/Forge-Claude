@@ -16,11 +16,12 @@ const tool_invoke = defineTool({
   input_schema: {
     type: "object",
     properties: {
-      role_id:    { type: "string" },
-      input:      { type: "object" },
-      project_id: { type: "string" },
-      provider:   { type: "string" },
-      model:      { type: "string" }
+      role_id:     { type: "string" },
+      input:       { type: "object" },
+      project_id:  { type: "string" },
+      provider:    { type: "string" },
+      model:       { type: "string" },
+      scenario_id: { type: "string" }
     },
     required: ["role_id", "input", "project_id"]
   },
@@ -53,10 +54,11 @@ const tool_invoke = defineTool({
     }
 
     const innerCtx = {
-      root:     _root(ctx),
-      role_id:  input.role_id,
-      provider: input.provider || undefined,
-      model:    input.model    || undefined
+      root:        _root(ctx),
+      role_id:     input.role_id,
+      provider:    input.provider    || undefined,
+      model:       input.model       || undefined,
+      scenario_id: input.scenario_id || undefined
     };
 
     let roleResult;

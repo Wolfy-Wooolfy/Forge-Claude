@@ -1,7 +1,7 @@
 # 18 — Agent Roles Contract
 
-> Implemented: PHASE-7-F-1.
-> Authority: `artifacts/decisions/DECISION-20260510-2100-phase-7-F-1-foundation-roles.md`
+> Implemented: PHASE-7-F-1 (architect, spec_writer, reviewer Phase A), PHASE-7-F-2 (builder, security_auditor, test_designer, reviewer Phase B).
+> Authority: `artifacts/decisions/DECISION-20260510-2100-phase-7-F-1-foundation-roles.md`, `artifacts/decisions/DECISION-20260511-0930-phase-7-F-2-build-verify-roles.md`
 > System prompts: `docs/10_runtime/18b_ROLE_PROMPTS.md`
 
 ---
@@ -30,13 +30,16 @@ All external code uses the `role.invoke` L2 tool. Direct `role.run()` calls are 
 
 ```js
 reg.invoke("role.invoke", {
-  role_id:    "architect",           // required — registered role id
-  input:      { intent: "...", project_id: "..." }, // role-specific input
-  project_id: "my_project",          // required — used for agent.invoke
-  provider:   "anthropic",           // optional override
-  model:      "claude-opus-4-7"      // optional override
+  role_id:     "architect",           // required — registered role id
+  input:       { intent: "...", project_id: "..." }, // role-specific input
+  project_id:  "my_project",          // required — used for agent.invoke
+  provider:    "anthropic",           // optional override
+  model:       "claude-opus-4-7",     // optional override
+  scenario_id: "S83"                  // optional — TEST mode only; injects SCENARIO_TAG
 }, { root: "/path/to/project" });
 ```
+
+`scenario_id` is propagated through `innerCtx` to the role's `run()`. When present it appends `\nSCENARIO_TAG: <id>\n` to the prompt, enabling scenario-id-based mock keys in the test harness (see §Mock Keys below).
 
 **Output (SUCCESS):**
 ```js
@@ -60,21 +63,52 @@ The `role_id` field is always present at the top level of `output` for assertion
 
 ---
 
+## Prompt Loader
+
+`code/src/runtime/agents/_prompt_loader.js` is the single source of truth for all role system prompts.
+
+- Reads `docs/10_runtime/18b_ROLE_PROMPTS.md` once and caches in memory
+- Normalizes CRLF → LF before parsing (Windows-safe)
+- Parses sections matching: `` ## <id> (<date>) `` followed by a fenced code block
+- Throws `Error("prompt_loader: unknown prompt id '<id>'")` for unregistered ids — fail-closed
+- `resetPromptCache()` available for test isolation
+
+Usage: `const SYSTEM_PROMPT = loadPrompt("builder_v1");` (called at module load time)
+
+---
+
 ## Role Lifecycle (Inside `role.run`)
 
 Every role's `run()` function follows this sequence:
 
 1. Validate `input` against `input_schema` → FAILED `INVALID_INPUT` on violation
-2. Build prompt: `{role_id}|{project_id}\n{SYSTEM_PROMPT}\n\nINPUT:\n{JSON}\n\nRESPOND WITH VALID JSON ONLY.`
-3. Call `agent.invoke` via lazy `require("../../tools/_registry").getDefaultRegistry()`
-4. If `agent.invoke` fails → FAILED `AGENT_FAILED`
-5. `JSON.parse(output.text)` → FAILED `INVALID_ROLE_OUTPUT` on parse error
-6. Validate parsed JSON against `output_schema` → FAILED `INVALID_ROLE_OUTPUT` on violation
-7. Return `roleOk(parsed, { role, model, provider })`
+2. (Phase-gated roles) Validate phase-specific required fields → FAILED `INVALID_INPUT` on violation
+3. Build prompt: `{role_id}|{project_id}\n[SCENARIO_TAG]\n{SYSTEM_PROMPT}\n\nINPUT:\n{JSON}\n\nRESPOND WITH VALID JSON ONLY.`
+4. Call `agent.invoke` via lazy `require("../../tools/_registry").getDefaultRegistry()`
+5. If `agent.invoke` fails → FAILED `AGENT_FAILED`
+6. `JSON.parse(output.text)` → FAILED `INVALID_ROLE_OUTPUT` on parse error
+7. Validate parsed JSON against `output_schema` → FAILED `INVALID_ROLE_OUTPUT` on violation
+8. Return `roleOk(parsed, { role, model, provider })`
+
+Phase-specific validation (step 2) fires **before** the schema check to produce a meaningful error reason. Example: reviewer/security_auditor Phase B/CODE require a `code` field and validate it in `run()` before delegating to schema.
 
 ---
 
-## Registered Roles (PHASE-7-F-1)
+## Mock Keys
+
+Two key formats are supported by `mock_adapter.js`:
+
+**Prefix-based (legacy, S83–S91):** `mock|<model>|<first 500 chars of prompt>`
+
+Used when no SCENARIO_TAG is present. Fragile — sensitive to system prompt changes.
+
+**Scenario-id-based (S92+):** `mock|<model>|scenario:<id>`
+
+Enabled by passing `scenario_id` to `role.invoke` input. The role injects `\nSCENARIO_TAG: <id>\n` into the prompt; the mock adapter extracts it and builds a stable key. Preferred for all new test scenarios.
+
+---
+
+## Registered Roles (PHASE-7-F-1 + PHASE-7-F-2)
 
 ### architect
 
@@ -116,19 +150,71 @@ Converts an Architect design into a formal implementation contract. Does not add
 |---|---|
 | `id` | `reviewer` |
 | `authority_level` | `BLOCKING` |
-| `system_prompt_id` | `reviewer_v1` |
+| `system_prompt_id` | `reviewer_v2` |
 | `default_model` | `claude-opus-4-7` |
 
-**Input schema:** `{ phase: "A"|"B", spec: object, design: object, project_id: string }`
+**Input schema:** `{ phase: "A"|"B", spec: object, design: object, project_id: string, code?: object }`
 
 **Output schema:** `{ verdict: "APPROVED"|"APPROVED_WITH_CONCERNS"|"REJECTED", findings[], summary }`
 
-Phase A only in PHASE-7-F-1. Phase B input rejected with `UNSUPPORTED_PHASE`. BLOCKER findings stop pipeline progression.
+Phase A reviews spec completeness against design. Phase B reviews Builder's code plan — `code` field required (validated before schema check in `run()`).
 
 **Verdict rules:**
-- `APPROVED` — no BLOCKER findings, at most 2 WARN findings
-- `APPROVED_WITH_CONCERNS` — no BLOCKER findings, 3+ WARN findings
+- `APPROVED` — no BLOCKER findings
+- `APPROVED_WITH_CONCERNS` — no BLOCKER findings, 1+ WARN findings
 - `REJECTED` — one or more BLOCKER findings
+
+---
+
+### builder
+
+| Field | Value |
+|---|---|
+| `id` | `builder` |
+| `authority_level` | `ADVISORY` |
+| `system_prompt_id` | `builder_v1` |
+| `default_provider` | `claude_code` |
+| `default_model` | `claude-opus-4-7` |
+
+**Input schema:** `{ project_id: string, spec: object, design: object, target_files?: array }`
+
+**Output schema:** `{ files_written[], summary, dependencies_added[], notes[] }`
+
+Plans the implementation by describing files to create or modify. Delegates actual file writing to executor adapters (claude_code provider). Does not write files directly — Track A compliant.
+
+---
+
+### security_auditor
+
+| Field | Value |
+|---|---|
+| `id` | `security_auditor` |
+| `authority_level` | `BLOCKING` |
+| `system_prompt_id` | `security_auditor_v1` |
+| `default_model` | `claude-opus-4-7` |
+
+**Input schema:** `{ project_id: string, phase: "SPEC"|"CODE", spec: object, design: object, code?: object }`
+
+**Output schema:** `{ threat_level: "CRITICAL"|"HIGH"|"MEDIUM"|"LOW"|"NONE", findings[], summary }`
+
+Phase SPEC reviews spec for security gaps before code is written. Phase CODE reviews the Builder's implementation plan for vulnerabilities — `code` field required in Phase CODE. BLOCKER findings must be resolved before pipeline proceeds.
+
+---
+
+### test_designer
+
+| Field | Value |
+|---|---|
+| `id` | `test_designer` |
+| `authority_level` | `ADVISORY` |
+| `system_prompt_id` | `test_designer_v1` |
+| `default_model` | `claude-opus-4-7` |
+
+**Input schema:** `{ project_id: string, spec: object, design: object }`
+
+**Output schema:** `{ scenarios[], coverage_summary: { acs_total, acs_covered, gaps[] } }`
+
+Generates test scenarios for the project being built (not for Forge). Each scenario maps to one or more spec acceptance criteria. Never invents ACs not present in the spec.
 
 ---
 
@@ -171,14 +257,10 @@ All side effects go through `agent.invoke` (which writes to cost ledger) and the
 
 ---
 
-## Future Roles (PHASE-7-F-2 and beyond)
+## Future Roles (PHASE-7-F-3 and beyond)
 
 | Role | Phase | Status |
 |---|---|---|
-| Builder | PHASE-7-F-2 | PENDING |
-| Security Auditor | PHASE-7-F-2 | PENDING |
-| Test Designer | PHASE-7-F-2 | PENDING |
-| Reviewer (Phase B) | PHASE-7-F-2 | PENDING |
 | Documentation | PHASE-7-F-3 | PENDING |
 | Cost Estimator | PHASE-7-F-3 | PENDING |
 | Environment | PHASE-7-F-3 | PENDING |

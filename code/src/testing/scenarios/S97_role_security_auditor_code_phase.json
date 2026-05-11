@@ -1,0 +1,43 @@
+{
+  "id": "S97",
+  "name": "role.invoke security_auditor — Phase CODE happy path returns threat_level",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "role.invoke",
+  "input": {
+    "role_id":     "security_auditor",
+    "project_id":  "test_sec_s97",
+    "provider":    "mock",
+    "model":       "mock-sec-s97",
+    "scenario_id": "S97",
+    "input": {
+      "project_id": "test_sec_s97",
+      "phase": "CODE",
+      "spec": {
+        "scope": "Build a task management REST API",
+        "decisions": [],
+        "acceptance_criteria": [{ "id": "AC-1", "description": "POST /users returns 201" }],
+        "files_to_create": [],
+        "files_to_modify": [],
+        "out_of_scope": []
+      },
+      "design": {
+        "design_summary": "Node.js/Express API with SQLite",
+        "components": [],
+        "data_flow": "Client → API → SQLite",
+        "technology_choices": [],
+        "integration_points": [],
+        "identified_risks": []
+      },
+      "code": {
+        "files_written": [{ "path": "src/app.js", "action": "create", "line_count": 60, "sha256": "abc123def456abc123def456abc123def456abc123def456abc123def456abc123" }],
+        "summary": "Express API implemented",
+        "dependencies_added": [],
+        "notes": []
+      }
+    }
+  },
+  "assertions": [
+    { "type": "status_equals", "expected": "SUCCESS" }
+  ]
+}

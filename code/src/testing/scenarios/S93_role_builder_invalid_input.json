@@ -1,0 +1,28 @@
+{
+  "id": "S93",
+  "name": "role.invoke builder — missing spec returns FAILED INVALID_INPUT",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "role.invoke",
+  "input": {
+    "role_id":    "builder",
+    "project_id": "test_bld_s93",
+    "provider":   "mock",
+    "model":      "mock-bld-s93",
+    "input": {
+      "project_id": "test_bld_s93",
+      "design": {
+        "design_summary": "Node.js/Express API",
+        "components": [],
+        "data_flow": "test",
+        "technology_choices": [],
+        "integration_points": [],
+        "identified_risks": []
+      }
+    }
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "FAILED" },
+    { "type": "state_field_equals", "field": "reason", "expected": "INVALID_INPUT" }
+  ]
+}

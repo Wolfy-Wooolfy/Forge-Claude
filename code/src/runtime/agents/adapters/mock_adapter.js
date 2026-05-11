@@ -14,8 +14,12 @@ try {
   _responses = {};
 }
 
-// Stable hash key: provider + model + prompt (truncated to avoid massive keys).
+// Hash key: prefer scenario-id tag if present; fall back to prompt-prefix (PHASE-7-F-1 compat).
 function _hashKey(input) {
+  const scenarioMatch = (input.prompt || "").match(/SCENARIO_TAG:\s*([A-Z0-9]+)/);
+  if (scenarioMatch) {
+    return [input.provider, input.model, "scenario:" + scenarioMatch[1]].join("|");
+  }
   const p = (input.prompt || "").slice(0, 500);
   return [input.provider, input.model, p].join("|");
 }

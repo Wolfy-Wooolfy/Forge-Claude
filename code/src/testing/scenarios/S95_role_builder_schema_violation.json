@@ -1,0 +1,37 @@
+{
+  "id": "S95",
+  "name": "role.invoke builder — agent returns JSON failing OUTPUT_SCHEMA returns FAILED INVALID_ROLE_OUTPUT",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "role.invoke",
+  "input": {
+    "role_id":     "builder",
+    "project_id":  "test_bld_s95",
+    "provider":    "mock",
+    "model":       "mock-bld-s95",
+    "scenario_id": "S95",
+    "input": {
+      "project_id": "test_bld_s95",
+      "spec": {
+        "scope": "test",
+        "decisions": [],
+        "acceptance_criteria": [],
+        "files_to_create": [],
+        "files_to_modify": [],
+        "out_of_scope": []
+      },
+      "design": {
+        "design_summary": "test",
+        "components": [],
+        "data_flow": "test",
+        "technology_choices": [],
+        "integration_points": [],
+        "identified_risks": []
+      }
+    }
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "FAILED" },
+    { "type": "state_field_equals", "field": "reason", "expected": "INVALID_ROLE_OUTPUT" }
+  ]
+}

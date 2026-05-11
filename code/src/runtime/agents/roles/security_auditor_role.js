@@ -4,68 +4,79 @@ const { defineRole, roleOk, roleFailed } = require("../_role_contract");
 const { validate }                        = require("../_json_schema_validator");
 const { loadPrompt }                      = require("../_prompt_loader");
 
-const SYSTEM_PROMPT = loadPrompt("spec_writer_v1");
+const SYSTEM_PROMPT = loadPrompt("security_auditor_v1");
 
 const INPUT_SCHEMA = {
   type: "object",
-  required: ["design", "project_id"],
+  required: ["project_id", "phase", "spec", "design"],
   properties: {
+    project_id: { type: "string", minLength: 1 },
+    phase:      { enum: ["SPEC", "CODE"] },
+    spec:       { type: "object" },
     design:     { type: "object" },
-    project_id: { type: "string", minLength: 1 }
+    code:       { type: "object" }
   }
 };
 
 const OUTPUT_SCHEMA = {
   type: "object",
-  required: ["scope", "decisions", "acceptance_criteria",
-             "files_to_create", "files_to_modify", "out_of_scope"],
+  required: ["threat_level", "findings", "summary"],
   properties: {
-    scope:               { type: "string", minLength: 1 },
-    decisions:           { type: "array",  items: {
-      type: "object", required: ["decision", "rationale"],
-      properties: { decision: { type: "string" }, rationale: { type: "string" } }
+    threat_level: { enum: ["CRITICAL", "HIGH", "MEDIUM", "LOW", "NONE"] },
+    findings: { type: "array", items: {
+      type: "object", required: ["severity", "vulnerability", "location", "attack_vector", "mitigation"],
+      properties: {
+        severity:      { enum: ["BLOCKER", "WARN", "INFO"] },
+        vulnerability: { type: "string" },
+        location:      { type: "string" },
+        attack_vector: { type: "string" },
+        mitigation:    { type: "string" }
+      }
     }},
-    acceptance_criteria: { type: "array",  items: {
-      type: "object", required: ["id", "description"],
-      properties: { id: { type: "string" }, description: { type: "string" } }
-    }},
-    files_to_create:     { type: "array",  items: {
-      type: "object", required: ["path", "purpose"],
-      properties: { path: { type: "string" }, purpose: { type: "string" } }
-    }},
-    files_to_modify:     { type: "array",  items: {
-      type: "object", required: ["path", "change"],
-      properties: { path: { type: "string" }, change: { type: "string" } }
-    }},
-    out_of_scope:        { type: "array",  items: { type: "string" } }
+    summary: { type: "string", minLength: 1 }
   }
 };
 
 module.exports = defineRole({
-  id:               "spec_writer",
-  label:            "Spec Writer",
-  description:      "Converts an architect design into a formal implementation specification",
+  id:               "security_auditor",
+  label:            "Security Auditor",
+  description:      "Reviews specs (Phase SPEC) and code plans (Phase CODE) for security vulnerabilities",
   default_provider: "anthropic",
   default_model:    "claude-opus-4-7",
-  system_prompt_id: "spec_writer_v1",
+  system_prompt_id: "security_auditor_v1",
   input_schema:     INPUT_SCHEMA,
   output_schema:    OUTPUT_SCHEMA,
-  authority_level:  "ADVISORY",
-  typical_cost_usd_min: 0.08,
-  typical_cost_usd_max: 0.40,
+  authority_level:  "BLOCKING",
+  typical_cost_usd_min: 0.30,
+  typical_cost_usd_max: 0.80,
 
   async run(input, ctx) {
     const iv = validate(input, INPUT_SCHEMA);
     if (!iv.valid) return roleFailed("INVALID_INPUT", iv.errors.join("; "), ctx);
 
+    // Phase CODE requires code field
+    if (input.phase === "CODE" && (!input.code || typeof input.code !== "object")) {
+      return roleFailed("INVALID_INPUT",
+        "phase CODE requires a 'code' field (Builder's output object)", ctx);
+    }
+
     const provider   = (ctx && ctx.provider)   || this.default_provider;
     const model      = (ctx && ctx.model)      || this.default_model;
     const project_id = input.project_id;
 
+    const scenarioTag = (ctx && ctx.scenario_id)
+      ? "\nSCENARIO_TAG: " + ctx.scenario_id + "\n"
+      : "";
+
+    const inputData = input.phase === "CODE"
+      ? { phase: input.phase, spec: input.spec, design: input.design, code: input.code }
+      : { phase: input.phase, spec: input.spec, design: input.design };
+
     const prompt =
-      "spec_writer|" + project_id + "\n" +
+      "security_auditor|" + project_id + "\n" +
+      scenarioTag +
       SYSTEM_PROMPT +
-      "\n\nINPUT:\n" + JSON.stringify({ design: input.design }) +
+      "\n\nINPUT:\n" + JSON.stringify(inputData) +
       "\n\nRESPOND WITH VALID JSON ONLY.";
 
     let agentResult;

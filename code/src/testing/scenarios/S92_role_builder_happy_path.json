@@ -1,0 +1,36 @@
+{
+  "id": "S92",
+  "name": "role.invoke builder — happy path returns files_written plan",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "role.invoke",
+  "input": {
+    "role_id":     "builder",
+    "project_id":  "test_bld_s92",
+    "provider":    "mock",
+    "model":       "mock-bld-s92",
+    "scenario_id": "S92",
+    "input": {
+      "project_id": "test_bld_s92",
+      "spec": {
+        "scope": "Build a task management REST API",
+        "decisions": [{ "decision": "Use Express.js", "rationale": "Minimal setup" }],
+        "acceptance_criteria": [{ "id": "AC-1", "description": "POST /users returns 201" }],
+        "files_to_create": [{ "path": "src/app.js", "purpose": "Entry point" }],
+        "files_to_modify": [],
+        "out_of_scope": ["Frontend UI"]
+      },
+      "design": {
+        "design_summary": "Node.js/Express API with SQLite",
+        "components": [{ "name": "API Server", "tech": "Express", "purpose": "HTTP handler" }],
+        "data_flow": "Client → API → SQLite",
+        "technology_choices": [],
+        "integration_points": [],
+        "identified_risks": []
+      }
+    }
+  },
+  "assertions": [
+    { "type": "status_equals", "expected": "SUCCESS" }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "id": "S102",
+  "name": "role.invoke reviewer Phase B — happy path returns APPROVED_WITH_CONCERNS",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "role.invoke",
+  "input": {
+    "role_id":     "reviewer",
+    "project_id":  "test_rev_s102",
+    "provider":    "mock",
+    "model":       "mock-rev-s102",
+    "scenario_id": "S102",
+    "input": {
+      "project_id": "test_rev_s102",
+      "phase": "B",
+      "spec": {
+        "scope": "Build a task management REST API",
+        "decisions": [{ "decision": "Use Express.js", "rationale": "Minimal setup" }],
+        "acceptance_criteria": [
+          { "id": "AC-1", "description": "POST /users returns 201 with user id" },
+          { "id": "AC-2", "description": "POST /auth/login returns JWT on correct credentials" },
+          { "id": "AC-3", "description": "GET /tasks requires valid JWT; returns 401 without token" }
+        ],
+        "files_to_create": [
+          { "path": "src/app.js",       "purpose": "Express app entry point" },
+          { "path": "src/routes/auth.js", "purpose": "Auth route handlers" }
+        ],
+        "files_to_modify": [],
+        "out_of_scope": ["Frontend UI"]
+      },
+      "design": {
+        "design_summary": "Node.js/Express API with SQLite and JWT auth",
+        "components": [{ "name": "API Server", "tech": "Express", "purpose": "HTTP handler" }],
+        "data_flow": "Client → API → SQLite",
+        "technology_choices": [],
+        "integration_points": [],
+        "identified_risks": []
+      },
+      "code": {
+        "files_written": [
+          { "path": "src/app.js",         "action": "create", "line_count": 15, "sha256": "aabbccdd11223344aabbccdd11223344aabbccdd11223344aabbccdd11223344aa" },
+          { "path": "src/routes/auth.js", "action": "create", "line_count": 45, "sha256": "bbccddee22334455bbccddee22334455bbccddee22334455bbccddee22334455bb" }
+        ],
+        "summary": "Implemented Express entry point and auth routes with JWT token issuance.",
+        "dependencies_added": [
+          { "ecosystem": "npm", "package": "express",   "version": "^4.18.0" }
+        ],
+        "notes": []
+      }
+    }
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "verdict", "expected": "APPROVED_WITH_CONCERNS" }
+  ]
+}

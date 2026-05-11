@@ -4,55 +4,57 @@ const { defineRole, roleOk, roleFailed } = require("../_role_contract");
 const { validate }                        = require("../_json_schema_validator");
 const { loadPrompt }                      = require("../_prompt_loader");
 
-const SYSTEM_PROMPT = loadPrompt("spec_writer_v1");
+const SYSTEM_PROMPT = loadPrompt("builder_v1");
 
 const INPUT_SCHEMA = {
   type: "object",
-  required: ["design", "project_id"],
+  required: ["project_id", "spec", "design"],
   properties: {
-    design:     { type: "object" },
-    project_id: { type: "string", minLength: 1 }
+    project_id:   { type: "string", minLength: 1 },
+    spec:         { type: "object" },
+    design:       { type: "object" },
+    target_files: { type: "array" }
   }
 };
 
 const OUTPUT_SCHEMA = {
   type: "object",
-  required: ["scope", "decisions", "acceptance_criteria",
-             "files_to_create", "files_to_modify", "out_of_scope"],
+  required: ["files_written", "summary", "dependencies_added", "notes"],
   properties: {
-    scope:               { type: "string", minLength: 1 },
-    decisions:           { type: "array",  items: {
-      type: "object", required: ["decision", "rationale"],
-      properties: { decision: { type: "string" }, rationale: { type: "string" } }
+    files_written: { type: "array", items: {
+      type: "object", required: ["path", "action", "line_count", "sha256"],
+      properties: {
+        path:        { type: "string" },
+        action:      { enum: ["create", "modify"] },
+        line_count:  { type: "number", minimum: 0 },
+        sha256:      { type: "string" }
+      }
     }},
-    acceptance_criteria: { type: "array",  items: {
-      type: "object", required: ["id", "description"],
-      properties: { id: { type: "string" }, description: { type: "string" } }
+    summary:           { type: "string", minLength: 1 },
+    dependencies_added: { type: "array", items: {
+      type: "object", required: ["ecosystem", "package", "version"],
+      properties: {
+        ecosystem: { type: "string" },
+        package:   { type: "string" },
+        version:   { type: "string" }
+      }
     }},
-    files_to_create:     { type: "array",  items: {
-      type: "object", required: ["path", "purpose"],
-      properties: { path: { type: "string" }, purpose: { type: "string" } }
-    }},
-    files_to_modify:     { type: "array",  items: {
-      type: "object", required: ["path", "change"],
-      properties: { path: { type: "string" }, change: { type: "string" } }
-    }},
-    out_of_scope:        { type: "array",  items: { type: "string" } }
+    notes: { type: "array", items: { type: "string" } }
   }
 };
 
 module.exports = defineRole({
-  id:               "spec_writer",
-  label:            "Spec Writer",
-  description:      "Converts an architect design into a formal implementation specification",
-  default_provider: "anthropic",
+  id:               "builder",
+  label:            "Builder",
+  description:      "Plans the implementation by describing files to create; delegates to executor adapters",
+  default_provider: "claude_code",
   default_model:    "claude-opus-4-7",
-  system_prompt_id: "spec_writer_v1",
+  system_prompt_id: "builder_v1",
   input_schema:     INPUT_SCHEMA,
   output_schema:    OUTPUT_SCHEMA,
   authority_level:  "ADVISORY",
-  typical_cost_usd_min: 0.08,
-  typical_cost_usd_max: 0.40,
+  typical_cost_usd_min: 1.50,
+  typical_cost_usd_max: 4.00,
 
   async run(input, ctx) {
     const iv = validate(input, INPUT_SCHEMA);
@@ -62,10 +64,15 @@ module.exports = defineRole({
     const model      = (ctx && ctx.model)      || this.default_model;
     const project_id = input.project_id;
 
+    const scenarioTag = (ctx && ctx.scenario_id)
+      ? "\nSCENARIO_TAG: " + ctx.scenario_id + "\n"
+      : "";
+
     const prompt =
-      "spec_writer|" + project_id + "\n" +
+      "builder|" + project_id + "\n" +
+      scenarioTag +
       SYSTEM_PROMPT +
-      "\n\nINPUT:\n" + JSON.stringify({ design: input.design }) +
+      "\n\nINPUT:\n" + JSON.stringify({ spec: input.spec, design: input.design }) +
       "\n\nRESPOND WITH VALID JSON ONLY.";
 
     let agentResult;

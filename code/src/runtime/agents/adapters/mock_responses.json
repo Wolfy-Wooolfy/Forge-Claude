@@ -23,16 +23,70 @@
     "tokens_out": 500,
     "finish_reason": "stop"
   },
-  "mock|mock-rev-s89|reviewer|test_rev_s89\nYou are the Reviewer Agent for Forge, a multi-agent AI operating system.\n\nYou review other agents' outputs and identify issues that must be addressed before the pipeline proceeds.\n\nPhase A (spec review): you receive the Spec Writer's specification and the Architect's design.\nPhase B (code review): added in a future version — reject Phase B input with UNSUPPORTED_PHASE.\n\nYour task for Phase A: review the specification for completeness, correctness, and implementability.\n\nRes": {
+  "mock|mock-rev-s89|reviewer|test_rev_s89\nYou are the Reviewer Agent for Forge, a multi-agent AI operating system.\n\nYou review other agents' outputs and identify issues before the pipeline proceeds. You operate in two phases based on the `phase` field in your input.\n\nPhase A (spec review): you receive the Spec Writer's specification and the Architect's design. Your job is to verify the spec is complete, consistent, and implementable.\n\nPhase B (code review): you receive the Builder's code output (files_written, summ": {
     "text": "{\"verdict\":\"APPROVED\",\"findings\":[{\"severity\":\"INFO\",\"issue\":\"Only one acceptance criterion is defined\",\"location\":\"acceptance_criteria\",\"recommendation\":\"Consider adding AC for authentication failure cases\"}],\"summary\":\"The specification is implementable and consistent with the design. One informational note about coverage.\"}",
     "tokens_in": 700,
     "tokens_out": 300,
     "finish_reason": "stop"
   },
-  "mock|mock-rev-s90|reviewer|test_rev_s90\nYou are the Reviewer Agent for Forge, a multi-agent AI operating system.\n\nYou review other agents' outputs and identify issues that must be addressed before the pipeline proceeds.\n\nPhase A (spec review): you receive the Spec Writer's specification and the Architect's design.\nPhase B (code review): added in a future version — reject Phase B input with UNSUPPORTED_PHASE.\n\nYour task for Phase A: review the specification for completeness, correctness, and implementability.\n\nRes": {
+  "mock|mock-rev-s90|reviewer|test_rev_s90\nYou are the Reviewer Agent for Forge, a multi-agent AI operating system.\n\nYou review other agents' outputs and identify issues before the pipeline proceeds. You operate in two phases based on the `phase` field in your input.\n\nPhase A (spec review): you receive the Spec Writer's specification and the Architect's design. Your job is to verify the spec is complete, consistent, and implementable.\n\nPhase B (code review): you receive the Builder's code output (files_written, summ": {
     "text": "{\"verdict\":\"REJECTED\",\"findings\":[{\"severity\":\"BLOCKER\",\"issue\":\"acceptance_criteria is empty — no verifiable criteria exist\",\"location\":\"acceptance_criteria\",\"recommendation\":\"Add at least one AC per functional requirement\"},{\"severity\":\"BLOCKER\",\"issue\":\"files_to_create is empty but scope mentions building an API\",\"location\":\"files_to_create\",\"recommendation\":\"List every file that must be created to implement the scope\"},{\"severity\":\"WARN\",\"issue\":\"decisions array is empty — all implementation choices are implicit\",\"location\":\"decisions\",\"recommendation\":\"Document framework, database, and auth choices explicitly\"}],\"summary\":\"The specification is too sparse to implement. Two blockers prevent pipeline progression.\"}",
     "tokens_in": 700,
     "tokens_out": 350,
+    "finish_reason": "stop"
+  },
+  "mock|mock-rev-s102|scenario:S102": {
+    "text": "{\"verdict\":\"APPROVED_WITH_CONCERNS\",\"findings\":[{\"severity\":\"WARN\",\"issue\":\"files_written does not include a database migration file mentioned implicitly in AC-2\",\"location\":\"files_written\",\"recommendation\":\"Add src/db/migrations/001_init.js to cover AC-2 database setup\"},{\"severity\":\"WARN\",\"issue\":\"dependencies_added does not include a JWT library required by src/routes/auth.js\",\"location\":\"dependencies_added\",\"recommendation\":\"Add jsonwebtoken@^9.0.0 (npm) to match auth route implementation\"},{\"severity\":\"INFO\",\"issue\":\"line_count estimate for src/app.js (15 lines) seems low for full Express app setup\",\"location\":\"files_written[0]\",\"recommendation\":\"Review estimate; typical Express entry point is 40-80 lines\"}],\"summary\":\"The code plan covers the spec adequately. Two warnings require owner acknowledgment before build proceeds.\"}",
+    "tokens_in": 900,
+    "tokens_out": 450,
+    "finish_reason": "stop"
+  },
+  "mock|mock-bld-s92|scenario:S92": {
+    "text": "{\"files_written\":[{\"path\":\"src/app.js\",\"action\":\"create\",\"line_count\":60,\"sha256\":\"a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2\"},{\"path\":\"src/routes/tasks.js\",\"action\":\"create\",\"line_count\":80,\"sha256\":\"b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3\"},{\"path\":\"src/db.js\",\"action\":\"create\",\"line_count\":40,\"sha256\":\"c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4\"}],\"summary\":\"Created Express API entry point, task CRUD routes, and SQLite persistence layer with schema auto-initialization.\",\"dependencies_added\":[{\"ecosystem\":\"npm\",\"package\":\"express\",\"version\":\"^4.18.0\"},{\"ecosystem\":\"npm\",\"package\":\"jsonwebtoken\",\"version\":\"^9.0.0\"},{\"ecosystem\":\"npm\",\"package\":\"better-sqlite3\",\"version\":\"^9.0.0\"}],\"notes\":[\"Database schema auto-initializes on first run\",\"JWT_SECRET must be set as environment variable\"]}",
+    "tokens_in": 850,
+    "tokens_out": 420,
+    "finish_reason": "stop"
+  },
+  "mock|mock-bld-s94|scenario:S94": {
+    "text": "I am unable to generate a valid implementation plan for this input.",
+    "tokens_in": 300,
+    "tokens_out": 15,
+    "finish_reason": "stop"
+  },
+  "mock|mock-bld-s95|scenario:S95": {
+    "text": "{\"files_written\":\"not-an-array\",\"summary\":\"broken\",\"dependencies_added\":[],\"notes\":[]}",
+    "tokens_in": 300,
+    "tokens_out": 20,
+    "finish_reason": "stop"
+  },
+  "mock|mock-sec-s96|scenario:S96": {
+    "text": "{\"threat_level\":\"MEDIUM\",\"findings\":[{\"severity\":\"WARN\",\"vulnerability\":\"Missing rate limiting on authentication endpoint\",\"location\":\"spec.acceptance_criteria/AC-2\",\"attack_vector\":\"Attacker performs credential stuffing against POST /auth/login with no throttle applied\",\"mitigation\":\"Add rate limiting middleware capped at 5 login attempts per minute per IP address\"},{\"severity\":\"INFO\",\"vulnerability\":\"JWT secret management not specified in spec\",\"location\":\"spec.decisions\",\"attack_vector\":\"Hardcoded or weak JWT secret exposed via source code repository\",\"mitigation\":\"Require JWT_SECRET via environment variable; fail startup if absent or shorter than 32 characters\"}],\"summary\":\"Specification has medium threat exposure. No blockers found. Rate limiting on the auth endpoint is absent and JWT secret management is unspecified. Address the WARN before build proceeds.\"}",
+    "tokens_in": 750,
+    "tokens_out": 380,
+    "finish_reason": "stop"
+  },
+  "mock|mock-sec-s97|scenario:S97": {
+    "text": "{\"threat_level\":\"HIGH\",\"findings\":[{\"severity\":\"BLOCKER\",\"vulnerability\":\"SQL injection via unsanitized query parameter\",\"location\":\"src/routes/tasks.js\",\"attack_vector\":\"GET /tasks?user_id=1 OR 1=1-- bypasses user isolation and returns all tasks in the database\",\"mitigation\":\"Use parameterized queries via better-sqlite3's prepare().get() with bound parameters only; never concatenate user input into SQL strings\"},{\"severity\":\"WARN\",\"vulnerability\":\"Missing authentication middleware on DELETE endpoint\",\"location\":\"src/routes/tasks.js\",\"attack_vector\":\"Unauthenticated DELETE /tasks/:id removes any task without requiring a valid JWT\",\"mitigation\":\"Apply JWT validation middleware to all DELETE routes before the route handler executes\"}],\"summary\":\"Code plan has high threat exposure due to a SQL injection blocker in the task route. This must be resolved before build proceeds. One additional warning about missing authentication on the DELETE endpoint.\"}",
+    "tokens_in": 900,
+    "tokens_out": 450,
+    "finish_reason": "stop"
+  },
+  "mock|mock-sec-s99|scenario:S99": {
+    "text": "Security audit encountered an error. Unable to generate findings at this time.",
+    "tokens_in": 200,
+    "tokens_out": 15,
+    "finish_reason": "stop"
+  },
+  "mock|mock-td-s100|scenario:S100": {
+    "text": "{\"scenarios\":[{\"id\":\"T-1\",\"name\":\"Create user returns 201 with user ID\",\"description\":\"Verifies that a valid POST /users request creates a new user and returns HTTP 201 with the new user id\",\"inputs\":{\"method\":\"POST\",\"path\":\"/users\",\"body\":{\"username\":\"alice\",\"password\":\"secure123\"}},\"expected_outputs\":{\"status_code\":201,\"body.id\":\"non-null string\"},\"covers_ac\":[\"AC-1\"]},{\"id\":\"T-2\",\"name\":\"Login with valid credentials returns JWT\",\"description\":\"Verifies that POST /auth/login with correct credentials returns a signed JWT token\",\"inputs\":{\"method\":\"POST\",\"path\":\"/auth/login\",\"body\":{\"username\":\"alice\",\"password\":\"secure123\"}},\"expected_outputs\":{\"status_code\":200,\"body.token\":\"non-null string\"},\"covers_ac\":[\"AC-2\"]},{\"id\":\"T-3\",\"name\":\"GET /tasks without JWT returns 401\",\"description\":\"Verifies that accessing the tasks endpoint without a valid JWT token is rejected with HTTP 401 Unauthorized\",\"inputs\":{\"method\":\"GET\",\"path\":\"/tasks\",\"headers\":{}},\"expected_outputs\":{\"status_code\":401},\"covers_ac\":[\"AC-3\"]}],\"coverage_summary\":{\"acs_total\":3,\"acs_covered\":3,\"gaps\":[]}}",
+    "tokens_in": 800,
+    "tokens_out": 400,
+    "finish_reason": "stop"
+  },
+  "mock|mock-td-s103|scenario:S103": {
+    "text": "Unable to generate test scenarios from the provided specification.",
+    "tokens_in": 200,
+    "tokens_out": 12,
     "finish_reason": "stop"
   }
 }

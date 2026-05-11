@@ -1,0 +1,37 @@
+{
+  "id": "S96",
+  "name": "role.invoke security_auditor — Phase SPEC happy path returns threat_level",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "role.invoke",
+  "input": {
+    "role_id":     "security_auditor",
+    "project_id":  "test_sec_s96",
+    "provider":    "mock",
+    "model":       "mock-sec-s96",
+    "scenario_id": "S96",
+    "input": {
+      "project_id": "test_sec_s96",
+      "phase": "SPEC",
+      "spec": {
+        "scope": "Build a task management REST API",
+        "decisions": [{ "decision": "Use Express.js", "rationale": "Minimal setup" }],
+        "acceptance_criteria": [{ "id": "AC-1", "description": "POST /users returns 201" }],
+        "files_to_create": [{ "path": "src/app.js", "purpose": "Entry point" }],
+        "files_to_modify": [],
+        "out_of_scope": []
+      },
+      "design": {
+        "design_summary": "Node.js/Express API with SQLite",
+        "components": [{ "name": "API Server", "tech": "Express", "purpose": "HTTP handler" }],
+        "data_flow": "Client → API → SQLite",
+        "technology_choices": [],
+        "integration_points": [],
+        "identified_risks": []
+      }
+    }
+  },
+  "assertions": [
+    { "type": "status_equals", "expected": "SUCCESS" }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "S100",
+  "name": "role.invoke test_designer — happy path returns scenarios and coverage_summary",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "role.invoke",
+  "input": {
+    "role_id":     "test_designer",
+    "project_id":  "test_td_s100",
+    "provider":    "mock",
+    "model":       "mock-td-s100",
+    "scenario_id": "S100",
+    "input": {
+      "project_id": "test_td_s100",
+      "spec": {
+        "scope": "Build a task management REST API",
+        "decisions": [{ "decision": "Use Express.js", "rationale": "Minimal setup" }],
+        "acceptance_criteria": [
+          { "id": "AC-1", "description": "POST /users returns 201 with user id" },
+          { "id": "AC-2", "description": "POST /auth/login returns JWT on correct credentials" },
+          { "id": "AC-3", "description": "GET /tasks requires valid JWT; returns 401 without token" }
+        ],
+        "files_to_create": [{ "path": "src/app.js", "purpose": "Entry point" }],
+        "files_to_modify": [],
+        "out_of_scope": ["Frontend UI"]
+      },
+      "design": {
+        "design_summary": "Node.js/Express API with SQLite and JWT auth",
+        "components": [{ "name": "API Server", "tech": "Express", "purpose": "HTTP handler" }],
+        "data_flow": "Client → API → SQLite",
+        "technology_choices": [],
+        "integration_points": [],
+        "identified_risks": []
+      }
+    }
+  },
+  "assertions": [
+    { "type": "status_equals", "expected": "SUCCESS" }
+  ]
+}

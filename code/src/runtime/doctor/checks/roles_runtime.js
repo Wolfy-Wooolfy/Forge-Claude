@@ -21,7 +21,7 @@ module.exports = {
     }
 
     // 2. Required roles are registered
-    const REQUIRED_ROLES = ["architect", "spec_writer", "reviewer"];
+    const REQUIRED_ROLES = ["architect", "spec_writer", "reviewer", "builder", "security_auditor", "test_designer"];
     const roleIds = roles.map(r => r.id);
 
     for (const required of REQUIRED_ROLES) {
