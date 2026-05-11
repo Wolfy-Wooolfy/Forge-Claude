@@ -88,5 +88,65 @@
     "tokens_in": 200,
     "tokens_out": 12,
     "finish_reason": "stop"
+  },
+  "mock|mock-ce-s104|scenario:S104": {
+    "text": "{\"phases\":[{\"phase\":\"Setup & Infrastructure\",\"description\":\"Initialize project, configure Node.js runtime, set up SQLite\",\"effort_low_hours\":2,\"effort_mid_hours\":4,\"effort_high_hours\":8,\"cost_drivers\":[\"dependency configuration\",\"environment setup\"]},{\"phase\":\"Core API Development\",\"description\":\"Implement CRUD endpoints for tasks and users with JWT auth\",\"effort_low_hours\":10,\"effort_mid_hours\":16,\"effort_high_hours\":24,\"cost_drivers\":[\"auth complexity\",\"input validation coverage\"]}],\"total_effort_low_hours\":12,\"total_effort_mid_hours\":20,\"total_effort_high_hours\":32,\"external_costs\":[],\"top_risks\":[{\"risk\":\"JWT secret management complexity\",\"impact\":\"MEDIUM\",\"mitigation\":\"Use environment variable; document rotation procedure\"}],\"uncertainty_flags\":[\"AC-3 auth enforcement scope not fully specified\"],\"summary\":\"Mid-range effort of 20 developer hours; primary cost driver is auth complexity; external costs are zero for SQLite-based stack.\"}",
+    "tokens_in": 700,
+    "tokens_out": 350,
+    "finish_reason": "stop"
+  },
+  "mock|mock-ce-s106|scenario:S106": {
+    "text": "I cannot generate a cost estimate at this time.",
+    "tokens_in": 200,
+    "tokens_out": 12,
+    "finish_reason": "stop"
+  },
+  "mock|mock-env-s107|scenario:S107": {
+    "text": "{\"target_environment\":\"container\",\"runtime_dependencies\":[{\"name\":\"Node.js\",\"version_constraint\":\">=20.0.0\",\"purpose\":\"Application runtime\"},{\"name\":\"SQLite3\",\"version_constraint\":\">=3.40.0\",\"purpose\":\"Embedded database\"}],\"environment_variables\":[{\"name\":\"JWT_SECRET\",\"purpose\":\"Signs and verifies JWT tokens\",\"format\":\"string\",\"required\":true,\"is_secret\":true,\"example\":\"your-jwt-secret-here\"},{\"name\":\"PORT\",\"purpose\":\"HTTP server listen port\",\"format\":\"integer\",\"required\":false,\"is_secret\":false,\"example\":\"3000\"}],\"external_services\":[],\"os_requirements\":{\"os_family\":\"linux\",\"min_ram_mb\":256,\"min_disk_mb\":512,\"cpu_notes\":\"x86_64 or arm64\"},\"container_recommendation\":{\"base_image\":\"node:20-alpine\",\"multi_stage\":false,\"notes\":\"Single-stage build sufficient; SQLite file stored in volume mount\"},\"filesystem_requirements\":[{\"path\":\"/app/data\",\"access\":\"read-write\",\"notes\":\"SQLite database file location; must be mounted as volume for persistence\"}],\"assumption_flags\":[\"No TLS termination specified; assumed handled by reverse proxy\"],\"summary\":\"Container-based Node.js 20 environment; JWT_SECRET is the only secret; SQLite requires a writable volume mount for persistence.\"}",
+    "tokens_in": 700,
+    "tokens_out": 380,
+    "finish_reason": "stop"
+  },
+  "mock|mock-env-s109|scenario:S109": {
+    "text": "Unable to analyze environment at this time.",
+    "tokens_in": 200,
+    "tokens_out": 10,
+    "finish_reason": "stop"
+  },
+  "mock|mock-doc-s110|scenario:S110": {
+    "text": "{\"overview\":{\"title\":\"Task Management REST API\",\"purpose\":\"A RESTful API for managing tasks and users with JWT authentication, built with Node.js and SQLite.\",\"key_capabilities\":[\"User registration and authentication\",\"Task CRUD operations\",\"JWT-based access control\"]},\"components\":[{\"name\":\"API Server\",\"description\":\"Express.js HTTP server handling all API requests\",\"interface_summary\":\"Exposes REST endpoints on configured PORT; responds with JSON\"},{\"name\":\"Auth Module\",\"description\":\"Issues and validates JWT tokens for authenticated routes\",\"interface_summary\":\"POST /auth/login returns JWT; validates Authorization header on protected routes\"},{\"name\":\"Database\",\"description\":\"SQLite file-based database for users and tasks\",\"interface_summary\":\"Accessed internally by route handlers; not exposed externally\"}],\"api_reference\":[{\"endpoint\":\"/users\",\"method\":\"POST\",\"description\":\"Register a new user\",\"inputs\":\"JSON body: { username, password }\",\"outputs\":\"201 with { id, username }\",\"errors\":[\"400 if username taken\",\"422 if fields missing\"]},{\"endpoint\":\"/auth/login\",\"method\":\"POST\",\"description\":\"Authenticate and receive a JWT\",\"inputs\":\"JSON body: { username, password }\",\"outputs\":\"200 with { token }\",\"errors\":[\"401 if credentials invalid\"]},{\"endpoint\":\"/tasks\",\"method\":\"GET\",\"description\":\"List tasks for authenticated user\",\"inputs\":\"Authorization: Bearer <token>\",\"outputs\":\"200 with [{ id, title, status }]\",\"errors\":[\"401 if token missing or invalid\"]}],\"quickstart\":{\"prerequisites\":[\"Node.js >=20 installed\",\"JWT_SECRET environment variable set\"],\"steps\":[\"Install dependencies: npm install\",\"Start server: node src/app.js\",\"Send POST /users to register; POST /auth/login to get token; GET /tasks with token\"]},\"operations\":{\"health_check\":\"GET /health returns 200 OK when server is running\",\"logging\":\"Request method and path logged to stdout at INFO level; errors logged at ERROR level\",\"common_issues\":[{\"symptom\":\"401 on all requests\",\"cause\":\"JWT_SECRET not set or changed\",\"fix\":\"Ensure JWT_SECRET env var is set and tokens were issued with current secret\"},{\"symptom\":\"Database locked error\",\"cause\":\"Concurrent writes to SQLite exceed capacity\",\"fix\":\"Serialize write operations or migrate to PostgreSQL\"}]},\"known_limitations\":[\"Real-time task sync is out of scope\",\"Email notifications are out of scope\",\"Frontend UI is out of scope\"],\"summary\":\"Documentation covers all 3 components and 3 API endpoints; intended for developer operators; covers happy path and 2 common error scenarios.\"}",
+    "tokens_in": 900,
+    "tokens_out": 600,
+    "finish_reason": "stop"
+  },
+  "mock|mock-doc-s112|scenario:S112": {
+    "text": "Documentation generation failed. Please retry.",
+    "tokens_in": 200,
+    "tokens_out": 8,
+    "finish_reason": "stop"
+  },
+  "mock|mock-dep-s113|scenario:S113": {
+    "text": "{\"target_environment\":\"container\",\"prerequisites\":[{\"item\":\"Docker >=24 installed on host\",\"verified_by\":\"docker --version shows >=24.0\"},{\"item\":\"JWT_SECRET environment variable defined\",\"verified_by\":\"echo $JWT_SECRET returns non-empty value\"},{\"item\":\"Port 3000 available on host\",\"verified_by\":\"netstat -tuln shows port 3000 not in use\"}],\"build_steps\":[{\"step\":1,\"description\":\"Build Docker image from project root using the provided Dockerfile\",\"artifact\":\"Docker image tagged forge-app:latest\",\"notes\":\"No secrets should be baked into the image\"},{\"step\":2,\"description\":\"Verify image builds without error and contains node src/app.js entrypoint\",\"artifact\":\"Image inspection output\",\"notes\":\"Check CMD directive in image metadata\"}],\"deployment_sequence\":[{\"step\":1,\"description\":\"Create named volume for SQLite data persistence if not already present\",\"requires_elevated_privileges\":false,\"is_irreversible\":false,\"notes\":\"Volume persists across container restarts\"},{\"step\":2,\"description\":\"Run container with JWT_SECRET env var and data volume mounted at /app/data\",\"requires_elevated_privileges\":false,\"is_irreversible\":false,\"notes\":\"Use --restart unless-stopped for production\"},{\"step\":3,\"description\":\"Verify container started successfully by checking container logs for server listening message\",\"requires_elevated_privileges\":false,\"is_irreversible\":false,\"notes\":\"Allow up to 10 seconds for startup\"}],\"rollback_procedure\":[{\"step\":1,\"description\":\"Stop the running container\"},{\"step\":2,\"description\":\"Start previous image version with same volume and environment configuration\"}],\"health_verification\":{\"method\":\"Send GET request to http://localhost:3000/health\",\"expected_outcome\":\"HTTP 200 response with body OK\",\"timeout_seconds\":30},\"post_deployment_tasks\":[\"Verify POST /users creates a user\",\"Verify POST /auth/login returns a valid token\"],\"deployment_risks\":[{\"risk\":\"SQLite data volume not mounted — data lost on container restart\",\"severity\":\"HIGH\",\"mitigation\":\"Always specify volume mount in run command; verify /app/data path in container\"},{\"risk\":\"JWT_SECRET not set — all auth will fail\",\"severity\":\"HIGH\",\"mitigation\":\"Check JWT_SECRET in environment before starting container\"}],\"summary\":\"Container deployment to Docker; critical path is volume mount and JWT_SECRET; top risk is data loss if volume is omitted.\"}",
+    "tokens_in": 800,
+    "tokens_out": 500,
+    "finish_reason": "stop"
+  },
+  "mock|mock-dep-s115|scenario:S115": {
+    "text": "Deployment plan generation is unavailable.",
+    "tokens_in": 200,
+    "tokens_out": 8,
+    "finish_reason": "stop"
+  },
+  "mock|mock-qj-s116|scenario:S116": {
+    "text": "{\"verdict\":\"APPROVED\",\"confidence_score\":85,\"cross_role_issues\":[{\"severity\":\"INFO\",\"issue\":\"Cost estimate phases do not map explicitly to spec AC IDs\",\"roles_involved\":[\"cost_estimator\",\"spec_writer\"],\"recommendation\":\"Consider annotating cost phases with AC references in future iterations\"}],\"role_assessments\":{\"architect\":{\"status\":\"CLEAN\",\"notes\":\"Design is internally consistent with clear component boundaries\"},\"spec_writer\":{\"status\":\"CLEAN\",\"notes\":\"All 3 ACs are testable and unambiguous\"},\"reviewer\":{\"status\":\"CLEAN\",\"notes\":\"Phase A review approved the spec\"},\"security_auditor\":{\"status\":\"CONCERNS\",\"notes\":\"MEDIUM threat_level; no BLOCKERs; owner should review WARN findings\"},\"builder\":{\"status\":\"CLEAN\",\"notes\":\"All spec files accounted for in build plan\"},\"test_designer\":{\"status\":\"CLEAN\",\"notes\":\"All 3 ACs covered by scenarios\"},\"documentation\":{\"status\":\"CLEAN\",\"notes\":\"All components and endpoints documented\"},\"cost_estimator\":{\"status\":\"CLEAN\",\"notes\":\"Estimate range is reasonable for scope\"},\"environment\":{\"status\":\"CLEAN\",\"notes\":\"Container strategy is appropriate; JWT_SECRET correctly flagged as secret\"},\"deployment\":{\"status\":\"CLEAN\",\"notes\":\"Rollback procedure covers all irreversible steps\"}},\"action_items\":[\"Owner should review security_auditor WARN findings before first production deployment\"],\"summary\":\"Pipeline output is consistent and complete with confidence score 85; one WARN from security audit requires owner acknowledgment; delivery is approved.\"}",
+    "tokens_in": 900,
+    "tokens_out": 550,
+    "finish_reason": "stop"
+  },
+  "mock|mock-qj-s118|scenario:S118": {
+    "text": "{\"verdict\":\"REJECTED\",\"confidence_score\":42,\"cross_role_issues\":[{\"severity\":\"BLOCKER\",\"issue\":\"Spec AC-3 (JWT auth enforcement) has no corresponding test scenario in test_designer output\",\"roles_involved\":[\"spec_writer\",\"test_designer\"],\"recommendation\":\"Add a test scenario covering GET /tasks with missing and invalid JWT\"},{\"severity\":\"WARN\",\"issue\":\"Security audit reports HIGH threat_level but pipeline was not halted\",\"roles_involved\":[\"security_auditor\"],\"recommendation\":\"Resolve or explicitly acknowledge HIGH security findings before re-judging\"}],\"role_assessments\":{\"architect\":{\"status\":\"CLEAN\",\"notes\":\"Design is coherent\"},\"spec_writer\":{\"status\":\"CONCERNS\",\"notes\":\"AC-3 defined but not covered by tests\"},\"reviewer\":{\"status\":\"CLEAN\",\"notes\":\"Approved with concerns\"},\"security_auditor\":{\"status\":\"CRITICAL\",\"notes\":\"HIGH threat_level with unresolved BLOCKER finding\"},\"builder\":{\"status\":\"CLEAN\",\"notes\":\"Build plan covers spec files\"},\"test_designer\":{\"status\":\"CRITICAL\",\"notes\":\"AC-3 not covered by any scenario\"},\"documentation\":{\"status\":\"CONCERNS\",\"notes\":\"Not provided to quality_judge\"},\"cost_estimator\":{\"status\":\"CLEAN\",\"notes\":\"Estimate is reasonable\"},\"environment\":{\"status\":\"CLEAN\",\"notes\":\"Container strategy correct\"},\"deployment\":{\"status\":\"CONCERNS\",\"notes\":\"Not provided to quality_judge\"}},\"action_items\":[\"Add test scenario for AC-3 JWT enforcement\",\"Resolve HIGH security finding from security_auditor before re-judging\"],\"summary\":\"Pipeline rejected due to AC-3 test coverage gap and unresolved HIGH security finding; confidence score 42; two action items must be completed before re-judging.\"}",
+    "tokens_in": 900,
+    "tokens_out": 580,
+    "finish_reason": "stop"
   }
 }

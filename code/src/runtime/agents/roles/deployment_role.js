@@ -6,54 +6,93 @@ const { loadPrompt }                      = require("../_prompt_loader");
 const { emit: emitActivity }             = require("../_activity_emitter");
 const { getIndicator }                   = require("../_activity_catalog");
 
-const SYSTEM_PROMPT = loadPrompt("spec_writer_v1");
+const SYSTEM_PROMPT = loadPrompt("deployment_v1");
 
 const INPUT_SCHEMA = {
   type: "object",
-  required: ["design", "project_id"],
+  required: ["project_id", "spec", "design"],
   properties: {
-    design:     { type: "object" },
-    project_id: { type: "string", minLength: 1 }
+    project_id:  { type: "string", minLength: 1 },
+    spec:        { type: "object" },
+    design:      { type: "object" },
+    environment: { type: "object" }
   }
 };
 
 const OUTPUT_SCHEMA = {
   type: "object",
-  required: ["scope", "decisions", "acceptance_criteria",
-             "files_to_create", "files_to_modify", "out_of_scope"],
+  required: ["target_environment", "prerequisites", "build_steps",
+             "deployment_sequence", "rollback_procedure", "health_verification",
+             "post_deployment_tasks", "deployment_risks", "summary"],
   properties: {
-    scope:               { type: "string", minLength: 1 },
-    decisions:           { type: "array",  items: {
-      type: "object", required: ["decision", "rationale"],
-      properties: { decision: { type: "string" }, rationale: { type: "string" } }
+    target_environment: { type: "string", minLength: 1 },
+    prerequisites: { type: "array", items: {
+      type: "object", required: ["item", "verified_by"],
+      properties: {
+        item:        { type: "string" },
+        verified_by: { type: "string" }
+      }
     }},
-    acceptance_criteria: { type: "array",  items: {
-      type: "object", required: ["id", "description"],
-      properties: { id: { type: "string" }, description: { type: "string" } }
+    build_steps: { type: "array", items: {
+      type: "object", required: ["step", "description", "artifact", "notes"],
+      properties: {
+        step:        { type: "number" },
+        description: { type: "string" },
+        artifact:    { type: "string" },
+        notes:       { type: "string" }
+      }
     }},
-    files_to_create:     { type: "array",  items: {
-      type: "object", required: ["path", "purpose"],
-      properties: { path: { type: "string" }, purpose: { type: "string" } }
+    deployment_sequence: { type: "array", items: {
+      type: "object",
+      required: ["step", "description", "requires_elevated_privileges", "is_irreversible", "notes"],
+      properties: {
+        step:                        { type: "number" },
+        description:                 { type: "string" },
+        requires_elevated_privileges:{ type: "boolean" },
+        is_irreversible:             { type: "boolean" },
+        notes:                       { type: "string" }
+      }
     }},
-    files_to_modify:     { type: "array",  items: {
-      type: "object", required: ["path", "change"],
-      properties: { path: { type: "string" }, change: { type: "string" } }
+    rollback_procedure: { type: "array", items: {
+      type: "object", required: ["step", "description"],
+      properties: {
+        step:        { type: "number" },
+        description: { type: "string" }
+      }
     }},
-    out_of_scope:        { type: "array",  items: { type: "string" } }
+    health_verification: {
+      type: "object",
+      required: ["method", "expected_outcome", "timeout_seconds"],
+      properties: {
+        method:           { type: "string" },
+        expected_outcome: { type: "string" },
+        timeout_seconds:  { type: "number", minimum: 1 }
+      }
+    },
+    post_deployment_tasks: { type: "array", items: { type: "string" } },
+    deployment_risks: { type: "array", items: {
+      type: "object", required: ["risk", "severity", "mitigation"],
+      properties: {
+        risk:       { type: "string" },
+        severity:   { enum: ["LOW", "MEDIUM", "HIGH"] },
+        mitigation: { type: "string" }
+      }
+    }},
+    summary: { type: "string", minLength: 1 }
   }
 };
 
 module.exports = defineRole({
-  id:               "spec_writer",
-  label:            "Spec Writer",
-  description:      "Converts an architect design into a formal implementation specification",
+  id:               "deployment",
+  label:            "Deployment",
+  description:      "Produces a structured deployment plan including build steps, rollback, and health verification",
   default_provider: "anthropic",
   default_model:    "claude-opus-4-7",
-  system_prompt_id: "spec_writer_v1",
+  system_prompt_id: "deployment_v1",
   input_schema:     INPUT_SCHEMA,
   output_schema:    OUTPUT_SCHEMA,
   authority_level:  "ADVISORY",
-  typical_cost_usd_min: 0.08,
+  typical_cost_usd_min: 0.10,
   typical_cost_usd_max: 0.40,
 
   async run(input, ctx) {
@@ -70,11 +109,14 @@ module.exports = defineRole({
       ? "\nSCENARIO_TAG: " + ctx.scenario_id + "\n"
       : "";
 
+    const inputData = { spec: input.spec, design: input.design };
+    if (input.environment) inputData.environment = input.environment;
+
     const prompt =
-      "spec_writer|" + project_id + "\n" +
+      "deployment|" + project_id + "\n" +
       scenarioTag +
       SYSTEM_PROMPT +
-      "\n\nINPUT:\n" + JSON.stringify({ design: input.design }) +
+      "\n\nINPUT:\n" + JSON.stringify(inputData) +
       "\n\nRESPOND WITH VALID JSON ONLY.";
 
     let agentResult;

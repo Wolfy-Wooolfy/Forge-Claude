@@ -3,6 +3,8 @@
 const { defineRole, roleOk, roleFailed } = require("../_role_contract");
 const { validate }                        = require("../_json_schema_validator");
 const { loadPrompt }                      = require("../_prompt_loader");
+const { emit: emitActivity }             = require("../_activity_emitter");
+const { getIndicator }                   = require("../_activity_catalog");
 
 const SYSTEM_PROMPT = loadPrompt("architect_v1");
 
@@ -62,12 +64,19 @@ module.exports = defineRole({
     const iv = validate(input, INPUT_SCHEMA);
     if (!iv.valid) return roleFailed("INVALID_INPUT", iv.errors.join("; "), ctx);
 
-    const provider   = (ctx && ctx.provider)   || this.default_provider;
-    const model      = (ctx && ctx.model)      || this.default_model;
-    const project_id = input.project_id;
+    const provider      = (ctx && ctx.provider)      || this.default_provider;
+    const model         = (ctx && ctx.model)         || this.default_model;
+    const project_id    = input.project_id;
+    const invocation_id = (ctx && ctx.invocation_id) || null;
+    const root          = (ctx && ctx.root)          || process.cwd();
+
+    const scenarioTag = (ctx && ctx.scenario_id)
+      ? "\nSCENARIO_TAG: " + ctx.scenario_id + "\n"
+      : "";
 
     const prompt =
       "architect|" + project_id + "\n" +
+      scenarioTag +
       SYSTEM_PROMPT +
       "\n\nINPUT:\n" + JSON.stringify({ intent: input.intent }) +
       "\n\nRESPOND WITH VALID JSON ONLY.";
@@ -78,7 +87,7 @@ module.exports = defineRole({
       agentResult = await reg.invoke(
         "agent.invoke",
         { provider, model, prompt, project_id, context: { role: this.id } },
-        { root: (ctx && ctx.root) || process.cwd(), role_id: this.id }
+        { root, role_id: this.id }
       );
     } catch (err) {
       return roleFailed("AGENT_INVOKE_ERROR", err.message, ctx);
@@ -96,8 +105,18 @@ module.exports = defineRole({
       return roleFailed("INVALID_ROLE_OUTPUT", "JSON parse failed: " + e.message, ctx);
     }
 
+    try {
+      emitActivity({ invocation_id, project_id, role: this.id,
+        state: "PARSING_OUTPUT", indicator: getIndicator(this.id, "PARSING_OUTPUT") }, { root });
+    } catch (_e) { /* best-effort */ }
+
     const ov = validate(parsed, OUTPUT_SCHEMA);
     if (!ov.valid) return roleFailed("INVALID_ROLE_OUTPUT", ov.errors.join("; "), ctx);
+
+    try {
+      emitActivity({ invocation_id, project_id, role: this.id,
+        state: "VALIDATING_SCHEMA", indicator: getIndicator(this.id, "VALIDATING_SCHEMA") }, { root });
+    } catch (_e) { /* best-effort */ }
 
     return roleOk(parsed, { role: this.id, model, provider });
   }

@@ -4,10 +4,10 @@
   "current_stage": "A",
   "overall_progress_percent": 99,
   "stage_progress_percent": 100,
-  "current_task": "PHASE-7-F-2-CLOSED",
-  "next_phase": "PHASE-7-F-3",
-  "next_step": "Begin PHASE-7-F-3 per architecture/VISION-PHASE-7-F.md. Prerequisite: PHASE-7-F-2 CLOSED.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-20260511-0930-phase-7-F-2-build-verify-roles.md",
+  "current_task": "PHASE-7-F-3-CLOSED",
+  "next_phase": "PHASE-8",
+  "next_step": "Begin PHASE-8 per architecture/FORGE_V2_PHASE_ROADMAP.md. Prerequisite: PHASE-7-F-3 CLOSED.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-20260511-1000-phase-7-F-3-quality-delivery-roles.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -74,19 +74,19 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-05-11T09:30:00.000Z",
+    "last_doctor_run": "2026-05-11T10:10:00.000Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
     "self_test_last_run": "2026-05-11",
-    "self_test_last_result": "98 passed, 0 failed, 5 skipped (103 total) — full PHASE-7-F-2 coverage (5 SKIPs require docker/podman daemon)",
-    "self_test_scenarios_pass": 98,
+    "self_test_last_result": "113 passed, 0 failed, 5 skipped (118 total) — full PHASE-7-F-3 coverage (5 SKIPs require docker/podman daemon)",
+    "self_test_scenarios_pass": 113,
     "self_test_scenarios_skip": 5,
     "self_test_scenarios_fail": 0,
     "providers_registered_count": 12,
-    "tools_registered_count": 55,
+    "tools_registered_count": 56,
     "doctor_checks_count": 20,
-    "assertion_types_count": 9,
+    "assertion_types_count": 10,
     "active_permission_mode": "WORKSPACE_WRITE",
     "permission_policy_installed": true,
     "vision_authority": "ENABLED",
@@ -96,7 +96,10 @@
     "container_lifecycle": "ENABLED",
     "agent_runtime": "ENABLED",
     "roles_runtime": "ENABLED",
-    "note": "PHASE-7-F-2 closed. Build & Verify Roles active: builder, security_auditor, test_designer + reviewer Phase B. _prompt_loader.js single source of truth. scenario_id mock keys. role.invoke gains scenario_id field. scenarios: 91→103.",
+    "live_smoke_available": true,
+    "live_smoke_last_run": "2026-05-11",
+    "live_smoke_last_result": "10/11 roles PASS (security_auditor: gpt-4o-mini JSON format issue); provider: openai/gpt-4o-mini",
+    "note": "PHASE-7-F-3 closed. Quality & Delivery Roles: cost_estimator, environment, documentation, deployment, quality_judge. Activity Indicator System: _activity_catalog.js, _activity_emitter.js, activity_tools.js. role.invoke emits INVOKING_ADAPTER/COMPLETED/FAILED. All 6 existing roles retrofit with PARSING_OUTPUT/VALIDATING_SCHEMA. Live smoke runner + CLI. scenarios: 103→118. tools: 55→56. assertion types: 9→10.",
     "last_doctor_counts": {
       "pass": 17,
       "warn": 3,
@@ -120,11 +123,11 @@
       "PHASE-7-C-3",
       "PHASE-7-E",
       "PHASE-7-F-1",
-      "PHASE-7-F-2"
+      "PHASE-7-F-2",
+      "PHASE-7-F-3"
     ],
-    "next": "PHASE-7-F-3",
+    "next": "PHASE-8",
     "remaining": [
-      "PHASE-7-F-3",
       "PHASE-8",
       "PHASE-9",
       "PHASE-10",
@@ -137,5 +140,5 @@
       "PHASE-14"
     ]
   },
-  "last_updated": "2026-05-11T09:30:00.000Z"
+  "last_updated": "2026-05-11T10:10:00.000Z"
 }

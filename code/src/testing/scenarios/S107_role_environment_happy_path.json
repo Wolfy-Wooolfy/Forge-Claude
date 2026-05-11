@@ -1,0 +1,40 @@
+{
+  "id": "S107",
+  "name": "role.invoke environment — happy path returns container_recommendation and env vars",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "role.invoke",
+  "input": {
+    "role_id":     "environment",
+    "project_id":  "test_env_s107",
+    "provider":    "mock",
+    "model":       "mock-env-s107",
+    "scenario_id": "S107",
+    "input": {
+      "project_id": "test_env_s107",
+      "spec": {
+        "scope": "Build a task management REST API",
+        "decisions": [{ "decision": "Use Express.js", "rationale": "Minimal setup" }],
+        "acceptance_criteria": [
+          { "id": "AC-1", "description": "POST /users returns 201 with user id" }
+        ],
+        "files_to_create": [{ "path": "src/app.js", "purpose": "Entry point" }],
+        "files_to_modify": [],
+        "out_of_scope": []
+      },
+      "design": {
+        "design_summary": "Node.js/Express API with SQLite and JWT auth",
+        "components": [{ "name": "API Server", "tech": "Express", "purpose": "HTTP handler" }],
+        "data_flow": "Client → API → SQLite",
+        "technology_choices": [],
+        "integration_points": [],
+        "identified_risks": []
+      }
+    }
+  },
+  "assertions": [
+    { "type": "status_equals", "expected": "SUCCESS" },
+    { "type": "output_field_exists", "field": "container_recommendation" },
+    { "type": "output_field_exists", "field": "environment_variables" }
+  ]
+}

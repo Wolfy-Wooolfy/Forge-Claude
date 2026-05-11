@@ -1,8 +1,9 @@
 # 18 — Agent Roles Contract
 
-> Implemented: PHASE-7-F-1 (architect, spec_writer, reviewer Phase A), PHASE-7-F-2 (builder, security_auditor, test_designer, reviewer Phase B).
-> Authority: `artifacts/decisions/DECISION-20260510-2100-phase-7-F-1-foundation-roles.md`, `artifacts/decisions/DECISION-20260511-0930-phase-7-F-2-build-verify-roles.md`
+> Implemented: PHASE-7-F-1 (architect, spec_writer, reviewer Phase A), PHASE-7-F-2 (builder, security_auditor, test_designer, reviewer Phase B), PHASE-7-F-3 (cost_estimator, environment, documentation, deployment, quality_judge + Activity Indicator System).
+> Authority: `artifacts/decisions/DECISION-20260510-2100-phase-7-F-1-foundation-roles.md`, `artifacts/decisions/DECISION-20260511-0930-phase-7-F-2-build-verify-roles.md`, `artifacts/decisions/DECISION-20260511-1000-phase-7-F-3-quality-delivery-roles.md`
 > System prompts: `docs/10_runtime/18b_ROLE_PROMPTS.md`
+> Activity indicators: `docs/10_runtime/19_ACTIVITY_INDICATORS.md`
 
 ---
 
@@ -108,7 +109,26 @@ Enabled by passing `scenario_id` to `role.invoke` input. The role injects `\nSCE
 
 ---
 
-## Registered Roles (PHASE-7-F-1 + PHASE-7-F-2)
+## Role Invoke Wrapper — Activity Emit Points (PHASE-7-F-3)
+
+`role.invoke` in `role_tools.js` generates a `crypto.randomUUID()` invocation_id and emits activity events at 3 points:
+
+1. **INVOKING_ADAPTER** — immediately before `role.run()`
+2. **COMPLETED** — on `role.run()` SUCCESS, with `duration_ms` and `outcome: "success"`
+3. **FAILED** — on `role.run()` failure or uncaught error, with `duration_ms` and `outcome: "failed"`
+
+Inside each role's `run()`, 2 additional emit points fire on success:
+
+4. **PARSING_OUTPUT** — after successful `JSON.parse()`
+5. **VALIDATING_SCHEMA** — after successful schema validation
+
+All emits are best-effort (wrapped in try/catch). Emit failures never block role execution. Events are written to `artifacts/agent/activity.jsonl` (one JSON object per line).
+
+See `docs/10_runtime/19_ACTIVITY_INDICATORS.md` for indicator text per role per state.
+
+---
+
+## Registered Roles (PHASE-7-F-1 + PHASE-7-F-2 + PHASE-7-F-3)
 
 ### architect
 
@@ -257,13 +277,93 @@ All side effects go through `agent.invoke` (which writes to cost ledger) and the
 
 ---
 
-## Future Roles (PHASE-7-F-3 and beyond)
+### cost_estimator
+
+| Field | Value |
+|---|---|
+| `id` | `cost_estimator` |
+| `authority_level` | `ADVISORY` |
+| `system_prompt_id` | `cost_estimator_v1` |
+| `default_model` | `claude-opus-4-7` |
+
+**Input schema:** `{ project_id: string, spec: object, design: object }`
+
+**Output schema:** `{ phases[], total_effort_low_hours, total_effort_mid_hours, total_effort_high_hours, external_costs[], top_risks[], uncertainty_flags[], summary }`
+
+Produces effort and cost estimates for the project based on spec and design. Reports developer hours only (no calendar dates, no team sizing). Flags high-uncertainty ACs in `uncertainty_flags`.
+
+---
+
+### environment
+
+| Field | Value |
+|---|---|
+| `id` | `environment` |
+| `authority_level` | `ADVISORY` |
+| `system_prompt_id` | `environment_v1` |
+| `default_model` | `claude-opus-4-7` |
+
+**Input schema:** `{ project_id: string, spec: object, design: object }`
+
+**Output schema:** `{ target_environment, runtime_dependencies[], environment_variables[], external_services[], os_requirements, container_recommendation, filesystem_requirements[], assumption_flags[], summary }`
+
+Produces environment requirements report. Defaults to Docker container target. Forbids auto-install — reports only. Never marks a secret env var as non-secret.
+
+---
+
+### documentation
+
+| Field | Value |
+|---|---|
+| `id` | `documentation` |
+| `authority_level` | `ADVISORY` |
+| `system_prompt_id` | `documentation_v1` |
+| `default_model` | `claude-opus-4-7` |
+
+**Input schema:** `{ project_id: string, spec: object, design: object, code?: object }`
+
+**Output schema:** `{ overview, components[], api_reference[], quickstart, operations, known_limitations[], summary }`
+
+Generates structured documentation package for the project being built (not for Forge). `code` field is optional; when provided, enriches API reference.
+
+---
+
+### deployment
+
+| Field | Value |
+|---|---|
+| `id` | `deployment` |
+| `authority_level` | `ADVISORY` |
+| `system_prompt_id` | `deployment_v1` |
+| `default_model` | `claude-opus-4-7` |
+
+**Input schema:** `{ project_id: string, spec: object, design: object, environment?: object }`
+
+**Output schema:** `{ target_environment, prerequisites[], build_steps[], deployment_sequence[], rollback_procedure[], health_verification, post_deployment_tasks[], deployment_risks[], summary }`
+
+Produces deployment plan in prose (no shell commands). Flags irreversible steps. `environment` field optional; when provided, enriches prerequisites and build steps.
+
+---
+
+### quality_judge
+
+| Field | Value |
+|---|---|
+| `id` | `quality_judge` |
+| `authority_level` | `BLOCKING` |
+| `system_prompt_id` | `quality_judge_v1` |
+| `default_model` | `claude-opus-4-7` |
+
+**Input schema:** `{ project_id: string, spec: object, design: object, security_audit?: object, test_plan?: object, documentation?: object, cost_estimate?: object, environment?: object, deployment?: object, builder_output?: object }`
+
+**Output schema:** `{ verdict: "APPROVED"|"APPROVED_WITH_CONCERNS"|"REJECTED", confidence_score: 0-100, cross_role_issues[], role_assessments: {architect, spec_writer, ...}, action_items[], summary }`
+
+Final cross-role quality gate before delivery. Hard gate: REJECTED if any preceding role had unresolved CRITICAL/BLOCKER finding. `confidence_score` < 60 → REJECTED. All 10 role assessments required in output.
+
+---
+
+## Future Roles (PHASE-11+)
 
 | Role | Phase | Status |
 |---|---|---|
-| Documentation | PHASE-7-F-3 | PENDING |
-| Cost Estimator | PHASE-7-F-3 | PENDING |
-| Environment | PHASE-7-F-3 | PENDING |
-| Quality Judge | PHASE-7-F-3 | PENDING |
-| Deployment | PHASE-7-F-3 | PENDING |
 | Reverse Architect | PHASE-11 | DEFERRED |

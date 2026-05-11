@@ -1,0 +1,46 @@
+{
+  "id": "S110",
+  "name": "role.invoke documentation — happy path returns overview and api_reference",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "role.invoke",
+  "input": {
+    "role_id":     "documentation",
+    "project_id":  "test_doc_s110",
+    "provider":    "mock",
+    "model":       "mock-doc-s110",
+    "scenario_id": "S110",
+    "input": {
+      "project_id": "test_doc_s110",
+      "spec": {
+        "scope": "Build a task management REST API",
+        "decisions": [{ "decision": "Use Express.js", "rationale": "Minimal setup" }],
+        "acceptance_criteria": [
+          { "id": "AC-1", "description": "POST /users returns 201 with user id" },
+          { "id": "AC-2", "description": "POST /auth/login returns JWT on correct credentials" },
+          { "id": "AC-3", "description": "GET /tasks requires valid JWT; returns 401 without token" }
+        ],
+        "files_to_create": [{ "path": "src/app.js", "purpose": "Entry point" }],
+        "files_to_modify": [],
+        "out_of_scope": ["Frontend UI"]
+      },
+      "design": {
+        "design_summary": "Node.js/Express API with SQLite and JWT auth",
+        "components": [
+          { "name": "API Server", "tech": "Express", "purpose": "HTTP handler" },
+          { "name": "Auth Module", "tech": "JWT", "purpose": "Token issuance and validation" },
+          { "name": "Database", "tech": "SQLite", "purpose": "Data persistence" }
+        ],
+        "data_flow": "Client → API → SQLite",
+        "technology_choices": [],
+        "integration_points": [],
+        "identified_risks": []
+      }
+    }
+  },
+  "assertions": [
+    { "type": "status_equals", "expected": "SUCCESS" },
+    { "type": "output_field_exists", "field": "overview" },
+    { "type": "output_field_exists", "field": "api_reference" }
+  ]
+}

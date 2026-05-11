@@ -1,0 +1,42 @@
+{
+  "id": "S104",
+  "name": "role.invoke cost_estimator — happy path returns phases and effort totals",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "role.invoke",
+  "input": {
+    "role_id":     "cost_estimator",
+    "project_id":  "test_ce_s104",
+    "provider":    "mock",
+    "model":       "mock-ce-s104",
+    "scenario_id": "S104",
+    "input": {
+      "project_id": "test_ce_s104",
+      "spec": {
+        "scope": "Build a task management REST API",
+        "decisions": [{ "decision": "Use Express.js", "rationale": "Minimal setup" }],
+        "acceptance_criteria": [
+          { "id": "AC-1", "description": "POST /users returns 201 with user id" },
+          { "id": "AC-2", "description": "POST /auth/login returns JWT on correct credentials" },
+          { "id": "AC-3", "description": "GET /tasks requires valid JWT; returns 401 without token" }
+        ],
+        "files_to_create": [{ "path": "src/app.js", "purpose": "Entry point" }],
+        "files_to_modify": [],
+        "out_of_scope": ["Frontend UI"]
+      },
+      "design": {
+        "design_summary": "Node.js/Express API with SQLite and JWT auth",
+        "components": [{ "name": "API Server", "tech": "Express", "purpose": "HTTP handler" }],
+        "data_flow": "Client → API → SQLite",
+        "technology_choices": [],
+        "integration_points": [],
+        "identified_risks": []
+      }
+    }
+  },
+  "assertions": [
+    { "type": "status_equals", "expected": "SUCCESS" },
+    { "type": "output_field_exists", "field": "phases" },
+    { "type": "output_field_exists", "field": "total_effort_mid_hours" }
+  ]
+}

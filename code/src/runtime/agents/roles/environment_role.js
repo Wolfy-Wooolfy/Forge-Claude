@@ -6,60 +6,101 @@ const { loadPrompt }                      = require("../_prompt_loader");
 const { emit: emitActivity }             = require("../_activity_emitter");
 const { getIndicator }                   = require("../_activity_catalog");
 
-const SYSTEM_PROMPT = loadPrompt("reviewer_v2");
+const SYSTEM_PROMPT = loadPrompt("environment_v1");
 
 const INPUT_SCHEMA = {
   type: "object",
-  required: ["phase", "spec", "design", "project_id"],
+  required: ["project_id", "spec", "design"],
   properties: {
-    phase:      { enum: ["A", "B"] },
+    project_id: { type: "string", minLength: 1 },
     spec:       { type: "object" },
-    design:     { type: "object" },
-    code:       { type: "object" },
-    project_id: { type: "string", minLength: 1 }
+    design:     { type: "object" }
   }
 };
 
 const OUTPUT_SCHEMA = {
   type: "object",
-  required: ["verdict", "findings", "summary"],
+  required: ["target_environment", "runtime_dependencies", "environment_variables",
+             "external_services", "os_requirements", "container_recommendation",
+             "filesystem_requirements", "assumption_flags", "summary"],
   properties: {
-    verdict:  { enum: ["APPROVED", "APPROVED_WITH_CONCERNS", "REJECTED"] },
-    findings: { type: "array", items: {
-      type: "object", required: ["severity", "issue", "location", "recommendation"],
+    target_environment: { type: "string", minLength: 1 },
+    runtime_dependencies: { type: "array", items: {
+      type: "object", required: ["name", "version_constraint", "purpose"],
       properties: {
-        severity:       { enum: ["BLOCKER", "WARN", "INFO"] },
-        issue:          { type: "string" },
-        location:       { type: "string" },
-        recommendation: { type: "string" }
+        name:               { type: "string" },
+        version_constraint: { type: "string" },
+        purpose:            { type: "string" }
       }
     }},
-    summary:  { type: "string", minLength: 1 }
+    environment_variables: { type: "array", items: {
+      type: "object", required: ["name", "purpose", "format", "required", "is_secret", "example"],
+      properties: {
+        name:      { type: "string" },
+        purpose:   { type: "string" },
+        format:    { type: "string" },
+        required:  { type: "boolean" },
+        is_secret: { type: "boolean" },
+        example:   { type: "string" }
+      }
+    }},
+    external_services: { type: "array", items: {
+      type: "object", required: ["name", "type", "connection_method", "notes"],
+      properties: {
+        name:              { type: "string" },
+        type:              { type: "string" },
+        connection_method: { type: "string" },
+        notes:             { type: "string" }
+      }
+    }},
+    os_requirements: {
+      type: "object",
+      required: ["os_family"],
+      properties: {
+        os_family:   { type: "string" },
+        min_ram_mb:  {},
+        min_disk_mb: {},
+        cpu_notes:   {}
+      }
+    },
+    container_recommendation: {
+      type: "object",
+      required: ["base_image", "multi_stage", "notes"],
+      properties: {
+        base_image:   { type: "string" },
+        multi_stage:  { type: "boolean" },
+        notes:        { type: "string" }
+      }
+    },
+    filesystem_requirements: { type: "array", items: {
+      type: "object", required: ["path", "access", "notes"],
+      properties: {
+        path:   { type: "string" },
+        access: { type: "string" },
+        notes:  { type: "string" }
+      }
+    }},
+    assumption_flags: { type: "array", items: { type: "string" } },
+    summary:          { type: "string", minLength: 1 }
   }
 };
 
 module.exports = defineRole({
-  id:               "reviewer",
-  label:            "Reviewer",
-  description:      "Reviews specs (Phase A) and code plans (Phase B) for completeness and correctness",
+  id:               "environment",
+  label:            "Environment",
+  description:      "Produces environment requirements report (runtime deps, env vars, container strategy)",
   default_provider: "anthropic",
   default_model:    "claude-opus-4-7",
-  system_prompt_id: "reviewer_v2",
+  system_prompt_id: "environment_v1",
   input_schema:     INPUT_SCHEMA,
   output_schema:    OUTPUT_SCHEMA,
-  authority_level:  "BLOCKING",
-  typical_cost_usd_min: 0.30,
-  typical_cost_usd_max: 0.70,
+  authority_level:  "ADVISORY",
+  typical_cost_usd_min: 0.08,
+  typical_cost_usd_max: 0.30,
 
   async run(input, ctx) {
     const iv = validate(input, INPUT_SCHEMA);
     if (!iv.valid) return roleFailed("INVALID_INPUT", iv.errors.join("; "), ctx);
-
-    // Phase B requires code field
-    if (input.phase === "B" && (!input.code || typeof input.code !== "object")) {
-      return roleFailed("INVALID_INPUT",
-        "phase B requires a 'code' field (Builder's output object)", ctx);
-    }
 
     const provider      = (ctx && ctx.provider)      || this.default_provider;
     const model         = (ctx && ctx.model)         || this.default_model;
@@ -71,15 +112,11 @@ module.exports = defineRole({
       ? "\nSCENARIO_TAG: " + ctx.scenario_id + "\n"
       : "";
 
-    const inputData = input.phase === "B"
-      ? { phase: input.phase, spec: input.spec, design: input.design, code: input.code }
-      : { phase: input.phase, spec: input.spec, design: input.design };
-
     const prompt =
-      "reviewer|" + project_id + "\n" +
+      "environment|" + project_id + "\n" +
       scenarioTag +
       SYSTEM_PROMPT +
-      "\n\nINPUT:\n" + JSON.stringify(inputData) +
+      "\n\nINPUT:\n" + JSON.stringify({ spec: input.spec, design: input.design }) +
       "\n\nRESPOND WITH VALID JSON ONLY.";
 
     let agentResult;

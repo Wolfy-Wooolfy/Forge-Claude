@@ -6,60 +6,78 @@ const { loadPrompt }                      = require("../_prompt_loader");
 const { emit: emitActivity }             = require("../_activity_emitter");
 const { getIndicator }                   = require("../_activity_catalog");
 
-const SYSTEM_PROMPT = loadPrompt("reviewer_v2");
+const SYSTEM_PROMPT = loadPrompt("cost_estimator_v1");
 
 const INPUT_SCHEMA = {
   type: "object",
-  required: ["phase", "spec", "design", "project_id"],
+  required: ["project_id", "spec", "design"],
   properties: {
-    phase:      { enum: ["A", "B"] },
+    project_id: { type: "string", minLength: 1 },
     spec:       { type: "object" },
-    design:     { type: "object" },
-    code:       { type: "object" },
-    project_id: { type: "string", minLength: 1 }
+    design:     { type: "object" }
   }
 };
 
 const OUTPUT_SCHEMA = {
   type: "object",
-  required: ["verdict", "findings", "summary"],
+  required: ["phases", "total_effort_low_hours", "total_effort_mid_hours",
+             "total_effort_high_hours", "external_costs", "top_risks",
+             "uncertainty_flags", "summary"],
   properties: {
-    verdict:  { enum: ["APPROVED", "APPROVED_WITH_CONCERNS", "REJECTED"] },
-    findings: { type: "array", items: {
-      type: "object", required: ["severity", "issue", "location", "recommendation"],
+    phases: { type: "array", items: {
+      type: "object",
+      required: ["phase", "description", "effort_low_hours", "effort_mid_hours",
+                 "effort_high_hours", "cost_drivers"],
       properties: {
-        severity:       { enum: ["BLOCKER", "WARN", "INFO"] },
-        issue:          { type: "string" },
-        location:       { type: "string" },
-        recommendation: { type: "string" }
+        phase:              { type: "string" },
+        description:        { type: "string" },
+        effort_low_hours:   { type: "number", minimum: 0 },
+        effort_mid_hours:   { type: "number", minimum: 0 },
+        effort_high_hours:  { type: "number", minimum: 0 },
+        cost_drivers:       { type: "array", items: { type: "string" } }
       }
     }},
-    summary:  { type: "string", minLength: 1 }
+    total_effort_low_hours:  { type: "number", minimum: 0 },
+    total_effort_mid_hours:  { type: "number", minimum: 0 },
+    total_effort_high_hours: { type: "number", minimum: 0 },
+    external_costs: { type: "array", items: {
+      type: "object", required: ["item", "cost_type", "estimate_usd", "notes"],
+      properties: {
+        item:         { type: "string" },
+        cost_type:    { enum: ["one-time", "monthly", "per-call"] },
+        estimate_usd: { type: "string" },
+        notes:        { type: "string" }
+      }
+    }},
+    top_risks: { type: "array", items: {
+      type: "object", required: ["risk", "impact", "mitigation"],
+      properties: {
+        risk:       { type: "string" },
+        impact:     { enum: ["LOW", "MEDIUM", "HIGH"] },
+        mitigation: { type: "string" }
+      }
+    }},
+    uncertainty_flags: { type: "array", items: { type: "string" } },
+    summary:           { type: "string", minLength: 1 }
   }
 };
 
 module.exports = defineRole({
-  id:               "reviewer",
-  label:            "Reviewer",
-  description:      "Reviews specs (Phase A) and code plans (Phase B) for completeness and correctness",
+  id:               "cost_estimator",
+  label:            "Cost Estimator",
+  description:      "Produces effort and cost estimates for the project based on spec and design",
   default_provider: "anthropic",
   default_model:    "claude-opus-4-7",
-  system_prompt_id: "reviewer_v2",
+  system_prompt_id: "cost_estimator_v1",
   input_schema:     INPUT_SCHEMA,
   output_schema:    OUTPUT_SCHEMA,
-  authority_level:  "BLOCKING",
-  typical_cost_usd_min: 0.30,
-  typical_cost_usd_max: 0.70,
+  authority_level:  "ADVISORY",
+  typical_cost_usd_min: 0.10,
+  typical_cost_usd_max: 0.40,
 
   async run(input, ctx) {
     const iv = validate(input, INPUT_SCHEMA);
     if (!iv.valid) return roleFailed("INVALID_INPUT", iv.errors.join("; "), ctx);
-
-    // Phase B requires code field
-    if (input.phase === "B" && (!input.code || typeof input.code !== "object")) {
-      return roleFailed("INVALID_INPUT",
-        "phase B requires a 'code' field (Builder's output object)", ctx);
-    }
 
     const provider      = (ctx && ctx.provider)      || this.default_provider;
     const model         = (ctx && ctx.model)         || this.default_model;
@@ -71,15 +89,11 @@ module.exports = defineRole({
       ? "\nSCENARIO_TAG: " + ctx.scenario_id + "\n"
       : "";
 
-    const inputData = input.phase === "B"
-      ? { phase: input.phase, spec: input.spec, design: input.design, code: input.code }
-      : { phase: input.phase, spec: input.spec, design: input.design };
-
     const prompt =
-      "reviewer|" + project_id + "\n" +
+      "cost_estimator|" + project_id + "\n" +
       scenarioTag +
       SYSTEM_PROMPT +
-      "\n\nINPUT:\n" + JSON.stringify(inputData) +
+      "\n\nINPUT:\n" + JSON.stringify({ spec: input.spec, design: input.design }) +
       "\n\nRESPOND WITH VALID JSON ONLY.";
 
     let agentResult;

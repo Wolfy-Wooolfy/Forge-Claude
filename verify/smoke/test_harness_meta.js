@@ -45,15 +45,15 @@ function printSummary() {
   console.log("\n── PHASE-5 Self-Test Harness Meta Smoke Test ────────────────────\n");
 
   // ── M1: scenario files exist and are valid JSON ───────────────────────────
-  console.log("M1: 103 scenario JSON files present and parse");
+  console.log("M1: 118 scenario JSON files present and parse");
   {
     const scenDir = path.join(ROOT, "code", "src", "testing", "scenarios");
     const files   = fs.existsSync(scenDir)
       ? fs.readdirSync(scenDir).filter((f) => f.endsWith(".json")).sort()
       : [];
 
-    check("M1 exactly 103 scenario files",
-      files.length === 103,
+    check("M1 exactly 118 scenario files",
+      files.length === 118,
       "found " + files.length);
 
     let allParsed = true;
@@ -72,9 +72,9 @@ function printSummary() {
         return JSON.parse(fs.readFileSync(path.join(scenDir, f), "utf8")).id;
       } catch { return null; }
     });
-    const expectedIds = ["S01","S02","S03","S04","S05","S06","S07","S08","S09","S10","S11","S12","S13","S14","S15","S16","S17","S18","S19","S20","S21","S22","S23","S24","S25","S26","S27","S28","S29","S30","S31","S32","S33","S34","S35","S36","S37","S38","S39","S40","S41","S42","S43","S44","S45","S46","S47","S48","S49","S50","S51","S52","S53","S54","S55","S56","S57","S58","S59","S60","S61","S62","S63","S64","S65","S66","S67","S68","S69","S70","S71","S72","S73","S74","S75","S76","S77","S78","S79","S80","S81","S82","S83","S84","S85","S86","S87","S88","S89","S90","S91","S92","S93","S94","S95","S96","S97","S98","S99","S100","S101","S102","S103"];
+    const expectedIds = ["S01","S02","S03","S04","S05","S06","S07","S08","S09","S10","S11","S12","S13","S14","S15","S16","S17","S18","S19","S20","S21","S22","S23","S24","S25","S26","S27","S28","S29","S30","S31","S32","S33","S34","S35","S36","S37","S38","S39","S40","S41","S42","S43","S44","S45","S46","S47","S48","S49","S50","S51","S52","S53","S54","S55","S56","S57","S58","S59","S60","S61","S62","S63","S64","S65","S66","S67","S68","S69","S70","S71","S72","S73","S74","S75","S76","S77","S78","S79","S80","S81","S82","S83","S84","S85","S86","S87","S88","S89","S90","S91","S92","S93","S94","S95","S96","S97","S98","S99","S100","S101","S102","S103","S104","S105","S106","S107","S108","S109","S110","S111","S112","S113","S114","S115","S116","S117","S118"];
     const allIds = expectedIds.every((id) => ids.includes(id));
-    check("M1 all expected IDs present (S01–S103)", allIds,
+    check("M1 all expected IDs present (S01–S118)", allIds,
       "missing: " + expectedIds.filter((id) => !ids.includes(id)).join(", "));
   }
 
@@ -132,29 +132,29 @@ function printSummary() {
   }
 
   // ── M3: assertion registry loads all types ─────────────────────────────────
-  console.log("\nM3: assertion registry loads 9 assertion types");
+  console.log("\nM3: assertion registry loads 10 assertion types");
   {
     const assertDir  = path.join(ROOT, "code", "src", "testing", "assertions");
     const jsFiles    = fs.existsSync(assertDir)
       ? fs.readdirSync(assertDir).filter((f) => f.endsWith(".js") && f !== "_registry.js")
       : [];
 
-    check("M3 9 assertion files present",
-      jsFiles.length === 9,
+    check("M3 10 assertion files present",
+      jsFiles.length === 10,
       "found " + jsFiles.length + ": " + jsFiles.join(", "));
 
     const { runAssertion } = require(path.join(assertDir, "_registry"));
     const knownTypes = [
       "status_equals", "response_contains", "state_field_equals", "tool_called",
       "tool_not_called", "active_state", "artifact_exists", "audit_count",
-      "state_field_exists"
+      "state_field_exists", "output_field_exists"
     ];
     const allLoaded = knownTypes.every((type) => {
       const r = runAssertion({ type, expected: "__noop__", field: "x" }, {}, { root: ROOT });
       return typeof r.detail === "string" &&
              !r.detail.startsWith("unknown assertion type:");
     });
-    check("M3 all 9 assertion types run without 'unknown type' error", allLoaded);
+    check("M3 all 10 assertion types run without 'unknown type' error", allLoaded);
   }
 
   // ── M4: runScenarios returns stable report schema ─────────────────────────
@@ -177,8 +177,8 @@ function printSummary() {
       report.counts && typeof report.counts.pass === "number",
       "got " + JSON.stringify(report.counts));
 
-    check("M4 report has 103 scenarios",
-      Array.isArray(report.scenarios) && report.scenarios.length === 103,
+    check("M4 report has 118 scenarios",
+      Array.isArray(report.scenarios) && report.scenarios.length === 118,
       "got " + (report.scenarios ? report.scenarios.length : "no array"));
   }
 

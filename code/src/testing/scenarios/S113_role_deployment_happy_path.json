@@ -1,0 +1,40 @@
+{
+  "id": "S113",
+  "name": "role.invoke deployment — happy path returns deployment_sequence and health_verification",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "role.invoke",
+  "input": {
+    "role_id":     "deployment",
+    "project_id":  "test_dep_s113",
+    "provider":    "mock",
+    "model":       "mock-dep-s113",
+    "scenario_id": "S113",
+    "input": {
+      "project_id": "test_dep_s113",
+      "spec": {
+        "scope": "Build a task management REST API",
+        "decisions": [{ "decision": "Use Express.js", "rationale": "Minimal setup" }],
+        "acceptance_criteria": [
+          { "id": "AC-1", "description": "POST /users returns 201 with user id" }
+        ],
+        "files_to_create": [{ "path": "src/app.js", "purpose": "Entry point" }],
+        "files_to_modify": [],
+        "out_of_scope": []
+      },
+      "design": {
+        "design_summary": "Node.js/Express API with SQLite and JWT auth",
+        "components": [{ "name": "API Server", "tech": "Express", "purpose": "HTTP handler" }],
+        "data_flow": "Client → API → SQLite",
+        "technology_choices": [],
+        "integration_points": [],
+        "identified_risks": []
+      }
+    }
+  },
+  "assertions": [
+    { "type": "status_equals", "expected": "SUCCESS" },
+    { "type": "output_field_exists", "field": "deployment_sequence" },
+    { "type": "output_field_exists", "field": "health_verification" }
+  ]
+}

@@ -1,0 +1,181 @@
+{
+  "schema_version": "1.0",
+  "ts": "2026-05-11T10:02:38.652Z",
+  "provider": "openai",
+  "model": "gpt-4o-mini",
+  "hard_cap_usd": 7,
+  "total_cost_usd": 0,
+  "results": [
+    {
+      "role_id": "architect",
+      "status": "DENIED",
+      "cost_usd": 0,
+      "duration_ms": 128,
+      "assessment": {
+        "valid": false,
+        "note": "INSUFFICIENT_MODE"
+      },
+      "metadata": {
+        "reason": "INSUFFICIENT_MODE",
+        "detail": "tool 'role.invoke' requires 'PROMPT'; active data mode is 'WORKSPACE_WRITE'",
+        "context": null
+      }
+    },
+    {
+      "role_id": "spec_writer",
+      "status": "DENIED",
+      "cost_usd": 0,
+      "duration_ms": 19,
+      "assessment": {
+        "valid": false,
+        "note": "INSUFFICIENT_MODE"
+      },
+      "metadata": {
+        "reason": "INSUFFICIENT_MODE",
+        "detail": "tool 'role.invoke' requires 'PROMPT'; active data mode is 'WORKSPACE_WRITE'",
+        "context": null
+      }
+    },
+    {
+      "role_id": "reviewer",
+      "status": "DENIED",
+      "cost_usd": 0,
+      "duration_ms": 14,
+      "assessment": {
+        "valid": false,
+        "note": "INSUFFICIENT_MODE"
+      },
+      "metadata": {
+        "reason": "INSUFFICIENT_MODE",
+        "detail": "tool 'role.invoke' requires 'PROMPT'; active data mode is 'WORKSPACE_WRITE'",
+        "context": null
+      }
+    },
+    {
+      "role_id": "security_auditor",
+      "status": "DENIED",
+      "cost_usd": 0,
+      "duration_ms": 9,
+      "assessment": {
+        "valid": false,
+        "note": "INSUFFICIENT_MODE"
+      },
+      "metadata": {
+        "reason": "INSUFFICIENT_MODE",
+        "detail": "tool 'role.invoke' requires 'PROMPT'; active data mode is 'WORKSPACE_WRITE'",
+        "context": null
+      }
+    },
+    {
+      "role_id": "builder",
+      "status": "DENIED",
+      "cost_usd": 0,
+      "duration_ms": 28,
+      "assessment": {
+        "valid": false,
+        "note": "INSUFFICIENT_MODE"
+      },
+      "metadata": {
+        "reason": "INSUFFICIENT_MODE",
+        "detail": "tool 'role.invoke' requires 'PROMPT'; active data mode is 'WORKSPACE_WRITE'",
+        "context": null
+      }
+    },
+    {
+      "role_id": "test_designer",
+      "status": "DENIED",
+      "cost_usd": 0,
+      "duration_ms": 14,
+      "assessment": {
+        "valid": false,
+        "note": "INSUFFICIENT_MODE"
+      },
+      "metadata": {
+        "reason": "INSUFFICIENT_MODE",
+        "detail": "tool 'role.invoke' requires 'PROMPT'; active data mode is 'WORKSPACE_WRITE'",
+        "context": null
+      }
+    },
+    {
+      "role_id": "cost_estimator",
+      "status": "DENIED",
+      "cost_usd": 0,
+      "duration_ms": 19,
+      "assessment": {
+        "valid": false,
+        "note": "INSUFFICIENT_MODE"
+      },
+      "metadata": {
+        "reason": "INSUFFICIENT_MODE",
+        "detail": "tool 'role.invoke' requires 'PROMPT'; active data mode is 'WORKSPACE_WRITE'",
+        "context": null
+      }
+    },
+    {
+      "role_id": "environment",
+      "status": "DENIED",
+      "cost_usd": 0,
+      "duration_ms": 12,
+      "assessment": {
+        "valid": false,
+        "note": "INSUFFICIENT_MODE"
+      },
+      "metadata": {
+        "reason": "INSUFFICIENT_MODE",
+        "detail": "tool 'role.invoke' requires 'PROMPT'; active data mode is 'WORKSPACE_WRITE'",
+        "context": null
+      }
+    },
+    {
+      "role_id": "documentation",
+      "status": "DENIED",
+      "cost_usd": 0,
+      "duration_ms": 12,
+      "assessment": {
+        "valid": false,
+        "note": "INSUFFICIENT_MODE"
+      },
+      "metadata": {
+        "reason": "INSUFFICIENT_MODE",
+        "detail": "tool 'role.invoke' requires 'PROMPT'; active data mode is 'WORKSPACE_WRITE'",
+        "context": null
+      }
+    },
+    {
+      "role_id": "deployment",
+      "status": "DENIED",
+      "cost_usd": 0,
+      "duration_ms": 10,
+      "assessment": {
+        "valid": false,
+        "note": "INSUFFICIENT_MODE"
+      },
+      "metadata": {
+        "reason": "INSUFFICIENT_MODE",
+        "detail": "tool 'role.invoke' requires 'PROMPT'; active data mode is 'WORKSPACE_WRITE'",
+        "context": null
+      }
+    },
+    {
+      "role_id": "quality_judge",
+      "status": "DENIED",
+      "cost_usd": 0,
+      "duration_ms": 12,
+      "assessment": {
+        "valid": false,
+        "note": "INSUFFICIENT_MODE"
+      },
+      "metadata": {
+        "reason": "INSUFFICIENT_MODE",
+        "detail": "tool 'role.invoke' requires 'PROMPT'; active data mode is 'WORKSPACE_WRITE'",
+        "context": null
+      }
+    }
+  ],
+  "summary": {
+    "total": 11,
+    "pass": 0,
+    "fail": 0,
+    "skipped": 0
+  }
+}

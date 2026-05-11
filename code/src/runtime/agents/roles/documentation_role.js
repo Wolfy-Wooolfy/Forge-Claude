@@ -6,60 +6,97 @@ const { loadPrompt }                      = require("../_prompt_loader");
 const { emit: emitActivity }             = require("../_activity_emitter");
 const { getIndicator }                   = require("../_activity_catalog");
 
-const SYSTEM_PROMPT = loadPrompt("reviewer_v2");
+const SYSTEM_PROMPT = loadPrompt("documentation_v1");
 
 const INPUT_SCHEMA = {
   type: "object",
-  required: ["phase", "spec", "design", "project_id"],
+  required: ["project_id", "spec", "design"],
   properties: {
-    phase:      { enum: ["A", "B"] },
+    project_id: { type: "string", minLength: 1 },
     spec:       { type: "object" },
     design:     { type: "object" },
-    code:       { type: "object" },
-    project_id: { type: "string", minLength: 1 }
+    code:       { type: "object" }
   }
 };
 
 const OUTPUT_SCHEMA = {
   type: "object",
-  required: ["verdict", "findings", "summary"],
+  required: ["overview", "components", "api_reference", "quickstart",
+             "operations", "known_limitations", "summary"],
   properties: {
-    verdict:  { enum: ["APPROVED", "APPROVED_WITH_CONCERNS", "REJECTED"] },
-    findings: { type: "array", items: {
-      type: "object", required: ["severity", "issue", "location", "recommendation"],
+    overview: {
+      type: "object",
+      required: ["title", "purpose", "key_capabilities"],
       properties: {
-        severity:       { enum: ["BLOCKER", "WARN", "INFO"] },
-        issue:          { type: "string" },
-        location:       { type: "string" },
-        recommendation: { type: "string" }
+        title:            { type: "string" },
+        purpose:          { type: "string" },
+        key_capabilities: { type: "array", items: { type: "string" } }
+      }
+    },
+    components: { type: "array", items: {
+      type: "object", required: ["name", "description", "interface_summary"],
+      properties: {
+        name:              { type: "string" },
+        description:       { type: "string" },
+        interface_summary: { type: "string" }
       }
     }},
-    summary:  { type: "string", minLength: 1 }
+    api_reference: { type: "array", items: {
+      type: "object", required: ["endpoint", "method", "description", "inputs", "outputs", "errors"],
+      properties: {
+        endpoint:    { type: "string" },
+        method:      { type: "string" },
+        description: { type: "string" },
+        inputs:      { type: "string" },
+        outputs:     { type: "string" },
+        errors:      { type: "array", items: { type: "string" } }
+      }
+    }},
+    quickstart: {
+      type: "object",
+      required: ["prerequisites", "steps"],
+      properties: {
+        prerequisites: { type: "array", items: { type: "string" } },
+        steps:         { type: "array", items: { type: "string" } }
+      }
+    },
+    operations: {
+      type: "object",
+      required: ["health_check", "logging", "common_issues"],
+      properties: {
+        health_check:  { type: "string" },
+        logging:       { type: "string" },
+        common_issues: { type: "array", items: {
+          type: "object", required: ["symptom", "cause", "fix"],
+          properties: {
+            symptom: { type: "string" },
+            cause:   { type: "string" },
+            fix:     { type: "string" }
+          }
+        }}
+      }
+    },
+    known_limitations: { type: "array", items: { type: "string" } },
+    summary:           { type: "string", minLength: 1 }
   }
 };
 
 module.exports = defineRole({
-  id:               "reviewer",
-  label:            "Reviewer",
-  description:      "Reviews specs (Phase A) and code plans (Phase B) for completeness and correctness",
+  id:               "documentation",
+  label:            "Documentation",
+  description:      "Generates structured documentation package for the built project",
   default_provider: "anthropic",
   default_model:    "claude-opus-4-7",
-  system_prompt_id: "reviewer_v2",
+  system_prompt_id: "documentation_v1",
   input_schema:     INPUT_SCHEMA,
   output_schema:    OUTPUT_SCHEMA,
-  authority_level:  "BLOCKING",
-  typical_cost_usd_min: 0.30,
-  typical_cost_usd_max: 0.70,
+  authority_level:  "ADVISORY",
+  typical_cost_usd_min: 0.15,
+  typical_cost_usd_max: 0.50,
 
   async run(input, ctx) {
     const iv = validate(input, INPUT_SCHEMA);
     if (!iv.valid) return roleFailed("INVALID_INPUT", iv.errors.join("; "), ctx);
-
-    // Phase B requires code field
-    if (input.phase === "B" && (!input.code || typeof input.code !== "object")) {
-      return roleFailed("INVALID_INPUT",
-        "phase B requires a 'code' field (Builder's output object)", ctx);
-    }
 
     const provider      = (ctx && ctx.provider)      || this.default_provider;
     const model         = (ctx && ctx.model)         || this.default_model;
@@ -71,12 +108,11 @@ module.exports = defineRole({
       ? "\nSCENARIO_TAG: " + ctx.scenario_id + "\n"
       : "";
 
-    const inputData = input.phase === "B"
-      ? { phase: input.phase, spec: input.spec, design: input.design, code: input.code }
-      : { phase: input.phase, spec: input.spec, design: input.design };
+    const inputData = { spec: input.spec, design: input.design };
+    if (input.code) inputData.code = input.code;
 
     const prompt =
-      "reviewer|" + project_id + "\n" +
+      "documentation|" + project_id + "\n" +
       scenarioTag +
       SYSTEM_PROMPT +
       "\n\nINPUT:\n" + JSON.stringify(inputData) +
