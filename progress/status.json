@@ -74,7 +74,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-05-11T13:11:16.973Z",
+    "last_doctor_run": "2026-05-11T18:32:30.965Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
@@ -111,8 +111,8 @@
     "adapter_json_extraction": "ENABLED — extractJsonFromResponse in _adapter_contract.js, applied in anthropic/openai/claude_code/aider adapters (DECISION-20260512-0900 addendum)",
     "note": "PHASE-8 CLOSED. Built-Project Test Harness (L5b): scenario_loader, harness_runner, verdict_aggregator, loopback_signal, 8 assertion types, builtproject_tools (run_scenarios+read_report), builtproject_runtime doctor check, CLI (forge-builtproject-test.js), reference fixture (_reference_todo_api, 6 scenarios T-1→T-6, 6/6 PASS). Test Designer schema upgraded v1→v2. scenarios: 118→128 (S119–S128). tools: 56→58. doctor checks: 20→21. docs: 20_BUILT_PROJECT_HARNESS_CONTRACT.md.",
     "last_doctor_counts": {
-      "pass": 17,
-      "warn": 4,
+      "pass": 18,
+      "warn": 3,
       "fail": 0
     }
   },
@@ -150,5 +150,19 @@
       "PHASE-14"
     ]
   },
-  "last_updated": "2026-05-11T13:30:00.000Z"
+  "phase_9": {
+    "stage": "9.3-COMPLETE",
+    "next_stage": "9.4",
+    "stages_complete": [
+      "9.0",
+      "9.1",
+      "9.2",
+      "9.3"
+    ],
+    "cost_actuals_usd": 0,
+    "kb_runtime": "PENDING",
+    "arc_exceptions": ["§ARC-4 (kb/manifests.js + kb/cost_ledger.js)"],
+    "stop_and_report_count": 1
+  },
+  "last_updated": "2026-05-13T21:00:00.000Z"
 }

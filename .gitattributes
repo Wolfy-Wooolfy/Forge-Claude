@@ -1,0 +1,18 @@
+# Force LF line endings for source files
+* text=auto eol=lf
+
+# Binary files: keep as-is
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pdf binary
+*.zip binary
+*.tar.gz binary
+
+# Specific text files (just in case)
+*.md text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf

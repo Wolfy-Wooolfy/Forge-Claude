@@ -784,6 +784,8 @@ All JSONL writes use the atomic pattern:
 
 This prevents corruption on crash during write.
 
+> **Implementation note (§ARC-4):** The atomic write pattern in §11.2 and the cost ledger append pattern in §9 are implemented via direct `fs` operations in two bounded infrastructure files (`code/src/runtime/kb/manifests.js` and `code/src/runtime/kb/cost_ledger.js`), authorized under §ARC-4. No other file under `code/src/runtime/kb/` uses direct `fs`. The exception exists because these modules are called from within L2 tool `execute()` functions — calling `tools.fs.*` from those call sites would cause re-entrancy. See `artifacts/decisions/DECISION-202605132000-phase-9-arc-4-kb-manifest-fs-exception.md` for full justification.
+
 ### 11.3 Migration Script (future)
 
 A future migration from LanceDB to a different vector DB requires only:

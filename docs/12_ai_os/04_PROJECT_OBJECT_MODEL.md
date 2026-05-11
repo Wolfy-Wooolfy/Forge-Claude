@@ -92,3 +92,29 @@ Examples:
 * `ARCHIVED`
 
 ---
+
+### 8.6 Budget Field (PHASE-9 addition)
+
+Added by PHASE-9 per `DECISION-202605131900-phase-9-readiness.md` Decision 5.
+
+Every project object may include an optional `budget` sub-object in its vision:
+
+```yaml
+budget:
+  kb_lifecycle_usd_max: 1.50   # default; hard ceiling 5.00
+```
+
+| Field | Type | Default | Hard ceiling | Governance |
+|---|---|---|---|---|
+| `kb_lifecycle_usd_max` | number | 1.50 | 5.00 | Vision amendment required to modify |
+
+**Rules:**
+- Modification of `kb_lifecycle_usd_max` requires a vision amendment per `docs/12_ai_os/05_PROJECT_LIFECYCLE.md`.
+- Cannot be set above 5.00 without a Layer-1 decision artifact + code change.
+- Enforced at L2 tool boundary via `budget_guard.js` before every cost-incurring KB operation.
+- Per-project spend tracked in `artifacts/projects/<id>/kb/cost_ledger.jsonl`.
+- Doctor check `kb_budget_status` reports current spend vs cap for active projects.
+
+**Cross-reference:** `docs/12_ai_os/22_KNOWLEDGE_BASE_CONTRACT.md` §9 — Budget Cap Mechanism.
+
+---
