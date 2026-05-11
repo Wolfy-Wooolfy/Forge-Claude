@@ -1,0 +1,14 @@
+{
+  "draft_id": "ai_proposal_1775936397125",
+  "created_at": "2026-04-11T19:39:57.125Z",
+  "mode": "PROPOSAL",
+  "files": [
+    {
+      "path": "code/src/workspace/apiServer.js",
+      "content": "app.use((req, res, next) => {\n  console.log(`${req.method} ${req.url}`);\n  next();\n});",
+      "allow_overwrite": true
+    }
+  ],
+  "approved": false,
+  "ready_for_decision": false
+}

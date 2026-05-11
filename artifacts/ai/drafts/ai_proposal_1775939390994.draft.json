@@ -1,0 +1,14 @@
+{
+  "draft_id": "ai_proposal_1775939390994",
+  "created_at": "2026-04-11T20:29:50.994Z",
+  "mode": "PROPOSAL",
+  "files": [
+    {
+      "path": "code/src/workspace/apiServer.js",
+      "content": "const { registerAuthRoutes } = require(\"../auth/authSystem\");\n\n    function integrateAuth(app) {\n      registerAuthRoutes(app);\n    }",
+      "allow_overwrite": true
+    }
+  ],
+  "approved": false,
+  "ready_for_decision": false
+}

@@ -146,14 +146,19 @@ artifacts/archive/
 artifacts/forge/
 
 
-# -- 8. OLD RUNTIME AI ARTIFACTS (pre-Forge-v2 system) -----------------------
-
-artifacts/ai/proposals/
-artifacts/ai/drafts/
-artifacts/ai/conversations/
-artifacts/ai/analysis/
-artifacts/ai/decision_links/
-artifacts/ai/context/
+# -- 8. AI LAYER GOVERNANCE TRAIL — IS COMMITTED -----------------------------
+# These are governance records of AI Layer operations (proposals, drafts,
+# analysis, conversations, decision_links, context). NOT pre-v2 cruft.
+# Generated during PHASE-7-E and PHASE-7-F-X — part of the forensic record.
+#
+# artifacts/ai/proposals/      — TRACKED — AI proposal records
+# artifacts/ai/drafts/         — TRACKED — AI draft outputs
+# artifacts/ai/analysis/       — TRACKED — AI analysis mode findings
+# artifacts/ai/conversations/  — TRACKED — AI session messages
+# artifacts/ai/decision_links/ — TRACKED — proposal→decision_packet links
+# artifacts/ai/context/        — TRACKED — AI session context (forensic)
+#
+# ONLY exception: artifacts/ai/cost_ledger.jsonl is still ignored in §7.
 
 
 # -- 9. DEBUG / SCRATCH PROJECTS ----------------------------------------------

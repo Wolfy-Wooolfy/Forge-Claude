@@ -1,0 +1,32 @@
+{
+  "proposal_id": "ai_proposal_1776428844994",
+  "created_at": "2026-04-17T12:27:24.994Z",
+  "mode": "PROPOSAL",
+  "request": "edit web/index.html to add a test banner",
+  "description": "Generated proposal based on AI analysis",
+  "impact": "LOW",
+  "execution_required": true,
+  "execution_approved": false,
+  "generation_strategy": "PROVIDER_CODEX_FILES",
+  "target_file": "web/index.html",
+  "target_files": [
+    "web/index.html"
+  ],
+  "operation_mode": "SINGLE_FILE",
+  "selected_strategy": {
+    "strategy_id": "FALLBACK_ECHO",
+    "title": "Fallback echo generation",
+    "score": 0.4,
+    "target_file": "web/index.html",
+    "rationale": "No stronger strategy matched the request."
+  },
+  "strategy_candidates": [
+    {
+      "strategy_id": "FALLBACK_ECHO",
+      "title": "Fallback echo generation",
+      "score": 0.4,
+      "target_file": "web/index.html",
+      "rationale": "No stronger strategy matched the request."
+    }
+  ]
+}

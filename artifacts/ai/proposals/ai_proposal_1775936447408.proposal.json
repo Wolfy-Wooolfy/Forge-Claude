@@ -1,0 +1,12 @@
+{
+  "proposal_id": "ai_proposal_1775936447408",
+  "created_at": "2026-04-11T19:40:47.408Z",
+  "mode": "PROPOSAL",
+  "request": "create a function that prints hello khaled",
+  "description": "Generated proposal based on AI analysis",
+  "impact": "LOW",
+  "execution_required": true,
+  "execution_approved": false,
+  "generation_strategy": "FUNCTION_PRINT",
+  "target_file": "code/test_workspace_integration.js"
+}

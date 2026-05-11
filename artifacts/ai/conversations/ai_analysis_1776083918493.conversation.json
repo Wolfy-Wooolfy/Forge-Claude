@@ -1,0 +1,15 @@
+{
+  "session_id": "ai_analysis_1776083918493",
+  "created_at": "2026-04-13T12:38:38.493Z",
+  "mode": "ANALYSIS",
+  "messages": [
+    {
+      "role": "user",
+      "content": "create simple test file"
+    },
+    {
+      "role": "assistant",
+      "content": "Analysis completed in read-only mode with context and analysis artifacts generated."
+    }
+  ]
+}
