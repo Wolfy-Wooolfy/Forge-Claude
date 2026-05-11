@@ -1,18 +1,65 @@
-# Force LF line endings for source files
+# ============================================================================
+# Forge — .gitattributes
+# ============================================================================
+# Goal: enforce LF line endings on commit (regardless of OS).
+# Without this, Windows clients write CRLF and Linux/Mac write LF, creating
+# noisy diffs and merge conflicts.
+# ============================================================================
+
+# Default: auto-detect text, normalize to LF on commit
 * text=auto eol=lf
 
-# Binary files: keep as-is
-*.png binary
-*.jpg binary
-*.jpeg binary
-*.gif binary
-*.pdf binary
-*.zip binary
-*.tar.gz binary
+# -- Source code (force LF) --------------------------------------------------
+*.js     text eol=lf
+*.cjs    text eol=lf
+*.mjs    text eol=lf
+*.ts     text eol=lf
+*.tsx    text eol=lf
+*.jsx    text eol=lf
+*.json   text eol=lf
+*.html   text eol=lf
+*.css    text eol=lf
+*.scss   text eol=lf
 
-# Specific text files (just in case)
-*.md text eol=lf
-*.js text eol=lf
-*.json text eol=lf
-*.yaml text eol=lf
-*.yml text eol=lf
+# -- Docs & config (force LF) ------------------------------------------------
+*.md         text eol=lf
+*.yaml       text eol=lf
+*.yml        text eol=lf
+*.toml       text eol=lf
+.gitignore   text eol=lf
+.gitattributes text eol=lf
+.env.example text eol=lf
+
+# -- Shell scripts (always LF — Linux/Mac NEED them) -------------------------
+*.sh    text eol=lf
+*.bash  text eol=lf
+
+# -- Windows batch files (CRLF — Windows tools may break with LF) ------------
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+*.ps1   text eol=crlf
+
+# -- Binary files (no conversion, ever) --------------------------------------
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.ico    binary
+*.svg    text eol=lf
+*.pdf    binary
+*.zip    binary
+*.tar    binary
+*.tar.gz binary
+*.tgz    binary
+*.rar    binary
+*.7z     binary
+*.exe    binary
+*.dll    binary
+*.so     binary
+*.dylib  binary
+*.node   binary
+*.wasm   binary
+
+# -- Language-specific GitHub linguist hints (optional, for repo stats) ------
+docs/* linguist-documentation
+*.md   linguist-documentation

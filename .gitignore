@@ -1,13 +1,17 @@
 # ============================================================================
-# Forge .gitignore
+# Forge — .gitignore (v3 FINAL)
 # ============================================================================
-# Strategy: commit source-of-truth, ignore generated/regenerable/sensitive.
-# Sections ordered by importance.
+#
+# Goal: full project portability on GitHub.
+# Strategy: commit source-of-truth + governance trail; ignore environment-
+#           specific, sensitive, and machine-generated content.
+#
+# Audited 2026-05-13 by CTO advisor after 2 prior failed attempts.
+# DO NOT modify without checking artifacts/decisions/ for governance impact.
 # ============================================================================
 
 
-# -- 1. SECRETS (NEVER commit) -----------------------------------------------
-# Anything that could leak credentials, keys, or owner-specific config.
+# -- 1. SECRETS — NEVER commit -----------------------------------------------
 
 .env
 .env.local
@@ -16,25 +20,43 @@
 .env.production
 *.pem
 *.key
+*.p12
+*.pfx
 secrets/
 .secrets/
 notify-telegram.js
 
-# Owner-specific personal logs not meant for repo
+# Owner-specific personal logs
 MY_FORGE_PROGRESS.md
 
 
-# -- 2. NODE / NPM / DEPENDENCIES (regenerable via npm install) ---------------
-# node_modules is rebuilt by npm; never commit it.
-# package-lock.json IS committed (it locks versions -- that's the point).
+# -- 2. MACHINE-SPECIFIC CONFIG -----------------------------------------------
+# These contain absolute paths or per-machine settings.
+# Khaled's .local.json has "d:\\S\\Halo\\Tech\\Forge-Claude" hardcoded.
+
+.claude/settings.local.json
+.claude/cache/
+.vscode/settings.json
+.vscode/launch.json
+!.vscode/extensions.json
+
+# JetBrains
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/usage.statistics.xml
+.idea/shelf/
+
+
+# -- 3. NODE / NPM / DEPENDENCIES ---------------------------------------------
 
 node_modules/
 **/node_modules/
 .npm/
 .pnpm-store/
 .yarn/
+.yarn-integrity
 
-# Caches from build tools
+# Build outputs
 .cache/
 .parcel-cache/
 .vite/
@@ -44,7 +66,7 @@ dist/
 build/
 
 
-# -- 3. PYTHON (if Forge ever shells out to Python tooling) -------------------
+# -- 4. PYTHON ----------------------------------------------------------------
 
 __pycache__/
 *.py[cod]
@@ -52,45 +74,45 @@ __pycache__/
 .Python
 .venv/
 venv/
-env/
+/env/
 .pytest_cache/
 
 
-# -- 4. OS / EDITOR CRUFT -----------------------------------------------------
+# -- 5. OS / EDITOR CRUFT -----------------------------------------------------
 
 # macOS
 .DS_Store
 .AppleDouble
 .LSOverride
+._*
 
 # Windows
 Thumbs.db
+ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 
 # Linux
 *~
 .directory
+.Trash-*
 
 # Editors
-.vscode/
-!.vscode/settings.json.example
 .idea/
 *.swp
 *.swo
 .cursor/
 
-# PowerShell escaping accidents (pre-existing, kept for safety)
+# PowerShell escaping accidents (PHASE-8 closure note)
 resolve(data))
 v.severity
 ${APPDATA}/
 
 
-# -- 5. RUNTIME ARTIFACTS (regenerable; bloat the repo) -----------------------
-# These are written during normal Forge operation. Owner re-runs Forge -- they
-# come back. They are NOT source of truth for the codebase.
+# -- 6. RUNTIME LLM TRACES (high-volume, regenerable) ------------------------
+# These accumulate every LLM call. Forge regenerates them on use.
+# NOT source-of-truth — these are operational telemetry.
 
-# LLM trace files -- accumulate fast, can be enormous
 artifacts/llm/metadata/
 artifacts/llm/requests/
 artifacts/llm/responses/
@@ -98,51 +120,45 @@ artifacts/llm/input/
 artifacts/llm/outputs/
 artifacts/llm/use_cases/
 # KEEP committed: artifacts/llm/approval_policy.json (governance config)
-# KEEP committed: artifacts/llm/decision_log.json (until it grows past 1MB)
+# KEEP committed: artifacts/llm/decision_log.json (until >1MB)
 
-# Audit trace logs -- generated per-tool-call
-artifacts/audit/
-artifacts/trace/
 
-# Per-run health snapshots
-artifacts/health/
+# -- 7. RUNTIME LOGS (per-call audit JSONL) -----------------------------------
+# High-volume JSONL within otherwise-governance folders.
+# We ignore ONLY the JSONL files, not the folder.
 
-# Cost ledgers (regenerable; can contain spending detail)
-artifacts/ai/cost_ledger.jsonl
+artifacts/audit/tool_audit.jsonl
+artifacts/audit/permission_audit.jsonl
 artifacts/agent/cost_ledger.jsonl
 artifacts/agent/activity.jsonl
+artifacts/ai/cost_ledger.jsonl
 
-# Scenario test runs (regenerable)
+# Per-run doctor snapshots
+artifacts/health/
+
+# Scenario test run outputs
 artifacts/testing/
 
-# Archives, backups, scratch
+# Old reset snapshots
 artifacts/archive/
+
+# Internal Forge state cache
 artifacts/forge/
 
-# Pipeline stage intermediate outputs (regenerable from inputs)
-artifacts/cognitive/
-artifacts/intake/
-artifacts/exploration/
-artifacts/gap/
-artifacts/backfill/
-artifacts/execute/
-artifacts/verify/
-artifacts/closure/
-artifacts/admission/
-artifacts/orchestration/
-artifacts/coverage/
-artifacts/release/
-artifacts/reports/
-artifacts/tasks/
-artifacts/env/
-artifacts/stage_A/
-artifacts/stage_B/
-artifacts/stage_C/
-artifacts/stage_D/
+
+# -- 8. OLD RUNTIME AI ARTIFACTS (pre-Forge-v2 system) -----------------------
+
+artifacts/ai/proposals/
+artifacts/ai/drafts/
+artifacts/ai/conversations/
+artifacts/ai/analysis/
+artifacts/ai/decision_links/
+artifacts/ai/context/
 
 
-# -- 6. TRANSIENT TEST/DEBUG PROJECTS -----------------------------------------
-# Throwaway scratch projects from debugging. Not real demos.
+# -- 9. DEBUG / SCRATCH PROJECTS ----------------------------------------------
+# Not real demos; leftovers from earlier debugging.
+# The reference TODO API at artifacts/projects/_reference_todo_api/ IS kept.
 
 artifacts/projects/test_pip_debug/
 artifacts/projects/test_pip_debug2/
@@ -155,27 +171,24 @@ artifacts/projects/default_project/
 artifacts/projects/active_project.json
 
 
-# -- 7. PER-PROJECT GENERATED CONTENT -----------------------------------------
-# For any project Forge builds, its node_modules and KB indexes are
-# regenerable. Source code and vision ARE committed.
+# -- 10. PER-PROJECT (built by Forge) — node_modules and binary indexes ------
+# For ANY project Forge builds, its node_modules and LanceDB binary indexes
+# are regenerable. Source code, vision, tests ARE committed.
 
 artifacts/projects/*/node_modules/
 artifacts/projects/*/package-lock.json
 artifacts/projects/*/kb/chunks/
 artifacts/projects/*/kb/cost_ledger.jsonl
-
-# Global library binary indexes also regenerable
 artifacts/_global_kb/chunks/
 
 
-# -- 8. ATOMIC-WRITE LEFTOVERS ------------------------------------------------
-# Should never exist long enough to commit, but belt-and-suspenders.
+# -- 11. ATOMIC-WRITE LEFTOVERS -----------------------------------------------
 
 *.tmp
 *.jsonl.tmp
 
 
-# -- 9. LOGS ------------------------------------------------------------------
+# -- 12. LOGS -----------------------------------------------------------------
 
 logs/
 *.log
@@ -184,14 +197,14 @@ yarn-debug.log*
 yarn-error.log*
 
 
-# -- 10. COVERAGE / TEST OUTPUTS (regenerable) --------------------------------
+# -- 13. COVERAGE / TEST OUTPUTS ----------------------------------------------
 
-coverage/
+/coverage/
 .nyc_output/
 *.lcov
 
 
-# -- 11. ARCHIVES & DOWNLOADS (often accidental) ------------------------------
+# -- 14. ARCHIVES & DOWNLOADS -------------------------------------------------
 
 *.zip
 *.tar
@@ -199,58 +212,91 @@ coverage/
 *.tgz
 *.rar
 *.7z
-# Exception: if a fixture explicitly needs to ship as zip, force-add it
-# manually with `git add -f path/to/fixture.zip`
 
 
-# -- 12. RUNTIME AI ARTIFACTS (missed in initial .gitignore) ------------------
-# Runtime-generated by Forge during normal operation -- old runs
-# accumulated 307+ files. Not source of truth; regenerable.
+# -- 15. ROOT-LEVEL SCRATCH TEST INPUTS (cleanup candidates) -----------------
+# These 14 files in repo root are scratch inputs from earlier debugging.
+# Listed here as safety net in case they linger after deletion.
 
-artifacts/ai/proposals/
-artifacts/ai/drafts/
-artifacts/ai/conversations/
-artifacts/ai/analysis/
-artifacts/ai/decision_links/
-artifacts/ai/context/
-
-
-# -- 13. ARCHIVE / RESET SNAPSHOTS --------------------------------------------
-# Old project reset snapshots. Not needed for current work.
-
-artifacts/archive/
-
-
-# -- 14. RELEASE MANIFESTS ----------------------------------------------------
-# Version is in package.json + git tags. Regenerable via Forge tooling.
-# To keep: comment out the next line.
-
-artifacts/release/
-
-
-# -- 15. STAGE TRACKING ARTIFACTS (if not already covered) --------------------
-
-artifacts/coverage/
+/test-action-answers.json
+/test-action-decision.json
+/test-action-intake.json
+/test-action-options.json
+/test-arabic-intake.json
+/test-auto-docs.json
+/test-auto-options.json
+/test-clarification-answers.json
+/test-decision.json
+/test-docs-approve.json
+/test-docs.json
+/test-handoff.json
+/test-options.json
+/test-output-json-only.json
 
 
 # ============================================================================
-# What IS committed (source of truth -- do NOT add to this file):
+# WHAT IS COMMITTED (source of truth — full inventory)
 # ============================================================================
-# code/**                      -- Forge source code
-# docs/**                      -- authoritative documentation
-# bin/**                       -- CLI entrypoints
-# architecture/**              -- blueprints + phase roadmap
-# artifacts/decisions/**       -- all DECISION-*.md files
-# artifacts/projects/_reference_todo_api/   -- reference demo project (source only)
-#   |-- README.md, server.js, db.js, vision.md
-#   |-- package.json (LOCK file ignored per section 7)
-#   |-- routes/**
-#   `-- forge_tests/**         -- L5b scenario fixtures
-# artifacts/llm/approval_policy.json    -- governance config
-# artifacts/llm/decision_log.json       -- until it grows past 1MB
-# progress/status.json         -- the single source of phase truth
-# package.json + package-lock.json (repo-level)
-# README.md, CLAUDE.md, INSTRUCTIONS.md
-# .gitignore (this file)
-# .gitattributes (if added)
+#
+# CODE & DOCS:
+#   code/**                      — Forge source code
+#   docs/**                      — authoritative documentation
+#   bin/**                       — CLI entrypoints
+#   architecture/**              — Blueprints + Phase Roadmap
+#   web/**                       — UI source
+#   tests/**                     — Test files
+#   tools/**                     — Tooling scripts
+#   verify/**                    — Verification scripts
+#
+# GOVERNANCE TRAIL (Layer-0/1 evidence):
+#   progress/status.json         — single source of phase truth
+#   artifacts/decisions/**       — all DECISION-*.md (the project's spine)
+#   artifacts/stage_A/**         — Stage A closure
+#   artifacts/stage_B/**         — Stage B closure
+#   artifacts/stage_C/**         — Stage C closure
+#   artifacts/stage_D/**         — Stage D closure
+#   artifacts/audit/**           — Audit reports (EXCEPT *.jsonl per §7)
+#   artifacts/release/**         — Release manifests
+#   artifacts/intake/**          — Project intake reports
+#   artifacts/orchestration/**   — Orchestration run reports
+#   artifacts/verify/**          — Verification reports
+#   artifacts/closure/**         — Closure reports
+#   artifacts/coverage/**        — Vision coverage matrices
+#   artifacts/reports/**         — Autonomy/audit reports
+#   artifacts/exploration/**     — Option matrices
+#   artifacts/admission/**       — Project admission docs
+#   artifacts/gap/**             — Gap reports (Stage B)
+#   artifacts/backfill/**        — Backfill execution logs (Stage B)
+#   artifacts/execute/**         — Execute diffs and logs (Stage C)
+#   artifacts/tasks/**           — TASK-*.closure.md (per-task records)
+#   artifacts/env/**             — system_fingerprint.json (evidence)
+#   artifacts/cognitive/**       — Agent response trace (full provenance)
+#   artifacts/agent/             — Agent runtime config (but NOT *.jsonl)
+#
+# REFERENCE DEMO PROJECT:
+#   artifacts/projects/_reference_todo_api/   — source files only
+#     |-- README.md, vision.md
+#     |-- server.js, db.js
+#     |-- package.json (LOCK ignored per §10)
+#     |-- routes/**
+#     `-- forge_tests/**         — L5b scenario fixtures
+#
+# CONFIG & MANIFEST:
+#   package.json                 — Forge dependency manifest
+#   package-lock.json            — root version lock
+#   .gitignore                   — this file
+#   .gitattributes               — line ending policy
+#   .claude/settings.json        — Claude Code permissions (NO secrets, OK to commit)
+#
+# ENTRY POINTS:
+#   start-api.js                 — Node entry script
+#   start.bat                    — Windows launcher
+#   cleanup.bat                  — Windows cleanup utility
+#   release_*.hashes.json        — Release integrity hashes (root level)
+#
+# DOCUMENTATION:
+#   README.md                    — Repository entry doc
+#   CLAUDE.md                    — Claude Code instructions
+#   INSTRUCTIONS.md              — Forge orchestration instructions
+#
 # ============================================================================
