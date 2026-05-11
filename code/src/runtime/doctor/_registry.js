@@ -23,7 +23,8 @@ const checks = [
   require("./checks/packageManagement"),
   require("./checks/containerRuntime"),
   require("./checks/agent_runtime"),
-  require("./checks/roles_runtime")
+  require("./checks/roles_runtime"),
+  require("./checks/builtproject_runtime")
 ];
 
 function listChecks()  { return checks.slice(); }

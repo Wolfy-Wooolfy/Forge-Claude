@@ -1,0 +1,29 @@
+{
+  "total": 1,
+  "pass": 1,
+  "fail": 0,
+  "error": 0,
+  "overall_status": "PASS",
+  "ran_at": "2026-05-11T13:11:50.753Z",
+  "scenarios": [
+    {
+      "id": "T-2",
+      "name": "list_todos_empty_returns_empty_array",
+      "status": "PASS",
+      "duration_ms": 239,
+      "assertions": [
+        {
+          "type": "http_status_equals",
+          "pass": true,
+          "reason": null
+        },
+        {
+          "type": "response_body_is_array",
+          "pass": true,
+          "reason": null
+        }
+      ],
+      "error": null
+    }
+  ]
+}

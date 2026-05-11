@@ -4,10 +4,10 @@
   "current_stage": "A",
   "overall_progress_percent": 99,
   "stage_progress_percent": 100,
-  "current_task": "PHASE-7-F-3-CLOSED",
-  "next_phase": "PHASE-8",
-  "next_step": "Begin PHASE-8 per architecture/FORGE_V2_PHASE_ROADMAP.md. Prerequisite: PHASE-7-F-3 CLOSED.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-20260511-1000-phase-7-F-3-quality-delivery-roles.md",
+  "current_task": "PHASE-8-CLOSED",
+  "next_phase": "PHASE-9",
+  "next_step": "Begin PHASE-9 per architecture/FORGE_V2_PHASE_ROADMAP.md. Prerequisite: PHASE-8 CLOSED.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-20260513-1100-phase-8-builtproject-harness.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -74,18 +74,18 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-05-11T10:10:00.000Z",
+    "last_doctor_run": "2026-05-11T13:11:16.973Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
     "self_test_last_run": "2026-05-11",
-    "self_test_last_result": "113 passed, 0 failed, 5 skipped (118 total) — full PHASE-7-F-3 coverage (5 SKIPs require docker/podman daemon)",
-    "self_test_scenarios_pass": 113,
+    "self_test_last_result": "123 passed, 0 failed, 5 skipped (128 total) — full PHASE-8 coverage (5 SKIPs require docker/podman daemon)",
+    "self_test_scenarios_pass": 123,
     "self_test_scenarios_skip": 5,
     "self_test_scenarios_fail": 0,
     "providers_registered_count": 12,
-    "tools_registered_count": 56,
-    "doctor_checks_count": 20,
+    "tools_registered_count": 58,
+    "doctor_checks_count": 21,
     "assertion_types_count": 10,
     "active_permission_mode": "WORKSPACE_WRITE",
     "permission_policy_installed": true,
@@ -109,10 +109,10 @@
       "decision_artifact": "DECISION-20260512-0900-phase-7-F-3-override.md"
     },
     "adapter_json_extraction": "ENABLED — extractJsonFromResponse in _adapter_contract.js, applied in anthropic/openai/claude_code/aider adapters (DECISION-20260512-0900 addendum)",
-    "note": "PHASE-7-F-3 closed with override. Quality & Delivery Roles: cost_estimator, environment, documentation, deployment, quality_judge. Activity Indicator System: _activity_catalog.js, _activity_emitter.js, activity_tools.js. role.invoke emits INVOKING_ADAPTER/COMPLETED/FAILED. All 6 existing roles retrofit with PARSING_OUTPUT/VALIDATING_SCHEMA. Live smoke runner + CLI. scenarios: 103→118. tools: 55→56. assertion types: 9→10. Adapter JSON fence extraction added.",
+    "note": "PHASE-8 CLOSED. Built-Project Test Harness (L5b): scenario_loader, harness_runner, verdict_aggregator, loopback_signal, 8 assertion types, builtproject_tools (run_scenarios+read_report), builtproject_runtime doctor check, CLI (forge-builtproject-test.js), reference fixture (_reference_todo_api, 6 scenarios T-1→T-6, 6/6 PASS). Test Designer schema upgraded v1→v2. scenarios: 118→128 (S119–S128). tools: 56→58. doctor checks: 20→21. docs: 20_BUILT_PROJECT_HARNESS_CONTRACT.md.",
     "last_doctor_counts": {
       "pass": 17,
-      "warn": 3,
+      "warn": 4,
       "fail": 0
     }
   },
@@ -134,11 +134,11 @@
       "PHASE-7-E",
       "PHASE-7-F-1",
       "PHASE-7-F-2",
-      "PHASE-7-F-3"
+      "PHASE-7-F-3",
+      "PHASE-8"
     ],
-    "next": "PHASE-8",
+    "next": "PHASE-9",
     "remaining": [
-      "PHASE-8",
       "PHASE-9",
       "PHASE-10",
       "PHASE-11",
@@ -150,5 +150,5 @@
       "PHASE-14"
     ]
   },
-  "last_updated": "2026-05-11T10:10:00.000Z"
+  "last_updated": "2026-05-11T13:30:00.000Z"
 }

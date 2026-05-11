@@ -1,0 +1,17 @@
+{
+  "id": "S122",
+  "name": "builtproject.read_report returns last report after run",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "builtproject.read_report",
+  "input": {
+    "project_root": "artifacts/projects/_reference_todo_api"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_exists", "field": "overall_status" },
+    { "type": "state_field_exists", "field": "total" },
+    { "type": "state_field_exists", "field": "scenarios" },
+    { "type": "state_field_exists", "field": "ran_at" }
+  ]
+}

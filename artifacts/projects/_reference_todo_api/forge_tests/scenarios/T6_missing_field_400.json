@@ -1,0 +1,32 @@
+{
+  "id": "T-6",
+  "name": "missing_title_returns_400",
+  "description": "POST /todos with empty body returns 400 Bad Request with error field",
+  "category": "http",
+  "fixture": "fresh_db",
+  "setup": {
+    "actions": [
+      { "type": "start_server", "command": "node server.js", "wait_for_port": 3000, "timeout_ms": 5000 }
+    ]
+  },
+  "execution": {
+    "type": "http_request",
+    "method": "POST",
+    "url": "http://localhost:3000/todos",
+    "headers": { "Content-Type": "application/json" },
+    "body": {}
+  },
+  "assertions": [
+    { "type": "http_status_equals", "expected": 400 },
+    { "type": "response_body_contains_key", "key": "error" }
+  ],
+  "teardown": {
+    "actions": [
+      { "type": "stop_server" }
+    ]
+  },
+  "metadata": {
+    "covers_ac": ["AC-6"],
+    "estimated_duration_ms": 300
+  }
+}

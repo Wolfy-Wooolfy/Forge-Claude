@@ -1,0 +1,17 @@
+{
+  "id": "S125",
+  "name": "builtproject.run_scenarios T-1 — create_todo assertions all PASS",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "builtproject.run_scenarios",
+  "input": {
+    "project_root": "artifacts/projects/_reference_todo_api",
+    "scenario_ids": ["T-1"]
+  },
+  "assertions": [
+    { "type": "status_equals", "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "scenarios[0].status", "expected": "PASS" },
+    { "type": "state_field_equals", "field": "scenarios[0].id",     "expected": "T-1" },
+    { "type": "state_field_exists", "field": "scenarios[0].assertions" }
+  ]
+}

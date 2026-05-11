@@ -1,0 +1,17 @@
+{
+  "id": "S126",
+  "name": "builtproject.run_scenarios T-6 — missing_title_returns_400 PASS",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "builtproject.run_scenarios",
+  "input": {
+    "project_root": "artifacts/projects/_reference_todo_api",
+    "scenario_ids": ["T-6"]
+  },
+  "assertions": [
+    { "type": "status_equals", "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "overall_status",  "expected": "PASS" },
+    { "type": "state_field_equals", "field": "scenarios[0].status", "expected": "PASS" },
+    { "type": "state_field_equals", "field": "scenarios[0].id",     "expected": "T-6" }
+  ]
+}

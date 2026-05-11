@@ -1,0 +1,18 @@
+{
+  "id": "S120",
+  "name": "builtproject.run_scenarios reference project — all 6 scenarios PASS",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "builtproject.run_scenarios",
+  "input": {
+    "project_root": "artifacts/projects/_reference_todo_api"
+  },
+  "assertions": [
+    { "type": "status_equals", "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "overall_status", "expected": "PASS" },
+    { "type": "state_field_equals", "field": "total",          "expected": 6 },
+    { "type": "state_field_equals", "field": "pass",           "expected": 6 },
+    { "type": "state_field_equals", "field": "fail",           "expected": 0 },
+    { "type": "state_field_equals", "field": "error",          "expected": 0 }
+  ]
+}

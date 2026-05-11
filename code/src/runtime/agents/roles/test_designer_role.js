@@ -23,14 +23,19 @@ const OUTPUT_SCHEMA = {
   required: ["scenarios", "coverage_summary"],
   properties: {
     scenarios: { type: "array", items: {
-      type: "object", required: ["id", "name", "description", "inputs", "expected_outputs", "covers_ac"],
+      type: "object",
+      required: ["id", "name", "description", "category", "setup", "execution", "assertions", "teardown", "metadata"],
       properties: {
-        id:               { type: "string" },
-        name:             { type: "string" },
-        description:      { type: "string" },
-        inputs:           { type: "object" },
-        expected_outputs: { type: "object" },
-        covers_ac:        { type: "array", items: { type: "string" } }
+        id:          { type: "string" },
+        name:        { type: "string" },
+        description: { type: "string" },
+        category:    { type: "string" },
+        fixture:     { type: "string" },
+        setup:       { type: "object" },
+        execution:   { type: "object" },
+        assertions:  { type: "array" },
+        teardown:    { type: "object" },
+        metadata:    { type: "object" }
       }
     }},
     coverage_summary: {
@@ -51,7 +56,7 @@ module.exports = defineRole({
   description:      "Generates test scenarios for the built project based on spec acceptance criteria",
   default_provider: "anthropic",
   default_model:    "claude-opus-4-7",
-  system_prompt_id: "test_designer_v1",
+  system_prompt_id: "test_designer_v2",
   input_schema:     INPUT_SCHEMA,
   output_schema:    OUTPUT_SCHEMA,
   authority_level:  "ADVISORY",

@@ -1,0 +1,18 @@
+{
+  "id": "S121",
+  "name": "builtproject.run_scenarios with scenario_ids filter — runs only specified scenario",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "builtproject.run_scenarios",
+  "input": {
+    "project_root": "artifacts/projects/_reference_todo_api",
+    "scenario_ids": ["T-1"]
+  },
+  "assertions": [
+    { "type": "status_equals", "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "overall_status", "expected": "PASS" },
+    { "type": "state_field_equals", "field": "total",          "expected": 1 },
+    { "type": "state_field_equals", "field": "pass",           "expected": 1 },
+    { "type": "state_field_equals", "field": "scenarios[0].id", "expected": "T-1" }
+  ]
+}

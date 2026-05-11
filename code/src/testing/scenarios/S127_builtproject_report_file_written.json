@@ -1,0 +1,17 @@
+{
+  "id": "S127",
+  "name": "builtproject.run_scenarios writes last_report.json and loopback_signal.json",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "builtproject.run_scenarios",
+  "input": {
+    "project_root": "artifacts/projects/_reference_todo_api",
+    "scenario_ids": ["T-2"]
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_exists", "field": "report_path" },
+    { "type": "state_field_exists", "field": "signal_path" },
+    { "type": "state_field_equals", "field": "overall_status", "expected": "PASS" }
+  ]
+}

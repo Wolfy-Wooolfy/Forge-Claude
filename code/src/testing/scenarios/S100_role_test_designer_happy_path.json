@@ -35,6 +35,14 @@
     }
   },
   "assertions": [
-    { "type": "status_equals", "expected": "SUCCESS" }
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "scenarios[0].category",                    "expected": "http" },
+    { "type": "state_field_equals", "field": "scenarios[0].setup.actions[0].type",        "expected": "start_server" },
+    { "type": "state_field_equals", "field": "scenarios[0].execution.type",               "expected": "http_request" },
+    { "type": "state_field_equals", "field": "scenarios[0].teardown.actions[0].type",     "expected": "stop_server" },
+    { "type": "state_field_equals", "field": "scenarios[0].metadata.covers_ac[0]",        "expected": "AC-1" },
+    { "type": "state_field_exists", "field": "scenarios[0].assertions" },
+    { "type": "state_field_equals", "field": "coverage_summary.acs_total",               "expected": 3 },
+    { "type": "state_field_equals", "field": "coverage_summary.acs_covered",             "expected": 3 }
   ]
 }

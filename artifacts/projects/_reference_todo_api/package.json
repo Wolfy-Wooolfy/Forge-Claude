@@ -1,0 +1,17 @@
+{
+  "name": "reference-todo-api",
+  "version": "1.0.0",
+  "description": "Reference TODO API — Forge L5b fixture",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.0.0",
+    "debug": "^2.6.9",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "node-gyp": "^12.3.0"
+  }
+}

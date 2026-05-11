@@ -1,0 +1,16 @@
+{
+  "id": "S124",
+  "name": "builtproject.run_scenarios — scenario_ids empty list runs all scenarios",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "builtproject.run_scenarios",
+  "input": {
+    "project_root": "artifacts/projects/_reference_todo_api",
+    "scenario_ids": []
+  },
+  "assertions": [
+    { "type": "status_equals", "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "overall_status", "expected": "PASS" },
+    { "type": "state_field_equals", "field": "total",          "expected": 6 }
+  ]
+}

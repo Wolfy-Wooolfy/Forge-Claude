@@ -1,5 +1,5 @@
 {
-  "detected_at": "2026-05-11T10:59:22.635Z",
+  "detected_at": "2026-05-11T13:12:01.326Z",
   "ttl": 3600,
   "fingerprint": {
     "container": {
@@ -10,7 +10,7 @@
         "code": "NOT_FOUND",
         "message": "docker/podman not found in PATH"
       },
-      "detected_at": "2026-05-11T10:59:22.218Z"
+      "detected_at": "2026-05-11T13:12:00.935Z"
     },
     "git": {
       "id": "git",
@@ -19,7 +19,7 @@
         "version": "2.51.0.windows.1"
       },
       "error": null,
-      "detected_at": "2026-05-11T10:59:22.310Z"
+      "detected_at": "2026-05-11T13:12:00.991Z"
     },
     "go": {
       "id": "go",
@@ -29,7 +29,7 @@
         "code": "NOT_FOUND",
         "message": "go not found in PATH"
       },
-      "detected_at": "2026-05-11T10:59:22.316Z"
+      "detected_at": "2026-05-11T13:12:00.998Z"
     },
     "node": {
       "id": "node",
@@ -39,7 +39,7 @@
         "executable": "C:\\Program Files\\nodejs\\node.exe"
       },
       "error": null,
-      "detected_at": "2026-05-11T10:59:22.317Z"
+      "detected_at": "2026-05-11T13:12:00.998Z"
     },
     "os": {
       "id": "os",
@@ -51,7 +51,7 @@
         "type": "Windows_NT"
       },
       "error": null,
-      "detected_at": "2026-05-11T10:59:22.317Z"
+      "detected_at": "2026-05-11T13:12:00.998Z"
     },
     "php": {
       "id": "php",
@@ -61,7 +61,7 @@
         "code": "NOT_FOUND",
         "message": "php not found in PATH"
       },
-      "detected_at": "2026-05-11T10:59:22.322Z"
+      "detected_at": "2026-05-11T13:12:01.006Z"
     },
     "python": {
       "id": "python",
@@ -71,7 +71,7 @@
         "version": "3.10.11"
       },
       "error": null,
-      "detected_at": "2026-05-11T10:59:22.621Z"
+      "detected_at": "2026-05-11T13:12:01.308Z"
     },
     "ruby": {
       "id": "ruby",
@@ -81,7 +81,7 @@
         "code": "NOT_FOUND",
         "message": "ruby not found in PATH"
       },
-      "detected_at": "2026-05-11T10:59:22.627Z"
+      "detected_at": "2026-05-11T13:12:01.317Z"
     },
     "rust": {
       "id": "rust",
@@ -91,16 +91,16 @@
         "code": "NOT_FOUND",
         "message": "rustc not found in PATH"
       },
-      "detected_at": "2026-05-11T10:59:22.634Z"
+      "detected_at": "2026-05-11T13:12:01.326Z"
     },
     "shell": {
       "id": "shell",
       "detected": true,
       "data": {
-        "path": "C:\\Windows\\system32\\cmd.exe"
+        "path": "C:\\Program Files\\Git\\bin\\bash.exe"
       },
       "error": null,
-      "detected_at": "2026-05-11T10:59:22.634Z"
+      "detected_at": "2026-05-11T13:12:01.326Z"
     },
     "system": {
       "id": "system",
@@ -108,11 +108,11 @@
       "data": {
         "cpus": 4,
         "total_mem_mb": 23994,
-        "free_mem_mb": 11067,
+        "free_mem_mb": 11436,
         "hostname": "KhaledSayed"
       },
       "error": null,
-      "detected_at": "2026-05-11T10:59:22.635Z"
+      "detected_at": "2026-05-11T13:12:01.326Z"
     }
   }
 }

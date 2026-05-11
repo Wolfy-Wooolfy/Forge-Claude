@@ -1,0 +1,10 @@
+{
+  "id": "S119",
+  "name": "doctor builtproject_runtime check passes",
+  "type": "direct_doctor",
+  "assertions": [
+    { "type": "status_equals", "expected": "PASS" },
+    { "type": "state_field_equals", "field": "checks[20].id",     "expected": "builtproject_runtime" },
+    { "type": "state_field_equals", "field": "checks[20].status", "expected": "PASS" }
+  ]
+}

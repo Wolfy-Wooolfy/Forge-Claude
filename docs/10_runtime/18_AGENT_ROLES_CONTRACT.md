@@ -227,14 +227,30 @@ Phase SPEC reviews spec for security gaps before code is written. Phase CODE rev
 |---|---|
 | `id` | `test_designer` |
 | `authority_level` | `ADVISORY` |
-| `system_prompt_id` | `test_designer_v1` |
+| `system_prompt_id` | `test_designer_v2` (v1 DEPRECATED 2026-05-13) |
 | `default_model` | `claude-opus-4-7` |
 
 **Input schema:** `{ project_id: string, spec: object, design: object }`
 
 **Output schema:** `{ scenarios[], coverage_summary: { acs_total, acs_covered, gaps[] } }`
 
-Generates test scenarios for the project being built (not for Forge). Each scenario maps to one or more spec acceptance criteria. Never invents ACs not present in the spec.
+Each scenario item (L5b-compatible executable format, upgraded per DECISION-20260513-0930):
+```js
+{
+  id:          string,       // "T-1", "T-2", ...
+  name:        string,       // short descriptive name (snake_case)
+  description: string,       // what the scenario verifies
+  category:    string,       // "http" | "cli"
+  fixture:     string,       // e.g. "fresh_db"
+  setup:       { actions: [{ type: "start_server", command, wait_for_port, timeout_ms }] },
+  execution:   { type: "http_request", method, url, headers, body },
+  assertions:  [{ type: <one of 8 L5b types>, ...params }],
+  teardown:    { actions: [{ type: "stop_server" }] },
+  metadata:    { covers_ac: string[], estimated_duration_ms: number }
+}
+```
+
+Generates **executable** L5b test scenarios for the project being built (not for Forge). Each scenario maps to one or more spec acceptance criteria via `metadata.covers_ac`. Uses only the 8 L5b assertion types. Never invents ACs not present in the spec. Never uses non-localhost URLs.
 
 ---
 
