@@ -83,6 +83,23 @@ $0.00 — all implementations are mock-testable. No real API calls made.
 
 ---
 
+## PDF Binary Limitation (deferred to Stage 9.5)
+
+**Root cause:** `http_tools.js` `_request()` collects raw response bytes, then calls `Buffer.concat(chunks).toString("utf8")`. UTF-8 encoding replaces any non-UTF-8-safe byte with the replacement character `0xFD`. Real PDFs (binary format) contain 0x80–0xFF bytes extensively — the round-trip `string → Buffer.from(body, "binary")` cannot recover bytes that were already corrupted to 0xFD.
+
+**Empirical test (CTO, 2026-05-12):** All 0x80–0xFF bytes become 0xFD after the utf8 round-trip. 99%+ of real PDFs are broken by this.
+
+**Why it matters:** KB Contract §3 lists `application/pdf` in `content_type` enum, so the schema promises PDF support.
+
+**Fix applied (Stage 9.4):**
+- `_extractText()` PDF branch replaced with an explicit `throw new Error("PDF support deferred to Stage 9.5")` (unreachable, but fails loudly if somehow reached)
+- `acquireSource()` rejects PDF-detected content BEFORE extraction with `reason: "PDF_DEFERRED_TO_STAGE_9_5"`
+
+**Stage 9.5 fix plan:** Add `binary_response: true` option to `http_tools.js` that skips the `.toString("utf8")` step and returns base64-encoded body instead. `source_acquisition.js` will decode the base64 to a Buffer and pass directly to `pdf-parse`. This requires a Track-A-clean amendment to `http_tools.js` only — no new §ARC needed.
+
+**Files amended (mid-stage fix):**
+- `code/src/runtime/kb/source_acquisition.js` — PDF gate added + `_extractText` PDF branch replaced + global scope early rejection added
+
 ## Awaiting Sign-off For
 
 Step 3b: `research.search_web` (Brave primary + Tavily fallback + cost ledger integration)

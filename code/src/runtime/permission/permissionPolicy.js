@@ -12,6 +12,7 @@ const { createVisionLockRule }           = require("./rules/vision_lock_rule");
 const { createShellVisionLockRule }      = require("./rules/shell_vision_lock_rule");
 const { createContainerPrivilegeRule }   = require("./rules/container_privilege_rule");
 const { createAgentBudgetRule }          = require("./rules/agent_budget_rule");
+const { createResearchHostRule }         = require("./rules/research_host_rule");
 
 const PERMISSION_AUDIT_REL = path.join("artifacts", "audit", "permission_audit.jsonl");
 
@@ -54,6 +55,7 @@ function createPolicy(options) {
   const _shellVisionRules     = [createShellVisionLockRule({ root })];
   const _containerPrivRules   = [createContainerPrivilegeRule({ root })];
   const _agentBudgetRules     = [createAgentBudgetRule({ root })];
+  const _researchHostRules    = [createResearchHostRule({ getActiveMode: () => active_mode })];
 
   // ── authorize ──────────────────────────────────────────────────────────────
 
@@ -111,6 +113,14 @@ function createPolicy(options) {
       const ab = rule.check(tool, input, ctx || {});
       if (ab.denied) {
         return emit({ allow: false, reason: ab.reason, detail: ab.detail || null }, "agent_budget");
+      }
+    }
+
+    // Step 1.9 — Research host rules (explicit named deny for research.search_web in READ_ONLY)
+    for (const rule of _researchHostRules) {
+      const rh = rule.check(tool, input, ctx || {});
+      if (rh.denied) {
+        return emit({ allow: false, reason: rh.reason, detail: rh.detail || null }, "research_host");
       }
     }
 

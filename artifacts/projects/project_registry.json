@@ -1,28 +1,16 @@
 {
   "active_project_id": "test_apiserver_s28",
-  "updated_at": "2026-05-11T19:28:55.888Z",
+  "updated_at": "2026-05-12T09:18:27.300Z",
   "projects": [
     {
       "project_id": "default_project",
       "project_name": "default_project",
       "project_status": "ACTIVE",
-      "current_phase": "EXECUTION_READY",
-      "active_runtime_state": "EXECUTION_PREPARATION",
-      "pending_decisions": [
-        "EXECUTION_PACKAGE_PENDING_FORGE"
-      ],
-      "active_project_flag": false,
-      "last_updated_at": "2026-05-11T19:28:55.887Z"
-    },
-    {
-      "project_id": "hr",
-      "project_name": "HR",
-      "project_status": "ACTIVE",
       "current_phase": "DISCOVERY",
-      "active_runtime_state": "IDEATION",
+      "active_runtime_state": "DISCUSSION",
       "pending_decisions": [],
       "active_project_flag": false,
-      "last_updated_at": "2026-05-11T19:28:55.888Z"
+      "last_updated_at": "2026-05-12T09:18:27.287Z"
     },
     {
       "project_id": "live_smoke",
@@ -32,7 +20,7 @@
       "active_runtime_state": "DISCUSSION",
       "pending_decisions": [],
       "active_project_flag": false,
-      "last_updated_at": "2026-05-11T19:28:55.889Z"
+      "last_updated_at": "2026-05-12T09:18:27.302Z"
     },
     {
       "project_id": "live_smoke_retry",
@@ -42,7 +30,7 @@
       "active_runtime_state": "DISCUSSION",
       "pending_decisions": [],
       "active_project_flag": false,
-      "last_updated_at": "2026-05-11T19:28:55.889Z"
+      "last_updated_at": "2026-05-12T09:18:27.304Z"
     },
     {
       "project_id": "test_pip_debug",
@@ -52,7 +40,7 @@
       "active_runtime_state": "DISCUSSION",
       "pending_decisions": [],
       "active_project_flag": false,
-      "last_updated_at": "2026-05-11T19:28:55.889Z"
+      "last_updated_at": "2026-05-12T09:18:27.305Z"
     },
     {
       "project_id": "test_pip_debug2",
@@ -62,7 +50,7 @@
       "active_runtime_state": "DISCUSSION",
       "pending_decisions": [],
       "active_project_flag": false,
-      "last_updated_at": "2026-05-11T19:28:55.889Z"
+      "last_updated_at": "2026-05-12T09:18:27.307Z"
     },
     {
       "project_id": "test_pkg_s48_debug",
@@ -72,7 +60,7 @@
       "active_runtime_state": "DISCUSSION",
       "pending_decisions": [],
       "active_project_flag": false,
-      "last_updated_at": "2026-05-11T19:28:55.889Z"
+      "last_updated_at": "2026-05-12T09:18:27.308Z"
     },
     {
       "project_id": "test_pkg_s57_debug",
@@ -82,7 +70,7 @@
       "active_runtime_state": "DISCUSSION",
       "pending_decisions": [],
       "active_project_flag": false,
-      "last_updated_at": "2026-05-11T19:28:55.890Z"
+      "last_updated_at": "2026-05-12T09:18:27.309Z"
     },
     {
       "project_id": "_reference_todo_api",
@@ -92,7 +80,7 @@
       "active_runtime_state": "DISCUSSION",
       "pending_decisions": [],
       "active_project_flag": false,
-      "last_updated_at": "2026-05-11T19:28:55.890Z"
+      "last_updated_at": "2026-05-12T09:18:27.311Z"
     }
   ]
 }

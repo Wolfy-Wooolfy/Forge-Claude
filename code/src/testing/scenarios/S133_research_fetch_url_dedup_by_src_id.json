@@ -1,0 +1,23 @@
+{
+  "id": "S133",
+  "name": "research.fetch_url returns DUPLICATE when src_id already in manifest",
+  "type": "direct_tool",
+  "permission": "WORKSPACE_WRITE",
+  "tool": "research.fetch_url",
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_dedup_s133/kb/exports/sources.jsonl",
+      "content": "{\"schema_version\":\"1.0.0\",\"id\":\"src_b9fa7c13b595\",\"url\":\"https://example.com/s133-dedup-test\",\"title\":\"S133 Test Page\",\"fetched_at\":\"2026-05-12T00:00:00.000Z\",\"content_type\":\"text/html\",\"raw_byte_size\":512,\"extracted_text_size\":64,\"language\":\"en\",\"credibility\":{\"score\":0.60,\"tier\":\"REPUTABLE\",\"signals\":[\"https\"],\"scored_by\":\"heuristic_v1\",\"scored_at\":\"2026-05-12T00:00:00.000Z\"},\"scope\":\"project\",\"project_id\":\"test_dedup_s133\",\"ingestion_decision\":null}\n"
+    }
+  ],
+  "input": {
+    "url":        "https://example.com/s133-dedup-test",
+    "project_id": "test_dedup_s133"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "deduped",  "expected": true },
+    { "type": "state_field_equals", "field": "status",   "expected": "DUPLICATE" },
+    { "type": "state_field_equals", "field": "src_id",   "expected": "src_b9fa7c13b595" }
+  ]
+}

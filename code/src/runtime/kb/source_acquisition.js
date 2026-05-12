@@ -49,17 +49,10 @@ async function _extractText(body, contentType) {
   }
 
   if (contentType === "application/pdf") {
-    // http.get returns body as UTF-8 string; convert to Buffer using binary
-    // encoding to preserve raw bytes. Note: bodies >4MB are blocked by http_tools
-    // MAX_BODY_BYTES limit — accepted constraint at this stage.
-    const pdfParse = require("pdf-parse");
-    const buf      = Buffer.from(body, "binary");
-    try {
-      const result = await pdfParse(buf);
-      return result.text || "";
-    } catch (err) {
-      throw new Error("PDF extraction failed: " + err.message);
-    }
+    // Unreachable — gated by PDF_DEFERRED_TO_STAGE_9_5 check in acquireSource().
+    // http_tools.js toString("utf8") corrupts binary PDF bytes (0x80-0xFF → 0xFD).
+    // Re-enabled in Stage 9.5 when http_tools.js gains binary response support.
+    throw new Error("PDF support deferred to Stage 9.5");
   }
 
   // text/markdown, text/plain — return raw body
@@ -129,9 +122,21 @@ async function acquireSource(url, options) {
   const root       = opts.root || process.cwd();
   const ctx        = { root };
 
-  // Lazy require to avoid circular dep at module load time
+  // Lazy require to avoid circular dep at module load time; opts._reg for test injection
   const { getDefaultRegistry } = require("../tools/_registry");
-  const reg = getDefaultRegistry();
+  const reg = opts._reg || getDefaultRegistry();
+
+  // Global scope is gated by DANGER_FULL_ACCESS + decision artifact (KB Contract §10).
+  // Full global ingestion workflow is Stage 9.6+.
+  if (scope === "global") {
+    return {
+      status: "REJECTED",
+      reason: "GLOBAL_SCOPE_REQUIRES_DECISION_ARTIFACT",
+      source: null,
+      deduped: false,
+      extracted_text: null
+    };
+  }
 
   const src_id = srcId(url);
 
@@ -161,6 +166,21 @@ async function acquireSource(url, options) {
 
   // 3. Detect content type from response header (with extension fallback)
   const content_type = _detectContentType(responseHeaders || {}, url);
+
+  // Stage 9.4 limitation: PDF binary handling deferred to Stage 9.5.
+  // http_tools.js toString("utf8") corrupts non-ASCII bytes (0x80-0xFF → 0xFD),
+  // making pdf-parse fail on 99%+ of real PDFs. Fix requires binary response
+  // encoding support in http_tools.js.
+  if (content_type === "application/pdf") {
+    return {
+      status: "REJECTED",
+      reason: "PDF_DEFERRED_TO_STAGE_9_5",
+      source: null,
+      deduped: false,
+      extracted_text: null
+    };
+  }
+
   if (!ALLOWED_FETCH_CONTENT_TYPES.includes(content_type)) {
     return {
       status: "REJECTED",
