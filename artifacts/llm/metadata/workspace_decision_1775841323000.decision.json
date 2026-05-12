@@ -1,0 +1,35 @@
+{
+  "ok": true,
+  "entry_type": "DECISION_PACKET",
+  "decision_packet_id": "workspace_decision_1775841323000",
+  "approver_role": "cto",
+  "required_roles": [
+    "tech_lead",
+    "cto"
+  ],
+  "approval_policy_version": "1.1",
+  "operation_mode": "MULTI_FILE",
+  "file_count": 2,
+  "total_bytes": 56,
+  "decision_packet_paths": [
+    "artifacts/decisions/decision_packet.json",
+    "artifacts/decisions/decision_packet.md"
+  ],
+  "queued_files": [
+    "code/test_multi_file_a.js",
+    "code/test_multi_file_b.js"
+  ],
+  "summary": "Created two new files: test_multi_file_a.js and test_multi_file_b.js in the code directory.",
+  "diffs": [
+    {
+      "path": "code/test_multi_file_a.js",
+      "diff": "- \n+ console.log(\"Multi-file A\");",
+      "sha256": "e2e72247c127a102ee38658593e9b16381d7abe19e1217037bb643ed67ae33fa"
+    },
+    {
+      "path": "code/test_multi_file_b.js",
+      "diff": "- \n+ console.log(\"Multi-file B\");",
+      "sha256": "6358a58fff54f5ec9e8895ce943369c9cf48394d3bcb49440ab688f466f7d17d"
+    }
+  ]
+}

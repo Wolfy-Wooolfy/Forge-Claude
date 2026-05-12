@@ -1,0 +1,8 @@
+{
+  "ok": true,
+  "write_id": "write_1775504875952",
+  "written_files": [
+    "artifacts/llm/outputs/test-write.txt"
+  ],
+  "summary": "Updated artifacts/llm/outputs/test-write.txt with new content."
+}

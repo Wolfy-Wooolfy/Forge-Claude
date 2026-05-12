@@ -1,0 +1,90 @@
+{
+  "schema_version": "1.0",
+  "ok": true,
+  "summary": "0 critical, 2 warning",
+  "counts": {
+    "pass": 12,
+    "warn": 2,
+    "fail": 0
+  },
+  "started_at": "2026-05-08T18:15:46.595Z",
+  "duration_ms": 455,
+  "checks": [
+    {
+      "id": "node_version",
+      "status": "PASS",
+      "detail": "v22.11.0"
+    },
+    {
+      "id": "openai_api_key",
+      "status": "PASS",
+      "detail": "set, length=164"
+    },
+    {
+      "id": "env_dotfile",
+      "status": "PASS",
+      "detail": ".env present"
+    },
+    {
+      "id": "api_server_port",
+      "status": "PASS",
+      "detail": "port 4505 available"
+    },
+    {
+      "id": "web_server_port",
+      "status": "PASS",
+      "detail": "web served on API port 4505"
+    },
+    {
+      "id": "providers_registered",
+      "status": "WARN",
+      "detail": "12 registered, 12 legacy (not yet v2-compliant)"
+    },
+    {
+      "id": "tools_registered",
+      "status": "PASS",
+      "detail": "23 tools registered"
+    },
+    {
+      "id": "permission_mode",
+      "status": "PASS",
+      "detail": "mode active: WORKSPACE_WRITE"
+    },
+    {
+      "id": "status_json_valid",
+      "status": "PASS",
+      "detail": "valid v2.0, current_task=PHASE-4-CLOSED"
+    },
+    {
+      "id": "active_project",
+      "status": "PASS",
+      "detail": "no active project (idle)"
+    },
+    {
+      "id": "missing_dependencies",
+      "status": "WARN",
+      "detail": "missing optional: playwright"
+    },
+    {
+      "id": "recent_execution",
+      "status": "PASS",
+      "detail": "tool_audit.jsonl modified 0 day(s) ago"
+    },
+    {
+      "id": "disk_space",
+      "status": "PASS",
+      "detail": "artifacts/ is 8.7 MB"
+    },
+    {
+      "id": "trace_matrix_size",
+      "status": "PASS",
+      "detail": "artifacts/llm/ is 1.0 MB"
+    }
+  ],
+  "links": {
+    "ui": "http://localhost:4505/",
+    "api": "http://localhost:4505/api/system/doctor",
+    "logs": "logs/forge.log",
+    "decisions": "artifacts/decisions/"
+  }
+}

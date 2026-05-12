@@ -1,0 +1,20 @@
+{
+  "ok": true,
+  "entry_type": "DECISION_PACKET",
+  "decision_packet_id": "workspace_decision_1775741471468",
+  "decision_packet_paths": [
+    "artifacts/decisions/decision_packet.json",
+    "artifacts/decisions/decision_packet.md"
+  ],
+  "queued_files": [
+    "code/test_workspace_integration.js"
+  ],
+  "summary": "Overwrite integration test file with updated success message.",
+  "diffs": [
+    {
+      "path": "code/test_workspace_integration.js",
+      "diff": "- console.log(\"Workspace → Forge integration test successful\");\n+ console.log(\"Workspace → Forge integration test successful v2\");",
+      "sha256": "33e48e1226ce0776598dda6a0aa840eca9dc2f210e0d3d110d394774732e133f"
+    }
+  ]
+}

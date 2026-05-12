@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "entry_type": "DECISION_PACKET",
+  "decision_packet_id": "workspace_decision_1776625569174",
+  "approver_role": "cto",
+  "required_roles": [
+    "tech_lead",
+    "cto"
+  ],
+  "approval_policy_version": "1.1",
+  "operation_mode": "SINGLE_FILE",
+  "file_count": 1,
+  "total_bytes": 46873,
+  "decision_packet_paths": [
+    "artifacts/projects/default_project/decisions/decision_packet.json",
+    "artifacts/projects/default_project/decisions/decision_packet.md"
+  ],
+  "execution_package_paths": [
+    "artifacts/execute/execution_package.json"
+  ],
+  "queued_files": [
+    "web/index.html"
+  ],
+  "summary": "Generated proposal based on AI analysis",
+  "request": "edit this file to add logging",
+  "diffs": [
+    {
+      "path": "web/index.html",
+      "diff": "+   <script>\n+     console.log(\"Forge AI Workspace loaded\");\n+   </script>",
+      "sha256": "eaa5eade39dac7a9e7120b9a5c10d0393aba1c67e08c55d20833e7556673beb8"
+    }
+  ]
+}

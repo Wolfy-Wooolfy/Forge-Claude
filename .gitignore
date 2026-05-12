@@ -24,7 +24,6 @@
 *.pfx
 secrets/
 .secrets/
-notify-telegram.js
 
 # Owner-specific personal logs
 MY_FORGE_PROGRESS.md
@@ -34,7 +33,6 @@ MY_FORGE_PROGRESS.md
 # These contain absolute paths or per-machine settings.
 # Khaled's .local.json has "d:\\S\\Halo\\Tech\\Forge-Claude" hardcoded.
 
-.claude/settings.local.json
 .claude/cache/
 .vscode/settings.json
 .vscode/launch.json
@@ -113,12 +111,7 @@ ${APPDATA}/
 # These accumulate every LLM call. Forge regenerates them on use.
 # NOT source-of-truth — these are operational telemetry.
 
-artifacts/llm/metadata/
-artifacts/llm/requests/
-artifacts/llm/responses/
-artifacts/llm/input/
-artifacts/llm/outputs/
-artifacts/llm/use_cases/
+
 # KEEP committed: artifacts/llm/approval_policy.json (governance config)
 # KEEP committed: artifacts/llm/decision_log.json (until >1MB)
 
@@ -127,14 +120,9 @@ artifacts/llm/use_cases/
 # High-volume JSONL within otherwise-governance folders.
 # We ignore ONLY the JSONL files, not the folder.
 
-artifacts/audit/tool_audit.jsonl
-artifacts/audit/permission_audit.jsonl
-artifacts/agent/cost_ledger.jsonl
-artifacts/agent/activity.jsonl
 artifacts/ai/cost_ledger.jsonl
 
 # Per-run doctor snapshots
-artifacts/health/
 
 # Scenario test run outputs
 artifacts/testing/

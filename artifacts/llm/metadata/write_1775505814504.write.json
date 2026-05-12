@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "write_id": "write_1775505814504",
+  "written_files": [
+    "artifacts/llm/outputs/test-write.txt"
+  ],
+  "summary": "Update test-write.txt with final version content for diff preview test.",
+  "diffs": [
+    {
+      "path": "artifacts/llm/outputs/test-write.txt",
+      "diff": "----- OLD -----\nupdated content from forge\n----- NEW -----\nfinal version with diff preview test"
+    }
+  ]
+}
