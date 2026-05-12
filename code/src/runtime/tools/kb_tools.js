@@ -304,10 +304,12 @@ const delete_source = defineTool({
   output_schema: {
     type: "object",
     properties: {
-      chunks_removed: { type: "number", description: "Number of chunk vectors deleted" },
-      source_removed: { type: "boolean" }
+      chunks_removed:        { type: "number",  description: "Number of chunk vectors deleted from LanceDB" },
+      source_removed:        { type: "boolean", description: "true if source was in manifest" },
+      chunks_jsonl_removed:  { type: "number",  description: "Number of chunk entries removed from chunks.jsonl" },
+      citations_removed:     { type: "number",  description: "Number of citation entries removed that referenced deleted chunks" }
     },
-    required: ["chunks_removed", "source_removed"]
+    required: ["chunks_removed", "source_removed", "chunks_jsonl_removed", "citations_removed"]
   },
 
   preview(input) {
@@ -322,6 +324,12 @@ const delete_source = defineTool({
     const root  = (ctx && ctx.root) || process.cwd();
     const scope = input.scope || "project";
 
+    // 0. Capture chunk IDs BEFORE any delete (for citations cascade)
+    const existingChunks = _man().readChunks(input.project_id, scope, { root });
+    const chunkIds = existingChunks
+      .filter(c => c.source_id === input.src_id)
+      .map(c => c.id);
+
     // 1. Delete chunks from LanceDB
     let chunksRemoved = 0;
     try {
@@ -333,13 +341,26 @@ const delete_source = defineTool({
     // 2. Remove from sources JSONL manifest
     const { removed } = _man().removeSource(input.src_id, input.project_id, scope, { root });
 
+    // 2.5. Remove chunk entries from chunks.jsonl
+    const { removed: chunksJsonlRemoved } = _man().removeChunks(input.src_id, input.project_id, scope, { root });
+
     // 3. Delete individual source JSON via L2 fs.delete_file (Track A)
     const { getDefaultRegistry } = require("./_registry");
     const reg = (ctx && ctx._reg) || getDefaultRegistry();
     const relPath = "artifacts/projects/" + input.project_id + "/kb/sources/" + input.src_id + ".json";
     await reg.invoke("fs.delete_file", { path: relPath }, { root });
 
-    return ok({ chunks_removed: chunksRemoved, source_removed: removed });
+    // 4. Remove citations that reference any of the deleted chunks
+    const { removed: citationsRemoved } = chunkIds.length > 0
+      ? _man().removeCitationsByChunks(chunkIds, input.project_id, scope, { root })
+      : { removed: 0 };
+
+    return ok({
+      chunks_removed:       chunksRemoved,
+      source_removed:       removed,
+      chunks_jsonl_removed: chunksJsonlRemoved,
+      citations_removed:    citationsRemoved
+    });
   }
 });
 

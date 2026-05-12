@@ -108,6 +108,52 @@ function appendCitation(citationRecord, project_id, scope, options) {
   _appendAtomic(p, JSON.stringify(citationRecord));
 }
 
+function removeChunks(src_id, project_id, scope, options) {
+  const opts = options || {};
+  const p    = _chunksPath(project_id, scope, opts.root);
+  if (!fs.existsSync(p)) return { removed: 0 };
+  const all      = _readJsonl(p);
+  const filtered = all.filter(c => c.source_id !== src_id);
+  const count    = all.length - filtered.length;
+  if (count === 0) return { removed: 0 };
+  const content = filtered.map(c => JSON.stringify(c)).join("\n") + (filtered.length > 0 ? "\n" : "");
+  const tmpPath = p + ".tmp";
+  const fd      = fs.openSync(tmpPath, "w");
+  try {
+    fs.writeFileSync(fd, content);
+    fs.fsyncSync(fd);
+  } finally {
+    fs.closeSync(fd);
+  }
+  fs.renameSync(tmpPath, p);
+  return { removed: count };
+}
+
+function removeCitationsByChunks(chunk_ids_to_remove, project_id, scope, options) {
+  const opts   = options || {};
+  const p      = _citationsPath(project_id, scope, opts.root);
+  if (!fs.existsSync(p)) return { removed: 0 };
+  const removeSet = new Set(chunk_ids_to_remove);
+  const all       = _readJsonl(p);
+  const filtered  = all.filter(cit => {
+    const chunks = (cit.supporting_chunks) || [];
+    return !chunks.some(sc => removeSet.has(sc.chunk_id));
+  });
+  const count = all.length - filtered.length;
+  if (count === 0) return { removed: 0 };
+  const content = filtered.map(c => JSON.stringify(c)).join("\n") + (filtered.length > 0 ? "\n" : "");
+  const tmpPath = p + ".tmp";
+  const fd      = fs.openSync(tmpPath, "w");
+  try {
+    fs.writeFileSync(fd, content);
+    fs.fsyncSync(fd);
+  } finally {
+    fs.closeSync(fd);
+  }
+  fs.renameSync(tmpPath, p);
+  return { removed: count };
+}
+
 function removeSource(src_id, project_id, scope, options) {
   const opts = options || {};
   const p    = _sourcesPath(project_id, scope, opts.root);
@@ -173,6 +219,8 @@ module.exports = {
   appendChunk,
   appendCitation,
   removeSource,
+  removeChunks,
+  removeCitationsByChunks,
   readSources,
   readChunks,
   readCitations,

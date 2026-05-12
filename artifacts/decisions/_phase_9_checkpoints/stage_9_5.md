@@ -22,7 +22,7 @@
 | H2 | `code/src/testing/scenarios/staging/SU11_citation_engine.js` | New | DONE |
 | H2 | `code/src/testing/scenarios/staging/SU12_citation_validator.js` | New | DONE |
 | H2 | `code/src/testing/scenarios/staging/SU13_kb_tools_ingest_retrieve.js` | New | DONE |
-| H2 | `code/src/testing/scenarios/staging/SU14_kb_tools_cite_validate.js` | New | DONE |
+| H2 | `code/src/testing/scenarios/staging/SU14_kb_tools_cite_validate.js` | New | DONE (+T7 cascade) |
 | H3 | `code/src/testing/scenarios/S129_kb_ingest_url_dedup.json` | New | DONE |
 | H3 | `code/src/testing/scenarios/S130_kb_list_sources.json` | New | DONE |
 | H3 | `code/src/testing/scenarios/S131_kb_cite_rejects_low_credibility.json` | New | DONE |
@@ -45,6 +45,7 @@
 | JSONL exports via `manifests.*` (§ARC-4 bounded) | ✓ PASS |
 | Budget guard via `cost_ledger.sumCost()` (§ARC-4 bounded) | ✓ PASS |
 | Provider Contract v2: embedding via `getClient()` only | ✓ PASS |
+| `kb.delete_source` cascade: chunks.jsonl + citations.jsonl cleaned | ✓ PASS |
 
 **Zero new §ARC exceptions introduced.**
 
@@ -85,9 +86,9 @@ Single-quote escaping applied in `deleteBySource()` via `src_id.replace(/'/g, "'
 | SU11 — citation_engine.js | 17 | 17/17 PASS |
 | SU12 — citation_validator.js | 17 | 17/17 PASS |
 | SU13 — kb.ingest_url + kb.retrieve | 17 | 17/17 PASS |
-| SU14 — kb.cite + kb.validate_citations | 17 | 17/17 PASS |
+| SU14 — kb.cite + kb.validate_citations + cascade | 23 | 23/23 PASS |
 
-**77/77 assertions across 5 new unit test suites.**
+**83/83 assertions across 5 new unit test suites.**
 
 ---
 
@@ -101,6 +102,15 @@ Test fixture used `"chk_long_0"` which doesn't match schema pattern `chk_[a-f0-9
 
 **STOP #3 — SU12 T1 false FAIL_UNCITED**  
 Test artifact "This is a simple document." triggered Pattern 1 (`is a` matches `\b(is)\s+[a-z]`). Fixed by using claim-free content.
+
+**STOP #4 (post-closure CTO review) — kb.delete_source cascade incomplete**  
+`kb.delete_source` initially deleted LanceDB chunks + sources.jsonl + individual source JSON, but did NOT clean chunks.jsonl or citations.jsonl entries referencing deleted chunks. Found by CTO independent review. Fixed by:
+- Adding `removeChunks(src_id, ...)` to `manifests.js` (rewrite, §ARC-4 pattern)
+- Adding `removeCitationsByChunks(chunk_ids, ...)` to `manifests.js` (rewrite, §ARC-4 pattern)
+- Capturing `chunkIds` from `readChunks()` BEFORE delete in `kb.delete_source.execute()`
+- Cascading to both JSONL files in steps 2.5 and 4
+- Adding `chunks_jsonl_removed` and `citations_removed` to output schema
+- Adding SU14 T7 verifying the cascade (6 new assertions, suite now 23/23)
 
 ---
 
@@ -121,7 +131,7 @@ All 4 designed to run without OpenAI API keys (dedup / JSONL-only / pure-validat
 
 ```
 forge-test.js — 128 passed, 0 failed, 5 skipped (133 total)
-duration: 76379ms
+duration: 101444ms  (post-cascade-fix confirmation run)
 ```
 
 Previous baseline: 124 passed, 0 failed, 5 skipped (129 total).  

@@ -171,6 +171,53 @@ async function run() {
 
   assert("T6: FILE_NOT_FOUND returns FAILED", r6.status === "FAILED", r6.status);
 
+  // ── T7: kb.delete_source cascade — chunks.jsonl + citations.jsonl cleaned ───
+
+  const PID3       = PID + "_del";
+  const del_dir    = path.join(TMP_ROOT, "artifacts/projects", PID3, "kb/exports");
+  fs.mkdirSync(del_dir, { recursive: true });
+
+  // Seed source manifest
+  const delSrc = {
+    schema_version: "1.0.0", id: "src_aabbcc112233", url: "https://api.search.brave.com/del",
+    title: "Del Source", fetched_at: "2026-05-12T00:00:00Z", content_type: "text/html",
+    raw_byte_size: 100, extracted_text_size: 50, language: "en",
+    credibility: { score: 0.70, tier: "REPUTABLE", signals: ["https"], scored_by: "heuristic_v1", scored_at: "2026-05-12T00:00:00Z" },
+    scope: SCOPE, project_id: PID3, ingestion_decision: null
+  };
+  fs.writeFileSync(path.join(del_dir, "sources.jsonl"), JSON.stringify(delSrc) + "\n", "utf8");
+
+  // Seed chunks.jsonl with 2 chunks for this source
+  const chk1 = { schema_version: "1.0.0", id: "chk_aabbcc11_0", source_id: "src_aabbcc112233", ordinal: 0, text: "chunk 1", char_start: 0, char_end: 7, overlap_with_prev: 0, embedding: new Array(512).fill(0), embedding_model: "text-embedding-3-small@512", metadata: { chunk_strategy: "fixed_v1", page: null } };
+  const chk2 = { schema_version: "1.0.0", id: "chk_aabbcc11_1", source_id: "src_aabbcc112233", ordinal: 1, text: "chunk 2", char_start: 7, char_end: 14, overlap_with_prev: 0, embedding: new Array(512).fill(0), embedding_model: "text-embedding-3-small@512", metadata: { chunk_strategy: "fixed_v1", page: null } };
+  fs.writeFileSync(path.join(del_dir, "chunks.jsonl"), JSON.stringify(chk1) + "\n" + JSON.stringify(chk2) + "\n", "utf8");
+
+  // Seed citations.jsonl with a citation referencing chk_aabbcc11_0
+  const delCit = {
+    schema_version: "1.0.0", id: "cit_abc123456789",
+    claim_text: "The system must persist all session tokens in encrypted storage.",
+    claim_location: { artifact_path: "artifacts/projects/" + PID3 + "/spec.md", line_range: [1, 1] },
+    supporting_chunks: [{ chunk_id: "chk_aabbcc11_0", source_id: "src_aabbcc112233", relevance_score: 0.85, excerpt: "chunk 1" }],
+    confidence: "HIGH", synthesized_by: "research", synthesized_at: "2026-05-12T00:00:00Z"
+  };
+  fs.writeFileSync(path.join(del_dir, "citations.jsonl"), JSON.stringify(delCit) + "\n", "utf8");
+
+  const r7 = await delete_source_tool.execute(
+    { src_id: "src_aabbcc112233", project_id: PID3, scope: SCOPE },
+    { root: TMP_ROOT }
+  );
+
+  assert("T7: envelope = SUCCESS",           r7.status === "SUCCESS",                                       r7.status);
+  assert("T7: source_removed = true",        r7.output && r7.output.source_removed === true,                r7.output && r7.output.source_removed);
+  assert("T7: chunks_jsonl_removed = 2",     r7.output && r7.output.chunks_jsonl_removed === 2,             r7.output && r7.output.chunks_jsonl_removed);
+  assert("T7: citations_removed = 1",        r7.output && r7.output.citations_removed === 1,                r7.output && r7.output.citations_removed);
+
+  // Verify JSONL files are empty after cascade
+  const chunksRemaining   = fs.readFileSync(path.join(del_dir, "chunks.jsonl"), "utf8").trim();
+  const citationsRemaining = fs.readFileSync(path.join(del_dir, "citations.jsonl"), "utf8").trim();
+  assert("T7: chunks.jsonl empty after delete",    chunksRemaining === "",    chunksRemaining || "(empty)");
+  assert("T7: citations.jsonl empty after delete", citationsRemaining === "", citationsRemaining || "(empty)");
+
   fs.rmSync(TMP_ROOT, { recursive: true, force: true });
 }
 
