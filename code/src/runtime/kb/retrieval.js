@@ -11,12 +11,16 @@
 const { getClient }               = require("../../providers/_contract/openAiAdapter");
 const { openStore, searchVector } = require("./storage_lance");
 const { readSources }             = require("./manifests");
+const { appendEntry }             = require("./cost_ledger");
 const {
   EMBEDDING_MODEL,
   EMBEDDING_DIMENSIONS,
   CREDIBILITY_FLOOR_DEFAULT,
   RETRIEVAL_K_DEFAULT
 } = require("./_constants");
+
+// Cost of text-embedding-3-small: $0.02 per 1M tokens (approx 1 token per 4 chars)
+const EMBEDDING_COST_PER_TOKEN = 0.00000002;
 
 // ── Credibility tier ordering ─────────────────────────────────────────────────
 
@@ -66,14 +70,34 @@ async function retrieve(queryText, options) {
     dimensions: EMBEDDING_DIMENSIONS,
     input:      queryText
   });
-  const queryVec = embResponse.data[0].embedding;
+  const queryVec     = embResponse.data[0].embedding;
+  const tokenCount   = embResponse.usage && embResponse.usage.total_tokens
+    ? embResponse.usage.total_tokens
+    : Math.ceil(queryText.length / 4);
+  const embeddingCost = tokenCount * EMBEDDING_COST_PER_TOKEN;
+
+  // Item 2: record query embedding cost in KB cost ledger
+  if (project_id) {
+    try {
+      appendEntry({
+        project_id,
+        operation:  "embedding",
+        cost_usd:   embeddingCost,
+        model:      EMBEDDING_MODEL,
+        tool:       "kb.retrieve",
+        tokens_in:  tokenCount,
+        tokens_out: 0,
+        detail:     "query_embedding"
+      }, { root });
+    } catch (_e) { /* best-effort — do not fail retrieve on ledger error */ }
+  }
 
   // 2. Vector search — retrieve k*4 candidates to allow for credibility post-filter
   const store      = await openStore(project_id, scope, { root });
   const rawResults = await searchVector(store, queryVec, k * 4, {});
 
   if (!rawResults || rawResults.length === 0) {
-    return [];
+    return { results: [], rejected_low_credibility: 0 };
   }
 
   // 3. Build credibility tier map: source_id → tier
@@ -87,8 +111,11 @@ async function retrieve(queryText, options) {
     .filter(r => _tierRank(tierMap.get(r.source_id) || null) >= floorRank)
     .slice(0, k);
 
+  // Item 6: expose rejected count for research_role metadata
+  const rejectedCount = rawResults.length - filtered.length;
+
   // 5. Annotate with credibility tier and normalise field names
-  return filtered.map(r => ({
+  const results = filtered.map(r => ({
     chunk_id:        r.id,
     source_id:       r.source_id,
     text:            r.text,
@@ -97,6 +124,8 @@ async function retrieve(queryText, options) {
     section_heading: r.section_heading || null,
     ordinal:         r.ordinal
   }));
+
+  return { results, rejected_low_credibility: rejectedCount };
 }
 
 module.exports = { retrieve };

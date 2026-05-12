@@ -4,10 +4,10 @@
   "current_stage": "A",
   "overall_progress_percent": 99,
   "stage_progress_percent": 100,
-  "current_task": "PHASE-8-CLOSED",
-  "next_phase": "PHASE-9",
-  "next_step": "Begin PHASE-9 per architecture/FORGE_V2_PHASE_ROADMAP.md. Prerequisite: PHASE-8 CLOSED.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-20260513-1100-phase-8-builtproject-harness.md",
+  "current_task": "PHASE-9-CLOSED",
+  "next_phase": "PHASE-10",
+  "next_step": "Begin PHASE-10 (Iterative Build Loop) per architecture/FORGE_V2_PHASE_ROADMAP.md. Prerequisite: PHASE-9 CLOSED.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-20260512-phase-9-closure.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -79,13 +79,13 @@
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
     "self_test_last_run": "2026-05-11",
-    "self_test_last_result": "123 passed, 0 failed, 5 skipped (128 total) — full PHASE-8 coverage (5 SKIPs require docker/podman daemon)",
-    "self_test_scenarios_pass": 123,
+    "self_test_last_result": "132 passed, 0 failed, 5 skipped (137 total) — PHASE-9 CLOSED. Includes S134-S137 (research_role + kb.retrieve). 5 SKIPs require docker.",
+    "self_test_scenarios_pass": 132,
     "self_test_scenarios_skip": 5,
     "self_test_scenarios_fail": 0,
     "providers_registered_count": 12,
     "tools_registered_count": 58,
-    "doctor_checks_count": 21,
+    "doctor_checks_count": 24,
     "assertion_types_count": 10,
     "active_permission_mode": "WORKSPACE_WRITE",
     "permission_policy_installed": true,
@@ -109,10 +109,10 @@
       "decision_artifact": "DECISION-20260512-0900-phase-7-F-3-override.md"
     },
     "adapter_json_extraction": "ENABLED — extractJsonFromResponse in _adapter_contract.js, applied in anthropic/openai/claude_code/aider adapters (DECISION-20260512-0900 addendum)",
-    "note": "PHASE-8 CLOSED. Built-Project Test Harness (L5b): scenario_loader, harness_runner, verdict_aggregator, loopback_signal, 8 assertion types, builtproject_tools (run_scenarios+read_report), builtproject_runtime doctor check, CLI (forge-builtproject-test.js), reference fixture (_reference_todo_api, 6 scenarios T-1→T-6, 6/6 PASS). Test Designer schema upgraded v1→v2. scenarios: 118→128 (S119–S128). tools: 56→58. doctor checks: 20→21. docs: 20_BUILT_PROJECT_HARNESS_CONTRACT.md.",
+    "note": "PHASE-9 CLOSED. KB Runtime (L-KB-1→L-KB-5): source_acquisition, chunking_engine, embedding_engine, storage_lance (LanceDB), cost_ledger, budget_guard, retrieval, manifests, citation_engine, citation_validator, budget_guard vision-override, research_role (12th role, KNOWN-gate, deterministic findings, confidence recompute). 6 KB tools (ingest_url, retrieve, cite, list_sources, delete_source, validate_citations). 3 new doctor checks (kb_budget_status, kb_indexed_sources_count, research_role_registered). Stage 9.7 cleanup: 6 FIX items (retrieval cost ledger, rejected_low_credibility, citation_validator Pattern 4, S137, evidence cap, confidence recompute). scenarios: 128→137 (S129–S137). doctor checks: 21→24. SU assertions: ~276→314. API cost: $0.00.",
     "last_doctor_counts": {
-      "pass": 18,
-      "warn": 3,
+      "pass": 24,
+      "warn": 0,
       "fail": 0
     }
   },
@@ -135,11 +135,11 @@
       "PHASE-7-F-1",
       "PHASE-7-F-2",
       "PHASE-7-F-3",
-      "PHASE-8"
+      "PHASE-8",
+      "PHASE-9"
     ],
-    "next": "PHASE-9",
+    "next": "PHASE-10",
     "remaining": [
-      "PHASE-9",
       "PHASE-10",
       "PHASE-11",
       "PHASE-12",
@@ -151,18 +151,19 @@
     ]
   },
   "phase_9": {
-    "stage": "9.3-COMPLETE",
-    "next_stage": "9.4",
+    "stage": "CLOSED",
     "stages_complete": [
-      "9.0",
-      "9.1",
-      "9.2",
-      "9.3"
+      "9.0", "9.1", "9.2", "9.3", "9.4", "9.5", "9.6", "9.7"
     ],
     "cost_actuals_usd": 0,
-    "kb_runtime": "PENDING",
+    "kb_runtime": "COMPLETE",
     "arc_exceptions": ["§ARC-4 (kb/manifests.js + kb/cost_ledger.js)"],
-    "stop_and_report_count": 1
+    "stop_and_report_count": 3,
+    "deferred_to_phase_10": [
+      "retrieval.js withRetry/withTimeout (Item 1)",
+      "kb.ingest_url per-chunk budget check (Item 3)",
+      "kb.retrieve rejected_low_credibility metadata in research_role (Item 6 FIXED — retrieval.js now exposes count)"
+    ]
   },
-  "last_updated": "2026-05-13T21:00:00.000Z"
+  "last_updated": "2026-05-12T00:00:00.000Z"
 }

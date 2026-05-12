@@ -17,6 +17,17 @@ const { findId }                         = require("../../kb/_id_minting");
 const SYSTEM_PROMPT   = loadPrompt("research_v1");
 const SCHEMA_VERSION  = "1.0.0";
 const MAX_K_PER_SEARCH = 5;
+const MAX_EVIDENCE_CHUNKS = 10; // Item 8: cap evidence sent to LLM
+
+// Item 9: deterministic confidence from findings distribution (overrides LLM value)
+function _recomputeConfidence(findings) {
+  if (!findings || findings.length === 0) return "LOW";
+  const cs = findings.map(f => f.certainty);
+  if (cs.some(c => c === "UNCERTAIN")) return "LOW";
+  if (cs.some(c => c === "ESTIMATED")) return "MEDIUM";
+  if (cs.every(c => c === "KNOWN"))    return "HIGH";
+  return "LOW";
+}
 
 // ── Input / Output Schemas ────────────────────────────────────────────────────
 
@@ -128,8 +139,12 @@ module.exports = defineRole({
     const rejectedLow = (retrieveEnv && retrieveEnv.metadata &&
                          retrieveEnv.metadata.rejected_low_credibility) || 0;
 
+    // Item 8: cap evidence to MAX_EVIDENCE_CHUNKS to avoid exceeding model context window
+    const evidenceChunks = chunks.slice(0, MAX_EVIDENCE_CHUNKS);
+    const evidenceTruncated = chunks.length > MAX_EVIDENCE_CHUNKS;
+
     // Build evidence block for LLM
-    const evidenceLines = chunks.map((c, i) => (
+    const evidenceLines = evidenceChunks.map((c, i) => (
       "[Chunk " + (i + 1) + "] chunk_id=" + c.chunk_id +
       " source_id=" + c.source_id +
       " credibility=" + (c.credibility_tier || "UNKNOWN") +
@@ -137,8 +152,10 @@ module.exports = defineRole({
       "\n" + (c.text || "")
     )).join("\n\n");
 
-    const evidenceBlock = chunks.length > 0
-      ? "EVIDENCE CHUNKS (" + chunks.length + " retrieved):\n\n" + evidenceLines
+    const evidenceBlock = evidenceChunks.length > 0
+      ? "EVIDENCE CHUNKS (" + evidenceChunks.length + " retrieved" +
+        (evidenceTruncated ? ", " + (chunks.length - MAX_EVIDENCE_CHUNKS) + " omitted — cap reached" : "") +
+        "):\n\n" + evidenceLines
       : "EVIDENCE CHUNKS: none — KB is empty or no relevant results for this project.";
 
     const scenarioTag = (ctx && ctx.scenario_id)
@@ -217,6 +234,9 @@ module.exports = defineRole({
         }
       }
     }
+
+    // Item 9: override LLM's confidence_level with deterministic server-computed value
+    parsed.confidence_level = _recomputeConfidence(parsed.findings);
 
     const ov = validate(parsed, OUTPUT_SCHEMA);
     if (!ov.valid) return roleFailed("INVALID_ROLE_OUTPUT", ov.errors.join("; "), ctx);

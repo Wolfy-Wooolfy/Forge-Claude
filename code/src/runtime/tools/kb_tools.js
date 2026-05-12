@@ -158,7 +158,7 @@ const retrieve = defineTool({
 
   async execute(input, ctx) {
     const root = (ctx && ctx.root) || process.cwd();
-    const results = await _ret().retrieve(input.query, {
+    const ret = await _ret().retrieve(input.query, {
       project_id:        input.project_id,
       scope:             input.scope || "project",
       k:                 input.k,
@@ -166,7 +166,7 @@ const retrieve = defineTool({
       root,
       _client: (ctx && ctx._client) || null
     });
-    return ok({ results });
+    return ok({ results: ret.results }, { rejected_low_credibility: ret.rejected_low_credibility });
   }
 });
 

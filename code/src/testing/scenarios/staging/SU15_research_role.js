@@ -1,7 +1,7 @@
 "use strict";
 
 // SU15 — research_role.js: L-KB-5 Research Role
-// Tests: happy path, KNOWN-gate downgrade, budget exceeded, invalid input, empty KB
+// Tests: happy path, KNOWN-gate downgrade, budget exceeded, invalid input, empty KB, confidence recompute (Item 9)
 
 const path = require("path");
 
@@ -198,6 +198,43 @@ async function run() {
   assert("T5: knowledge_gaps auto-filled",        r5.output && Array.isArray(r5.output.knowledge_gaps) && r5.output.knowledge_gaps.length > 0, r5.output && r5.output.knowledge_gaps);
   assert("T5: metadata.sources_consulted = 0",    r5.output && r5.output.metadata.sources_consulted === 0,         r5.output && r5.output.metadata.sources_consulted);
   assert("T5: confidence_level = LOW",            r5.output && r5.output.confidence_level === "LOW",               r5.output && r5.output.confidence_level);
+
+  // ── T6: confidence_level recompute (Item 9) — LLM emits HIGH, downgrade → MEDIUM ──
+  // LLM emits confidence_level=HIGH but all findings have KNOWN+empty citations
+  // → KNOWN-gate downgrades all to ESTIMATED → _recomputeConfidence returns MEDIUM
+
+  const highWithNoEvidence = makeFindingsJson({
+    findings: [
+      {
+        id: "find_aabbccddeeff",
+        claim: "The system must use 256-bit AES encryption for stored tokens.",
+        certainty: "KNOWN",
+        supporting_citations: [],    // will be downgraded to ESTIMATED
+        contradicting_citations: []
+      },
+      {
+        id: "find_001122334455",
+        claim: "Key rotation must occur every 90 days.",
+        certainty: "KNOWN",
+        supporting_citations: [],    // will be downgraded to ESTIMATED
+        contradicting_citations: []
+      }
+    ],
+    confidence_level: "HIGH"  // LLM over-reports — should be overridden to MEDIUM
+  });
+
+  _mockRetrieveResult = { status: "SUCCESS", output: { results: [CHUNK] }, metadata: {} };
+  _mockAgentResult    = { status: "SUCCESS", output: { text: JSON.stringify(highWithNoEvidence) }, metadata: {} };
+
+  const r6 = await role.run(BASE_INPUT, { root: process.cwd() });
+
+  assert("T6: envelope = SUCCESS",                   r6.status === "SUCCESS",                                           r6.status);
+  assert("T6: both findings downgraded to ESTIMATED",
+    r6.output && r6.output.findings.every(f => f.certainty === "ESTIMATED"),
+    r6.output && r6.output.findings.map(f => f.certainty));
+  assert("T6: confidence_level recomputed to MEDIUM (overrides LLM HIGH)",
+    r6.output && r6.output.confidence_level === "MEDIUM",
+    r6.output && r6.output.confidence_level);
 }
 
 run().then(() => {

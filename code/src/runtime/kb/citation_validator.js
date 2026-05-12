@@ -15,7 +15,7 @@ const CLAIM_PATTERNS = [
   // Pattern 3: attribution anchors
   /according to|as specified in|per the|defined in/i,
   // Pattern 4: numbered requirement lines (multiline flag handled line-by-line)
-  /^[0-9]+\.\s+[A-Z].*(?:must|shall|required|mandatory)/i,
+  /^[0-9]+\.\s+[A-Z].*(?:must|shall|required|mandatory)/,
   // Pattern 5: percentage or metric assertions
   /[0-9]+(?:\.[0-9]+)?%|[0-9]+\s+(?:ms|seconds|minutes|hours|bytes|MB|GB)/i
 ];

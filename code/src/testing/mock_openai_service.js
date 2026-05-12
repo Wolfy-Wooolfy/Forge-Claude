@@ -60,6 +60,14 @@ class MockOpenAiService {
     req.on("data", (chunk) => { body += chunk; });
     req.on("end", () => {
       try {
+        // Embeddings endpoint: return a 512-dim zero vector (no scenario lookup needed)
+        if (req.url && req.url.includes("/embeddings")) {
+          const payload = this._buildEmbeddingsResponse();
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify(payload));
+          return;
+        }
+
         const parsed    = JSON.parse(body || "{}");
         const scenId    = parsed._forge_scenario_id || "";
         const mockEntry = this._responses[scenId] || this._firstEntry();
@@ -141,6 +149,15 @@ class MockOpenAiService {
         }
       ],
       usage: { prompt_tokens: 10, completion_tokens: 10, total_tokens: 20 }
+    };
+  }
+
+  _buildEmbeddingsResponse() {
+    return {
+      object: "list",
+      data: [{ object: "embedding", embedding: new Array(512).fill(0), index: 0 }],
+      model:  "text-embedding-3-small",
+      usage:  { prompt_tokens: 5, total_tokens: 5 }
     };
   }
 

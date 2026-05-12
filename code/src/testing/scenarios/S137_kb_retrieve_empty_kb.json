@@ -1,0 +1,26 @@
+{
+  "id": "S137",
+  "name": "kb.retrieve returns empty results for project with no vector data",
+  "type": "direct_tool",
+  "permission": "READ_ONLY",
+  "tool": "kb.retrieve",
+  "mock": {
+    "content": {}
+  },
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_s137/kb/exports/sources.jsonl",
+      "content": "{\"schema_version\":\"1.0.0\",\"id\":\"src_s137aa112233\",\"url\":\"https://restfulapi.net/s137-test\",\"title\":\"S137 Test Source\",\"fetched_at\":\"2026-05-12T00:00:00.000Z\",\"content_type\":\"text/html\",\"raw_byte_size\":512,\"extracted_text_size\":128,\"language\":\"en\",\"credibility\":{\"score\":0.72,\"tier\":\"REPUTABLE\",\"signals\":[\"https\"],\"scored_by\":\"heuristic_v1\",\"scored_at\":\"2026-05-12T00:00:00.000Z\"},\"scope\":\"project\",\"project_id\":\"test_s137\",\"ingestion_decision\":null}\n"
+    }
+  ],
+  "input": {
+    "query":      "What HTTP methods should a REST API support?",
+    "project_id": "test_s137",
+    "k":          5
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_exists", "field": "results" },
+    { "type": "state_field_equals", "field": "results.length", "expected": 0 }
+  ]
+}

@@ -100,11 +100,12 @@ async function run() {
     _client:           mockClient
   });
 
-  assert("T1: returns array",          Array.isArray(r1),             r1);
-  assert("T1: LOW source filtered out", r1.length === 1,              r1.length);
-  assert("T1: result has chunk_id",    r1[0] && r1[0].chunk_id === "chk_aabbcc11_0", r1[0] && r1[0].chunk_id);
-  assert("T1: credibility_tier REPUTABLE", r1[0] && r1[0].credibility_tier === "REPUTABLE", r1[0] && r1[0].credibility_tier);
-  assert("T1: relevance_score present", r1[0] && typeof r1[0].relevance_score === "number", r1[0] && r1[0].relevance_score);
+  assert("T1: returns object with results array",  Array.isArray(r1.results),            r1);
+  assert("T1: LOW source filtered out",            r1.results.length === 1,              r1.results.length);
+  assert("T1: result has chunk_id",                r1.results[0] && r1.results[0].chunk_id === "chk_aabbcc11_0", r1.results[0] && r1.results[0].chunk_id);
+  assert("T1: credibility_tier REPUTABLE",         r1.results[0] && r1.results[0].credibility_tier === "REPUTABLE", r1.results[0] && r1.results[0].credibility_tier);
+  assert("T1: relevance_score present",            r1.results[0] && typeof r1.results[0].relevance_score === "number", r1.results[0] && r1.results[0].relevance_score);
+  assert("T1: rejected_low_credibility=1",         r1.rejected_low_credibility === 1,    r1.rejected_low_credibility);
 
   // ── T2: COMMUNITY floor — includes LOW? No — LOW rank (0) < COMMUNITY rank (1) ─
 
@@ -117,8 +118,9 @@ async function run() {
     _client:           mockClient
   });
 
-  assert("T2: COMMUNITY floor includes REPUTABLE",   r2.some(c => c.credibility_tier === "REPUTABLE"), r2.map(c => c.credibility_tier));
-  assert("T2: COMMUNITY floor still excludes LOW",   !r2.some(c => c.credibility_tier === "LOW"),      r2.map(c => c.credibility_tier));
+  assert("T2: COMMUNITY floor includes REPUTABLE",   r2.results.some(c => c.credibility_tier === "REPUTABLE"), r2.results.map(c => c.credibility_tier));
+  assert("T2: COMMUNITY floor still excludes LOW",   !r2.results.some(c => c.credibility_tier === "LOW"),      r2.results.map(c => c.credibility_tier));
+  assert("T2: rejected_low_credibility=1",           r2.rejected_low_credibility === 1, r2.rejected_low_credibility);
 
   // ── T3: k=1 limits results ───────────────────────────────────────────────────
 
@@ -131,7 +133,7 @@ async function run() {
     _client:           mockClient
   });
 
-  assert("T3: k=1 limits to 1 result", r3.length === 1, r3.length);
+  assert("T3: k=1 limits to 1 result", r3.results.length === 1, r3.results.length);
 
   // ── T4: empty store → empty results ──────────────────────────────────────────
 
@@ -141,7 +143,8 @@ async function run() {
     project_id: PID, scope: SCOPE, root: TMP_ROOT, _client: mockClient
   });
 
-  assert("T4: empty store returns []", Array.isArray(r4) && r4.length === 0, r4);
+  assert("T4: empty store returns empty results array", Array.isArray(r4.results) && r4.results.length === 0, r4);
+  assert("T4: empty store rejected_low_credibility=0",  r4.rejected_low_credibility === 0, r4.rejected_low_credibility);
 
   _searchDelegate = async () => MOCK_RAW_RESULTS.slice(); // restore
 
