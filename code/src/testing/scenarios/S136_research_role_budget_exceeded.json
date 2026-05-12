@@ -1,0 +1,28 @@
+{
+  "id": "S136",
+  "name": "role.invoke research — pre-seeded cost_ledger over cap returns FAILED BUDGET_EXCEEDED",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "role.invoke",
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_s136/kb/cost_ledger.jsonl",
+      "content": "{\"timestamp\":\"2026-05-12T00:00:00.000Z\",\"operation\":\"embedding\",\"model\":\"text-embedding-3-small@512\",\"tokens\":100000,\"cost_usd\":1.60,\"project_id\":\"test_s136\",\"scope\":\"project\"}\n"
+    }
+  ],
+  "input": {
+    "role_id":    "research",
+    "project_id": "test_s136",
+    "provider":   "mock",
+    "model":      "mock-research-s136",
+    "input": {
+      "schema_version": "1.0.0",
+      "project_id":     "test_s136",
+      "question":       "What are the scalability requirements for this project?"
+    }
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "FAILED" },
+    { "type": "state_field_equals", "field": "reason", "expected": "BUDGET_EXCEEDED" }
+  ]
+}

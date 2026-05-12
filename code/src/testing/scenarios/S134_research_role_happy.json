@@ -1,0 +1,26 @@
+{
+  "id": "S134",
+  "name": "role.invoke research — happy path returns ResearchFindings with valid structure",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "role.invoke",
+  "input": {
+    "role_id":     "research",
+    "project_id":  "test_s134",
+    "provider":    "mock",
+    "model":       "mock-research-s134",
+    "scenario_id": "S134",
+    "input": {
+      "schema_version": "1.0.0",
+      "project_id":     "test_s134",
+      "question":       "What are the deployment requirements for this project?"
+    }
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_exists", "field": "findings" },
+    { "type": "state_field_exists", "field": "knowledge_gaps" },
+    { "type": "state_field_equals", "field": "confidence_level", "expected": "LOW" },
+    { "type": "state_field_equals", "field": "role_id",          "expected": "research" }
+  ]
+}

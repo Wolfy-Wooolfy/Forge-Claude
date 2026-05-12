@@ -148,5 +148,11 @@
     "tokens_in": 900,
     "tokens_out": 580,
     "finish_reason": "stop"
+  },
+  "mock|mock-research-s134|scenario:S134": {
+    "text": "{\"schema_version\":\"1.0.0\",\"question\":\"What are the deployment requirements for this project?\",\"findings\":[{\"id\":\"find_aabbccddeeff\",\"claim\":\"Deployment requirements are not available in the current knowledge base.\",\"certainty\":\"UNCERTAIN\",\"supporting_citations\":[],\"contradicting_citations\":[]}],\"scenarios\":[{\"scenario\":\"Knowledge base is populated with deployment documentation.\",\"probability\":\"MEDIUM\",\"key_conditions\":[\"deployment documentation is ingested into KB\"]}],\"recommendation\":{\"conclusion\":\"Ingest relevant deployment documentation before conducting this research.\",\"reasoning\":\"No evidence is available in the current knowledge base for this query.\",\"alternatives\":[{\"conclusion\":\"Conduct manual research externally.\",\"reasoning\":\"If KB population is not feasible in the near term.\"}]},\"knowledge_gaps\":[\"What are the deployment requirements for this project?\"],\"confidence_level\":\"LOW\",\"metadata\":{\"searches_performed\":0,\"sources_consulted\":0,\"sources_rejected_low_credibility\":0,\"total_cost_usd\":0}}",
+    "tokens_in": 300,
+    "tokens_out": 200,
+    "finish_reason": "stop"
   }
 }

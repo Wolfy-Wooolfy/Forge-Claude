@@ -24,7 +24,10 @@ const checks = [
   require("./checks/containerRuntime"),
   require("./checks/agent_runtime"),
   require("./checks/roles_runtime"),
-  require("./checks/builtproject_runtime")
+  require("./checks/builtproject_runtime"),
+  require("./checks/kb_budget_status"),
+  require("./checks/kb_indexed_sources_count"),
+  require("./checks/research_role_registered")
 ];
 
 function listChecks()  { return checks.slice(); }

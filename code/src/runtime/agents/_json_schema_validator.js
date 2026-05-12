@@ -85,6 +85,7 @@ function _check(value, schema, path, errors) {
 function _checkType(value, typeName) {
   if (typeName === "null")    return value === null;
   if (typeName === "boolean") return typeof value === "boolean";
+  if (typeName === "integer") return typeof value === "number" && !isNaN(value) && Number.isInteger(value);
   if (typeName === "number")  return typeof value === "number" && !isNaN(value);
   if (typeName === "string")  return typeof value === "string";
   if (typeName === "array")   return Array.isArray(value);

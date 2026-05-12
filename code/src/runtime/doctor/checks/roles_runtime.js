@@ -24,7 +24,8 @@ module.exports = {
     const REQUIRED_ROLES = [
       "architect", "spec_writer", "reviewer", "builder",
       "security_auditor", "test_designer",
-      "cost_estimator", "environment", "documentation", "deployment", "quality_judge"
+      "cost_estimator", "environment", "documentation", "deployment", "quality_judge",
+      "research"
     ];
     const roleIds = roles.map(r => r.id);
 
