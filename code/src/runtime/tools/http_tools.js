@@ -14,7 +14,9 @@ const DEFAULT_ALLOW_HOSTS = [
   "api.github.com",
   "raw.githubusercontent.com",
   "registry.npmjs.org",
-  "pypi.org"
+  "pypi.org",
+  "api.search.brave.com",
+  "api.tavily.com"
 ];
 
 function _getAllowedHosts() {
