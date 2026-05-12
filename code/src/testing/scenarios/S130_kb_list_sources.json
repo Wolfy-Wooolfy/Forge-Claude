@@ -1,0 +1,21 @@
+{
+  "id": "S130",
+  "name": "kb.list_sources returns seeded source from manifest",
+  "type": "direct_tool",
+  "permission": "READ_ONLY",
+  "tool": "kb.list_sources",
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_s130/kb/exports/sources.jsonl",
+      "content": "{\"schema_version\":\"1.0.0\",\"id\":\"src_706dcf134a18\",\"url\":\"https://api.search.brave.com/s130-list-test\",\"title\":\"S130 Source\",\"fetched_at\":\"2026-05-12T00:00:00.000Z\",\"content_type\":\"text/html\",\"raw_byte_size\":256,\"extracted_text_size\":128,\"language\":\"en\",\"credibility\":{\"score\":0.72,\"tier\":\"REPUTABLE\",\"signals\":[\"https\"],\"scored_by\":\"heuristic_v1\",\"scored_at\":\"2026-05-12T00:00:00.000Z\"},\"scope\":\"project\",\"project_id\":\"test_s130\",\"ingestion_decision\":null}\n"
+    }
+  ],
+  "input": {
+    "project_id": "test_s130"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "count",         "expected": 1 },
+    { "type": "state_field_equals", "field": "sources[0].id", "expected": "src_706dcf134a18" }
+  ]
+}

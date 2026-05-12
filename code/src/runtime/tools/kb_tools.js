@@ -252,11 +252,156 @@ const cite = defineTool({
   }
 });
 
-// ── Steps H tools (kb.list_sources, kb.delete_source, kb.validate_citations) ──
-// Implemented in Stage 9.5 Step H after mid-stage checkpoint.
+// ── 4. kb.list_sources ───────────────────────────────────────────────────────
+
+const list_sources = defineTool({
+  name:          "kb.list_sources",
+  description:   "List all SourceRecords in the project KB.",
+  required_mode: "READ_ONLY",
+  is_read_only:  true,
+
+  input_schema: {
+    type: "object",
+    properties: {
+      project_id: { type: "string" },
+      scope:      { type: "string", description: "\"project\" (default) or \"global\"" }
+    },
+    required: ["project_id"]
+  },
+  output_schema: {
+    type: "object",
+    properties: {
+      sources: { type: "array",  description: "Array of SourceRecord objects" },
+      count:   { type: "number", description: "Number of sources" }
+    },
+    required: ["sources", "count"]
+  },
+
+  async execute(input, ctx) {
+    const root    = (ctx && ctx.root) || process.cwd();
+    const scope   = input.scope || "project";
+    const sources = _man().readSources(input.project_id, scope, { root });
+    return ok({ sources, count: sources.length });
+  }
+});
+
+// ── 5. kb.delete_source ──────────────────────────────────────────────────────
+
+const delete_source = defineTool({
+  name:          "kb.delete_source",
+  description:   "Remove a SourceRecord and its chunks from the project KB (vector store + manifests + individual JSON).",
+  required_mode: "WORKSPACE_WRITE",
+
+  input_schema: {
+    type: "object",
+    properties: {
+      src_id:     { type: "string",  description: "SourceRecord ID (src_<12hex>)" },
+      project_id: { type: "string" },
+      scope:      { type: "string",  description: "\"project\" (default) or \"global\"" }
+    },
+    required: ["src_id", "project_id"]
+  },
+  output_schema: {
+    type: "object",
+    properties: {
+      chunks_removed: { type: "number", description: "Number of chunk vectors deleted" },
+      source_removed: { type: "boolean" }
+    },
+    required: ["chunks_removed", "source_removed"]
+  },
+
+  preview(input) {
+    return Promise.resolve({
+      status:  "PREVIEWED",
+      output:  { would_delete_src_id: input.src_id, project_id: input.project_id },
+      metadata: {}
+    });
+  },
+
+  async execute(input, ctx) {
+    const root  = (ctx && ctx.root) || process.cwd();
+    const scope = input.scope || "project";
+
+    // 1. Delete chunks from LanceDB
+    let chunksRemoved = 0;
+    try {
+      const store  = await _store().openStore(input.project_id, scope, { root });
+      const result = await _store().deleteBySource(store, input.src_id);
+      chunksRemoved = result.deleted;
+    } catch (_) { /* no vector store yet is not an error */ }
+
+    // 2. Remove from sources JSONL manifest
+    const { removed } = _man().removeSource(input.src_id, input.project_id, scope, { root });
+
+    // 3. Delete individual source JSON via L2 fs.delete_file (Track A)
+    const { getDefaultRegistry } = require("./_registry");
+    const reg = (ctx && ctx._reg) || getDefaultRegistry();
+    const relPath = "artifacts/projects/" + input.project_id + "/kb/sources/" + input.src_id + ".json";
+    await reg.invoke("fs.delete_file", { path: relPath }, { root });
+
+    return ok({ chunks_removed: chunksRemoved, source_removed: removed });
+  }
+});
+
+// ── 6. kb.validate_citations ─────────────────────────────────────────────────
+
+const validate_citations = defineTool({
+  name:          "kb.validate_citations",
+  description:   "Audit an artifact for factual claims not covered by CitationRecords. Returns PASS or FAIL_UNCITED.",
+  required_mode: "READ_ONLY",
+  is_read_only:  true,
+
+  input_schema: {
+    type: "object",
+    properties: {
+      artifact_path: { type: "string",  description: "Relative path from project root to the artifact" },
+      project_id:    { type: "string" },
+      scope:         { type: "string",  description: "\"project\" (default) or \"global\"" }
+    },
+    required: ["artifact_path", "project_id"]
+  },
+  output_schema: {
+    type: "object",
+    properties: {
+      status:               { type: "string",  description: "PASS | FAIL_UNCITED" },
+      uncited_claims_count: { type: "number" },
+      cited_claims_count:   { type: "number" },
+      uncited_claims:       { type: "array",   description: "[{line, text}]" }
+    },
+    required: ["status", "uncited_claims_count", "cited_claims_count", "uncited_claims"]
+  },
+
+  async execute(input, ctx) {
+    const root = (ctx && ctx.root) || process.cwd();
+    const scope = input.scope || "project";
+
+    // Read artifact content via L2 fs.read_file (Track A)
+    const { getDefaultRegistry } = require("./_registry");
+    const reg = (ctx && ctx._reg) || getDefaultRegistry();
+    const fileEnv = await reg.invoke("fs.read_file", { path: input.artifact_path }, { root });
+    if (!fileEnv || fileEnv.status !== "SUCCESS") {
+      const reason = (fileEnv && fileEnv.metadata && fileEnv.metadata.reason) || "FILE_READ_FAILED";
+      return failed(reason, "Cannot read artifact: " + input.artifact_path);
+    }
+    const content = fileEnv.output.content;
+
+    // Build set of cited line numbers from existing CitationRecords
+    const citations = _man().readCitations(input.project_id, scope, { root });
+    const citedLines = new Set();
+    for (const cit of citations) {
+      if (cit.claim_location && Array.isArray(cit.claim_location.line_range)) {
+        const [start, end] = cit.claim_location.line_range;
+        for (let ln = start; ln <= end; ln++) citedLines.add(ln);
+      }
+    }
+
+    const result = _cv().validateCitations(content, citedLines);
+    return ok(result);
+  }
+});
 
 // ── Export ────────────────────────────────────────────────────────────────────
 
 module.exports = {
-  tools: [ingest_url, retrieve, cite]
+  tools: [ingest_url, retrieve, cite, list_sources, delete_source, validate_citations]
 };

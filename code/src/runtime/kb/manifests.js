@@ -108,6 +108,26 @@ function appendCitation(citationRecord, project_id, scope, options) {
   _appendAtomic(p, JSON.stringify(citationRecord));
 }
 
+function removeSource(src_id, project_id, scope, options) {
+  const opts = options || {};
+  const p    = _sourcesPath(project_id, scope, opts.root);
+  if (!fs.existsSync(p)) return { removed: false };
+  const all      = _readJsonl(p);
+  const filtered = all.filter(s => s.id !== src_id);
+  if (filtered.length === all.length) return { removed: false };
+  const content  = filtered.map(s => JSON.stringify(s)).join("\n") + (filtered.length > 0 ? "\n" : "");
+  const tmpPath  = p + ".tmp";
+  const fd       = fs.openSync(tmpPath, "w");
+  try {
+    fs.writeFileSync(fd, content);
+    fs.fsyncSync(fd);
+  } finally {
+    fs.closeSync(fd);
+  }
+  fs.renameSync(tmpPath, p);
+  return { removed: true };
+}
+
 function readSources(project_id, scope, options) {
   const opts = options || {};
   const p    = _sourcesPath(project_id, scope, opts.root);
@@ -152,6 +172,7 @@ module.exports = {
   appendSource,
   appendChunk,
   appendCitation,
+  removeSource,
   readSources,
   readChunks,
   readCitations,

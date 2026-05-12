@@ -1,0 +1,29 @@
+{
+  "id": "S131",
+  "name": "kb.cite returns FAILED when all supporting chunks are LOW credibility",
+  "type": "direct_tool",
+  "permission": "WORKSPACE_WRITE",
+  "tool": "kb.cite",
+  "input": {
+    "claim_text":     "The system requires 99.9% uptime guarantees per specification.",
+    "claim_location": {
+      "artifact_path": "artifacts/projects/test_s131/spec.md",
+      "line_range": [1, 1]
+    },
+    "chunks": [
+      {
+        "chunk_id":        "chk_aabbcc11_0",
+        "source_id":       "src_aabbcc112233",
+        "text":            "Low quality content with no credibility.",
+        "relevance_score": 0.90,
+        "credibility_tier": "LOW"
+      }
+    ],
+    "synthesized_by": "research",
+    "project_id":     "test_s131"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "FAILED" },
+    { "type": "state_field_equals", "field": "reason", "expected": "ALL_CHUNKS_LOW_CREDIBILITY" }
+  ]
+}

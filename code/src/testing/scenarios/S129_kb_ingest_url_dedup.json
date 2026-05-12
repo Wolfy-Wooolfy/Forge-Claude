@@ -1,0 +1,23 @@
+{
+  "id": "S129",
+  "name": "kb.ingest_url returns DUPLICATE when src_id already in manifest",
+  "type": "direct_tool",
+  "permission": "WORKSPACE_WRITE",
+  "tool": "kb.ingest_url",
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_s129/kb/exports/sources.jsonl",
+      "content": "{\"schema_version\":\"1.0.0\",\"id\":\"src_623714c760d0\",\"url\":\"https://api.tavily.com/s129-ingest-test\",\"title\":\"S129 Test Page\",\"fetched_at\":\"2026-05-12T00:00:00.000Z\",\"content_type\":\"text/html\",\"raw_byte_size\":512,\"extracted_text_size\":64,\"language\":\"en\",\"credibility\":{\"score\":0.65,\"tier\":\"REPUTABLE\",\"signals\":[\"https\"],\"scored_by\":\"heuristic_v1\",\"scored_at\":\"2026-05-12T00:00:00.000Z\"},\"scope\":\"project\",\"project_id\":\"test_s129\",\"ingestion_decision\":null}\n"
+    }
+  ],
+  "input": {
+    "url":        "https://api.tavily.com/s129-ingest-test",
+    "project_id": "test_s129"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "status",  "expected": "DUPLICATE" },
+    { "type": "state_field_equals", "field": "deduped", "expected": true },
+    { "type": "state_field_equals", "field": "src_id",  "expected": "src_623714c760d0" }
+  ]
+}

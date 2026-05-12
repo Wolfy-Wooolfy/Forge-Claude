@@ -1,0 +1,23 @@
+{
+  "id": "S132",
+  "name": "kb.validate_citations detects uncited factual claim",
+  "type": "direct_tool",
+  "permission": "READ_ONLY",
+  "tool": "kb.validate_citations",
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_s132/spec.md",
+      "content": "# System Specification\nThe system must persist all session tokens in encrypted storage.\nEnd of document.\n"
+    }
+  ],
+  "input": {
+    "artifact_path": "artifacts/projects/test_s132/spec.md",
+    "project_id":    "test_s132"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "status",               "expected": "FAIL_UNCITED" },
+    { "type": "state_field_equals", "field": "uncited_claims_count",  "expected": 1 },
+    { "type": "state_field_equals", "field": "cited_claims_count",    "expected": 0 }
+  ]
+}

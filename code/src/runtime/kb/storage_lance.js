@@ -128,6 +128,16 @@ function _toResult(row) {
   };
 }
 
+// ── deleteBySource ────────────────────────────────────────────────────────────
+
+async function deleteBySource(store, src_id) {
+  if (!store.table) return { deleted: 0 };
+  const before = await store.table.countRows();
+  await store.table.delete("source_id = '" + src_id.replace(/'/g, "''") + "'");
+  const after  = await store.table.countRows();
+  return { deleted: before - after };
+}
+
 // ── closeStore ────────────────────────────────────────────────────────────────
 
 async function closeStore(store) {
@@ -160,6 +170,7 @@ module.exports = {
   openStore,
   insertChunks,
   searchVector,
+  deleteBySource,
   closeStore,
   closeAll,
   getTableInfo

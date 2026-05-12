@@ -14,8 +14,8 @@ const manifests                  = require("./manifests");
 // ── Confidence mapping ────────────────────────────────────────────────────────
 
 function _scoreToConfidence(maxRelevance) {
-  if (maxRelevance >= 0.75) return "HIGH";
-  if (maxRelevance >= 0.45) return "MEDIUM";
+  if (maxRelevance >= 0.80) return "HIGH";
+  if (maxRelevance >= 0.60) return "MEDIUM";
   return "LOW";
 }
 
