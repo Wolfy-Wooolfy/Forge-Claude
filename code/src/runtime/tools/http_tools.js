@@ -57,7 +57,7 @@ function _validateUrl(rawUrl) {
 
 // ── Raw HTTP request helper ───────────────────────────────────────────────────
 
-function _request(method, parsedUrl, headers, body, timeoutMs) {
+function _request(method, parsedUrl, headers, body, timeoutMs, binaryResponse) {
   return new Promise((resolve) => {
     const lib     = parsedUrl.protocol === "https:" ? https : http;
     const reqOpts = {
@@ -93,7 +93,8 @@ function _request(method, parsedUrl, headers, body, timeoutMs) {
           resolve({ error: "BODY_TOO_LARGE", status_code: res.statusCode });
           return;
         }
-        const rawBody = Buffer.concat(chunks).toString("utf8");
+        const buf     = Buffer.concat(chunks);
+        const rawBody = binaryResponse ? buf.toString("base64") : buf.toString("utf8");
         resolve({ status_code: res.statusCode, headers: res.headers, body: rawBody });
       });
     });
@@ -134,9 +135,10 @@ const get = defineTool({
   input_schema: {
     type: "object",
     properties: {
-      url:        { type: "string" },
-      headers:    { type: "object" },
-      timeout_ms: { type: "number" }
+      url:             { type: "string" },
+      headers:         { type: "object" },
+      timeout_ms:      { type: "number" },
+      binary_response: { type: "boolean", description: "When true, body is returned as base64 (for binary content like PDFs)" }
     },
     required: ["url"]
   },
@@ -146,7 +148,7 @@ const get = defineTool({
     const check = _validateUrl(input.url);
     if (!check.ok) return failed(check.reason, check.detail);
 
-    const result = await _request("GET", check.parsed, input.headers || {}, null, input.timeout_ms);
+    const result = await _request("GET", check.parsed, input.headers || {}, null, input.timeout_ms, input.binary_response);
     if (result.error === "TIMEOUT")       return failed("TIMEOUT",       "Request timed out");
     if (result.error === "BODY_TOO_LARGE") return failed("BODY_TOO_LARGE", "Response body exceeds " + MAX_BODY_BYTES + " bytes");
     if (result.error)                      return failed(result.error,   result.detail || "HTTP GET failed");

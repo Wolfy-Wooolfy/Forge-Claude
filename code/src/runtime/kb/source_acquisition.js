@@ -49,10 +49,11 @@ async function _extractText(body, contentType) {
   }
 
   if (contentType === "application/pdf") {
-    // Unreachable — gated by PDF_DEFERRED_TO_STAGE_9_5 check in acquireSource().
-    // http_tools.js toString("utf8") corrupts binary PDF bytes (0x80-0xFF → 0xFD).
-    // Re-enabled in Stage 9.5 when http_tools.js gains binary response support.
-    throw new Error("PDF support deferred to Stage 9.5");
+    // body is base64-encoded (two-pass fetch with binary_response:true in acquireSource)
+    const pdfParse = require("pdf-parse");
+    const buf      = Buffer.from(body, "base64");
+    const data     = await pdfParse(buf);
+    return data.text || "";
   }
 
   // text/markdown, text/plain — return raw body
@@ -167,18 +168,21 @@ async function acquireSource(url, options) {
   // 3. Detect content type from response header (with extension fallback)
   const content_type = _detectContentType(responseHeaders || {}, url);
 
-  // Stage 9.4 limitation: PDF binary handling deferred to Stage 9.5.
-  // http_tools.js toString("utf8") corrupts non-ASCII bytes (0x80-0xFF → 0xFD),
-  // making pdf-parse fail on 99%+ of real PDFs. Fix requires binary response
-  // encoding support in http_tools.js.
+  // PDF two-pass: utf8 first pass gave us headers; re-fetch with binary_response:true
+  // so pdf-parse receives an uncorrupted Buffer (0x80-0xFF bytes are preserved in base64).
+  let fetchBody = body;
   if (content_type === "application/pdf") {
-    return {
-      status: "REJECTED",
-      reason: "PDF_DEFERRED_TO_STAGE_9_5",
-      source: null,
-      deduped: false,
-      extracted_text: null
-    };
+    const pdfEnv = await reg.invoke("http.get", { url, timeout_ms: 15000, binary_response: true }, ctx);
+    if (!pdfEnv || pdfEnv.status !== "SUCCESS" || pdfEnv.output.status_code >= 400) {
+      return {
+        status:  "REJECTED",
+        reason:  "PDF_BINARY_FETCH_FAILED",
+        source:  null,
+        deduped: false,
+        extracted_text: null
+      };
+    }
+    fetchBody = pdfEnv.output.body; // base64-encoded binary
   }
 
   if (!ALLOWED_FETCH_CONTENT_TYPES.includes(content_type)) {
@@ -192,8 +196,8 @@ async function acquireSource(url, options) {
   }
 
   // 4. Extract text + title + language
-  const extractedText = await _extractText(body, content_type);
-  const title         = _extractTitle(extractedText, body, content_type);
+  const extractedText = await _extractText(fetchBody, content_type);
+  const title         = _extractTitle(extractedText, fetchBody, content_type);
   const language      = _detectLanguage(extractedText);
   const now           = new Date().toISOString();
 
@@ -205,7 +209,9 @@ async function acquireSource(url, options) {
     title,
     fetched_at:           now,
     content_type,
-    raw_byte_size:        Buffer.byteLength(body, "utf8"),
+    raw_byte_size:        content_type === "application/pdf"
+                            ? Buffer.from(fetchBody, "base64").length
+                            : Buffer.byteLength(fetchBody, "utf8"),
     extracted_text_size:  extractedText.length,
     language,
     credibility:          null,    // filled in step 6
