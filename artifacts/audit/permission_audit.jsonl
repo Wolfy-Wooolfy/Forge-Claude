@@ -20702,3 +20702,6 @@
 {"ts":"2026-05-12T11:31:54.874Z","tool":"role.invoke","required_mode":"PROMPT","active_mode":"TEST","stage":"test_mode","allow":true,"reason":"TEST_MODE_ALLOWED"}
 {"ts":"2026-05-12T11:31:55.162Z","tool":"role.invoke","required_mode":"PROMPT","active_mode":"TEST","stage":"test_mode","allow":true,"reason":"TEST_MODE_ALLOWED"}
 {"ts":"2026-05-12T11:31:55.166Z","tool":"agent.invoke","required_mode":"PROMPT","active_mode":"TEST","stage":"test_mode","allow":true,"reason":"TEST_MODE_ALLOWED"}
+{"ts":"2026-05-12T11:53:27.894Z","tool":"kb.list_sources","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-12T11:53:27.915Z","tool":"kb.validate_citations","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
+{"ts":"2026-05-12T11:53:27.932Z","tool":"fs.read_file","required_mode":"READ_ONLY","active_mode":"WORKSPACE_WRITE","stage":"read_only","allow":true,"reason":"READ_ONLY"}
