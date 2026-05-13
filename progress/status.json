@@ -4,10 +4,10 @@
   "current_stage": "A",
   "overall_progress_percent": 99,
   "stage_progress_percent": 100,
-  "current_task": "PHASE-10-STAGE-10-0-CLOSED",
+  "current_task": "PHASE-10-STAGE-10-1-CLOSED",
   "next_phase": "PHASE-10",
-  "next_step": "Begin PHASE-10 Stage 10.1 (Conversation Graph + Loop State) per DECISION-20260513-1000-phase-10-plan.md after owner approval.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-20260512-phase-9-closure.md",
+  "next_step": "Begin PHASE-10 Stage 10.2 per DECISION-20260513-1000-phase-10-plan.md after CTO 'TRULY CLOSED' confirmation.",
+  "last_completed_artifact": "artifacts/decisions/_phase_10_checkpoints/stage_10_1.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -74,13 +74,13 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-05-13T10:27:59.846Z",
+    "last_doctor_run": "2026-05-13T12:46:53.371Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
     "self_test_last_run": "2026-05-13",
-    "self_test_last_result": "133 passed, 0 failed, 5 skipped (138 total) — prereq PHASE-10 PROMPT mode correction closed. S138 added (agent.invoke WORKSPACE_WRITE). 5 SKIPs require docker.",
-    "self_test_scenarios_pass": 133,
+    "self_test_last_result": "136 passed, 0 failed, 5 skipped (141 total) — Stage 10.1 closed. S139/S140/S141 added (orchestration state machine, loop state persistence, boot validation). 5 SKIPs require docker.",
+    "self_test_scenarios_pass": 136,
     "self_test_scenarios_skip": 5,
     "self_test_scenarios_fail": 0,
     "providers_registered_count": 12,
@@ -111,8 +111,8 @@
     "adapter_json_extraction": "ENABLED — extractJsonFromResponse in _adapter_contract.js, applied in anthropic/openai/claude_code/aider adapters (DECISION-20260512-0900 addendum)",
     "note": "PHASE-9 CLOSED. KB Runtime (L-KB-1→L-KB-5): source_acquisition, chunking_engine, embedding_engine, storage_lance (LanceDB), cost_ledger, budget_guard, retrieval, manifests, citation_engine, citation_validator, budget_guard vision-override, research_role (12th role, KNOWN-gate, deterministic findings, confidence recompute). 6 KB tools (ingest_url, retrieve, cite, list_sources, delete_source, validate_citations). 3 new doctor checks (kb_budget_status, kb_indexed_sources_count, research_role_registered). Stage 9.7 cleanup: 6 FIX items (retrieval cost ledger, rejected_low_credibility, citation_validator Pattern 4, S137, evidence cap, confidence recompute). scenarios: 128→137 (S129–S137). doctor checks: 21→24. SU assertions: ~276→314. API cost: $0.00.",
     "last_doctor_counts": {
-      "pass": 22,
-      "warn": 2,
+      "pass": 21,
+      "warn": 3,
       "fail": 0
     }
   },
@@ -190,14 +190,34 @@
         "contract_doc": "docs/10_runtime/19_ORCHESTRATION_LOOP_CONTRACT.md",
         "checkpoint": "artifacts/decisions/_phase_10_checkpoints/stage_10_0.md",
         "closed_at": "2026-05-13T10:40:00.000Z",
-        "cost_actual_usd": 0.0
+        "cost_actual_usd": 0
       },
-      "10_1": { "status": "NOT_STARTED" },
-      "10_2": { "status": "NOT_STARTED" },
-      "10_3": { "status": "NOT_STARTED" },
-      "10_4": { "status": "NOT_STARTED" },
-      "10_5": { "status": "NOT_STARTED" }
+      "10_1": {
+        "status": "CLOSED",
+        "checkpoint": "artifacts/decisions/_phase_10_checkpoints/stage_10_1.md",
+        "scenarios_added": ["S139", "S140", "S141"],
+        "files_created": [
+          "code/src/runtime/orchestration/conversation_graph.js",
+          "code/src/runtime/orchestration/loop_state.js",
+          "code/src/runtime/orchestration/_registry.js",
+          "code/src/testing/helpers/orchestration_test_helper.js"
+        ],
+        "closed_at": "2026-05-13T12:50:00.000Z",
+        "cost_actual_usd": 0
+      },
+      "10_2": {
+        "status": "NOT_STARTED"
+      },
+      "10_3": {
+        "status": "NOT_STARTED"
+      },
+      "10_4": {
+        "status": "NOT_STARTED"
+      },
+      "10_5": {
+        "status": "NOT_STARTED"
+      }
     }
   },
-  "last_updated": "2026-05-13T10:40:00.000Z"
+  "last_updated": "2026-05-13T12:50:00.000Z"
 }

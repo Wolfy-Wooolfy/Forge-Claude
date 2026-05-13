@@ -1,0 +1,17 @@
+{
+  "id": "S141",
+  "name": "orchestration boot validation: 17 states, ITERATION_CAP, misspelling detection",
+  "description": "Verifies _registry.validate() fail-closed semantics. Four checks: (1) base validate() returns ok:true on unmodified codebase, (2) 16-state override fails (count mismatch), (3) iteration_cap_override:4 fails (strict equality check), (4) 17-state array with one misspelled ID fails (both missing-real-ID and unknown-ID errors caught).",
+  "type": "module_call",
+  "module": "code/src/testing/helpers/orchestration_test_helper",
+  "method": "runS141Checks",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "base_ok",           "expected": true  },
+    { "type": "state_field_equals", "field": "base_errors_empty", "expected": true  },
+    { "type": "state_field_equals", "field": "short_fails",       "expected": true  },
+    { "type": "state_field_equals", "field": "cap_fails",         "expected": true  },
+    { "type": "state_field_equals", "field": "misspell_fails",    "expected": true  }
+  ]
+}

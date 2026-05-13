@@ -1,0 +1,19 @@
+{
+  "id": "S140",
+  "name": "loop state persists across steps: graph.json written, reloaded, audit log correct",
+  "description": "Verifies loop_state.js persistence: createLoop writes graph.json, appendNode adds 4 nodes, appendAuditRow writes 3 JSONL rows, setCurrentState updates current_state, loadLoop re-reads the same content (simulated restart). Each audit row is validated against AuditLogRow required fields. Cleanup deletes test_s140 project directory.",
+  "type": "module_call",
+  "module": "code/src/testing/helpers/orchestration_test_helper",
+  "method": "runS140Sequence",
+  "args": [{}],
+  "cleanup_project": "test_s140",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "graph_exists",     "expected": true         },
+    { "type": "state_field_equals", "field": "nodes_count",      "expected": 4            },
+    { "type": "state_field_equals", "field": "current_state",    "expected": "REVIEWER_SPEC" },
+    { "type": "state_field_equals", "field": "audit_rows",       "expected": 3            },
+    { "type": "state_field_equals", "field": "all_rows_valid",   "expected": true         },
+    { "type": "state_field_equals", "field": "reloaded_matches", "expected": true         }
+  ]
+}

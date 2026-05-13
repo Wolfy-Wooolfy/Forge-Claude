@@ -6,10 +6,10 @@
 const path = require("path");
 
 // Lazy requires to avoid circular-dependency / early-load issues
-function _graph()     { return require("../runtime/orchestration/conversation_graph"); }
-function _loopState() { return require("../runtime/orchestration/loop_state"); }
-function _regModule() { return require("../runtime/orchestration/_registry"); }
-function _toolsReg()  { return require("../tools/_registry").getDefaultRegistry(); }
+function _graph()     { return require("../../runtime/orchestration/conversation_graph"); }
+function _loopState() { return require("../../runtime/orchestration/loop_state"); }
+function _regModule() { return require("../../runtime/orchestration/_registry"); }
+function _toolsReg()  { return require("../../runtime/tools/_registry").getDefaultRegistry(); }
 
 // ── S139 helper — state-machine checks ───────────────────────────────────────
 // Runs 4 deterministic checks against conversation_graph.js pure functions
@@ -50,9 +50,9 @@ async function runS139Checks(ctx) {
 
   return {
     initial_state_owner_intent:               initialState === "OWNER_INTENT",
-    transition_owner_to_architect_allowed:    t1.allowed  === true,
-    transition_owner_to_builder_allowed:      t2.allowed  === false,
-    transition_complete_to_any_allowed:       t3.allowed  === false,
+    transition_owner_to_architect_allowed:    t1.allowed,
+    transition_owner_to_builder_allowed:      t2.allowed,
+    transition_complete_to_any_allowed:       t3.allowed,
     loop_error:                               loopError   || null
   };
 }
