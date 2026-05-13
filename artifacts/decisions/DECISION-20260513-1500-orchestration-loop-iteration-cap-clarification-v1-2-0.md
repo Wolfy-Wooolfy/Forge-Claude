@@ -94,7 +94,27 @@ The binding reading is **Path B: `iteration_count >= ITERATION_CAP` triggers esc
 ```
 +++ append row to §14.4 amendment history table
 
-| v1.2.0 | 2026-05-13 | Iteration cap semantics clarification. Resolves three-way ambiguity between §6.2 (>= semantics), §11.2 (> semantics), §2.2 transition table (> semantics), and §3 schema (max:5, implies >= semantics). Binding reading: >= (count never exceeds 5). Rewrites §11.2 steps 1–3 and two §2.2 trigger condition strings. No schema change, no code semantics change; Stage 10.1 validateGraph was already correct. | DECISION-20260513-1500-orchestration-loop-iteration-cap-clarification-v1-2-0.md |
+| v1.2.0 | 2026-05-13 | Iteration cap semantics clarification. Resolves three-way ambiguity between §6.2 (>= semantics), §11.2 (> semantics), §2.2 transition table (> semantics), and §3 schema (max:5, implies >= semantics). Binding reading: >= (count never exceeds 5). Rewrites §11.2 steps 1–3 and two §2.2 trigger condition strings. No schema change, no code semantics change; Stage 10.1 validateGraph was already correct. Also synchronizes 2 trigger string literals in Stage 10.1 conversation_graph.js TRANSITION_TABLE (documentation mirrors of §2.2) — no logic change. | DECISION-20260513-1500-orchestration-loop-iteration-cap-clarification-v1-2-0.md |
+```
+
+### 3.7 — Stage 10.1 `conversation_graph.js` TRANSITION_TABLE trigger strings
+
+**Scope clarification:** These are documentation strings inside `conversation_graph.js` that mirror contract §2.2 transition table verbatim. They are string literals only — NOT executed logic. `validateGraph` (lines 261–262) already uses Path B logic correctly and is unchanged. Updating these strings keeps Stage 10.1 code synchronized with the amended contract.
+
+```
+--- before (code/src/runtime/orchestration/conversation_graph.js line ~144)
+    trigger:     "Gate 2 owner response = REJECT_AND_LOOP; iteration_count ≤ ITERATION_CAP",
+
++++ after
+    trigger:     "Gate 2 owner response = REJECT_AND_LOOP; iteration_count < ITERATION_CAP",
+```
+
+```
+--- before (code/src/runtime/orchestration/conversation_graph.js line ~150)
+    trigger:     "Gate 2 REJECT_AND_LOOP; iteration_count > ITERATION_CAP",
+
++++ after
+    trigger:     "Gate 2 REJECT_AND_LOOP; iteration_count >= ITERATION_CAP",
 ```
 
 ### 3.5 Header version
@@ -128,7 +148,11 @@ The binding reading is **Path B: `iteration_count >= ITERATION_CAP` triggers esc
 
 **No persisted graphs exist with `iteration_count > 5`.** Stage 10.1 is the first implementation to write any graphs; its `validateGraph` already rejects count > 5. No migration needed.
 
-**No code changes to Stage 10.1 or Stage 10.2 files.** The Stage 10.1 implementation (`conversation_graph.js` `validateGraph`) was already implementing Path B correctly. This amendment documents the intent, not a correction.
+**No CODE LOGIC changes to Stage 10.1 or Stage 10.2 files.** The Stage 10.1 `validateGraph` logic in `conversation_graph.js` was already implementing Path B correctly — no logic change.
+
+Two **documentation string edits** are applied to `conversation_graph.js` (§3.7 above): the `trigger` labels in TRANSITION_TABLE rows for `QUALITY_JUDGE → BUILDER` and `QUALITY_JUDGE → ESCALATED` are synchronized with the amended §2.2 transition table. These are string literals only; no state machine or validation logic change.
+
+Stage 10.2 files are completely untouched.
 
 **Stage 10.3 implementation spec (per CTO resolution):** `tryAdvanceForLoopBack` replaces the originally-planned `incrementIteration`; `checkCap` uses `>= ITERATION_CAP`; count never reaches 6 in any persisted state.
 
@@ -140,11 +164,11 @@ Upon owner approval in chat, the following will be executed in order:
 
 | Step | Action | File |
 |---|---|---|
-| A2 | Apply diffs from §3.1–§3.6 to the contract (5 edits) | `docs/10_runtime/19_ORCHESTRATION_LOOP_CONTRACT.md` |
+| A2 | Apply diffs from §3.1–§3.7: 5 contract edits + 2 code documentation string edits | `docs/10_runtime/19_ORCHESTRATION_LOOP_CONTRACT.md` + `code/src/runtime/orchestration/conversation_graph.js` |
 | A3 | Update Stage 10.3 mid-checkpoint to note contract is now v1.2.0 | `artifacts/decisions/_phase_10_checkpoints/stage_10_3_mid.md` |
 | A4 | Add `contract_amendment` field to `phase_10.stages.10_3` in status.json | `progress/status.json` (at Stage 10.3 close) |
 
-No code changes in A2–A4. No schema changes. No new scenarios.
+No schema changes. No logic changes. No new scenarios.
 
 ---
 
