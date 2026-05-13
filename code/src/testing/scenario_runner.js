@@ -719,6 +719,89 @@ async function _runApiserver(scenario, root) {
   return result;
 }
 
+// ── Dispatch: module_call ─────────────────────────────────────────────────────
+// Testing infrastructure addition — Stage 10.1. Supports pure-utility module
+// testing where no L2 tool is invoked (e.g. validateTransition, validate()).
+// Also supports helpers that use L2 tools internally when permission is set.
+// NOT a runtime change. Does not affect production code paths.
+
+async function _runModuleCall(scenario, root) {
+  const { createRegistry, resetDefaultRegistry } = require(
+    path.join(root, "code", "src", "runtime", "tools", "_registry")
+  );
+  const { createPolicy, resetDefaultPolicy } = require(
+    path.join(root, "code", "src", "runtime", "permission", "permissionPolicy")
+  );
+
+  const permission = scenario.permission || "WORKSPACE_WRITE";
+  const savedMode  = process.env.FORGE_PERMISSION_MODE;
+  process.env.FORGE_PERMISSION_MODE = permission;
+  resetDefaultRegistry();
+  resetDefaultPolicy();
+
+  const modulePath = path.join(root, scenario.module);
+
+  let execResult;
+  try {
+    // Clear module cache so each scenario gets a fresh require
+    try {
+      const resolved = require.resolve(modulePath);
+      delete require.cache[resolved];
+    } catch (_e) { /* not yet cached — ignore */ }
+
+    const mod = require(modulePath);
+    const method = mod[scenario.method];
+    if (typeof method !== "function") {
+      throw new Error(
+        "method '" + scenario.method + "' not found on module '" + scenario.module + "'"
+      );
+    }
+
+    const args = Array.isArray(scenario.args) ? scenario.args : [];
+    let returnValue = method(...args);
+    if (returnValue !== null && returnValue !== undefined &&
+        typeof returnValue.then === "function") {
+      returnValue = await returnValue;
+    }
+
+    execResult = {
+      status: "SUCCESS",
+      output: {
+        response:   "",
+        tool_calls: [],
+        state:      returnValue !== undefined ? returnValue : {}
+      },
+      audit: []
+    };
+  } catch (err) {
+    execResult = {
+      status: "FAILED",
+      output: { response: "", tool_calls: [], state: {} },
+      audit:  [],
+      error:  err.message
+    };
+  } finally {
+    if (savedMode !== undefined) process.env.FORGE_PERMISSION_MODE = savedMode;
+    else delete process.env.FORGE_PERMISSION_MODE;
+    resetDefaultRegistry();
+    resetDefaultPolicy();
+  }
+
+  // Cleanup: delete an artifacts/projects/<name> directory after assertions run
+  if (scenario.cleanup_project) {
+    const cleanupDir = path.join(root, "artifacts", "projects", scenario.cleanup_project);
+    Object.defineProperty(execResult, "_cleanup", {
+      value: () => {
+        try { fs.rmSync(cleanupDir, { recursive: true, force: true }); } catch { /* best-effort */ }
+      },
+      enumerable: false,
+      writable:   false
+    });
+  }
+
+  return execResult;
+}
+
 // ── Single scenario runner ────────────────────────────────────────────────────
 
 async function _probeRequiredBinary(binary, root) {
@@ -770,6 +853,8 @@ async function _runOne(scenario, root) {
       execResult = await _runDirectEngine(scenario, root);
     } else if (scenario.type === "apiserver") {
       execResult = await _runApiserver(scenario, root);
+    } else if (scenario.type === "module_call") {
+      execResult = await _runModuleCall(scenario, root);
     } else {
       throw new Error("unknown scenario type: " + scenario.type);
     }
