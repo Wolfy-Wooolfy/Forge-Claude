@@ -1,0 +1,17 @@
+{
+  "id": "S143",
+  "name": "debate protocol: arbitrate after 3 COUNTER rounds of disagreement",
+  "description": "Verifies runDebate exhausts MAX_COUNTER_ROUNDS=3 and invokes quality_judge when debaters never agree. Reviewer always flags BLOCKER at src/auth.js:42; security_auditor always flags BLOCKER at src/payment.js:100. Different location sets → disagree at PROPOSE and every COUNTER round. Expected: verdict=ARBITRATED, debate_log.length=9 (2 PROPOSE + 6 COUNTER + 1 ARBITRATE), last speaker is quality_judge.",
+  "type": "module_call",
+  "module": "code/src/testing/helpers/debate_test_helper",
+  "method": "runS143Sequence",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "verdict",                   "expected": "ARBITRATED" },
+    { "type": "state_field_equals", "field": "debate_log_length",         "expected": 9            },
+    { "type": "state_field_equals", "field": "last_speaker_is_qj",        "expected": true         },
+    { "type": "state_field_equals", "field": "winning_position_nonempty", "expected": true         },
+    { "type": "state_field_equals", "field": "schema_valid",              "expected": true         }
+  ]
+}

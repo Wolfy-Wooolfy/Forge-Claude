@@ -1,0 +1,18 @@
+{
+  "id": "S142",
+  "name": "debate protocol: agree at PROPOSE when BLOCKER locations match",
+  "description": "Verifies runDebate returns verdict=AGREE immediately when both debaters share the same BLOCKER location set. debate_log must have exactly 2 entries (both at round=0). role_invoker stub throws if called, confirming no COUNTER round was entered. DebateVerdict schema must validate cleanly.",
+  "type": "module_call",
+  "module": "code/src/testing/helpers/debate_test_helper",
+  "method": "runS142Sequence",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "verdict",                   "expected": "AGREE" },
+    { "type": "state_field_equals", "field": "debate_log_length",         "expected": 2       },
+    { "type": "state_field_equals", "field": "first_round_is_0",          "expected": true    },
+    { "type": "state_field_equals", "field": "second_round_is_0",         "expected": true    },
+    { "type": "state_field_equals", "field": "winning_position_nonempty", "expected": true    },
+    { "type": "state_field_equals", "field": "schema_valid",              "expected": true    }
+  ]
+}

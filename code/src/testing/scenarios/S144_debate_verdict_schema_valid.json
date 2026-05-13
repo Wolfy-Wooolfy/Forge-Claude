@@ -1,0 +1,18 @@
+{
+  "id": "S144",
+  "name": "debate protocol: DebateVerdict schema validation (positive + negative cases)",
+  "description": "Unit-tests validateDebateVerdict directly. Positive: a complete well-formed verdict must pass with valid:true and no errors. Negative-1: missing required 'basis' field must fail. Negative-2: verdict value not in VERDICT_ENUM must fail. Also verifies VERDICT_ENUM contains AGREE and ARBITRATED but not INVALID.",
+  "type": "module_call",
+  "module": "code/src/testing/helpers/debate_test_helper",
+  "method": "runS144Sequence",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "schema_valid",                 "expected": true },
+    { "type": "state_field_equals", "field": "all_required_fields",          "expected": true },
+    { "type": "state_field_equals", "field": "log_items_valid",              "expected": true },
+    { "type": "state_field_equals", "field": "verdict_is_enum",              "expected": true },
+    { "type": "state_field_equals", "field": "negative_missing_basis_fails", "expected": true },
+    { "type": "state_field_equals", "field": "negative_bad_verdict_fails",   "expected": true }
+  ]
+}
