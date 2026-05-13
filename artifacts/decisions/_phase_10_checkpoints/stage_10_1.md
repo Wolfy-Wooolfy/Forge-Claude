@@ -91,7 +91,7 @@ forge-doctor.js:
 
 1. **API split** — `conversation_graph.js` is stateless (constants + pure validators); `loop_state.js` owns all I/O. This supersedes plan §2 criterion #1 which listed `createLoop` etc. as graph exports.
 
-2. **Per-loop path** — Files stored at `artifacts/projects/<project_id>/orchestration/<loop_id>/graph.json` and `conversation_log.jsonl`. Contract §3.3 has a flat path (pre-PROMPT); the loop_id subdirectory is the authoritative layout.
+2. **Per-loop path layout** — Stage 10.1 implementation uses `/<loop_id>/` subdirectory under `orchestration/`. Contract amended v1.0.0 → v1.1.0 per `DECISION-20260513-1250-orchestration-loop-path-layout-v1-1-0.md`.
 
 3. **`module_call` scenario type** — Added to `scenario_runner.js`; return value placed in `result.output.state` so existing `state_field_equals` assertion type suffices with no new assertion type.
 

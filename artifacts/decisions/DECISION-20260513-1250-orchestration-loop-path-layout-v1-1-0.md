@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Decision ID | DECISION-20260513-1250-orchestration-loop-path-layout-v1-1-0 |
-| Status | **OWNER_APPROVAL_PENDING** |
+| Status | **OWNER_APPROVED** |
 | Date | 2026-05-13 |
 | Author | Claude (implementation arm) |
 | Requested by | CTO (Stage 10.1 closure verification) |
@@ -204,3 +204,5 @@ No code changes. No scenario changes. No doctor check changes. Loop_state.js is 
 
 *Decision artifact authored: 2026-05-13*
 *Scope: Contract §14.2 amendment — minor path layout change, no semantic change to state machine, schemas, or gates.*
+
+Approved by KhElmasry in chat on 2026-05-13.

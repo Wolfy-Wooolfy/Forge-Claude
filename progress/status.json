@@ -203,7 +203,13 @@
           "code/src/testing/helpers/orchestration_test_helper.js"
         ],
         "closed_at": "2026-05-13T12:50:00.000Z",
-        "cost_actual_usd": 0
+        "cost_actual_usd": 0,
+        "contract_amendment": {
+          "version_before": "v1.0.0",
+          "version_after": "v1.1.0",
+          "decision_artifact": "DECISION-20260513-1250-orchestration-loop-path-layout-v1-1-0.md",
+          "scope": "per-loop subdirectory in artifact paths"
+        }
       },
       "10_2": {
         "status": "NOT_STARTED"

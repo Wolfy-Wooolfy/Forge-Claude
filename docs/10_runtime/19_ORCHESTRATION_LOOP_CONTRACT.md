@@ -1,7 +1,7 @@
-# Orchestration Loop Contract v1.0.0
+# Orchestration Loop Contract v1.1.0
 
 > **Status:** BINDING from Stage 10.0 close — 2026-05-13
-> **Version:** v1.0.0
+> **Version:** v1.1.0
 > **Authority chain:** `DECISION-20260510-vision-shift-multi-agent-conductor.md §5`
 >   → `DECISION-20260513-1000-phase-10-plan.md`
 >   → this document
@@ -229,7 +229,7 @@ All schemas in this section use `"$schema": "http://json-schema.org/draft-07/sch
 ```
 
 The graph is persisted at:
-`artifacts/projects/<project_id>/orchestration/conversation_graph.json`
+`artifacts/projects/<project_id>/orchestration/<loop_id>/graph.json`
 
 Written via `tools.fs.write_file`. Never mutated directly — always replaced
 atomically via `tools.state.patch_state` or a dedicated write tool in Stage 10.4.
@@ -275,7 +275,7 @@ conversation graph node.
 ### 4.3 Audit Envelope
 
 Every state transition produces one audit row appended to:
-`artifacts/projects/<project_id>/orchestration/conversation_log.jsonl`
+`artifacts/projects/<project_id>/orchestration/<loop_id>/conversation_log.jsonl`
 
 Written via `tools.fs.append_file`. The row schema is defined in §12.
 This file is **append-only**. No loop operation may truncate or overwrite it.
@@ -406,7 +406,7 @@ iteration_count = 5 = ITERATION_CAP: cap reached → ESCALATED on next REJECT
 When the cap fires, the loop:
 1. Transitions to `ESCALATED`
 2. Writes an escalation artifact at:
-   `artifacts/projects/<project_id>/orchestration/escalation_<ts>.md`
+   `artifacts/projects/<project_id>/orchestration/<loop_id>/escalation_<ts>.md`
    (written via `tools.artifact_tools.write_artifact`)
 3. Records the transition in `conversation_log.jsonl` (§12)
 
@@ -698,7 +698,7 @@ The following conditions halt the loop immediately:
 
 On hard failure:
 1. Current state freezes (no partial state mutation)
-2. Escalation artifact written at `artifacts/projects/<id>/orchestration/escalation_<ts>.md`
+2. Escalation artifact written at `artifacts/projects/<id>/orchestration/<loop_id>/escalation_<ts>.md`
 3. Transition logged to `conversation_log.jsonl` with `transition_type: "ESCALATE"`
 4. No auto-recovery. Owner must inspect the escalation artifact and start a new loop.
 
@@ -731,7 +731,7 @@ deleted on abort. The owner can inspect the full dialogue before deciding to res
 ### 12.1 Audit Log Location
 
 ```
-artifacts/projects/<project_id>/orchestration/conversation_log.jsonl
+artifacts/projects/<project_id>/orchestration/<loop_id>/conversation_log.jsonl
 ```
 
 Written via `tools.fs.append_file`. One JSON object per line. Append-only.
@@ -786,7 +786,7 @@ Any code path that mutates prior rows is a Track A violation.
 
 On loop reaching `COMPLETE`, `ESCALATED`, or `ABORTED_BY_OWNER`, the loop writes:
 ```
-artifacts/projects/<project_id>/orchestration/orchestration_summary.md
+artifacts/projects/<project_id>/orchestration/<loop_id>/orchestration_summary.md
 ```
 
 Content:
@@ -920,10 +920,17 @@ new version.
 | Doctor contract | `docs/10_runtime/12_DOCTOR_CONTRACT.md` |
 | Tool runtime contract | `docs/10_runtime/11_TOOL_RUNTIME_CONTRACT.md` |
 
+### 14.4 Amendment History
+
+| Version | Date | Change | Decision |
+|---|---|---|---|
+| v1.1.0 | 2026-05-13 | Per-loop subdirectory inserted into all orchestration artifact paths (`orchestration/<loop_id>/`) to support N concurrent/sequential loops per project without collision. Backward-compatible: no v1.0.0 graphs exist. | DECISION-20260513-1250-orchestration-loop-path-layout-v1-1-0.md |
+
 ---
 
-**END OF ORCHESTRATION LOOP CONTRACT v1.0.0**
+**END OF ORCHESTRATION LOOP CONTRACT v1.1.0**
 
 *Authored: 2026-05-13 — Stage 10.0*
+*Amended: 2026-05-13 — Stage 10.1 (v1.1.0)*
 *Owner: KhElmasry*
 *Status: BINDING from Stage 10.0 close*
