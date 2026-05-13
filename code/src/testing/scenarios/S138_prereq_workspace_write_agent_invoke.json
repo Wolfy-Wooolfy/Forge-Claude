@@ -1,0 +1,21 @@
+{
+  "id": "S138",
+  "name": "agent.invoke allowed in WORKSPACE_WRITE mode (no PROMPT required)",
+  "description": "Verifies that agent.invoke with required_mode:WORKSPACE_WRITE is ALLOWED when active_mode=WORKSPACE_WRITE. Proves DECISION-20260512-1430 fix: no INSUFFICIENT_MODE regression. Mock provider bypasses vision-lock and budget checks (agent_budget_rule §isMock).",
+  "type": "direct_tool",
+  "permission": "WORKSPACE_WRITE",
+  "tool": "agent.invoke",
+  "mock": {
+    "content": {}
+  },
+  "input": {
+    "provider":   "mock",
+    "model":      "mock",
+    "prompt":     "SCENARIO_TAG: S138 permission prereq test",
+    "project_id": "test_s138"
+  },
+  "assertions": [
+    { "type": "status_equals", "expected": "SUCCESS" },
+    { "type": "audit_count",   "min": 1 }
+  ]
+}

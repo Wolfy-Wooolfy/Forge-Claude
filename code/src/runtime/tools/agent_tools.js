@@ -16,8 +16,8 @@ function _root(ctx) {
 
 const tool_invoke = defineTool({
   name:          "agent.invoke",
-  description:   "Invoke an LLM agent adapter (PROMPT). Each invocation requires owner approval. Vision must be locked (non-mock).",
-  required_mode: "PROMPT",
+  description:   "Invoke an LLM agent adapter. Vision must be locked for non-mock providers; budget enforced by agent_budget_rule.",
+  required_mode: "WORKSPACE_WRITE",
   input_schema: {
     type: "object",
     properties: {

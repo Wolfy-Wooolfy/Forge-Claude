@@ -14,8 +14,8 @@ function _root(ctx) {
 
 const tool_invoke = defineTool({
   name:          "role.invoke",
-  description:   "Invoke a specialized agent role (PROMPT). Resolves the role, runs it, and returns structured output.",
-  required_mode: "PROMPT",
+  description:   "Invoke a specialized agent role. Resolves the role, runs it, and returns structured output.",
+  required_mode: "WORKSPACE_WRITE",
   input_schema: {
     type: "object",
     properties: {

@@ -14,7 +14,7 @@ const { emit: emitSignal } = require("../builtproject/loopback_signal");
 const runScenarios = defineTool({
   name: "builtproject.run_scenarios",
   description: "Run L5b test scenarios against a built project and write a report.",
-  required_mode: "PROMPT",
+  required_mode: "WORKSPACE_WRITE",
 
   input_schema: {
     type: "object",

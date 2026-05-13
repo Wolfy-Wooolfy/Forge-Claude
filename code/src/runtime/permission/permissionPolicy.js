@@ -13,6 +13,7 @@ const { createShellVisionLockRule }      = require("./rules/shell_vision_lock_ru
 const { createContainerPrivilegeRule }   = require("./rules/container_privilege_rule");
 const { createAgentBudgetRule }          = require("./rules/agent_budget_rule");
 const { createResearchHostRule }         = require("./rules/research_host_rule");
+const { createBuiltprojectVisionRule }   = require("./rules/builtproject_vision_rule");
 
 const PERMISSION_AUDIT_REL = path.join("artifacts", "audit", "permission_audit.jsonl");
 
@@ -55,7 +56,8 @@ function createPolicy(options) {
   const _shellVisionRules     = [createShellVisionLockRule({ root })];
   const _containerPrivRules   = [createContainerPrivilegeRule({ root })];
   const _agentBudgetRules     = [createAgentBudgetRule({ root })];
-  const _researchHostRules    = [createResearchHostRule({ getActiveMode: () => active_mode })];
+  const _researchHostRules         = [createResearchHostRule({ getActiveMode: () => active_mode })];
+  const _builtprojectVisionRules   = [createBuiltprojectVisionRule({ root, getActiveMode: () => active_mode })];
 
   // ── authorize ──────────────────────────────────────────────────────────────
 
@@ -121,6 +123,14 @@ function createPolicy(options) {
       const rh = rule.check(tool, input, ctx || {});
       if (rh.denied) {
         return emit({ allow: false, reason: rh.reason, detail: rh.detail || null }, "research_host");
+      }
+    }
+
+    // Step 1.10 — Builtproject vision rules (scope + vision_lock gate for builtproject.run_scenarios)
+    for (const rule of _builtprojectVisionRules) {
+      const bv = rule.check(tool, input, ctx || {});
+      if (bv.denied) {
+        return emit({ allow: false, reason: bv.reason, detail: bv.detail || null }, "builtproject_vision");
       }
     }
 

@@ -25,10 +25,9 @@ if (!process.env.OPENAI_API_KEY) {
   process.exit(1);
 }
 
-// Set TEST permission mode (auto-approves role.invoke)
-if (!process.env.FORGE_PERMISSION_MODE) {
-  process.env.FORGE_PERMISSION_MODE = "TEST";
-}
+// TEST mode reserved for bin/forge-test.js (L5 scenario harness) only.
+// This script runs in WORKSPACE_WRITE; L3 gates role.invoke normally.
+// Per DECISION-20260512-1430: required_mode on role.invoke changed to WORKSPACE_WRITE.
 
 // Ensure live_smoke_retry project vision exists
 function _ensureVision() {

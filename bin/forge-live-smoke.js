@@ -63,11 +63,9 @@ function _ensureVision() {
 
 _loadEnv();
 _ensureVision();
-// Live smoke requires TEST mode: auto-approves role.invoke and agent.invoke calls
-// while still routing to real LLM providers
-if (!process.env.FORGE_PERMISSION_MODE) {
-  process.env.FORGE_PERMISSION_MODE = "TEST";
-}
+// TEST mode reserved for bin/forge-test.js (L5 scenario harness) only.
+// Live smoke runs in WORKSPACE_WRITE; L3 gates role.invoke/agent.invoke via WORKSPACE_WRITE check.
+// Per DECISION-20260512-1430: required_mode on role.invoke/agent.invoke changed to WORKSPACE_WRITE.
 
 function parseArgs(argv) {
   const args = { provider: "openai", model: "gpt-4o-mini", dry_run: false };
