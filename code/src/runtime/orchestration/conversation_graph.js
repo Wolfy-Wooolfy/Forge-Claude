@@ -141,13 +141,13 @@ const TRANSITION_TABLE = Object.freeze([
   {
     from:        "QUALITY_JUDGE",
     to:          "BUILDER",
-    trigger:     "Gate 2 owner response = REJECT_AND_LOOP; iteration_count ≤ ITERATION_CAP",
+    trigger:     "Gate 2 owner response = REJECT_AND_LOOP; iteration_count < ITERATION_CAP",
     gate_check:  "Gate 2 REJECT_AND_LOOP"
   },
   {
     from:        "QUALITY_JUDGE",
     to:          "ESCALATED",
-    trigger:     "Gate 2 REJECT_AND_LOOP; iteration_count > ITERATION_CAP",
+    trigger:     "Gate 2 REJECT_AND_LOOP; iteration_count >= ITERATION_CAP",
     gate_check:  "Cap exceeded"
   },
   {

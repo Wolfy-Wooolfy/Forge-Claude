@@ -1,7 +1,7 @@
-# Orchestration Loop Contract v1.1.0
+# Orchestration Loop Contract v1.2.0
 
 > **Status:** BINDING from Stage 10.0 close — 2026-05-13
-> **Version:** v1.1.0
+> **Version:** v1.2.0
 > **Authority chain:** `DECISION-20260510-vision-shift-multi-agent-conductor.md §5`
 >   → `DECISION-20260513-1000-phase-10-plan.md`
 >   → this document
@@ -135,8 +135,8 @@ transition is gated; `—` means the transition fires unconditionally on trigger
 | `QUALITY_JUDGE` | `QUALITY_JUDGE` | `role.invoke(quality_judge)` → SUCCESS; blocks on Gate 2 | Gate 2 — BLOCK |
 | `QUALITY_JUDGE` | `DEPLOYMENT_OR_END` | Gate 2 owner response = `APPROVE_SHIP` | Gate 2 APPROVE_SHIP |
 | `QUALITY_JUDGE` | `DEPLOYMENT_OR_END` | Gate 2 owner response = `APPROVE_WITH_CAVEATS`; caveats logged in audit trail | Gate 2 APPROVE_WITH_CAVEATS |
-| `QUALITY_JUDGE` | `BUILDER` | Gate 2 owner response = `REJECT_AND_LOOP`; `iteration_count ≤ ITERATION_CAP` | Gate 2 REJECT_AND_LOOP |
-| `QUALITY_JUDGE` | `ESCALATED` | Gate 2 `REJECT_AND_LOOP`; `iteration_count > ITERATION_CAP` | Cap exceeded |
+| `QUALITY_JUDGE` | `BUILDER` | Gate 2 owner response = `REJECT_AND_LOOP`; `iteration_count < ITERATION_CAP` | Gate 2 REJECT_AND_LOOP |
+| `QUALITY_JUDGE` | `ESCALATED` | Gate 2 `REJECT_AND_LOOP`; `iteration_count >= ITERATION_CAP` | Cap exceeded |
 | `DEPLOYMENT_OR_END` | `LIVE_DELIVERABLE` | `deployment_enabled = false`; Gate 3 vacuous skip | — |
 | `DEPLOYMENT_OR_END` | `DEPLOYMENT_OR_END` | `deployment_enabled = true`; blocks on Gate 3 | Gate 3 — BLOCK |
 | `DEPLOYMENT_OR_END` | `LIVE_DELIVERABLE` | Gate 3 owner response = `APPROVE`; deploy tools execute | Gate 3 APPROVE |
@@ -706,10 +706,11 @@ On hard failure:
 
 When `role.invoke(quality_judge)` produces a REJECTED verdict AND Gate 2 owner
 response is `REJECT_AND_LOOP`:
-1. `iteration_count` is incremented
-2. If `iteration_count <= ITERATION_CAP`: loop returns to `BUILDER`; Builder receives
-   the Quality Judge's rejection reasons as part of the inbound envelope
-3. If `iteration_count > ITERATION_CAP`: hard escalation (§11.1 path above)
+1. Check whether `iteration_count >= ITERATION_CAP` at the moment of `REJECT_AND_LOOP`
+2. If `iteration_count < ITERATION_CAP`: increment by 1 (count goes N → N+1, max 5),
+   loop returns to `BUILDER`; Builder receives Quality Judge's rejection reasons
+3. If `iteration_count >= ITERATION_CAP`: hard escalation (§11.1 path above);
+   `iteration_count` is NOT incremented (stays at its current value ≤ 5)
 
 ### 11.3 Owner Abort
 
@@ -925,12 +926,14 @@ new version.
 | Version | Date | Change | Decision |
 |---|---|---|---|
 | v1.1.0 | 2026-05-13 | Per-loop subdirectory inserted into all orchestration artifact paths (`orchestration/<loop_id>/`) to support N concurrent/sequential loops per project without collision. Backward-compatible: no v1.0.0 graphs exist. | DECISION-20260513-1250-orchestration-loop-path-layout-v1-1-0.md |
+| v1.2.0 | 2026-05-13 | Iteration cap semantics clarification. Resolves three-way ambiguity between §6.2 (`>=` semantics), §11.2 (`>` semantics), §2.2 transition table (`>` semantics), and §3 schema (`max:5`, implies `>=` semantics). Binding reading: `>=` (count never exceeds 5). Rewrites §11.2 steps 1–3 and two §2.2 trigger condition strings. No schema change, no code semantics change; Stage 10.1 `validateGraph` was already correct. Also synchronizes 2 trigger string literals in Stage 10.1 `conversation_graph.js` TRANSITION_TABLE (documentation mirrors of §2.2) — no logic change. | DECISION-20260513-1500-orchestration-loop-iteration-cap-clarification-v1-2-0.md |
 
 ---
 
-**END OF ORCHESTRATION LOOP CONTRACT v1.1.0**
+**END OF ORCHESTRATION LOOP CONTRACT v1.2.0**
 
 *Authored: 2026-05-13 — Stage 10.0*
 *Amended: 2026-05-13 — Stage 10.1 (v1.1.0)*
+*Amended: 2026-05-13 — Stage 10.3 Step 0 (v1.2.0)*
 *Owner: KhElmasry*
 *Status: BINDING from Stage 10.0 close*

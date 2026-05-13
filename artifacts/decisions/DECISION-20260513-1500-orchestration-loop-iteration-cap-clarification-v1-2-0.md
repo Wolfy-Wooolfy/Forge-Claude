@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Decision ID | DECISION-20260513-1500-orchestration-loop-iteration-cap-clarification-v1-2-0 |
-| Status | **OWNER_APPROVAL_PENDING** |
+| Status | **OWNER_APPROVED** |
 | Date | 2026-05-13 |
 | Author | Claude (implementation arm) |
 | Requested by | CTO (Stage 10.3 Step 0 — Q-ITERATION-CAP resolution) |
