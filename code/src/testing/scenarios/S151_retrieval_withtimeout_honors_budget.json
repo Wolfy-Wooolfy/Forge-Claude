@@ -1,0 +1,16 @@
+{
+  "id": "S151",
+  "name": "retrieve() with 50ms timeout fires TimeoutError; withRetry does NOT retry on TimeoutError",
+  "description": "Validates the withTimeout + withRetry composition added to retrieval.js (PHASE-9 Item 1). A mock _client is injected whose embeddings.create increments a call counter then delays 200ms (>> 50ms budget). retrieve() is called with timeoutMs:50. Expected: TimeoutError is thrown at ~50ms (throws_timeout_error), the error message includes '50' (error_message_includes_50ms), the mock was called exactly once (attempt_count_equals_1 — withRetry does NOT retry on TimeoutError), and the error class name is TimeoutError (error_is_timeout_type). No openStore call is attempted because the timeout fires before the vector search step.",
+  "type": "module_call",
+  "module": "code/src/testing/helpers/orchestration_tools_test_helper",
+  "method": "runS151Checks",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "throws_timeout_error",        "expected": true },
+    { "type": "state_field_equals", "field": "error_message_includes_50ms", "expected": true },
+    { "type": "state_field_equals", "field": "attempt_count_equals_1",      "expected": true },
+    { "type": "state_field_equals", "field": "error_is_timeout_type",       "expected": true }
+  ]
+}

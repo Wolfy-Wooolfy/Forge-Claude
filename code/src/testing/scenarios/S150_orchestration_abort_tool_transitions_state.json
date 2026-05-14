@@ -1,0 +1,18 @@
+{
+  "id": "S150",
+  "name": "orchestration.abort transitions loop to ABORTED_BY_OWNER; audit log preserved with schema-pure ABORT row",
+  "description": "End-to-end tool invocation test via the default registry. Sequence: (1) orchestration.start_loop creates a fresh loop (random loop_id for run isolation), (2) orchestration.abort transitions state to ABORTED_BY_OWNER and writes an ABORT audit row, (3) orchestration.get_status confirms current_state=ABORTED_BY_OWNER, (4) orchestration.read_log confirms the audit log is readable and contains an ABORT row with all required schema fields (ts, loop_id, from_state, to_state, transition_type, mock, cost_usd). Verifies that abort does not corrupt the log (log_preserved) and leaves a non-empty audit trail (log_row_count_positive).",
+  "type": "module_call",
+  "module": "code/src/testing/helpers/orchestration_tools_test_helper",
+  "method": "runS150Sequence",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "tool_returned_aborted",    "expected": true },
+    { "type": "state_field_equals", "field": "graph_state_aborted",      "expected": true },
+    { "type": "state_field_equals", "field": "abort_audit_row_present",  "expected": true },
+    { "type": "state_field_equals", "field": "audit_row_schema_pure",    "expected": true },
+    { "type": "state_field_equals", "field": "log_preserved",            "expected": true },
+    { "type": "state_field_equals", "field": "log_row_count_positive",   "expected": true }
+  ]
+}

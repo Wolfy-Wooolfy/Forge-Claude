@@ -4,10 +4,10 @@
   "current_stage": "A",
   "overall_progress_percent": 99,
   "stage_progress_percent": 100,
-  "current_task": "PHASE-10-STAGE-10-3-CLOSED",
+  "current_task": "PHASE-10-STAGE-10-4-CLOSED",
   "next_phase": "PHASE-10",
-  "next_step": "Begin PHASE-10 Stage 10.4 (Orchestration Tools) per DECISION-20260513-1000-phase-10-plan.md.",
-  "last_completed_artifact": "artifacts/decisions/_phase_10_checkpoints/stage_10_3.md",
+  "next_step": "Begin PHASE-10 Stage 10.5 (E2E Demo) per DECISION-20260513-1000-phase-10-plan.md.",
+  "last_completed_artifact": "artifacts/decisions/_phase_10_checkpoints/stage_10_4.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -74,18 +74,18 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-05-14T13:00:21.528Z",
+    "last_doctor_run": "2026-05-14T13:25:36.149Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
-    "self_test_last_run": "2026-05-13",
-    "self_test_last_result": "143 passed, 0 failed, 5 skipped (148 total) — Stage 10.3 closed. S145/S146/S147/S148 added (iteration cap escalation, gate 1 approve/block, gate 2 REJECT_AND_LOOP, shouldSkipGate3 pure). S120/S124 (builtproject HTTP server tests) exhibit port-conflict flakiness predating Stage 10.3; canonical run confirmed 143/0/5. 5 SKIPs require docker.",
-    "self_test_scenarios_pass": 143,
+    "self_test_last_run": "2026-05-14",
+    "self_test_last_result": "146 passed, 0 failed, 5 skipped (151 total) — Stage 10.4 closed. S149/S150/S151 added (orchestration tools registered, abort tool transitions state, retrieval withTimeout/withRetry). S120/S124 (builtproject HTTP server tests) exhibit port-conflict flakiness predating Stage 10.4; canonical runs confirmed 146/0/5. 5 SKIPs require docker.",
+    "self_test_scenarios_pass": 146,
     "self_test_scenarios_skip": 5,
     "self_test_scenarios_fail": 0,
     "providers_registered_count": 12,
-    "tools_registered_count": 66,
-    "doctor_checks_count": 24,
+    "tools_registered_count": 72,
+    "doctor_checks_count": 25,
     "assertion_types_count": 10,
     "active_permission_mode": "WORKSPACE_WRITE",
     "permission_policy_installed": true,
@@ -169,9 +169,11 @@
     ],
     "stop_and_report_count": 3,
     "deferred_to_phase_10": [
-      "retrieval.js withRetry/withTimeout (Item 1)",
-      "kb.ingest_url per-chunk budget check (Item 3)",
-      "kb.retrieve rejected_low_credibility metadata in research_role (Item 6 FIXED — retrieval.js now exposes count)"
+      "kb.ingest_url per-chunk budget check (Item 3) — deferred to PHASE-12"
+    ],
+    "deferred_items_resolved_in_phase_10": [
+      "Item 1 (retrieval.js withRetry/withTimeout) — absorbed into Stage 10.4",
+      "Item 6 (kb.retrieve rejected_low_credibility) — fixed in Stage 9.7"
     ]
   },
   "prereq_phase_10": {
@@ -254,12 +256,44 @@
         }
       },
       "10_4": {
-        "status": "NOT_STARTED"
+        "status": "CLOSED",
+        "checkpoint": "artifacts/decisions/_phase_10_checkpoints/stage_10_4.md",
+        "scenarios_added": [
+          "S149",
+          "S150",
+          "S151"
+        ],
+        "tools_added": [
+          "orchestration.start_loop",
+          "orchestration.advance_state",
+          "orchestration.respond",
+          "orchestration.abort",
+          "orchestration.get_status",
+          "orchestration.read_log"
+        ],
+        "doctor_checks_added": [
+          "orchestration_runtime"
+        ],
+        "files_created": [
+          "code/src/runtime/tools/orchestration_tools.js",
+          "code/src/runtime/doctor/checks/orchestration_runtime.js",
+          "code/src/testing/helpers/orchestration_tools_test_helper.js"
+        ],
+        "files_modified": [
+          "code/src/runtime/kb/retrieval.js",
+          "code/src/runtime/doctor/_registry.js"
+        ],
+        "phase_9_followup_addressed": {
+          "item_1_retrieval_wrappers": "ABSORBED — withRetry + withTimeout added to retrieval.js",
+          "item_6_rejected_low_credibility": "ALREADY_DONE — fixed in Stage 9.7; removed from deferred ledger"
+        },
+        "closed_at": "2026-05-14T00:00:00.000Z",
+        "cost_actual_usd": 0
       },
       "10_5": {
         "status": "NOT_STARTED"
       }
     }
   },
-  "last_updated": "2026-05-13T15:10:00.000Z"
+  "last_updated": "2026-05-14T00:00:00.000Z"
 }

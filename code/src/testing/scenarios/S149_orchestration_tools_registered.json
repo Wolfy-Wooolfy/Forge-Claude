@@ -1,0 +1,18 @@
+{
+  "id": "S149",
+  "name": "orchestration tools registered — all 6 present with correct modes, previews, and input schemas",
+  "description": "Registry inspection check for Stage 10.4 deliverables. Loads an isolated copy of the tool registry and verifies: (1) all 6 orchestration.* tools are present by name, (2) start_loop and abort have required_mode WORKSPACE_WRITE, (3) get_status has required_mode READ_ONLY, (4) all 6 tools have a preview function (write tools have explicit previews; read tools have noop preview from defineTool), (5) all 6 have an input_schema object. No I/O — deterministic registry metadata inspection.",
+  "type": "module_call",
+  "module": "code/src/testing/helpers/orchestration_tools_test_helper",
+  "method": "runS149Checks",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "all_6_registered",      "expected": true },
+    { "type": "state_field_equals", "field": "start_loop_mode_write", "expected": true },
+    { "type": "state_field_equals", "field": "get_status_mode_read",  "expected": true },
+    { "type": "state_field_equals", "field": "abort_mode_write",      "expected": true },
+    { "type": "state_field_equals", "field": "all_have_preview",      "expected": true },
+    { "type": "state_field_equals", "field": "all_have_input_schema", "expected": true }
+  ]
+}
