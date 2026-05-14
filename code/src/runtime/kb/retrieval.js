@@ -22,6 +22,44 @@ const {
 // Cost of text-embedding-3-small: $0.02 per 1M tokens (approx 1 token per 4 chars)
 const EMBEDDING_COST_PER_TOKEN = 0.00000002;
 
+// ── Timeout + Retry helpers (PHASE-9 Item 1 — local, not exported) ───────────
+// Composition: withRetry OUTSIDE, withTimeout INSIDE.
+// Each retry attempt gets its own timeout budget.
+// TimeoutError is never retried (budget violation).
+
+class TimeoutError extends Error {
+  constructor(msg) { super(msg); this.name = "TimeoutError"; }
+}
+
+function withTimeout(fn, timeoutMs) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(
+      () => reject(new TimeoutError("operation timed out after " + timeoutMs + "ms")),
+      timeoutMs
+    );
+    Promise.resolve().then(fn).then(
+      v => { clearTimeout(timer); resolve(v); },
+      e => { clearTimeout(timer); reject(e); }
+    );
+  });
+}
+
+async function withRetry(fn, maxAttempts, backoffMs) {
+  let lastErr;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (err instanceof TimeoutError) throw err;
+      lastErr = err;
+      if (attempt < maxAttempts) {
+        await new Promise(r => setTimeout(r, backoffMs));
+      }
+    }
+  }
+  throw lastErr;
+}
+
 // ── Credibility tier ordering ─────────────────────────────────────────────────
 
 const TIER_RANK = { LOW: 0, COMMUNITY: 1, REPUTABLE: 2, AUTHORITATIVE: 3 };
@@ -42,7 +80,8 @@ function _tierRank(tier) {
  *   k?: number,
  *   credibility_floor?: string,
  *   root?: string,
- *   _client?: object
+ *   _client?: object,
+ *   timeoutMs?: number
  * }} options
  * @returns {Promise<Array<{
  *   chunk_id: string,
@@ -62,14 +101,21 @@ async function retrieve(queryText, options) {
   const credibility_floor = opts.credibility_floor || CREDIBILITY_FLOOR_DEFAULT;
   const root              = opts.root || process.cwd();
   const floorRank         = _tierRank(credibility_floor);
+  const timeoutMs         = opts.timeoutMs || 8000;
 
   // 1. Embed the query (Provider Contract v2 — no new OpenAI())
   const client      = opts._client || getClient();
-  const embResponse = await client.embeddings.create({
-    model:      EMBEDDING_MODEL,
-    dimensions: EMBEDDING_DIMENSIONS,
-    input:      queryText
-  });
+  const embResponse = await withRetry(
+    () => withTimeout(
+      () => client.embeddings.create({
+        model:      EMBEDDING_MODEL,
+        dimensions: EMBEDDING_DIMENSIONS,
+        input:      queryText
+      }),
+      timeoutMs
+    ),
+    2, 500
+  );
   const queryVec     = embResponse.data[0].embedding;
   const tokenCount   = embResponse.usage && embResponse.usage.total_tokens
     ? embResponse.usage.total_tokens
@@ -94,7 +140,10 @@ async function retrieve(queryText, options) {
 
   // 2. Vector search — retrieve k*4 candidates to allow for credibility post-filter
   const store      = await openStore(project_id, scope, { root });
-  const rawResults = await searchVector(store, queryVec, k * 4, {});
+  const rawResults = await withRetry(
+    () => withTimeout(() => searchVector(store, queryVec, k * 4, {}), timeoutMs),
+    2, 500
+  );
 
   if (!rawResults || rawResults.length === 0) {
     return { results: [], rejected_low_credibility: 0 };
