@@ -183,8 +183,10 @@ async function runS147Sequence(ctx) {
   };
 }
 
-// ── S148 helper — gate 3 skipped when deployment disabled ─────────────────────
+// ── S148 helper — conservative-fire semantics for shouldSkipGate3 ────────────
 // Pure function: tests shouldSkipGate3 with 5 representative inputs.
+// Option A (DECISION-20260514-1000): gate fires by default; skips ONLY when
+// deployment_enabled is explicitly false. Missing/null/undefined → fire.
 // No I/O — safe to call synchronously.
 
 function runS148Checks() {
@@ -193,8 +195,8 @@ function runS148Checks() {
   return {
     case1_false_skips:             shouldSkipGate3({ deployment_enabled: false }) === true,
     case2_true_does_not_skip:      shouldSkipGate3({ deployment_enabled: true  }) === false,
-    case3_empty_skips:             shouldSkipGate3({}) === true,
-    case4_null_skips:              shouldSkipGate3(null) === true,
+    case3_empty_fires:             shouldSkipGate3({}) === false,
+    case4_null_fires:              shouldSkipGate3(null) === false,
     case5_false_with_extras_skips: shouldSkipGate3({ deployment_enabled: false, extra: "data" }) === true
   };
 }

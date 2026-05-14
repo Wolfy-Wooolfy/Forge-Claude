@@ -139,11 +139,11 @@ All 4 assertions pass:
 S148 — shouldSkipGate3 returns true when deployment_enabled is not strictly true
 ```
 
-All 6 assertions pass (5 cases + status):
+All 6 assertions pass (5 cases + status) **with Option A field names** (per DECISION-20260514-1000):
 - `case1_false_skips = true` ✓
 - `case2_true_does_not_skip = true` ✓
-- `case3_empty_skips = true` ✓
-- `case4_null_skips = true` ✓
+- `case3_empty_fires = true` ✓ (empty → gate fires — conservative-fire default)
+- `case4_null_fires = true` ✓ (null → gate fires — conservative-fire default)
 - `case5_false_with_extras_skips = true` ✓
 
 **PASS** ✓
@@ -168,13 +168,16 @@ node bin/forge-test.js → ALL PASS — 143 passed, 0 failed, 5 skipped (148 tot
 
 ```
 grep "gate_responder" code/src/runtime/ outside approval_gates.js → 0 files ✓
-grep "gate_responder" code/src/testing/ outside gates_test_helper.js → 0 files ✓
+grep "gate_responder" code/src/testing/ outside gates_test_helper.js
+  → 2 occurrences in S146/S147 scenario JSON description fields (narrative text, not code) ✓
 grep "fs\.(writeFileSync|appendFileSync)" iteration_controller.js → 0 ✓
 grep "fs\.(writeFileSync|appendFileSync)" approval_gates.js → 0 ✓
 grep "new OpenAI" iteration_controller.js, approval_gates.js → 0 ✓
 ```
 
 All I/O routes through `getDefaultRegistry().invoke()`. No new `§ARC` exceptions.
+
+**Note (CTO verification):** `gate_responder` appears in the `description` fields of S146 and S147 scenario JSON files (documentation strings, not import or invocation). The Track A semantic invariant is preserved — no code outside `approval_gates.js` and `gates_test_helper.js` uses `gate_responder`. The original checkpoint claim was an overstatement of the grep result.
 
 **PASS** ✓
 
@@ -235,4 +238,24 @@ Stage 10.3 is **CLOSED**.
 
 ---
 
+## §C7-bis — shouldSkipGate3 Option A Correction (2026-05-14)
+
+**Applied per DECISION-20260514-1000 Option A (owner-approved 2026-05-14).**
+
+`shouldSkipGate3` semantics reverted to PROMPT §1.2 conservative-fire spec:
+
+| File | Change |
+|---|---|
+| `approval_gates.js` | `shouldSkipGate3`: `return false` (fire) for missing/null; `=== false` check |
+| `gates_test_helper.js` | Field renames: `case3_empty_fires`, `case4_null_fires` |
+| `S148_gate_3_skipped_when_deployment_disabled.json` | Assertion fields updated to match |
+
+Test suite re-confirmed at **143/0/5** with all changes applied.
+Decision authority: `DECISION-20260514-1000-gate-3-skip-default-semantics.md`
+
+Stage 10.3 effective close: **2026-05-14**
+
+---
+
 *Closure checkpoint authored: 2026-05-13 — Stage 10.3*
+*Amended: 2026-05-14 — Option A correction per CTO verification + DECISION-20260514-1000*

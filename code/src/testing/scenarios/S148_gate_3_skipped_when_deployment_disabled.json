@@ -10,8 +10,8 @@
     { "type": "status_equals",      "expected": "SUCCESS" },
     { "type": "state_field_equals", "field": "case1_false_skips",             "expected": true },
     { "type": "state_field_equals", "field": "case2_true_does_not_skip",      "expected": true },
-    { "type": "state_field_equals", "field": "case3_empty_skips",             "expected": true },
-    { "type": "state_field_equals", "field": "case4_null_skips",              "expected": true },
+    { "type": "state_field_equals", "field": "case3_empty_fires",             "expected": true },
+    { "type": "state_field_equals", "field": "case4_null_fires",              "expected": true },
     { "type": "state_field_equals", "field": "case5_false_with_extras_skips", "expected": true }
   ]
 }

@@ -104,11 +104,13 @@ function validateGateEnvelope(envelope) {
 // ── shouldSkipGate3 ───────────────────────────────────────────────────────────
 // Pure. (project_config) → bool
 // Returns true when Gate 3 should be vacuously skipped (contract §7.4).
-// Skips when deployment_enabled is not strictly true — falsy, missing, or null.
+// Skips ONLY when deployment_enabled is explicitly false.
+// Missing/null/undefined defaults to fire (conservative per
+// DECISION-20260514-1000 Option A, mirrors PROMPT §1.2).
 
 function shouldSkipGate3(project_config) {
-  if (!project_config || typeof project_config !== "object") return true;
-  return project_config.deployment_enabled !== true;
+  if (!project_config || typeof project_config !== "object") return false;
+  return project_config.deployment_enabled === false;
 }
 
 // ── fireGate ──────────────────────────────────────────────────────────────────
