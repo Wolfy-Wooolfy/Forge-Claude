@@ -1,0 +1,16 @@
+{
+  "id": "S156",
+  "name": "deployment_enabled=false → Gate 3 skipped (VACUOUS_SKIP) → COMPLETE without deploy step",
+  "description": "Drives loop to DEPLOYMENT_OR_END, then calls shouldSkipGate3({deployment_enabled: false}). Returns true (conservative-fire Option A, Stage 10.3 binding: skip ONLY when deployment_enabled===false). Gate 3 is NOT fired; instead _advance is called with transition_type=VACUOUS_SKIP, transitioning DEPLOYMENT_OR_END → LIVE_DELIVERABLE. Loop then advances LIVE_DELIVERABLE → COMPLETE. Audit log has a VACUOUS_SKIP row and no GATE_APPROVE row with owner_gate_id=3. vision.md is NOT modified (vision_locked:true). project_config is injected at driver level — not from vision.md. Plan §2 closure criterion 5.",
+  "type": "module_call",
+  "module": "code/src/testing/helpers/e2e_loop_helper",
+  "method": "runS156",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "gate3_skipped",            "expected": true },
+    { "type": "state_field_equals", "field": "vacuous_skip_row_present", "expected": true },
+    { "type": "state_field_equals", "field": "no_gate3_approve_row",     "expected": true },
+    { "type": "state_field_equals", "field": "final_state_complete",     "expected": true }
+  ]
+}

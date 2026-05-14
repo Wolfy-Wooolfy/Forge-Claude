@@ -1,0 +1,17 @@
+{
+  "id": "S153",
+  "name": "Gate 1 fires in ENV_REPORT, auto-approve via env, proceeds to TEST_DESIGN",
+  "description": "Drives loop to ENV_REPORT then fires Gate 1 (owner_gate_id=1) using FORGE_OWNER_AUTO_APPROVE=1. Verifies the gate fires, appends a GATE_APPROVE audit row with from_state=ENV_REPORT and to_state=TEST_DESIGN, and that the loop's current_state becomes TEST_DESIGN. Specifically tests the Gate 1 envelope path (not just the full loop) and verifies owner_gate_id is recorded in the audit row. Plan §2 closure criterion 2.",
+  "type": "module_call",
+  "module": "code/src/testing/helpers/e2e_loop_helper",
+  "method": "runS153",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "state_after_gate1",    "expected": true },
+    { "type": "state_field_equals", "field": "gate1_audit_row",      "expected": true },
+    { "type": "state_field_equals", "field": "gate1_from_env_report","expected": true },
+    { "type": "state_field_equals", "field": "gate1_to_test_design", "expected": true },
+    { "type": "state_field_equals", "field": "gate1_owner_id_1",     "expected": true }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "id": "S152",
+  "name": "Full loop fast-path: FORGE_OWNER_AUTO_APPROVE=1, 14 transitions, reaches COMPLETE",
+  "description": "E2E orchestration loop driven through all 14 forward states to COMPLETE against _reference_todo_api. FORGE_OWNER_AUTO_APPROVE=1 auto-approves all 3 owner gates (Gate 1 ENV_REPORT, Gate 2 QUALITY_JUDGE, Gate 3 DEPLOYMENT_OR_END) with no blocking. After terminal state is reached, writeSummary writes orchestration_summary.md. Verifies: audit log has exactly 14 rows (5 NORMAL + GATE_APPROVE + 5 NORMAL + GATE_APPROVE + GATE_APPROVE + NORMAL), final to_state=COMPLETE, conversation_log.jsonl and orchestration_summary.md exist at the v1.1.0 per-loop artifact path. Plan §2 closure criterion 1.",
+  "type": "module_call",
+  "module": "code/src/testing/helpers/e2e_loop_helper",
+  "method": "runS152",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "final_state_complete",    "expected": true },
+    { "type": "state_field_equals", "field": "transition_count_14",     "expected": true },
+    { "type": "state_field_equals", "field": "conversation_log_exists", "expected": true },
+    { "type": "state_field_equals", "field": "summary_written",         "expected": true }
+  ]
+}

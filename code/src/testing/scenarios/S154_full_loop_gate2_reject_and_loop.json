@@ -1,0 +1,15 @@
+{
+  "id": "S154",
+  "name": "Gate 2 REJECT_AND_LOOP increments iteration count; loop returns to BUILDER; second iteration reaches COMPLETE",
+  "description": "Drives loop to QUALITY_JUDGE (first pass), fires Gate 2 with REJECT_AND_LOOP response. tryAdvanceForLoopBack increments iteration_count from 0 to 1 and appends a LOOP_BACK audit row (QUALITY_JUDGE → BUILDER). Driver then calls setCurrentState('BUILDER') explicitly (workaround for known Stage 10.3 gap: tryAdvanceForLoopBack does not persist the state change). Second pass drives from BUILDER through QUALITY_JUDGE, Gate 2 auto-approves (APPROVE_SHIP), Gate 3 auto-approves, loop reaches COMPLETE. Verifies: LOOP_BACK audit row present, iteration_count >= 1, final state COMPLETE. Plan §2 closure criterion 3.",
+  "type": "module_call",
+  "module": "code/src/testing/helpers/e2e_loop_helper",
+  "method": "runS154",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "iteration_count_incremented",  "expected": true },
+    { "type": "state_field_equals", "field": "loop_back_audit_row",          "expected": true },
+    { "type": "state_field_equals", "field": "second_pass_reached_complete", "expected": true }
+  ]
+}

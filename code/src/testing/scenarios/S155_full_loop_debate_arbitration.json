@@ -1,0 +1,16 @@
+{
+  "id": "S155",
+  "name": "Reviewer + Security disagree → debate runs → Quality Judge arbitrates → verdict ARBITRATED in debate_verdicts.jsonl",
+  "description": "Drives loop to REVIEWER_CODE_AND_SECURITY, then invokes runDebate() from debate_protocol.js with mock role_invoker. Reviewer reports BLOCKER at routes/todos.js:42; security_auditor reports BLOCKER at server.js:15. Different BLOCKER locations cause _blockersAgree() to return false for all 3 COUNTER rounds (MAX_COUNTER_ROUNDS=3). quality_judge is invoked for ARBITRATE, producing verdict=ARBITRATED. debate_log has exactly 9 entries (2 PROPOSE + 6 COUNTER + 1 ARBITRATE). Verdict is persisted to debate_verdicts.jsonl at the v1.1.0 per-loop path. Loop continues to COMPLETE. No audit row added for debate (SUMMARY_WRITTEN not in VALID_TRANSITION_TYPES — OQ5 resolution). Plan §2 closure criterion 4.",
+  "type": "module_call",
+  "module": "code/src/testing/helpers/e2e_loop_helper",
+  "method": "runS155",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "debate_verdict_written",   "expected": true },
+    { "type": "state_field_equals", "field": "verdict_is_arbitrated",    "expected": true },
+    { "type": "state_field_equals", "field": "debate_log_has_9_entries", "expected": true },
+    { "type": "state_field_equals", "field": "final_state_complete",     "expected": true }
+  ]
+}
