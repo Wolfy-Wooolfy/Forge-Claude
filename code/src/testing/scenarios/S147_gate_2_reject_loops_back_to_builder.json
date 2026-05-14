@@ -1,0 +1,16 @@
+{
+  "id": "S147",
+  "name": "gate 2 REJECT_AND_LOOP increments iteration_count and returns next_state=BUILDER",
+  "description": "Verifies fireGate Gate 2 REJECT_AND_LOOP path: gate_responder returns REJECT_AND_LOOP, fireGate delegates to tryAdvanceForLoopBack which increments iteration_count (0→1) and appends LOOP_BACK audit row. Returned next_state=BUILDER, escalated=false. iteration_count in persisted graph is 1. Contract: §7.3 REJECT_AND_LOOP + §11.2 Path B (count 0 < CAP 5 → advance).",
+  "type": "module_call",
+  "module": "code/src/testing/helpers/gates_test_helper",
+  "method": "runS147Sequence",
+  "args": [{}],
+  "cleanup_project": "test_s147",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS"  },
+    { "type": "state_field_equals", "field": "next_state",      "expected": "BUILDER" },
+    { "type": "state_field_equals", "field": "escalated",       "expected": false     },
+    { "type": "state_field_equals", "field": "iteration_count", "expected": 1         }
+  ]
+}

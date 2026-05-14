@@ -1,0 +1,17 @@
+{
+  "id": "S146",
+  "name": "owner gate 1 auto-approves with FORGE_OWNER_AUTO_APPROVE=1; blocks when no responder",
+  "description": "Two sub-paths for Gate 1 (ENV_REPORT host state): (1) Positive: FORGE_OWNER_AUTO_APPROVE=1 triggers automatic APPROVE response and advances to TEST_DESIGN. (2) Negative: no gate_responder and env unset causes fireGate to throw 'would block indefinitely'. Verifies contract §7.1 BLOCK_INDEFINITELY timeout behavior and §10.2 auto-approve semantics.",
+  "type": "module_call",
+  "module": "code/src/testing/helpers/gates_test_helper",
+  "method": "runS146Sequence",
+  "args": [{}],
+  "cleanup_project": "test_s146",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "approve_response",              "expected": "APPROVE"      },
+    { "type": "state_field_equals", "field": "approve_next_state",            "expected": "TEST_DESIGN"  },
+    { "type": "state_field_equals", "field": "block_throws",                  "expected": true           },
+    { "type": "state_field_equals", "field": "block_error_includes_gate_id",  "expected": true           }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "id": "S145",
+  "name": "iteration cap (count=5 >= CAP=5) triggers escalation without incrementing counter",
+  "description": "Verifies tryAdvanceForLoopBack Path B semantics: when iteration_count equals ITERATION_CAP (5), the function escalates instead of incrementing. Checks: cap_exceeded=true, iteration_count stays at 5 (NOT 6), escalation artifact written at v1.1.0 path, ESCALATE audit row present, final state=ESCALATED. Authority: DECISION-20260513-1500 §2 (Path B binding).",
+  "type": "module_call",
+  "module": "code/src/testing/helpers/gates_test_helper",
+  "method": "runS145Sequence",
+  "args": [{}],
+  "cleanup_project": "test_s145",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "cap_exceeded",                  "expected": true       },
+    { "type": "state_field_equals", "field": "iteration_count_after",         "expected": 5          },
+    { "type": "state_field_equals", "field": "escalation_triggered",          "expected": true       },
+    { "type": "state_field_equals", "field": "escalation_path_includes_loop", "expected": true       },
+    { "type": "state_field_equals", "field": "escalation_file_exists",        "expected": true       },
+    { "type": "state_field_equals", "field": "final_state",                   "expected": "ESCALATED" },
+    { "type": "state_field_equals", "field": "escalate_audit_row_present",    "expected": true       }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "id": "S148",
+  "name": "shouldSkipGate3 returns true when deployment_enabled is not strictly true",
+  "description": "Pure function tests on shouldSkipGate3 (5 cases). Gate 3 vacuous skip (contract §7.4): fires only when deployment_enabled===true. Cases: (1) {deployment_enabled:false}→skip, (2) {deployment_enabled:true}→no skip, (3) {}→skip (missing field defaults to skip), (4) null→skip, (5) {deployment_enabled:false, extra:'data'}→skip. No I/O — deterministic pure logic.",
+  "type": "module_call",
+  "module": "code/src/testing/helpers/gates_test_helper",
+  "method": "runS148Checks",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "case1_false_skips",             "expected": true },
+    { "type": "state_field_equals", "field": "case2_true_does_not_skip",      "expected": true },
+    { "type": "state_field_equals", "field": "case3_empty_skips",             "expected": true },
+    { "type": "state_field_equals", "field": "case4_null_skips",              "expected": true },
+    { "type": "state_field_equals", "field": "case5_false_with_extras_skips", "expected": true }
+  ]
+}
