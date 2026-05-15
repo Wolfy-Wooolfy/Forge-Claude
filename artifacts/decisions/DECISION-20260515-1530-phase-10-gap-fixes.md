@@ -4,7 +4,7 @@
 |---|---|
 | Date | 2026-05-15 |
 | Owner | KhElmasry |
-| Status | OWNER_DECISION_PENDING |
+| Status | OWNER_APPROVED — 2026-05-15 |
 | Scope | PHASE-10 Step 3 — Gap 3 (tryAdvanceForLoopBack state setter) + Gap 4 (_validateAuditRow additionalProperties) |
 | Related | `DECISION-20260514-1500-phase-10-closure.md` (§3 three-step plan, OWNER_APPROVED) |
 | Related | `DECISION-2026-05-15T14-00-live-ratification-pre-phase-11-final.md` (LIVE-RAT APPROVED) |
@@ -143,12 +143,20 @@ $0.00 — mock-only changes, no LLM invocations.
 
 ## 7. Owner Approval
 
-> To ratify Step 3, the owner (KhElmasry) must review and post:
->
-> "STEP-3 APPROVED. PHASE-10 closed."
->
-> After ratification:
-> - `progress/status.json` `phase_10_gap_fixes.status` = CLOSED (already set)
-> - PHASE-11 prompt may be issued
+**Status:** OWNER_APPROVED — 2026-05-15
 
-Until ratification, PHASE-11 does NOT begin.
+Ratified by owner KhElmasry on 2026-05-15 with phrase:
+
+> "STEP-3 APPROVED. PHASE-10 closed."
+
+**PHASE-10 closure cascade now complete:**
+- PHASE-10 technical closure: DECISION-20260514-1500 (OWNER_APPROVED 2026-05-15)
+- Live ratification: DECISION-2026-05-15T14-00 (OWNER_APPROVED 2026-05-15, semantic review waived)
+- Gap fixes (Gap 3 + Gap 4): this artifact (OWNER_APPROVED 2026-05-15)
+
+**Remaining deferred items** (per §3 above):
+- Gap 1 → PHASE-11 runner integration
+- Gap 2 → PHASE-12 production hardening
+- Gap 5 → PHASE-12 production hardening
+
+**Next:** PHASE-11 (Existing Project Intake) prompt to follow.

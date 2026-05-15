@@ -79,8 +79,9 @@ async function _driveNormal(project_id, loop_id, states, ctx) {
 // Fire a gate with an explicit gate_responder function.
 // Returns fireGate result: { next_state, response, responded_at, ... }.
 // NOTE: For REJECT_AND_LOOP (Gate 2), tryAdvanceForLoopBack inside fireGate
-// increments iteration_count and appends LOOP_BACK audit row, but does NOT
-// call setCurrentState("BUILDER"). Callers must fix state themselves.
+// handles the full state transition: iteration_count++, LOOP_BACK audit
+// row, and setCurrentState("BUILDER"). Callers no longer need workarounds.
+// (Was: workaround removed in DECISION-20260515-1530 §2 Gap 3 fix.)
 async function _fireGateWithResponder(gateId, project_id, loop_id, responderFn, ctx) {
   const ctxWithResponder = Object.assign({}, ctx || {}, { gate_responder: responderFn });
   return fireGate(gateId, project_id, loop_id, {}, ctxWithResponder);
@@ -245,8 +246,9 @@ async function runS153(opts) {
 // Plan §2 criterion 3: iteration_count incremented; loop returns to BUILDER;
 // second iteration completes and reaches COMPLETE.
 //
-// After REJECT_AND_LOOP: tryAdvanceForLoopBack increments count + writes LOOP_BACK
-// audit row but does NOT call setCurrentState("BUILDER"). We fix state explicitly.
+// After REJECT_AND_LOOP: tryAdvanceForLoopBack handles full state transition
+// (iteration_count++, LOOP_BACK audit row, setCurrentState("BUILDER")) as of
+// DECISION-20260515-1530 §2 Gap 3 fix. No workaround needed in this driver.
 
 async function runS154(opts) {
   const project_id      = (opts && opts.project_id) || PROJECT_ID;
