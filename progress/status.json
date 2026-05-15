@@ -312,5 +312,24 @@
       }
     }
   },
-  "last_updated": "2026-05-14T15:00:00.000Z"
+  "live_ratification": {
+    "status": "PARTIAL_FAIL",
+    "loop_id": "d493a566-7b48-4b84-9525-b2922f2963a9",
+    "total_cost_usd": 0.08576,
+    "transitions_actual": 6,
+    "transitions_expected": 14,
+    "final_state_actual": "TEST_DESIGN",
+    "exit_code": 2,
+    "failure_role": "test_designer",
+    "failure_reason": "INVALID_ROLE_OUTPUT",
+    "kill_switch_fired": false,
+    "verdict": "NO-GO",
+    "drift_semantic": "CONCERN",
+    "drift_structural": "FAIL",
+    "drift_schema": "FAIL",
+    "decision_artifact": "artifacts/decisions/DECISION-2026-05-15T13-35-live-ratification-pre-phase-11.md",
+    "run_at": "2026-05-15T13:04:40.984Z",
+    "owner_ratification": "PENDING"
+  },
+  "last_updated": "2026-05-15T13:35:00.000Z"
 }

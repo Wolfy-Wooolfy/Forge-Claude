@@ -1,3 +1,18 @@
+---
+project_id: _reference_todo_api
+project_name: Reference TODO API
+domain: test
+vision_version: 1
+vision_locked: true
+vision_locked_at: "2026-05-13T11:00:00Z"
+amendments_history: []
+goals:
+  primary: "Minimal REST API for managing TODO items — L5b test fixture"
+  secondary: []
+constraints: []
+non_goals: []
+---
+
 # Reference TODO API — Project Vision
 
 ## Overview
