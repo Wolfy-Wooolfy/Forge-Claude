@@ -74,7 +74,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-05-15T12:26:35.790Z",
+    "last_doctor_run": "2026-05-15T15:44:23.036Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
@@ -341,14 +341,21 @@
   },
   "phase_10_gap_fixes": {
     "status": "CLOSED",
-    "gaps_fixed": ["gap_3_tryAdvanceForLoopBack", "gap_4_validateAuditRow_additionalProperties"],
+    "gaps_fixed": [
+      "gap_3_tryAdvanceForLoopBack",
+      "gap_4_validateAuditRow_additionalProperties"
+    ],
     "gaps_deferred": [
       "gap_1_summary_auto_write_PHASE_11",
       "gap_2_debate_verdicts_schema_PHASE_12",
       "gap_5_kb_per_chunk_budget_PHASE_12"
     ],
-    "scenarios_added": ["S157"],
-    "scenarios_modified": ["S147"],
+    "scenarios_added": [
+      "S157"
+    ],
+    "scenarios_modified": [
+      "S147"
+    ],
     "files_modified": [
       "code/src/runtime/orchestration/iteration_controller.js",
       "code/src/runtime/orchestration/loop_state.js",
@@ -362,7 +369,50 @@
     ],
     "decision_artifact": "artifacts/decisions/DECISION-20260515-1530-phase-10-gap-fixes.md",
     "closed_at": "2026-05-15T15:30:00.000Z",
-    "cost_actual_usd": 0.00
+    "cost_actual_usd": 0
   },
-  "last_updated": "2026-05-15T15:30:00.000Z"
+  "phase_11": {
+    "status": "IN_PROGRESS",
+    "current_stage": "11.0",
+    "stages": {
+      "11_0": {
+        "status": "CLOSED",
+        "decision_artifact": "artifacts/decisions/DECISION-20260515-1600-phase-11-plan.md",
+        "contract_doc": "docs/10_runtime/20_INTAKE_CONTRACT.md",
+        "oq_sweep": "artifacts/audit/phase_11_oq_sweep.md",
+        "checkpoint_mid": "artifacts/decisions/_phase_11_checkpoints/stage_11_0_mid.md",
+        "closed_at": "2026-05-15T16:00:00.000Z",
+        "cost_actual_usd": 0,
+        "files_created": [
+          "docs/10_runtime/20_INTAKE_CONTRACT.md",
+          "code/src/providers/reverseVisionProvider.js",
+          "code/src/runtime/agents/roles/reverse_vision_role.js",
+          "code/src/runtime/tools/intake_tools.js",
+          "artifacts/audit/phase_11_oq_sweep.md",
+          "artifacts/vendor/tree-sitter-grammars/python.wasm",
+          "artifacts/vendor/tree-sitter-grammars/MANIFEST.json"
+        ],
+        "files_modified": [
+          "docs/10_runtime/18b_ROLE_PROMPTS.md",
+          "package.json"
+        ],
+        "deps_installed": [
+          "web-tree-sitter@0.26.8",
+          "adm-zip@0.5.17",
+          "ignore@7.0.5"
+        ],
+        "oq_summary": {
+          "blockers": 0,
+          "warns": 4,
+          "infos": 4,
+          "verdict": "PROCEED"
+        },
+        "decision_o3_wasm": "native tree-sitter rejected (node-gyp failure on Windows); web-tree-sitter WASM selected; python.wasm v0.25.0 ABI verified"
+      }
+    },
+    "total_live_cap_usd": 12,
+    "cost_actuals_usd": 0
+  },
+  "current_task": "PHASE-11-STAGE-11-0-CLOSED",
+  "last_updated": "2026-05-15T16:00:00.000Z"
 }
