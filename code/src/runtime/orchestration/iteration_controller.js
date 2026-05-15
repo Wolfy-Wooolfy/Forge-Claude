@@ -145,7 +145,9 @@ async function tryAdvanceForLoopBack(project_id, loop_id, ctx) {
     owner_gate_id:   2
   }, ctxObj);
 
-  return { advanced: true, escalated: false, graph };
+  await setCurrentState(project_id, loop_id, "BUILDER", ctxObj);
+  const updatedGraph = await loadLoop(project_id, loop_id, ctxObj);
+  return { advanced: true, escalated: false, graph: updatedGraph };
 }
 
 // ── Export ─────────────────────────────────────────────────────────────────────

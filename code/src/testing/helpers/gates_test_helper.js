@@ -179,7 +179,8 @@ async function runS147Sequence(ctx) {
   return {
     next_state:      result.next_state,
     escalated:       result.escalated,
-    iteration_count: updated ? updated.iteration_count : -1
+    iteration_count: updated ? updated.iteration_count : -1,
+    persisted_state: updated ? updated.current_state    : null
   };
 }
 

@@ -11,6 +11,7 @@
     { "type": "status_equals",      "expected": "SUCCESS"  },
     { "type": "state_field_equals", "field": "next_state",      "expected": "BUILDER" },
     { "type": "state_field_equals", "field": "escalated",       "expected": false     },
-    { "type": "state_field_equals", "field": "iteration_count", "expected": 1         }
+    { "type": "state_field_equals", "field": "iteration_count", "expected": 1         },
+    { "type": "state_field_equals", "field": "persisted_state", "expected": "BUILDER" }
   ]
 }

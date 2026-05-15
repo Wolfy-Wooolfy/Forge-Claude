@@ -267,9 +267,6 @@ async function runS154(opts) {
       async function() { return { response: "REJECT_AND_LOOP" }; },
       ctxObj
     );
-    // tryAdvanceForLoopBack saved graph with current_state=QUALITY_JUDGE — fix to BUILDER
-    await setCurrentState(project_id, loop_id, "BUILDER", ctxObj);
-
     // ── Second pass: drive from BUILDER to COMPLETE ──────────────────────────
     await _driveNormal(project_id, loop_id, BUILDER_TO_RCS, ctxObj);
     await _driveNormal(project_id, loop_id, RCS_TO_GATE2, ctxObj);

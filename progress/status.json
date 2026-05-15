@@ -4,7 +4,7 @@
   "current_stage": "A",
   "overall_progress_percent": 99,
   "stage_progress_percent": 100,
-  "current_task": "PHASE-10-STAGE-10-5-CLOSED",
+  "current_task": "PHASE-10-GAP-FIXES-CLOSED",
   "next_phase": "PHASE-11",
   "next_step": "Begin PHASE-11 (Existing Project Intake) per owner GO and FORGE_V2_PHASE_ROADMAP.md. Requires new decision artifact and explicit owner confirmation before starting.",
   "last_completed_artifact": "artifacts/decisions/_phase_10_checkpoints/stage_10_5.md",
@@ -324,8 +324,8 @@
     "final_state_actual": "COMPLETE",
     "exit_code": 0,
     "kill_switch_fired": false,
-    "verdict": "GO_PENDING_SEMANTIC_REVIEW",
-    "drift_semantic": "PENDING_OWNER_REVIEW",
+    "verdict": "GO_APPROVED",
+    "drift_semantic": "WAIVED_BY_OWNER_2026-05-15",
     "drift_structural": "PASS",
     "drift_schema": "PASS",
     "bugs_fixed": [
@@ -337,7 +337,32 @@
     "decision_artifact_final": "artifacts/decisions/DECISION-2026-05-15T14-00-live-ratification-pre-phase-11-final.md",
     "output_dir": "artifacts/projects/_reference_todo_api/orchestration/6eb913a7-f2eb-41a6-85c0-ab7dba2c5520/live_ratification/",
     "run3_at": "2026-05-15T13:04:40.984Z",
-    "owner_ratification": "PENDING"
+    "owner_ratification": "APPROVED_2026-05-15_SEMANTIC_REVIEW_WAIVED"
   },
-  "last_updated": "2026-05-15T14:00:00.000Z"
+  "phase_10_gap_fixes": {
+    "status": "CLOSED",
+    "gaps_fixed": ["gap_3_tryAdvanceForLoopBack", "gap_4_validateAuditRow_additionalProperties"],
+    "gaps_deferred": [
+      "gap_1_summary_auto_write_PHASE_11",
+      "gap_2_debate_verdicts_schema_PHASE_12",
+      "gap_5_kb_per_chunk_budget_PHASE_12"
+    ],
+    "scenarios_added": ["S157"],
+    "scenarios_modified": ["S147"],
+    "files_modified": [
+      "code/src/runtime/orchestration/iteration_controller.js",
+      "code/src/runtime/orchestration/loop_state.js",
+      "code/src/testing/helpers/e2e_loop_helper.js",
+      "code/src/testing/helpers/gates_test_helper.js",
+      "code/src/testing/scenarios/S147_gate_2_reject_loops_back_to_builder.json"
+    ],
+    "files_created": [
+      "code/src/testing/helpers/loop_state_validation_helper.js",
+      "code/src/testing/scenarios/S157_audit_row_rejects_extra_field.json"
+    ],
+    "decision_artifact": "artifacts/decisions/DECISION-20260515-1530-phase-10-gap-fixes.md",
+    "closed_at": "2026-05-15T15:30:00.000Z",
+    "cost_actual_usd": 0.00
+  },
+  "last_updated": "2026-05-15T15:30:00.000Z"
 }

@@ -1,0 +1,14 @@
+{
+  "id": "S157",
+  "name": "appendAuditRow rejects rows with unexpected fields (contract §12.2)",
+  "description": "Gap 4 fix from DECISION-20260514-1500 §3. _validateAuditRow now enforces additionalProperties:false per contract §12.2. Verifies that adding an extra field to an audit row throws with the expected error message containing 'unexpected field' and the contract reference '§12.2'.",
+  "type": "module_call",
+  "module": "code/src/testing/helpers/loop_state_validation_helper",
+  "method": "runS157Check",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "rejected_with_unexpected_field",          "expected": true },
+    { "type": "state_field_equals", "field": "rejection_message_contains_contract_ref", "expected": true }
+  ]
+}

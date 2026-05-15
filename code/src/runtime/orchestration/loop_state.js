@@ -8,6 +8,8 @@ const { validateGraph, STATES }                    = require("./conversation_gra
 // ── AuditLogRow validation (contract §12.2) ───────────────────────────────────
 
 const AUDIT_REQUIRED       = ["ts", "loop_id", "from_state", "to_state", "transition_type", "mock", "cost_usd"];
+const AUDIT_OPTIONAL       = Object.freeze(["role_invoked", "owner_gate_id"]);
+const AUDIT_ALLOWED        = Object.freeze([...AUDIT_REQUIRED, ...AUDIT_OPTIONAL]);
 const VALID_TRANSITION_TYPES = Object.freeze(
   ["NORMAL", "GATE_APPROVE", "GATE_REJECT", "LOOP_BACK", "ESCALATE", "ABORT", "VACUOUS_SKIP"]
 );
@@ -35,6 +37,13 @@ function _validateAuditRow(row) {
   if (typeof row.mock    !== "boolean") errors.push("mock must be a boolean");
   if (typeof row.cost_usd !== "number" || row.cost_usd < 0)
     errors.push("cost_usd must be a non-negative number");
+
+  // Contract §12.2: additionalProperties: false
+  for (const key of Object.keys(row)) {
+    if (!AUDIT_ALLOWED.includes(key)) {
+      errors.push("unexpected field: " + key + " (contract §12.2 additionalProperties:false)");
+    }
+  }
 
   return errors;
 }
