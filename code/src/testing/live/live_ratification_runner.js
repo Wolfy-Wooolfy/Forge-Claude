@@ -94,19 +94,17 @@ async function _invokeRole(role_id, project_id, input, consecutiveFails, ctx) {
 // ── State advancement ─────────────────────────────────────────────────────────
 
 async function _advanceLive(project_id, loop_id, to_state, transition_type, role_invoked, cost_usd, ctx) {
-  const result = await _reg().invoke(
-    "orchestration.advance_state",
-    {
-      project_id,
-      loop_id,
-      to_state,
-      transition_type,
-      role_invoked: role_invoked || null,
-      cost_usd:     cost_usd    || 0,
-      mock:         false
-    },
-    ctx || {}
-  );
+  var advInput = {
+    project_id,
+    loop_id,
+    to_state,
+    transition_type,
+    cost_usd: cost_usd || 0,
+    mock:     false
+  };
+  if (role_invoked) advInput.role_invoked = role_invoked;
+
+  const result = await _reg().invoke("orchestration.advance_state", advInput, ctx || {});
   if (!result || result.status !== "SUCCESS") {
     throw new Error(
       "_advanceLive→" + to_state + " failed: " +
