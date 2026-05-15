@@ -291,12 +291,12 @@ async function runLiveRatification(opts) {
     // ── Transition 10: REVIEWER_CODE_AND_SECURITY → DOCUMENTATION ─────────────
     // State: REVIEWER_CODE_AND_SECURITY — invoke reviewer Phase B + security_auditor
     var { result: rev_b_res, cost_usd: rev_b_cost } = await _invokeRole(
-      "reviewer", project_id, { phase: "B", spec: spec, design: design, project_id }, 0, ctx
+      "reviewer", project_id, { phase: "B", spec: spec, design: design, code: bld_res, project_id }, 0, ctx
     );
     per_role_cost.reviewer_phase_b = rev_b_cost;
 
     var { result: sec_res, cost_usd: sec_cost } = await _invokeRole(
-      "security_auditor", project_id, { phase: "CODE", spec: spec, design: design, project_id }, 0, ctx
+      "security_auditor", project_id, { phase: "CODE", spec: spec, design: design, code: bld_res, project_id }, 0, ctx
     );
     per_role_cost.security_auditor = sec_cost;
 

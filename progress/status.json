@@ -313,23 +313,31 @@
     }
   },
   "live_ratification": {
-    "status": "PARTIAL_FAIL",
-    "loop_id": "d493a566-7b48-4b84-9525-b2922f2963a9",
-    "total_cost_usd": 0.08576,
-    "transitions_actual": 6,
+    "status": "COMPLETE",
+    "runs_total": 3,
+    "loop_id_final": "6eb913a7-f2eb-41a6-85c0-ab7dba2c5520",
+    "loop_id_partial_run1": "d493a566-7b48-4b84-9525-b2922f2963a9",
+    "total_cost_usd_run3": 0.17916,
+    "total_cost_usd_cumulative_est": 0.37,
+    "transitions_actual": 14,
     "transitions_expected": 14,
-    "final_state_actual": "TEST_DESIGN",
-    "exit_code": 2,
-    "failure_role": "test_designer",
-    "failure_reason": "INVALID_ROLE_OUTPUT",
+    "final_state_actual": "COMPLETE",
+    "exit_code": 0,
     "kill_switch_fired": false,
-    "verdict": "NO-GO",
-    "drift_semantic": "CONCERN",
-    "drift_structural": "FAIL",
-    "drift_schema": "FAIL",
-    "decision_artifact": "artifacts/decisions/DECISION-2026-05-15T13-35-live-ratification-pre-phase-11.md",
-    "run_at": "2026-05-15T13:04:40.984Z",
+    "verdict": "GO_PENDING_SEMANTIC_REVIEW",
+    "drift_semantic": "PENDING_OWNER_REVIEW",
+    "drift_structural": "PASS",
+    "drift_schema": "PASS",
+    "bugs_fixed": [
+      "test_designer_role.js loadPrompt v1→v2 (PHASE-9 migration residue)",
+      "runner reviewer Phase B missing code field",
+      "runner security_auditor Phase CODE missing code field"
+    ],
+    "decision_artifact_partial": "artifacts/decisions/DECISION-2026-05-15T13-35-live-ratification-pre-phase-11.md",
+    "decision_artifact_final": "artifacts/decisions/DECISION-2026-05-15T14-00-live-ratification-pre-phase-11-final.md",
+    "output_dir": "artifacts/projects/_reference_todo_api/orchestration/6eb913a7-f2eb-41a6-85c0-ab7dba2c5520/live_ratification/",
+    "run3_at": "2026-05-15T13:04:40.984Z",
     "owner_ratification": "PENDING"
   },
-  "last_updated": "2026-05-15T13:35:00.000Z"
+  "last_updated": "2026-05-15T14:00:00.000Z"
 }

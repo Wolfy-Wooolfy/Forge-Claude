@@ -1,0 +1,13 @@
+{
+  "architect": 0.00871,
+  "spec_writer": 0.01303,
+  "reviewer_phase_a": 0.00951,
+  "cost_estimator": 0.01622,
+  "environment": 0.01421,
+  "test_designer": 0.0289,
+  "builder": 0.01613,
+  "reviewer_phase_b": 0.01359,
+  "security_auditor": 0.01655,
+  "documentation": 0.02149,
+  "quality_judge": 0.02082
+}
