@@ -4,7 +4,7 @@
 |---|---|
 | Date | 2026-05-14 |
 | Owner | KhElmasry |
-| Status | OWNER_DECISION_PENDING |
+| Status | OWNER_APPROVED — 2026-05-15 |
 | Scope | PHASE-10 closure — full orchestration loop + E2E demo |
 | Supersedes | Nothing (closure artifact) |
 | Related | `DECISION-20260513-1000-phase-10-plan.md` (PHASE-10 plan, now CLOSED) |
@@ -150,11 +150,28 @@ a new decision artifact. This closure does NOT authorize PHASE-11 to begin.
 
 ## 6. Owner Approval
 
-> To close PHASE-10 officially, the owner (KhElmasry) must confirm:
->
-> "PHASE-10 CLOSED. Approved. Proceed to PHASE-11 planning."
->
-> Or equivalent explicit GO for next phase.
+**Status:** OWNER_APPROVED — 2026-05-15
 
-Until approval, `progress/status.json.phase_10.status` is written as `CLOSED` (technical
-closure complete, owner ratification pending).
+Ratified by owner KhElmasry on 2026-05-15 with phrase:
+
+> "PHASE-10 CLOSED. Approved. Proceed to PHASE-11 planning."
+
+**Note on timing:** Technical closure was completed 2026-05-14 (all
+six stages closed, scenarios PASS, checkpoints written, status.json
+patched). Verbal ratification was deferred to 2026-05-15 due to chat
+session continuity — the original session ended before the owner
+posted the GO phrase. `progress/status.json` correctly reflected the
+technical closure on 2026-05-14; only this artifact's Status field
+was behind.
+
+**Ratification path forward (per three-step plan agreed 2026-05-15):**
+1. ✓ This patch (Step 1 — closure-artifact metadata sync)
+2. Live ratification demo (Step 2 — separate decision artifact:
+   DECISION-<ts>-live-ratification-pre-phase-11.md, budget $5,
+   S152 fast-path against _reference_todo_api with real OpenAI
+   calls across all 12 roles)
+3. Gap-fix prompt (Step 3 — PROMPT-PHASE-10-GAPS.md addressing
+   §3 Gap 3 minimum, conditional on Step 2 findings)
+
+PHASE-11 (Existing Project Intake) prompt will follow after Step 3
+closure.
