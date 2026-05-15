@@ -6,7 +6,7 @@ const { loadPrompt }                      = require("../_prompt_loader");
 const { emit: emitActivity }             = require("../_activity_emitter");
 const { getIndicator }                   = require("../_activity_catalog");
 
-const SYSTEM_PROMPT = loadPrompt("test_designer_v1");
+const SYSTEM_PROMPT = loadPrompt("test_designer_v2");
 
 const INPUT_SCHEMA = {
   type: "object",

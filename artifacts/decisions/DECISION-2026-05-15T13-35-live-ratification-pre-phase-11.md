@@ -103,17 +103,37 @@ assumption used in the projection (actual input tokens ranged from 463 to 1762 p
 
 ### Root Cause — test_designer INVALID_ROLE_OUTPUT
 
-The `test_designer_role.js` OUTPUT_SCHEMA requires each scenario object to include 9 fields:
-`id`, `name`, `description`, `category`, `setup`, `execution`, `assertions`, `teardown`, `metadata`.
+**AMENDMENT (2026-05-15, owner-verified):** The original root cause analysis below was incorrect
+and has been superseded. The accurate root cause is a one-line code bug, not a prompt engineering gap.
 
-gpt-4o-mini produced scenario objects with only `id`, `name`, `description`, and `steps` — a simplified
-structure. The `category`, `setup`, `execution`, `assertions`, `teardown`, and `metadata` fields were
-absent. Schema validation in `role.run()` returned `INVALID_ROLE_OUTPUT`. With `consecutive_fails = 1`
-(below `MAX_CONSECUTIVE_FAILURES = 3`), the runner threw and the CLI exited code 2.
+#### Actual Root Cause: PHASE-9 migration left a stale `loadPrompt` call
 
-**This is a schema drift finding, not a runtime infrastructure failure.** The LLM was not
-briefed adequately about the exact schema shape required. The system prompt for test_designer
-does not include the full JSON schema — the model inferred a simplified structure.
+```
+code/src/runtime/agents/roles/test_designer_role.js
+
+  Line  9: const SYSTEM_PROMPT = loadPrompt("test_designer_v1");  ← loads deprecated v1 prompt
+  Line 59:   system_prompt_id: "test_designer_v2",                ← declares v2
+```
+
+The role loads `test_designer_v1` (the deprecated prompt that teaches the simplified
+`{inputs, expected_outputs}` schema) but declares `system_prompt_id: "test_designer_v2"` and
+validates output against the v2 `OUTPUT_SCHEMA` (which requires `category`, `setup`, `execution`,
+`assertions`, `teardown`, `metadata`). This is a guaranteed mismatch: the model follows the v1
+prompt, produces v1-shaped output, and schema validation (which uses the v2 OUTPUT_SCHEMA) rejects it.
+
+The bug originates in `DECISION-20260513-0930-test-designer-schema-upgrade.md` (PHASE-9 migration):
+the `OUTPUT_SCHEMA` and `system_prompt_id` were updated to v2 but the `loadPrompt()` call on line 9
+was not changed.
+
+**Why mock tests did not catch this:** Mock tests are prompt-agnostic — they bypass the LLM call
+entirely. The `loadPrompt` value is never read in mock execution paths, so no mock scenario
+could detect the stale v1 load. Only a live run (with a real LLM call) surfaces the mismatch.
+
+**Scope:** Owner independently verified this is the ONLY role with this mismatch. All other 11
+roles have consistent `loadPrompt()` / `system_prompt_id` pairs (confirmed by scan of
+`code/src/runtime/agents/roles/*.js`).
+
+**Fix applied:** Line 9 changed to `loadPrompt("test_designer_v2")` per Task 3 (2026-05-15).
 
 ### Pre-Run Fixes Applied (this session)
 
