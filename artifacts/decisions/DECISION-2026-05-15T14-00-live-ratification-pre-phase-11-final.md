@@ -4,7 +4,7 @@
 |---|---|
 | Date | 2026-05-15 |
 | Owner | KhElmasry |
-| Status | OWNER_DECISION_PENDING |
+| Status | OWNER_APPROVED — 2026-05-15 (semantic review waived) |
 | Scope | PHASE-10 live ratification — S152 fast-path, _reference_todo_api, real OpenAI calls — full completion |
 | Prior artifacts | `DECISION-2026-05-15T13-35-live-ratification-pre-phase-11.md` (partial, NO-GO) |
 | Prior artifacts | `DECISION-2026-05-15T13-3-live-ratification-pre-phase-11.md` (CLI-generated, Run 3 raw data) |
@@ -214,12 +214,41 @@ semantic coherence by reviewing the output files, or explicitly waives the revie
 
 ## 10. Owner Approval
 
-> To ratify this demo, the owner (KhElmasry) must review the drift analysis
-> (or explicitly waive semantic review) and post:
->
-> "LIVE-RAT APPROVED. GO to Step 3." (or equivalent)
->
-> Output files for review:
-> `artifacts/projects/_reference_todo_api/orchestration/6eb913a7-f2eb-41a6-85c0-ab7dba2c5520/live_ratification/`
+**Status:** OWNER_APPROVED — 2026-05-15 (semantic review waived)
 
-Until ratification, PHASE-11 does NOT begin.
+Ratified by owner KhElmasry on 2026-05-15 with phrase:
+
+> "LIVE-RAT APPROVED. GO to Step 3."
+
+**Semantic review waiver rationale (CTO recommendation, owner accepted):**
+
+1. Mock parity established — S152 mock (heavily tested across
+   156 scenarios) and Run 3 live both reach COMPLETE in 14
+   transitions through the identical sequence
+2. All 11 role outputs passed OUTPUT_SCHEMA validation — schema-
+   valid implies non-trivial work product was generated
+3. Role outputs are not persisted to disk in the current runner
+   (only transition metadata is). A meaningful semantic review
+   would require runner modification + re-run, with low marginal
+   value over what structural+schema parity already proves
+
+**Findings recorded for PHASE-12 production hardening (non-blocking):**
+
+- **F-1:** live_ratification_runner.js does not persist per-role
+  outputs to the output dir. Production runner (post-PHASE-11)
+  must persist all role outputs for audit/review.
+- **F-2:** Cost projection methodology under-estimated by ~2.2×
+  (projected $0.026 upper / actual $0.17916). Token estimation
+  needs calibration against real prompt sizes.
+- **F-3:** No retry-with-feedback loop on INVALID_ROLE_OUTPUT
+  (runner throws on first failure). Production runner should
+  retry up to MAX_CONSECUTIVE_FAILURES=3 with the validation
+  error fed back to the LLM.
+- **F-4:** Mid-checkpoint inaccuracy about L3 policy (documented
+  in §8 of this artifact). Standalone scripts DO have full L3
+  policy active via getDefaultRegistry() auto-install — this
+  should be made explicit in a future "Standalone CLI Permission
+  Policy" contract addendum.
+
+**Next step:** Step 3 (PHASE-10 known-gap fixes), per the three-
+step plan from DECISION-20260514-1500-phase-10-closure.md.
