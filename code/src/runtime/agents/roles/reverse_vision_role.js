@@ -2,16 +2,22 @@
 
 // Reverse-Vision Role — analyzes SourceTreeAnalysis and infers InferredVision.
 // @see docs/10_runtime/20_INTAKE_CONTRACT.md §4 (InferredVision schema)
+// @see docs/10_runtime/20_INTAKE_CONTRACT.md §5 (Vision Lock Semantics)
 // @see docs/10_runtime/18b_ROLE_PROMPTS.md (reverse_vision_v1)
 //
-// STAGE_11_0_STUB: run() throws — full implementation in Stage 11.1.
-// Activity indicators deferred to Stage 11.1 (OQ-4).
-// WASM lazy-init pattern documented in OQ-6/OQ-7.
+// IMPORTANT: run() calls reverseVisionProvider.executeTask() DIRECTLY — not via
+// agent.invoke — because this role runs before any vision exists, and agent.invoke
+// triggers agent_budget_rule which rejects calls when vision is not locked.
+// This bypass is intentional and documented in INTAKE_CONTRACT §5.
 
 const { defineRole, roleOk, roleFailed } = require("../_role_contract");
-const { loadPrompt }                     = require("../_prompt_loader");
+const { validate }                        = require("../_json_schema_validator");
+const { loadPrompt }                      = require("../_prompt_loader");
+const { emit: emitActivity }             = require("../_activity_emitter");
+const { getIndicator }                   = require("../_activity_catalog");
 
-const SYSTEM_PROMPT  = loadPrompt("reverse_vision_v1");
+void loadPrompt("reverse_vision_v1");   // validates prompt id at registry load time
+
 const SCHEMA_VERSION = "1.0.0";
 
 // ── Input Schema ──────────────────────────────────────────────────────────────
@@ -45,7 +51,6 @@ const INPUT_SCHEMA = {
 };
 
 // ── Output Schema — InferredVision (§4) ───────────────────────────────────────
-// Must match output_tool.parameters in reverseVisionProvider.js exactly.
 
 const OUTPUT_SCHEMA = {
   type: "object",
@@ -94,22 +99,63 @@ module.exports = defineRole({
   typical_cost_usd_max: 0.10,
 
   async run(input, ctx) {
-    void SYSTEM_PROMPT;  // loaded at module level — ensures prompt registry validates the id
-    void SCHEMA_VERSION;
+    const iv = validate(input, INPUT_SCHEMA);
+    if (!iv.valid) return roleFailed("INVALID_INPUT", iv.errors.join("; "), ctx);
 
-    // STAGE_11_0_STUB — full implementation in Stage 11.1:
-    // 1. Load python.wasm via module-level cached Promise (OQ-6/OQ-7)
-    // 2. Verify WASM SHA256 against MANIFEST.json (§8)
-    // 3. Parse AST samples for top-level symbols
-    // 4. Call reverse_vision provider via reg.invoke("agent.invoke")
-    // 5. Validate output against OUTPUT_SCHEMA
-    // 6. Return roleOk(inferred_vision)
-    //
-    // Activity indicators (PARSING_OUTPUT, VALIDATING_SCHEMA) added in Stage 11.1 (OQ-4).
-    // Stub uses best-effort try/catch no-ops consistent with existing pattern.
+    const project_id    = input.project_id;
+    const invocation_id = (ctx && ctx.invocation_id) || null;
+    const root          = (ctx && ctx.root)          || process.cwd();
 
-    void input;
-    void ctx;
-    throw new Error("STAGE_11_0_STUB: reverse_vision_role not yet implemented");
+    // Load provider directly (not via agent.invoke — see module header).
+    const provider = require("../../../providers/reverseVisionProvider");
+
+    try {
+      emitActivity({ invocation_id, project_id, role: this.id,
+        state: "INVOKING_ADAPTER", indicator: getIndicator(this.id, "INVOKING_ADAPTER") }, { root });
+    } catch (_e) { /* best-effort */ }
+
+    let providerResult;
+    try {
+      providerResult = await provider.executeTask({
+        task_id:    "rv_" + project_id + "_" + Date.now(),
+        project_id: project_id,
+        context: {
+          schema_version: SCHEMA_VERSION,
+          project_id:     project_id,
+          source_tree:    input.source_tree,
+          provider:       (ctx && ctx.provider) || this.default_provider,
+          model:          (ctx && ctx.model)    || this.default_model
+        }
+      });
+    } catch (err) {
+      return roleFailed("PROVIDER_CALL_ERROR", err.message, ctx);
+    }
+
+    try {
+      emitActivity({ invocation_id, project_id, role: this.id,
+        state: "PARSING_OUTPUT", indicator: getIndicator(this.id, "PARSING_OUTPUT") }, { root });
+    } catch (_e) { /* best-effort */ }
+
+    if (!providerResult || providerResult.status !== "SUCCESS") {
+      const meta = (providerResult && providerResult.metadata) || {};
+      return roleFailed(meta.reason || "PROVIDER_FAILED", meta.detail || null, ctx);
+    }
+
+    const ov = validate(providerResult.output, OUTPUT_SCHEMA);
+    if (!ov.valid) return roleFailed("INVALID_ROLE_OUTPUT", ov.errors.join("; "), ctx);
+
+    try {
+      emitActivity({ invocation_id, project_id, role: this.id,
+        state: "VALIDATING_SCHEMA", indicator: getIndicator(this.id, "VALIDATING_SCHEMA") }, { root });
+    } catch (_e) { /* best-effort */ }
+
+    return roleOk(providerResult.output, {
+      role:       this.id,
+      model:      (providerResult.metadata && providerResult.metadata.model)      || this.default_model,
+      tokens_in:  (providerResult.metadata && providerResult.metadata.tokens_in)  || 0,
+      tokens_out: (providerResult.metadata && providerResult.metadata.tokens_out) || 0,
+      latency_ms: (providerResult.metadata && providerResult.metadata.latency_ms) || 0,
+      attempt:    (providerResult.metadata && providerResult.metadata.attempt)    || 1
+    });
   }
 });

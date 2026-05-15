@@ -77,6 +77,13 @@ const ACTIVITY_CATALOG = Object.freeze({
     VALIDATING_SCHEMA: "Verifying the plan...",
     COMPLETED:         "Launch plan ready",
     FAILED:            "Launch planning hit a snag"
+  },
+  reverse_vision: {
+    INVOKING_ADAPTER:  "Analyzing codebase...",
+    PARSING_OUTPUT:    "Inferring vision...",
+    VALIDATING_SCHEMA: "Validating inferred vision...",
+    COMPLETED:         "Vision inferred",
+    FAILED:            "Vision inference failed"
   }
 });
 

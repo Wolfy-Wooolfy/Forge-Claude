@@ -7,8 +7,8 @@
 | **Phase** | PHASE-11 |
 | **Stage** | 11.0 — Plan + Contract Design |
 | **Author** | Claude (CTO advisor) |
-| **Status** | COMPLETE — all sections written |
-| **Owner approval** | PENDING |
+| **Status** | OWNER_APPROVED — 2026-05-15 |
+| **Owner approval** | RATIFIED — 2026-05-15 |
 
 ---
 
@@ -141,6 +141,29 @@ Full audit trail: `artifacts/vendor/tree-sitter-grammars/MANIFEST.json`
 
 ---
 
-**Owner approval required to mark Stage 11.0 OWNER_APPROVED.**
+---
+
+## §7 Owner Approval
+
+**Status:** OWNER_APPROVED — 2026-05-15
+
+Ratified by owner KhElmasry on 2026-05-15 with phrase:
+
+> "STAGE-11.0 APPROVED. PHASE-11 Stage 11.0 closed."
+
+**Closure verification (CTO advisor, independent):**
+- All 5 deliverables present on disk ✓
+- INTAKE_CONTRACT 9 sections complete ✓
+- Stubs auto-register and load cleanly ✓
+- Doctor 22/3/0 with 13 roles ✓
+- SU suite 152/0/5 on Windows ✓
+- OUTPUT_SCHEMA + prompt JSON example aligned (PHASE-10 lesson applied) ✓
+- python.wasm SHA256 + ABI empirically verified ✓
+
+**Findings recorded (non-blocking):**
+- Auto-discovery registered stubs on boot — scope expansion documented as architectural improvement (consistent with all other Forge components)
+- Stale runtime_health counts in status.json patched in same closure round
+
+**Next:** Stage 11.1 — Python analyzer + reverseVisionProvider full implementation + live demo on Python fixture, ≤$2.00 budget.
 
 **END OF DECISION ARTIFACT — DECISION-20260515-1600-phase-11-plan**

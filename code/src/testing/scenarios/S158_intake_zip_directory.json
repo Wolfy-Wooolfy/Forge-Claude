@@ -1,0 +1,18 @@
+{
+  "id": "S158",
+  "name": "project.intake_zip directory mode — copies fixture_pycli into project source",
+  "description": "PHASE-11 Stage 11.1 — Deliverable B. Verifies that intake_zip with directory_path copies Python fixture files and reports python in languages_detected.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS158IntakeZip",
+  "args": [],
+  "cleanup_project": "test_s158_proj",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "status_ok",          "expected": true },
+    { "type": "state_field_equals", "field": "has_extracted_path", "expected": true },
+    { "type": "state_field_equals", "field": "file_count_gt_0",    "expected": true },
+    { "type": "state_field_equals", "field": "has_python",         "expected": true }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "id": "S161",
+  "name": "intake end-to-end mock — intake_zip → analyze_source → reverse_vision_role → vision.md written unlocked",
+  "description": "PHASE-11 Stage 11.1 — full mock intake pipeline. Verifies the complete flow: directory intake → source analysis → mocked vision inference → unlocked vision.md written. Vision auto-lock is PROHIBITED per INTAKE_CONTRACT §5.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS161EndToEndMock",
+  "args": [],
+  "cleanup_project": "test_s161_proj",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "all_steps_ok",      "expected": true },
+    { "type": "state_field_equals", "field": "vision_file_exists", "expected": true },
+    { "type": "state_field_equals", "field": "vision_is_unlocked", "expected": true }
+  ]
+}

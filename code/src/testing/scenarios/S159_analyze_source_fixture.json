@@ -1,0 +1,19 @@
+{
+  "id": "S159",
+  "name": "project.analyze_source — parses fixture_pycli and returns SourceTreeAnalysis with AST samples",
+  "description": "PHASE-11 Stage 11.1 — Deliverable B. After intake_zip copies fixture_pycli, analyze_source detects Python, entry points, and produces AST samples via web-tree-sitter.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS159AnalyzeSource",
+  "args": [],
+  "cleanup_project": "test_s159_proj",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "intake_ok",       "expected": true },
+    { "type": "state_field_equals", "field": "status_ok",       "expected": true },
+    { "type": "state_field_equals", "field": "has_python",      "expected": true },
+    { "type": "state_field_equals", "field": "has_ast_samples", "expected": true },
+    { "type": "state_field_equals", "field": "file_count_gt_0", "expected": true }
+  ]
+}

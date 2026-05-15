@@ -1,0 +1,19 @@
+{
+  "id": "S160",
+  "name": "reverse_vision_role — mock provider returns valid InferredVision with all 8 required fields",
+  "description": "PHASE-11 Stage 11.1 — Deliverable E. Verifies reverse_vision_role.run() validates input, calls reverseVisionProvider.executeTask() directly (bypassing agent.invoke), and returns SUCCESS with all InferredVision fields.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS160ReverseVisionMock",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "status_ok",                    "expected": true },
+    { "type": "state_field_equals", "field": "has_project_name",             "expected": true },
+    { "type": "state_field_equals", "field": "has_domain",                   "expected": true },
+    { "type": "state_field_equals", "field": "has_goals_primary",            "expected": true },
+    { "type": "state_field_equals", "field": "has_confidence",               "expected": true },
+    { "type": "state_field_equals", "field": "detected_languages_has_python","expected": true }
+  ]
+}

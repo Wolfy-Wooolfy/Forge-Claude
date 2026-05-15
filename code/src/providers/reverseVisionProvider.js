@@ -2,14 +2,18 @@
 
 // Reverse-vision provider — analyzes SourceTreeAnalysis and infers a vision.md structure.
 // @see docs/10_runtime/20_INTAKE_CONTRACT.md §4 (InferredVision schema)
-// @see docs/10_runtime/20_INTAKE_CONTRACT.md §8 (Vendored Binaries Policy)
+// @see docs/10_runtime/20_INTAKE_CONTRACT.md §5 (Vision Lock Semantics — auto-lock PROHIBITED)
 //
-// STAGE_11_0_STUB: execute() throws — full implementation in Stage 11.1.
+// Bypasses agent.invoke (and agent_budget_rule vision-lock check) intentionally:
+// this provider runs BEFORE any vision exists. It calls callChatWithTool directly
+// via the defineProvider callChat helper. See INTAKE_CONTRACT §5.
 
-const { defineProvider } = require("./_contract/providerContract");
+const { defineProvider, validateAgainstSchema } = require("./_contract/providerContract");
+const { loadPrompt }                             = require("../runtime/agents/_prompt_loader");
+
+const SYSTEM_PROMPT = loadPrompt("reverse_vision_v1");
 
 // ── Input Schema ──────────────────────────────────────────────────────────────
-// Receives the SourceTreeAnalysis from project.analyze_source (§3).
 
 const INPUT_SCHEMA = {
   type: "object",
@@ -40,8 +44,6 @@ const INPUT_SCHEMA = {
 };
 
 // ── Output Tool — InferredVision (§4) ────────────────────────────────────────
-// Parameters must match visionSchema.js fields (project_name, domain, goals,
-// constraints, non_goals) plus reverse-vision-specific analysis fields.
 
 const OUTPUT_TOOL = {
   name: "inferred_vision",
@@ -77,6 +79,57 @@ const OUTPUT_TOOL = {
   }
 };
 
+// ── User prompt builder ───────────────────────────────────────────────────────
+
+function _buildUserPrompt(projectId, st) {
+  const lines = [];
+  lines.push("PROJECT: " + projectId);
+  lines.push("FILES: " + (st.file_count || 0) + " | SIZE: " + (st.total_size_bytes || 0) + " bytes");
+  lines.push("LANGUAGES: " + (st.detected_languages || []).join(", "));
+
+  if (st.entry_points && st.entry_points.length > 0) {
+    lines.push("ENTRY POINTS: " + st.entry_points.join(", "));
+  }
+  if (st.top_level_directories && st.top_level_directories.length > 0) {
+    lines.push("TOP-LEVEL DIRS: " + st.top_level_directories.join(", "));
+  }
+
+  const mf = st.manifest_files || {};
+  if (Object.keys(mf).length > 0) {
+    lines.push("\nMANIFESTS:");
+    if (mf.pyproject_toml) {
+      const p = mf.pyproject_toml;
+      lines.push("  pyproject.toml: name=" + (p.name || "?") +
+        " version=" + (p.version || "?") +
+        (p.description ? " desc=" + p.description : ""));
+    }
+    if (mf.requirements_txt && mf.requirements_txt.length > 0) {
+      lines.push("  requirements.txt: " + mf.requirements_txt.slice(0, 10).join(", "));
+    }
+    if (mf.readme_excerpt) {
+      lines.push("  README (excerpt): " + mf.readme_excerpt.slice(0, 300).replace(/\n/g, " "));
+    }
+  }
+
+  const samples = st.ast_samples || [];
+  if (samples.length > 0) {
+    lines.push("\nSOURCE FILES (AST samples):");
+    for (const s of samples.slice(0, 20)) {
+      const syms = (s.top_level_symbols || []).join(", ");
+      lines.push("  " + s.file + " [" + (s.loc || "?") + " LOC]" +
+        (syms ? " — " + syms : ""));
+    }
+  }
+
+  lines.push(
+    "\nAnalyze the source tree above and call the inferred_vision function with your " +
+    "structured analysis of this project's name, domain, goals, constraints, non-goals, " +
+    "source summary, and confidence level."
+  );
+
+  return lines.join("\n");
+}
+
 // ── Provider Definition ───────────────────────────────────────────────────────
 
 module.exports = defineProvider(
@@ -89,10 +142,92 @@ module.exports = defineProvider(
     output_tool:   OUTPUT_TOOL,
     fail_mode:     "FAIL_CLOSED"
   },
-  async function handler({ context }) {
-    // STAGE_11_0_STUB — full Python AST analysis implemented in Stage 11.1.
-    // When implemented: load python.wasm via _getLanguage(), parse source files,
-    // extract symbols, infer vision fields, call LLM for synthesis.
-    throw new Error("STAGE_11_0_STUB: reverseVisionProvider not yet implemented");
+  async function handler({ context, contract, callChat }) {
+    const model      = context.model || process.env.OPENAI_MODEL || "gpt-4o";
+    const sourceTree = context.source_tree;
+    const userPrompt = _buildUserPrompt(context.project_id, sourceTree);
+
+    const messages = [{ role: "user", content: userPrompt }];
+
+    // ── Attempt 1 ────────────────────────────────────────────────────────────
+    let result1;
+    try {
+      result1 = await callChat({ system: SYSTEM_PROMPT, messages, model });
+    } catch (err) {
+      return {
+        status:   "FAILED",
+        output:   null,
+        metadata: { reason: "PROVIDER_CALL_FAILED", detail: err.message, attempt: 1 }
+      };
+    }
+
+    const vision1  = result1.arguments;
+    const issues1  = validateAgainstSchema(vision1, contract.output_tool.parameters, "output");
+    const usage1   = result1.usage || {};
+
+    if (issues1.length === 0) {
+      return {
+        status:   "SUCCESS",
+        output:   vision1,
+        metadata: {
+          model:      result1.model,
+          latency_ms: result1.latency_ms || 0,
+          tokens_in:  usage1.prompt_tokens     || 0,
+          tokens_out: usage1.completion_tokens || 0,
+          attempt:    1
+        }
+      };
+    }
+
+    // ── Retry with validation errors ─────────────────────────────────────────
+    const retryMessages = [
+      ...messages,
+      { role: "assistant", content: JSON.stringify(vision1) },
+      {
+        role:    "user",
+        content: "Your response failed validation with these errors:\n" +
+                 issues1.join("\n") +
+                 "\n\nFix the issues and call the inferred_vision function again."
+      }
+    ];
+
+    let result2;
+    try {
+      result2 = await callChat({ system: SYSTEM_PROMPT, messages: retryMessages, model });
+    } catch (err) {
+      return {
+        status:   "FAILED",
+        output:   null,
+        metadata: { reason: "PROVIDER_RETRY_FAILED", detail: err.message, attempt: 2 }
+      };
+    }
+
+    const vision2 = result2.arguments;
+    const issues2 = validateAgainstSchema(vision2, contract.output_tool.parameters, "output");
+    const usage2  = result2.usage || {};
+
+    if (issues2.length > 0) {
+      return {
+        status:   "FAILED",
+        output:   null,
+        metadata: {
+          reason:  "INVALID_PROVIDER_OUTPUT",
+          detail:  "Two attempts failed validation. Last errors: " + issues2.join("; "),
+          attempt: 2
+        }
+      };
+    }
+
+    return {
+      status:   "SUCCESS",
+      output:   vision2,
+      metadata: {
+        model:      result2.model,
+        latency_ms: (result1.latency_ms || 0) + (result2.latency_ms || 0),
+        tokens_in:  (usage1.prompt_tokens     || 0) + (usage2.prompt_tokens     || 0),
+        tokens_out: (usage1.completion_tokens || 0) + (usage2.completion_tokens || 0),
+        attempt:    2
+      }
+    };
   }
 );

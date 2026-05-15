@@ -1,0 +1,17 @@
+{
+  "id": "S162",
+  "name": "project.analyze_source — Rust-only directory returns UNSUPPORTED_LANGUAGE (§7 language matrix)",
+  "description": "PHASE-11 Stage 11.1 — Deliverable B. Verifies that analyze_source fails with UNSUPPORTED_LANGUAGE when no Python files are found, per INTAKE_CONTRACT §7 (Python only in Stage 11.1).",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS162UnsupportedLanguage",
+  "args": [],
+  "cleanup_project": "test_s162_rust",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "setup_ok",                        "expected": true },
+    { "type": "state_field_equals", "field": "status_is_failed",                "expected": true },
+    { "type": "state_field_equals", "field": "reason_is_unsupported_language",  "expected": true }
+  ]
+}
