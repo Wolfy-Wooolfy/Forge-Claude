@@ -15,6 +15,7 @@ const { defineTool, ok, failed, previewed } = require("./_contract");
 let _pyLangPromise = null;
 let _jsLangPromise = null;
 let _tsLangPromise = null;
+let _goLangPromise = null;
 
 function _getPythonLanguage() {
   if (!_pyLangPromise) {
@@ -55,6 +56,19 @@ function _getTypeScriptLanguage() {
   return _tsLangPromise;
 }
 
+function _getGoLanguage() {
+  if (!_goLangPromise) {
+    _goLangPromise = (async () => {
+      const { Parser, Language } = require("web-tree-sitter");
+      await Parser.init();
+      return Language.load(path.resolve(
+        __dirname, "../../../../artifacts/vendor/tree-sitter-grammars/go.wasm"
+      ));
+    })();
+  }
+  return _goLangPromise;
+}
+
 // ── Language detection ────────────────────────────────────────────────────────
 
 const EXT_MAP = {
@@ -64,10 +78,11 @@ const EXT_MAP = {
   ".mjs": "javascript",
   ".cjs": "javascript",
   ".ts":  "typescript",
-  ".tsx": "typescript"
+  ".tsx": "typescript",
+  ".go":  "go"
 };
 
-const SUPPORTED_LANGUAGES = new Set(["python", "javascript", "typescript"]);
+const SUPPORTED_LANGUAGES = new Set(["python", "javascript", "typescript", "go"]);
 
 const ALWAYS_IGNORE     = new Set([".git", "node_modules", "__pycache__", ".DS_Store"]);
 const ALWAYS_IGNORE_EXT = new Set([".pyc", ".pyo", ".pyd"]);
@@ -76,6 +91,7 @@ const MANIFEST_NAMES = new Set([
   "pyproject.toml", "requirements.txt", "setup.py",
   "package.json", "tsconfig.json",
   "next.config.js", "next.config.mjs", "next.config.ts",
+  "go.mod", "go.sum",
   "README.md", "readme.md"
 ]);
 
@@ -86,6 +102,8 @@ const JS_ENTRY_BASES = new Set([
   "server.js", "server.ts",
   "app.js", "app.ts"
 ]);
+
+const GO_ENTRY_BASES = new Set(["main.go"]);
 
 const MAX_AST_FILES   = 20;
 const MAX_ZIP_ENTRIES = 1000;
@@ -171,6 +189,38 @@ function _parseTsconfig(content) {
     if (co.strict !== undefined) result.strict = co.strict;
     return result;
   } catch (_) { return null; }
+}
+
+function _parseGoMod(content) {
+  const result = { module_path: null, project_name: null, go_version: null, dependencies: [] };
+  let inRequire = false;
+  for (const raw of content.split("\n")) {
+    const line = raw.trim();
+    if (!line || line.startsWith("//")) continue;
+    if (line.startsWith("module ")) {
+      result.module_path = line.slice(7).trim();
+      const parts = result.module_path.split("/");
+      result.project_name = parts[parts.length - 1];
+    } else if (line.startsWith("go ")) {
+      result.go_version = line.slice(3).trim();
+    } else if (line === "require (") {
+      inRequire = true;
+    } else if (inRequire && line === ")") {
+      inRequire = false;
+    } else if (inRequire) {
+      const parts = line.split(/\s+/);
+      if (parts.length >= 2) result.dependencies.push({ name: parts[0], version: parts[1] });
+    } else if (line.startsWith("require ") && !line.includes("(")) {
+      const rest = line.slice(8).trim().split(/\s+/);
+      if (rest.length >= 2) result.dependencies.push({ name: rest[0], version: rest[1] });
+    }
+  }
+  return result;
+}
+
+function _parseGoSum(content) {
+  const lines = content.split("\n").filter(function(l) { return l.trim() && !l.startsWith("//"); });
+  return { entry_count: lines.length };
 }
 
 // ── Symbol extractors ─────────────────────────────────────────────────────────
@@ -280,6 +330,64 @@ function _extractTsSymbols(rootNode) {
     }
   }
   return { classes, functions, imports, types };
+}
+
+function _extractGoSymbols(rootNode) {
+  let pkg = null;
+  const imports = [], functions = [], methods = [], types = [];
+  for (const child of rootNode.children) {
+    switch (child.type) {
+      case "package_clause": {
+        const ident = child.children.find(function(c) {
+          return c.type === "package_identifier" || c.type === "identifier";
+        });
+        if (ident) pkg = ident.text;
+        break;
+      }
+      case "import_declaration": {
+        for (const imp of child.children) {
+          if (imp.type === "import_spec") {
+            const pathNode = imp.childForFieldName("path") ||
+              imp.children.find(function(c) {
+                return c.type === "interpreted_string_literal" || c.type === "raw_string_literal";
+              });
+            if (pathNode) imports.push(pathNode.text.replace(/['"]/g, ""));
+          } else if (imp.type === "import_spec_list") {
+            for (const spec of imp.children) {
+              if (spec.type === "import_spec") {
+                const pathNode = spec.childForFieldName("path") ||
+                  spec.children.find(function(c) {
+                    return c.type === "interpreted_string_literal" || c.type === "raw_string_literal";
+                  });
+                if (pathNode) imports.push(pathNode.text.replace(/['"]/g, ""));
+              }
+            }
+          }
+        }
+        break;
+      }
+      case "function_declaration": {
+        const nm = child.childForFieldName("name");
+        if (nm) functions.push(nm.text);
+        break;
+      }
+      case "method_declaration": {
+        const nm = child.childForFieldName("name");
+        if (nm) methods.push(nm.text);
+        break;
+      }
+      case "type_declaration": {
+        for (const spec of child.children) {
+          if (spec.type === "type_spec") {
+            const nm = spec.childForFieldName("name");
+            if (nm) types.push(nm.text);
+          }
+        }
+        break;
+      }
+    }
+  }
+  return { package: pkg, imports, functions, methods, types };
 }
 
 // ── Framework detection (JS/TS) ───────────────────────────────────────────────
@@ -556,6 +664,10 @@ const analyze_source = defineTool({
             manifests.tsconfig = _parseTsconfig(content);
           } else if (name === "next.config.js" || name === "next.config.mjs" || name === "next.config.ts") {
             manifests.next_config = { file: name, excerpt: content.slice(0, 500) };
+          } else if (name === "go.mod") {
+            manifests.go_mod = _parseGoMod(content);
+          } else if (name === "go.sum") {
+            manifests.go_sum = _parseGoSum(content);
           } else if (name === "README.md" || name === "readme.md") {
             manifests.readme_excerpt = content.slice(0, 500);
           }
@@ -566,6 +678,8 @@ const analyze_source = defineTool({
       if (PY_ENTRY_BASES.has(name)) entryPoints.push(relPath);
       // JS/TS top-level entry points
       if (JS_ENTRY_BASES.has(name) && !relPath.includes("/")) entryPoints.push(relPath);
+      // Go entry points
+      if (GO_ENTRY_BASES.has(name)) entryPoints.push(relPath);
       // Next.js App Router home and legacy pages
       if (/^(?:src\/)?app\/page\.(tsx?|jsx?)$/.test(relPath) ||
           /^(?:src\/)?pages\/index\.(tsx?|jsx?)$/.test(relPath)) {
@@ -602,6 +716,7 @@ const analyze_source = defineTool({
         if (lang === "python")     langInstances.python     = await _getPythonLanguage();
         if (lang === "javascript") langInstances.javascript = await _getJavaScriptLanguage();
         if (lang === "typescript") langInstances.typescript = await _getTypeScriptLanguage();
+        if (lang === "go")         langInstances.go         = await _getGoLanguage();
       } catch (e) {
         return failed("WASM_NOT_FOUND", "failed to load " + lang + " grammar: " + e.message);
       }
@@ -640,6 +755,7 @@ const analyze_source = defineTool({
         if (lang === "python")          symbols = _extractPySymbols(tree.rootNode);
         else if (lang === "javascript") symbols = _extractJsSymbols(tree.rootNode);
         else if (lang === "typescript") symbols = _extractTsSymbols(tree.rootNode);
+        else if (lang === "go")         symbols = _extractGoSymbols(tree.rootNode);
       } catch (_e) { /* best-effort */ }
 
       const topSymbols = [];
@@ -653,6 +769,10 @@ const analyze_source = defineTool({
         topSymbols.push(...symbols.classes.map(n => "class " + n));
         topSymbols.push(...symbols.functions.map(n => "function " + n));
         topSymbols.push(...(symbols.types || []));
+      } else if (lang === "go") {
+        topSymbols.push(...(symbols.functions || []).map(n => "func " + n));
+        topSymbols.push(...(symbols.methods   || []).map(n => "method " + n));
+        topSymbols.push(...(symbols.types     || []).map(n => "type " + n));
       }
 
       astSamples.push({

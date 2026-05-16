@@ -1,0 +1,17 @@
+{
+  "id": "S170",
+  "name": "reverse_vision_role — mock provider + Go CLI source tree → domain='cli_tool'",
+  "description": "PHASE-11 Stage 11.3 — Deliverable E. Verifies that reverse_vision_role returns domain='cli_tool' when source_tree reflects the todo_gocli fixture (go language, go.mod, CLI entry point). Uses mock provider to stay at $0 cost.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS170ReverseVisionGocliMock",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "status_ok",          "expected": true },
+    { "type": "state_field_equals", "field": "has_project_name",   "expected": true },
+    { "type": "state_field_equals", "field": "domain_is_cli_tool", "expected": true },
+    { "type": "state_field_equals", "field": "has_confidence",     "expected": true }
+  ]
+}

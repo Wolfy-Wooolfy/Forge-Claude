@@ -1,0 +1,20 @@
+{
+  "id": "S169",
+  "name": "project.analyze_source — fixture_gocli → go detected + go.mod parsed + AST symbols",
+  "description": "PHASE-11 Stage 11.3 — Deliverable E. Verifies analyze_source on the full Go CLI fixture: detects 'go', parses go.mod (module_path contains 'todo_gocli', go_version='1.21'), and AST symbols include function names from cmd/commands.go.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS169AnalyzeSourceGocli",
+  "args": [],
+  "cleanup_project": "test_s169_gocli",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "intake_ok",              "expected": true },
+    { "type": "state_field_equals", "field": "status_ok",              "expected": true },
+    { "type": "state_field_equals", "field": "has_go",                 "expected": true },
+    { "type": "state_field_equals", "field": "gomod_has_project_name", "expected": true },
+    { "type": "state_field_equals", "field": "gomod_has_go_version",   "expected": true },
+    { "type": "state_field_equals", "field": "has_ast_symbols",        "expected": true }
+  ]
+}
