@@ -372,8 +372,60 @@
   },
   "phase_11": {
     "status": "IN_PROGRESS",
-    "current_stage": "11.1",
+    "current_stage": "11.2",
     "stages": {
+      "11_2": {
+        "status": "CLOSED",
+        "decision_artifact": "artifacts/decisions/DECISION-2026-05-16T13-2-phase-11-stage-11-2-closure.md",
+        "checkpoint_mid": "artifacts/decisions/_phase_11_checkpoints/stage_11_2_mid.md",
+        "closed_at": "2026-05-16T13:20:00.000Z",
+        "cost_actual_usd": 0.00951,
+        "live_demo": {
+          "status": "SUCCESS",
+          "project_id": "stage_11_2_live_demo",
+          "provider": "openai",
+          "model": "gpt-4o",
+          "cost_usd": 0.00951,
+          "duration_s": 2.1,
+          "kill_switch_fired": false,
+          "hard_cap_hit": false,
+          "inferred_vision": {
+            "project_name": "nextjs_tasks_demo",
+            "domain": "web_application",
+            "confidence": "HIGH",
+            "detected_languages": ["javascript", "typescript"],
+            "detected_framework": "next"
+          },
+          "vision_path": "artifacts/projects/stage_11_2_live_demo/vision.md",
+          "vision_locked": false,
+          "domain_check": "PASS — model correctly returned web_application (not web_api)"
+        },
+        "scenarios_added": ["S163", "S164", "S165", "S166", "S167"],
+        "files_created": [
+          "code/src/testing/live/stage_11_2_live_runner.js",
+          "bin/forge-stage-11-2-live-demo.js",
+          "code/src/testing/scenarios/S163_analyze_source_javascript.json",
+          "code/src/testing/scenarios/S164_analyze_source_typescript.json",
+          "code/src/testing/scenarios/S165_analyze_source_nextjs.json",
+          "code/src/testing/scenarios/S166_reverse_vision_nextjs_mock.json",
+          "code/src/testing/scenarios/S167_intake_end_to_end_nextjs_mock.json",
+          "artifacts/test_fixtures/intake/fixture_nextjs/ (9 files)",
+          "artifacts/decisions/_phase_11_checkpoints/stage_11_2_mid.md"
+        ],
+        "files_modified": [
+          "code/src/runtime/tools/intake_tools.js",
+          "code/src/runtime/agents/roles/reverse_vision_role.js",
+          "code/src/runtime/agents/adapters/mock_responses.json",
+          "code/src/testing/helpers/intake_test_helper.js",
+          "docs/10_runtime/18b_ROLE_PROMPTS.md",
+          "docs/10_runtime/20_INTAKE_CONTRACT.md",
+          "artifacts/vendor/tree-sitter-grammars/MANIFEST.json"
+        ],
+        "grammars_vendored": [
+          "javascript.wasm v0.25.0 — 411770 bytes — sha256=5fb488d0cabb4775a594bab85682de5ad6ce83c0d6ac997a9f82dd084d571240",
+          "typescript.wasm v0.23.2 — 1413849 bytes — sha256=778025db5a8be0e70f8ccc3671e486dfeddd048c25d9e8a70c26de2e1bf6f97d"
+        ]
+      },
       "11_1": {
         "status": "CLOSED",
         "decision_artifact": "artifacts/decisions/DECISION-2026-05-16T12-2-phase-11-stage-11-1-closure.md",
@@ -463,9 +515,9 @@
       }
     },
     "total_live_cap_usd": 12,
-    "cost_actuals_usd": 0.00884,
-    "total_live_cap_remaining_usd": 11.99116
+    "cost_actuals_usd": 0.01835,
+    "total_live_cap_remaining_usd": 11.98165
   },
-  "current_task": "PHASE-11-STAGE-11-1-CLOSED",
-  "last_updated": "2026-05-16T12:20:00.000Z"
+  "current_task": "PHASE-11-STAGE-11-2-CLOSED",
+  "last_updated": "2026-05-16T13:20:00.000Z"
 }

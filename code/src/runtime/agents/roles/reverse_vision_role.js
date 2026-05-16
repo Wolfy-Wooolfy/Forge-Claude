@@ -3,7 +3,7 @@
 // Reverse-Vision Role — analyzes SourceTreeAnalysis and infers InferredVision.
 // @see docs/10_runtime/20_INTAKE_CONTRACT.md §4 (InferredVision schema)
 // @see docs/10_runtime/20_INTAKE_CONTRACT.md §5 (Vision Lock Semantics + reverse_vision exemption)
-// @see docs/10_runtime/18b_ROLE_PROMPTS.md (reverse_vision_v1)
+// @see docs/10_runtime/18b_ROLE_PROMPTS.md (reverse_vision_v2)
 
 const { defineRole, roleOk, roleFailed } = require("../_role_contract");
 const { validate }                        = require("../_json_schema_validator");

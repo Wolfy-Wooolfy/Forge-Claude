@@ -227,7 +227,8 @@ This is an **additive convention** — it does not amend the Orchestration Loop 
 | Language | Grammar | Stage | WASM File | Status |
 |---|---|---|---|---|
 | Python | tree-sitter-python v0.25.0 | 11.1 | `python.wasm` | VENDORED — ABI verified |
-| JavaScript / TypeScript | tree-sitter-javascript | 11.2 | `javascript.wasm` | PENDING — Stage 11.2 |
+| JavaScript | tree-sitter-javascript v0.25.0 | 11.2 | `javascript.wasm` | ACTIVE — ABI verified |
+| TypeScript / TSX | tree-sitter-typescript v0.23.2 | 11.2 | `typescript.wasm` | ACTIVE — ABI verified; TSX parses via TS grammar |
 | Go | tree-sitter-go | 11.3 | `go.wasm` | PENDING — Stage 11.3 |
 | Other | — | — | — | **BLOCKED** — returns `UNSUPPORTED_LANGUAGE` |
 
