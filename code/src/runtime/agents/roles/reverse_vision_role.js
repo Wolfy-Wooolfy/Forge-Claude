@@ -121,14 +121,10 @@ module.exports = defineRole({
           prompt:      "",
           project_id,
           provider_id: "reverse_vision",
-          task_input: {
-            schema_version: SCHEMA_VERSION,
-            project_id,
-            source_tree:    input.source_tree,
-            provider,
-            model,
-            scenario_id:    (ctx && ctx.scenario_id) || undefined
-          },
+          task_input: Object.assign(
+            { schema_version: SCHEMA_VERSION, project_id, source_tree: input.source_tree, provider, model },
+            (ctx && ctx.scenario_id) ? { scenario_id: ctx.scenario_id } : {}
+          ),
           context: { role: this.id }
         },
         { root, role_id: this.id }

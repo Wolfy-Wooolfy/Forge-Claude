@@ -372,9 +372,76 @@
   },
   "phase_11": {
     "status": "IN_PROGRESS",
-    "current_stage": "11.3",
-    "stages_complete": ["11.0", "11.1", "11.2", "11.3"],
+    "current_stage": "11.4",
+    "stages_complete": ["11.0", "11.1", "11.2", "11.3", "11.4"],
     "stages": {
+      "11_4": {
+        "status": "CLOSED",
+        "cost_actual_usd": 0.01698,
+        "decision_artifact": "artifacts/decisions/DECISION-2026-05-16T21-0-phase-11-stage-11-4-closure.md",
+        "checkpoint_mid": "artifacts/decisions/_phase_11_checkpoints/stage_11_4_mid.md",
+        "closed_at": "2026-05-16T21:00:00.000Z",
+        "live_demo": {
+          "status": "SUCCESS",
+          "project_id": "stage_11_4_live_demo",
+          "fixture": "fixture_pycli",
+          "provider": "openai",
+          "model": "gpt-4o",
+          "cost_usd": 0.01698,
+          "duration_s": 5.9,
+          "kill_switch_fired": false,
+          "hard_cap_hit": false,
+          "inferred_vision": {
+            "project_name": "todo_cli",
+            "domain": "cli_tool",
+            "confidence": "HIGH",
+            "detected_languages": ["python"]
+          },
+          "loop_id": "0c90059d-beb0-46b5-961b-5a61700468bb",
+          "loop_state_after_halt": "SPEC_WRITER_FORMALIZE",
+          "vision_locked": true,
+          "domain_check": "PASS — model correctly returned cli_tool",
+          "ledger_entries": 2,
+          "stop_triggers_fired": "none"
+        },
+        "scenarios_added": [
+          "S172", "S173", "S174", "S175", "S176", "S177", "S178", "S179", "S180", "S181"
+        ],
+        "files_created": [
+          "code/src/ai_os/intake_conversation_handler.js",
+          "code/src/testing/live/stage_11_4_live_runner.js",
+          "bin/forge-stage-11-4-live-demo.js",
+          "code/src/testing/scenarios/S172_IntakeDirPathTrigger.json",
+          "code/src/testing/scenarios/S173_IntakeZipPathTrigger.json",
+          "code/src/testing/scenarios/S174_ReverseVisionRealPathMock.json",
+          "code/src/testing/scenarios/S175_ApprovalAffirmIntent.json",
+          "code/src/testing/scenarios/S176_ApprovalRejectIntent.json",
+          "code/src/testing/scenarios/S177_ApprovalModifyIntent.json",
+          "code/src/testing/scenarios/S178_StartLoopVisionLockedIntake.json",
+          "code/src/testing/scenarios/S179_ProviderWritesTraceFiles.json",
+          "code/src/testing/scenarios/S180_RoleIdPropagation.json",
+          "code/src/testing/scenarios/S181_FullMockE2E.json",
+          "artifacts/decisions/_phase_11_checkpoints/stage_11_4_mid.md"
+        ],
+        "files_modified": [
+          "code/src/providers/reverseVisionProvider.js",
+          "code/src/runtime/agents/roles/reverse_vision_role.js",
+          "code/src/runtime/tools/orchestration_tools.js",
+          "code/src/runtime/agents/adapters/mock_responses.json",
+          "code/src/testing/helpers/intake_test_helper.js",
+          "docs/10_runtime/20_INTAKE_CONTRACT.md"
+        ],
+        "architectural_cleanup": {
+          "approach": "Approach 1 — mock branch moved to provider level",
+          "build_prompt_in_role": "DELETED — 0 references (grep confirmed)",
+          "role_lines": "174 (was 265, −91 net)",
+          "track_a_violations": 0,
+          "trace_parity": "VERIFIED — defineProvider wrapper writes trace files for both mock and real paths",
+          "bugs_fixed": [
+            "undefined scenario_id passed to role.invoke caused validator rejection — fixed with conditional Object.assign in intake_conversation_handler.js and reverse_vision_role.js"
+          ]
+        }
+      },
       "11_3": {
         "status": "CLOSED",
         "cost_actuals_usd": 0.00863,
@@ -529,7 +596,7 @@
           "intake_test_helper wrong require path for role (../agents vs ../../runtime/agents)",
           "architectural: reverse_vision_role called provider directly, bypassing agent.invoke and agent_budget_rule — fixed with exemption pattern"
         ],
-        "architectural_followup": "reverseVisionProvider.js is now unused reference implementation. Stage 11.4 decision required: Option A (re-wire provider) vs Option B (role-builds-prompt as canonical pattern, delete provider)."
+        "architectural_followup": "RESOLVED in Stage 11.4 — Approach 1 (re-wire provider) implemented. _buildPrompt deleted from role, mock branch at provider level, single unified path."
       },
       "11_0": {
         "status": "CLOSED",
@@ -567,9 +634,10 @@
       }
     },
     "total_live_cap_usd": 12,
-    "cost_actuals_usd": 0.02698,
-    "total_live_cap_remaining_usd": 11.97302
+    "cost_actuals_usd": 0.04396,
+    "total_live_cap_remaining_usd": 11.95604,
+    "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-11-STAGE-11-3-CLOSED",
-  "last_updated": "2026-05-16T15:50:00.000Z"
+  "current_task": "PHASE-11-STAGE-11-4-CLOSED",
+  "last_updated": "2026-05-16T21:00:00.000Z"
 }

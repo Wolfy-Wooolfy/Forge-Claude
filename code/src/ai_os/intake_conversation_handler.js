@@ -181,20 +181,22 @@ async function _startIntake(reg, root, project_id, zip_path, directory_path, opt
   // Step 3: reverse_vision role
   const rvResult = await reg.invoke(
     "role.invoke",
-    {
-      role_id:     "reverse_vision",
-      project_id,
-      provider,
-      model,
-      scenario_id: opts && opts.scenario_id,
-      input: {
-        schema_version: SCHEMA_VERSION,
+    Object.assign(
+      {
+        role_id: "reverse_vision",
         project_id,
-        source_tree:    sourceTree,
         provider,
-        model
-      }
-    },
+        model,
+        input: {
+          schema_version: SCHEMA_VERSION,
+          project_id,
+          source_tree:    sourceTree,
+          provider,
+          model
+        }
+      },
+      (opts && opts.scenario_id) ? { scenario_id: opts.scenario_id } : {}
+    ),
     { root }
   );
   if (!rvResult || rvResult.status !== "SUCCESS") {
