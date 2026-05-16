@@ -377,6 +377,7 @@
     "stages": {
       "11_3": {
         "status": "CLOSED",
+        "cost_actuals_usd": 0.00863,
         "decision_artifact": "artifacts/decisions/DECISION-2026-05-16T15-5-phase-11-stage-11-3-closure.md",
         "checkpoint_mid": "artifacts/decisions/_phase_11_checkpoints/stage_11_3_mid.md",
         "closed_at": "2026-05-16T15:50:00.000Z",
