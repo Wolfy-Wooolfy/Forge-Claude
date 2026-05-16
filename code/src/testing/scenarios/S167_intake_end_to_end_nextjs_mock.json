@@ -1,0 +1,18 @@
+{
+  "id": "S167",
+  "name": "intake end-to-end mock — fixture_nextjs → vision.md with domain='web_application'",
+  "description": "PHASE-11 Stage 11.2 — Deliverable E. Full end-to-end: intake fixture_nextjs → analyze_source → reverse_vision (mock) → fs.write_file vision.md. Asserts vision.md exists, vision_locked=false, domain='web_application'.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS167IntakeEndToEndNextjsMock",
+  "args": [],
+  "cleanup_project": "test_s167_nextjs",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "all_steps_ok",             "expected": true },
+    { "type": "state_field_equals", "field": "vision_file_exists",       "expected": true },
+    { "type": "state_field_equals", "field": "vision_is_unlocked",       "expected": true },
+    { "type": "state_field_equals", "field": "domain_is_web_application","expected": true }
+  ]
+}

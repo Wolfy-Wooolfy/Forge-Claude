@@ -1,0 +1,18 @@
+{
+  "id": "S166",
+  "name": "reverse_vision_role — mock provider + Next.js source tree → domain='web_application'",
+  "description": "PHASE-11 Stage 11.2 — Deliverable E. Verifies that reverse_vision_role returns domain='web_application' when source_tree carries detected_framework='next'. Proves framework awareness propagated from analyze_source through the v2 prompt.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS166ReverseVisionNextjsMock",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "status_ok",                         "expected": true },
+    { "type": "state_field_equals", "field": "has_project_name",                  "expected": true },
+    { "type": "state_field_equals", "field": "domain_is_web_application",         "expected": true },
+    { "type": "state_field_equals", "field": "has_confidence",                    "expected": true },
+    { "type": "state_field_equals", "field": "detected_languages_has_typescript", "expected": true }
+  ]
+}

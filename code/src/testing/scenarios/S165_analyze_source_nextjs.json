@@ -1,0 +1,18 @@
+{
+  "id": "S165",
+  "name": "project.analyze_source — fixture_nextjs → detects 'typescript' + detected_framework='next'",
+  "description": "PHASE-11 Stage 11.2 — Deliverable E. Verifies that analyze_source on the Next.js fixture detects TypeScript and sets detected_framework to 'next' via _detectJsFramework (package.json deps + next.config.mjs presence).",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS165AnalyzeSourceNextjs",
+  "args": [],
+  "cleanup_project": "test_s165_nextjs",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "intake_ok",         "expected": true },
+    { "type": "state_field_equals", "field": "status_ok",         "expected": true },
+    { "type": "state_field_equals", "field": "has_typescript",    "expected": true },
+    { "type": "state_field_equals", "field": "framework_is_next", "expected": true }
+  ]
+}

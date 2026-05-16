@@ -11,7 +11,7 @@ const { loadPrompt }                      = require("../_prompt_loader");
 const { emit: emitActivity }             = require("../_activity_emitter");
 const { getIndicator }                   = require("../_activity_catalog");
 
-const SYSTEM_PROMPT = loadPrompt("reverse_vision_v1");
+const SYSTEM_PROMPT = loadPrompt("reverse_vision_v2");
 
 const SCHEMA_VERSION = "1.0.0";
 
@@ -37,7 +37,8 @@ const INPUT_SCHEMA = {
         manifest_files:        { type: "object" },
         top_level_directories: { type: "array", items: { type: "string" } },
         ast_samples:           { type: "array" },
-        ignored_paths:         { type: "array", items: { type: "string" } }
+        ignored_paths:         { type: "array", items: { type: "string" } },
+        detected_framework:    { type: ["string", "null"] }
       }
     },
     provider: { type: "string" },
@@ -90,6 +91,7 @@ function _buildPrompt(projectId, st, scenarioTag) {
   lines.push("PROJECT: " + projectId);
   lines.push("FILES: " + (st.file_count || 0) + " | SIZE: " + (st.total_size_bytes || 0) + " bytes");
   lines.push("LANGUAGES: " + (st.detected_languages || []).join(", "));
+  if (st.detected_framework) lines.push("FRAMEWORK: " + st.detected_framework);
 
   if (st.entry_points && st.entry_points.length > 0) {
     lines.push("ENTRY POINTS: " + st.entry_points.join(", "));
@@ -112,6 +114,24 @@ function _buildPrompt(projectId, st, scenarioTag) {
     }
     if (mf.readme_excerpt) {
       lines.push("  README (excerpt): " + mf.readme_excerpt.slice(0, 300).replace(/\n/g, " "));
+    }
+    if (mf.package_json) {
+      const p = mf.package_json;
+      lines.push("  package.json: name=" + (p.name || "?") +
+        " version=" + (p.version || "?") +
+        (p.description ? " desc=" + p.description : ""));
+      const deps = Object.keys(p.dependencies || {}).slice(0, 10).join(", ");
+      if (deps) lines.push("    deps: " + deps);
+    }
+    if (mf.tsconfig) {
+      const t = mf.tsconfig;
+      lines.push("  tsconfig.json: target=" + (t.target || "?") +
+        " module=" + (t.module || "?") +
+        (t.jsx ? " jsx=" + t.jsx : "") +
+        (t.strict !== undefined ? " strict=" + t.strict : ""));
+    }
+    if (mf.next_config) {
+      lines.push("  next.config: present (" + (mf.next_config.file || "?") + ")");
     }
   }
 
@@ -137,7 +157,7 @@ module.exports = defineRole({
   description:      "Analyzes an existing codebase SourceTreeAnalysis and infers a structured InferredVision for owner review",
   default_provider: "openai",
   default_model:    "gpt-4o",
-  system_prompt_id: "reverse_vision_v1",
+  system_prompt_id: "reverse_vision_v2",
   input_schema:     INPUT_SCHEMA,
   output_schema:    OUTPUT_SCHEMA,
   authority_level:  "ADVISORY",

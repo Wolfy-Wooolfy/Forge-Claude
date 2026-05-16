@@ -4,7 +4,7 @@
 |---|---|
 | Date | 2026-05-16 |
 | Owner | KhElmasry |
-| Status | OWNER_DECISION_PENDING |
+| Status | OWNER_APPROVED — 2026-05-16 |
 | Scope | PHASE-11 Stage 11.1 — Python Analyzer + reverseVisionProvider + live gpt-4o demo |
 | Related | `artifacts/decisions/_phase_11_checkpoints/stage_11_1_mid.md` |
 
@@ -124,8 +124,23 @@ S162 ✓  project.analyze_source — Rust-only directory returns UNSUPPORTED_LAN
 
 ## §8 Owner Approval
 
-> To close Stage 11.1, the owner (KhElmasry) must review §5 and post approval:
->
-> "STAGE-11-1 APPROVED. GO to Stage 11.2." (or equivalent)
+**Status:** OWNER_APPROVED — 2026-05-16
 
-Until approval, `progress/status.json` remains at Stage 11.1.
+Ratified by owner KhElmasry on 2026-05-16 with phrase:
+
+> "STAGE 11.1 APPROVED. PHASE-11 Stage 11.1 closed."
+
+**Closure verification (CTO advisor, independent):**
+- Live demo cost $0.00884 exact match with cost ledger ✓
+- Duration 2.4s ledger, 2.6s reported (matches within margin) ✓
+- InferredVision: project_name="todo_cli" exact, all 8 required fields present, no hallucinations ✓
+- vision.md UNLOCKED at artifacts/projects/stage_11_1_live_demo/ ✓
+- S81 regression-free (vision-lock applies to non-exempt roles) ✓
+- SU suite 157/0/5 Windows, 148/9/5 env-bound Linux ✓
+- Track A clean across 4 production code files ✓
+
+**Architectural follow-up tracked:** §6 captures the provider-vs-role decision (Option A: re-wire reverseVisionProvider; Option B: adopt role-builds-prompt as canonical, delete provider). Decision required at Stage 11.4 closure.
+
+**Cost trajectory:** PHASE-11 cumulative actuals = $0.00884 / $12.00 cap (0.07% consumed). 5 stages remain.
+
+**Next:** Stage 11.2 — JavaScript/TypeScript analyzer extension. Smaller scope, reuses Stage 11.1 patterns. ≤$1.00 live cap.

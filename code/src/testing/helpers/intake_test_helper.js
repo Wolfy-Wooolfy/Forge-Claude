@@ -283,10 +283,230 @@ async function runS162UnsupportedLanguage() {
   };
 }
 
+// ── S163: analyze_source — .js file → detects "javascript" ───────────────────
+
+async function runS163AnalyzeSourceJs() {
+  const reg     = _makeRegistry("WORKSPACE_WRITE");
+  const project = "test_s163_js";
+  const ctx     = { root: ROOT, project_id: project };
+
+  const jsFilePath = path.join("artifacts", "projects", project, "source", "index.js");
+  const writeRes = await reg.invoke("fs.write_file",
+    { path: jsFilePath, content: '"use strict";\n\nfunction greet(name) {\n  return "Hello, " + name;\n}\n\nmodule.exports = { greet };\n' }, ctx);
+
+  if (!writeRes || writeRes.status !== "SUCCESS") {
+    return { setup_ok: false, status_ok: false, has_javascript: false, file_count_gt_0: false };
+  }
+
+  const result = await reg.invoke("project.analyze_source", { project_id: project }, ctx);
+  const out = result.output || {};
+
+  return {
+    setup_ok:        true,
+    status_ok:       result.status === "SUCCESS",
+    has_javascript:  !!(Array.isArray(out.detected_languages) && out.detected_languages.includes("javascript")),
+    file_count_gt_0: !!(out.file_count > 0)
+  };
+}
+
+// ── S164: analyze_source — .ts file → detects "typescript" ───────────────────
+
+async function runS164AnalyzeSourceTs() {
+  const reg     = _makeRegistry("WORKSPACE_WRITE");
+  const project = "test_s164_ts";
+  const ctx     = { root: ROOT, project_id: project };
+
+  const tsFilePath = path.join("artifacts", "projects", project, "source", "index.ts");
+  const writeRes = await reg.invoke("fs.write_file",
+    { path: tsFilePath, content: "export interface Item {\n  id: number;\n  name: string;\n}\n\nexport function create(name: string): Item {\n  return { id: 1, name };\n}\n" }, ctx);
+
+  if (!writeRes || writeRes.status !== "SUCCESS") {
+    return { setup_ok: false, status_ok: false, has_typescript: false, file_count_gt_0: false };
+  }
+
+  const result = await reg.invoke("project.analyze_source", { project_id: project }, ctx);
+  const out = result.output || {};
+
+  return {
+    setup_ok:        true,
+    status_ok:       result.status === "SUCCESS",
+    has_typescript:  !!(Array.isArray(out.detected_languages) && out.detected_languages.includes("typescript")),
+    file_count_gt_0: !!(out.file_count > 0)
+  };
+}
+
+// ── S165: analyze_source — fixture_nextjs → typescript + framework=next ──────
+
+async function runS165AnalyzeSourceNextjs() {
+  const reg     = _makeRegistry("WORKSPACE_WRITE");
+  const project = "test_s165_nextjs";
+  const ctx     = { root: ROOT, project_id: project };
+
+  const fixturePath = path.resolve(ROOT, "artifacts", "test_fixtures", "intake", "fixture_nextjs");
+
+  const intakeRes = await reg.invoke("project.intake_zip",
+    { project_id: project, directory_path: fixturePath }, ctx);
+
+  if (intakeRes.status !== "SUCCESS") {
+    return { intake_ok: false, status_ok: false, has_typescript: false,
+             framework_is_next: false, file_count_gt_0: false };
+  }
+
+  const analyzeRes = await reg.invoke("project.analyze_source", { project_id: project }, ctx);
+  const out = analyzeRes.output || {};
+
+  return {
+    intake_ok:         true,
+    status_ok:         analyzeRes.status === "SUCCESS",
+    has_typescript:    !!(Array.isArray(out.detected_languages) && out.detected_languages.includes("typescript")),
+    framework_is_next: out.detected_framework === "next",
+    file_count_gt_0:   !!(out.file_count > 0)
+  };
+}
+
+// ── S166: reverse_vision_role — mock + Next.js source_tree → web_application ─
+
+async function runS166ReverseVisionNextjsMock() {
+  const ROLE_PATH = require.resolve("../../runtime/agents/roles/reverse_vision_role");
+  const origRole  = require.cache[ROLE_PATH];
+  delete require.cache[ROLE_PATH];
+
+  let result;
+  try {
+    const role  = require(ROLE_PATH);
+    const input = {
+      schema_version: "1.0.0",
+      project_id:     "test_s166_proj",
+      source_tree: {
+        detected_languages:    ["typescript", "javascript"],
+        file_count:            9,
+        total_size_bytes:      8192,
+        entry_points:          ["app/page.tsx", "app/api/tasks/route.ts"],
+        manifest_files: {
+          package_json: { name: "nextjs_tasks_demo", version: "0.1.0",
+                          dependencies: { next: "14.2.3", react: "18.3.1" } },
+          tsconfig:     { target: "ES2017", module: "esnext", jsx: "preserve", strict: true },
+          next_config:  { file: "next.config.mjs", excerpt: "const nextConfig = {};" }
+        },
+        top_level_directories: ["app", "lib"],
+        ast_samples:           [],
+        ignored_paths:         [],
+        detected_framework:    "next"
+      }
+    };
+    // provider:"mock", model:"mock-rv", scenario_id:"S166" → key mock|mock-rv|scenario:S166
+    result = await role.run(input, { root: ROOT, provider: "mock", model: "mock-rv", scenario_id: "S166" });
+  } finally {
+    if (origRole) require.cache[ROLE_PATH] = origRole; else delete require.cache[ROLE_PATH];
+  }
+
+  const out = result.output || {};
+  return {
+    status_ok:                         result.status === "SUCCESS",
+    has_project_name:                  typeof out.project_name === "string" && out.project_name.length > 0,
+    domain_is_web_application:         out.domain === "web_application",
+    has_confidence:                    ["HIGH", "MEDIUM", "LOW"].includes(out.confidence),
+    detected_languages_has_typescript: Array.isArray(out.detected_languages) &&
+                                       out.detected_languages.includes("typescript")
+  };
+}
+
+// ── S167: end-to-end mock — fixture_nextjs → vision.md (domain=web_application)
+
+async function runS167IntakeEndToEndNextjsMock() {
+  const { serializeFrontmatter } = require("../../ai_os/schemas/visionSchema");
+  const ROLE_PATH = require.resolve("../../runtime/agents/roles/reverse_vision_role");
+  const origRole  = require.cache[ROLE_PATH];
+  delete require.cache[ROLE_PATH];
+
+  const reg     = _makeRegistry("WORKSPACE_WRITE");
+  const project = "test_s167_nextjs";
+  const ctx     = { root: ROOT, project_id: project };
+
+  let visionExists   = false;
+  let visionUnlocked = false;
+  let domainCorrect  = false;
+  let allStepsOk     = false;
+
+  try {
+    const fixturePath = path.resolve(ROOT, "artifacts", "test_fixtures", "intake", "fixture_nextjs");
+
+    const intakeRes = await reg.invoke("project.intake_zip",
+      { project_id: project, directory_path: fixturePath }, ctx);
+    if (intakeRes.status !== "SUCCESS") return { all_steps_ok: false, vision_file_exists: false, vision_is_unlocked: false, domain_is_web_application: false };
+
+    const analyzeRes = await reg.invoke("project.analyze_source", { project_id: project }, ctx);
+    if (analyzeRes.status !== "SUCCESS") return { all_steps_ok: false, vision_file_exists: false, vision_is_unlocked: false, domain_is_web_application: false };
+
+    // provider:"mock", model:"mock-rv", scenario_id:"S167" → key mock|mock-rv|scenario:S167
+    const role = require(ROLE_PATH);
+    const roleInput = {
+      schema_version: "1.0.0",
+      project_id:     project,
+      source_tree:    analyzeRes.output
+    };
+    const roleRes = await role.run(roleInput,
+      { root: ROOT, provider: "mock", model: "mock-rv", scenario_id: "S167" });
+    if (roleRes.status !== "SUCCESS") return { all_steps_ok: false, vision_file_exists: false, vision_is_unlocked: false, domain_is_web_application: false };
+
+    const inferredVision = roleRes.output;
+    const frontmatter = {
+      project_id:         project,
+      project_name:       inferredVision.project_name,
+      domain:             inferredVision.domain,
+      vision_version:     1,
+      vision_locked:      false,
+      vision_locked_at:   null,
+      locked_by_role:     null,
+      amendments_history: [],
+      goals: {
+        primary:   inferredVision.goals.primary,
+        secondary: inferredVision.goals.secondary
+      },
+      constraints: inferredVision.constraints,
+      non_goals:   inferredVision.non_goals
+    };
+    const visionContent = serializeFrontmatter(frontmatter) +
+      "\n\n# Project Vision: " + inferredVision.project_name + "\n" +
+      "\n" + (inferredVision.source_summary || "") + "\n";
+
+    const visionPath = path.join("artifacts", "projects", project, "vision.md");
+    const writeRes = await reg.invoke("fs.write_file",
+      { path: visionPath, content: visionContent }, ctx);
+    if (writeRes.status !== "SUCCESS") return { all_steps_ok: false, vision_file_exists: false, vision_is_unlocked: false, domain_is_web_application: false };
+
+    const abs = path.join(ROOT, visionPath);
+    visionExists = fs.existsSync(abs);
+    if (visionExists) {
+      const { parseFrontmatter } = require("../../ai_os/schemas/visionSchema");
+      const fm = parseFrontmatter(fs.readFileSync(abs, "utf8"));
+      visionUnlocked = !!(fm && fm.vision_locked === false);
+      domainCorrect  = !!(fm && fm.domain === "web_application");
+    }
+
+    allStepsOk = visionExists && visionUnlocked && domainCorrect;
+
+  } finally {
+    if (origRole) require.cache[ROLE_PATH] = origRole; else delete require.cache[ROLE_PATH];
+  }
+
+  return {
+    all_steps_ok:             allStepsOk,
+    vision_file_exists:       visionExists,
+    vision_is_unlocked:       visionUnlocked,
+    domain_is_web_application: domainCorrect
+  };
+}
+
 module.exports = {
   runS158IntakeZip,
   runS159AnalyzeSource,
   runS160ReverseVisionMock,
   runS161EndToEndMock,
-  runS162UnsupportedLanguage
+  runS162UnsupportedLanguage,
+  runS163AnalyzeSourceJs,
+  runS164AnalyzeSourceTs,
+  runS165AnalyzeSourceNextjs,
+  runS166ReverseVisionNextjsMock,
+  runS167IntakeEndToEndNextjsMock
 };

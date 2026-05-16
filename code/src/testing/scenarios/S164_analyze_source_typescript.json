@@ -1,0 +1,17 @@
+{
+  "id": "S164",
+  "name": "project.analyze_source — TypeScript file → detects 'typescript'",
+  "description": "PHASE-11 Stage 11.2 — Deliverable E. Verifies that analyze_source returns 'typescript' in detected_languages when the source directory contains a .ts file.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS164AnalyzeSourceTs",
+  "args": [],
+  "cleanup_project": "test_s164_ts",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "setup_ok",       "expected": true },
+    { "type": "state_field_equals", "field": "status_ok",      "expected": true },
+    { "type": "state_field_equals", "field": "has_typescript", "expected": true }
+  ]
+}

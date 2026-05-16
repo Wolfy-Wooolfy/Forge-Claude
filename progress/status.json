@@ -463,7 +463,8 @@
       }
     },
     "total_live_cap_usd": 12,
-    "cost_actuals_usd": 0.00884
+    "cost_actuals_usd": 0.00884,
+    "total_live_cap_remaining_usd": 11.99116
   },
   "current_task": "PHASE-11-STAGE-11-1-CLOSED",
   "last_updated": "2026-05-16T12:20:00.000Z"
