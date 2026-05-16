@@ -372,8 +372,61 @@
   },
   "phase_11": {
     "status": "IN_PROGRESS",
-    "current_stage": "11.0",
+    "current_stage": "11.1",
     "stages": {
+      "11_1": {
+        "status": "CLOSED",
+        "decision_artifact": "artifacts/decisions/DECISION-2026-05-16T12-2-phase-11-stage-11-1-closure.md",
+        "checkpoint_mid": "artifacts/decisions/_phase_11_checkpoints/stage_11_1_mid.md",
+        "closed_at": "2026-05-16T12:20:00.000Z",
+        "cost_actual_usd": 0.00884,
+        "live_demo": {
+          "status": "SUCCESS",
+          "project_id": "stage_11_1_live_demo",
+          "provider": "openai",
+          "model": "gpt-4o",
+          "cost_usd": 0.00884,
+          "duration_s": 2.6,
+          "kill_switch_fired": false,
+          "hard_cap_hit": false,
+          "inferred_vision": {
+            "project_name": "todo_cli",
+            "domain": "cli_tool",
+            "confidence": "HIGH",
+            "detected_languages": ["python"]
+          },
+          "vision_path": "artifacts/projects/stage_11_1_live_demo/vision.md",
+          "vision_locked": false
+        },
+        "scenarios_added": ["S158", "S159", "S160", "S161", "S162"],
+        "files_created": [
+          "code/src/runtime/tools/intake_tools.js",
+          "code/src/testing/helpers/intake_test_helper.js",
+          "code/src/testing/live/stage_11_1_live_runner.js",
+          "bin/forge-stage-11-1-live-demo.js",
+          "code/src/testing/scenarios/S158_intake_zip.json",
+          "code/src/testing/scenarios/S159_analyze_source.json",
+          "code/src/testing/scenarios/S160_reverse_vision_mock.json",
+          "code/src/testing/scenarios/S161_end_to_end_mock.json",
+          "code/src/testing/scenarios/S162_unsupported_language.json"
+        ],
+        "files_modified": [
+          "code/src/runtime/permission/rules/agent_budget_rule.js",
+          "code/src/runtime/agents/roles/reverse_vision_role.js",
+          "code/src/runtime/agents/adapters/mock_responses.json",
+          "code/src/providers/reverseVisionProvider.js",
+          "code/src/runtime/agents/_activity_catalog.js",
+          "docs/10_runtime/20_INTAKE_CONTRACT.md"
+        ],
+        "bugs_fixed": [
+          "HARD_DENY_SYSTEM_PATH — intake_tools.js now uses relative paths for all fs.* registry calls",
+          "fs.list_dir 'dir' vs 'directory' type string — fixed in _walkDir and top-dirs listing",
+          "reverse_vision_role wrong require path (../../providers vs ../../../providers)",
+          "intake_test_helper wrong require path for role (../agents vs ../../runtime/agents)",
+          "architectural: reverse_vision_role called provider directly, bypassing agent.invoke and agent_budget_rule — fixed with exemption pattern"
+        ],
+        "architectural_followup": "reverseVisionProvider.js is now unused reference implementation. Stage 11.4 decision required: Option A (re-wire provider) vs Option B (role-builds-prompt as canonical pattern, delete provider)."
+      },
       "11_0": {
         "status": "CLOSED",
         "decision_artifact": "artifacts/decisions/DECISION-20260515-1600-phase-11-plan.md",
@@ -410,8 +463,8 @@
       }
     },
     "total_live_cap_usd": 12,
-    "cost_actuals_usd": 0
+    "cost_actuals_usd": 0.00884
   },
-  "current_task": "PHASE-11-STAGE-11-0-CLOSED",
-  "last_updated": "2026-05-15T16:30:00.000Z"
+  "current_task": "PHASE-11-STAGE-11-1-CLOSED",
+  "last_updated": "2026-05-16T12:20:00.000Z"
 }
