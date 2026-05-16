@@ -1,17 +1,18 @@
 "use strict";
 
-// Reverse-Vision Role — analyzes SourceTreeAnalysis and infers InferredVision.
+// Reverse-Vision Role — thin dispatcher to reverseVisionProvider.
 // @see docs/10_runtime/20_INTAKE_CONTRACT.md §4 (InferredVision schema)
 // @see docs/10_runtime/20_INTAKE_CONTRACT.md §5 (Vision Lock Semantics + reverse_vision exemption)
 // @see docs/10_runtime/18b_ROLE_PROMPTS.md (reverse_vision_v2)
+//
+// Both mock and real invocations route through reverseVisionProvider via
+// agent.invoke { provider_id: "reverse_vision" }. The provider handles the
+// mock branch internally (see reverseVisionProvider.js mock branch comment).
 
 const { defineRole, roleOk, roleFailed } = require("../_role_contract");
 const { validate }                        = require("../_json_schema_validator");
-const { loadPrompt }                      = require("../_prompt_loader");
 const { emit: emitActivity }             = require("../_activity_emitter");
 const { getIndicator }                   = require("../_activity_catalog");
-
-const SYSTEM_PROMPT = loadPrompt("reverse_vision_v2");
 
 const SCHEMA_VERSION = "1.0.0";
 
@@ -79,76 +80,6 @@ const OUTPUT_SCHEMA = {
   }
 };
 
-// ── Prompt builder (mock path only — real path routes through reverseVisionProvider) ──────────
-
-function _buildPrompt(projectId, st, scenarioTag) {
-  const lines = [];
-  lines.push("reverse_vision|" + projectId);
-  if (scenarioTag) lines.push(scenarioTag);
-  lines.push(SYSTEM_PROMPT);
-  lines.push("\n---");
-  lines.push("SOURCE TREE:");
-  lines.push("PROJECT: " + projectId);
-  lines.push("FILES: " + (st.file_count || 0) + " | SIZE: " + (st.total_size_bytes || 0) + " bytes");
-  lines.push("LANGUAGES: " + (st.detected_languages || []).join(", "));
-  if (st.detected_framework) lines.push("FRAMEWORK: " + st.detected_framework);
-
-  if (st.entry_points && st.entry_points.length > 0) {
-    lines.push("ENTRY POINTS: " + st.entry_points.join(", "));
-  }
-  if (st.top_level_directories && st.top_level_directories.length > 0) {
-    lines.push("TOP-LEVEL DIRS: " + st.top_level_directories.join(", "));
-  }
-
-  const mf = st.manifest_files || {};
-  if (Object.keys(mf).length > 0) {
-    lines.push("\nMANIFESTS:");
-    if (mf.pyproject_toml) {
-      const p = mf.pyproject_toml;
-      lines.push("  pyproject.toml: name=" + (p.name || "?") +
-        " version=" + (p.version || "?") +
-        (p.description ? " desc=" + p.description : ""));
-    }
-    if (mf.requirements_txt && mf.requirements_txt.length > 0) {
-      lines.push("  requirements.txt: " + mf.requirements_txt.slice(0, 10).join(", "));
-    }
-    if (mf.readme_excerpt) {
-      lines.push("  README (excerpt): " + mf.readme_excerpt.slice(0, 300).replace(/\n/g, " "));
-    }
-    if (mf.package_json) {
-      const p = mf.package_json;
-      lines.push("  package.json: name=" + (p.name || "?") +
-        " version=" + (p.version || "?") +
-        (p.description ? " desc=" + p.description : ""));
-      const deps = Object.keys(p.dependencies || {}).slice(0, 10).join(", ");
-      if (deps) lines.push("    deps: " + deps);
-    }
-    if (mf.tsconfig) {
-      const t = mf.tsconfig;
-      lines.push("  tsconfig.json: target=" + (t.target || "?") +
-        " module=" + (t.module || "?") +
-        (t.jsx ? " jsx=" + t.jsx : "") +
-        (t.strict !== undefined ? " strict=" + t.strict : ""));
-    }
-    if (mf.next_config) {
-      lines.push("  next.config: present (" + (mf.next_config.file || "?") + ")");
-    }
-  }
-
-  const samples = st.ast_samples || [];
-  if (samples.length > 0) {
-    lines.push("\nSOURCE FILES (AST samples):");
-    for (const s of samples.slice(0, 20)) {
-      const syms = (s.top_level_symbols || []).join(", ");
-      lines.push("  " + s.file + " [" + (s.loc || "?") + " LOC]" +
-        (syms ? " — " + syms : ""));
-    }
-  }
-
-  lines.push("\nRESPOND WITH VALID JSON ONLY.");
-  return lines.join("\n");
-}
-
 // ── Role Definition ───────────────────────────────────────────────────────────
 
 module.exports = defineRole({
@@ -174,57 +105,36 @@ module.exports = defineRole({
     const provider      = input.provider || (ctx && ctx.provider) || this.default_provider;
     const model         = input.model    || (ctx && ctx.model)    || this.default_model;
 
-    const scenarioTag = (ctx && ctx.scenario_id)
-      ? "SCENARIO_TAG: " + ctx.scenario_id
-      : null;
-
-    const isMock = (provider === "mock");
-
     try {
       emitActivity({ invocation_id, project_id, role: this.id,
         state: "INVOKING_ADAPTER", indicator: getIndicator(this.id, "INVOKING_ADAPTER") }, { root });
     } catch (_e) { /* best-effort */ }
 
     let agentResult;
-    if (isMock) {
-      // Mock path: flat prompt via adapter (used by test scenarios S160/S161/S166/S167/S170/S171)
-      const prompt = _buildPrompt(project_id, input.source_tree, scenarioTag);
-      try {
-        const reg = require("../../tools/_registry").getDefaultRegistry();
-        agentResult = await reg.invoke(
-          "agent.invoke",
-          { provider, model, prompt, project_id, context: { role: this.id } },
-          { root, role_id: this.id }
-        );
-      } catch (err) {
-        return roleFailed("AGENT_INVOKE_ERROR", err.message, ctx);
-      }
-    } else {
-      // Real path: route through reverseVisionProvider (function calling, v2 prompt)
-      try {
-        const reg = require("../../tools/_registry").getDefaultRegistry();
-        agentResult = await reg.invoke(
-          "agent.invoke",
-          {
+    try {
+      const reg = require("../../tools/_registry").getDefaultRegistry();
+      agentResult = await reg.invoke(
+        "agent.invoke",
+        {
+          provider,
+          model,
+          prompt:      "",
+          project_id,
+          provider_id: "reverse_vision",
+          task_input: {
+            schema_version: SCHEMA_VERSION,
+            project_id,
+            source_tree:    input.source_tree,
             provider,
             model,
-            prompt:      "",
-            project_id,
-            provider_id: "reverse_vision",
-            task_input: {
-              schema_version: SCHEMA_VERSION,
-              project_id,
-              source_tree:    input.source_tree,
-              provider,
-              model
-            },
-            context: { role: this.id }
+            scenario_id:    (ctx && ctx.scenario_id) || undefined
           },
-          { root, role_id: this.id }
-        );
-      } catch (err) {
-        return roleFailed("AGENT_INVOKE_ERROR", err.message, ctx);
-      }
+          context: { role: this.id }
+        },
+        { root, role_id: this.id }
+      );
+    } catch (err) {
+      return roleFailed("AGENT_INVOKE_ERROR", err.message, ctx);
     }
 
     if (!agentResult || agentResult.status !== "SUCCESS") {

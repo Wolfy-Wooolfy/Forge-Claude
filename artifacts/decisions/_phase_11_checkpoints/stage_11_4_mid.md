@@ -46,13 +46,49 @@
 
 ---
 
-## Scenario Suite Result
+## Scenario Suite Result (initial — post-G)
 
 ```
 ALL PASS — 176 passed, 0 failed, 5 skipped (181 total)
 ```
 
 5 skips are docker-unavailable scenarios (S58, S62, S65, S67, S68) — unchanged from prior stages.
+
+---
+
+## Architectural Cleanup (Pre-Live-Demo Patch)
+
+**Approach:** Approach 1 — mock branch moved to provider level; role reduced to single path.
+
+### Files Changed
+
+| File | Delta | Change |
+|---|---|---|
+| `code/src/providers/reverseVisionProvider.js` | +50 | Added `path` require, `_MOCK_RESPONSES_PATH` constant, `scenario_id` to INPUT_SCHEMA, canonical mock branch (~33 lines) with 12-line comment block |
+| `code/src/runtime/agents/roles/reverse_vision_role.js` | −110 | Removed `loadPrompt`, `SYSTEM_PROMPT`, `_buildPrompt()` (~70 lines), `isMock`/`scenarioTag` dual-path; single `run()` path passing `scenario_id` to provider |
+| `code/src/testing/helpers/intake_test_helper.js` | −35 | `runS179ProviderWritesTraceFiles` simplified: removed require.cache manipulation; now calls `provider.executeTask` directly with `context.provider = "mock"` |
+| `code/src/runtime/agents/adapters/mock_responses.json` | +1 | Added `"mock|mock-rv|scenario:S179"` entry for simplified S179 runner |
+
+Net role line count: ~155 lines (was ~265). `_buildPrompt` — **0 references** remain in reverse_vision_role.js.
+
+### Post-Cleanup Regression Result
+
+```
+ALL PASS — 176 passed, 0 failed, 5 skipped (181 total)
+```
+
+Critical regression scenarios confirmed PASS: S160, S161, S166, S167, S170, S171 (mock-mode reverse_vision e2e), S179 (provider writes trace files), S180 (role_id propagation), S181 (full mock e2e), S81 (vision-lock for non-exempt roles).
+
+### Track A Grep (0 violations)
+
+Grep for `fs\.writeFileSync|fs\.unlinkSync|fs\.rmSync|new OpenAI\(\)` across all 3 modified production files:
+- `reverseVisionProvider.js` — 0 matches
+- `reverse_vision_role.js` — 0 matches
+- `intake_test_helper.js` — 0 matches (line 6 is a comment, not code)
+
+### `_buildPrompt` Verification
+
+`grep -n "_buildPrompt" code/src/runtime/agents/roles/reverse_vision_role.js` → **0 matches**
 
 ---
 
@@ -65,6 +101,8 @@ ALL PASS — 176 passed, 0 failed, 5 skipped (181 total)
 - ✓ Direct fs reads for state load (reads do not require L2 tool per §10)
 - ✓ agent_budget_rule exemption: `ctx.role_id === "reverse_vision"` skips vision-lock check (S180 verifies)
 - ✓ Loop starts at ARCHITECT_DESIGN when owner_intent_source=vision_locked_intake (S178 verifies)
+- ✓ Mock branch at provider level (Approach 1): `context.provider === "mock"` in reverseVisionProvider handler; role has no mock knowledge
+- ✓ `require(_MOCK_RESPONSES_PATH)` — Node module cache, NOT fs.readFileSync (Track A compliant)
 
 ---
 

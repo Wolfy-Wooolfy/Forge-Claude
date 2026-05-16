@@ -961,86 +961,39 @@ async function runS178LoopStartsAtArchitectDesign() {
 }
 
 // ── S179: reverseVisionProvider.executeTask writes LLM trace files ─────────────
+// Uses the mock branch (context.provider === "mock") — no cache manipulation needed.
+// providerContract.executeTask writes trace files for both mock and real paths.
 
 async function runS179ProviderWritesTraceFiles() {
-  const ADAPTER_PATH  = require.resolve("../../providers/_contract/openAiAdapter");
-  const CONTRACT_PATH = require.resolve("../../providers/_contract/providerContract");
-  const PROVIDER_PATH = require.resolve("../../providers/reverseVisionProvider");
+  const provider = require("../../providers/reverseVisionProvider");
+  const task_id  = "test_s179_" + Date.now();
 
-  const origAdapter  = require.cache[ADAPTER_PATH];
-  const origContract = require.cache[CONTRACT_PATH];
-  const origProvider = require.cache[PROVIDER_PATH];
-
-  const MOCK_IV = {
-    project_name:       "todo_gocli",
-    domain:             "cli_tool",
-    goals: { primary: "Minimal Go CLI TODO manager", secondary: [] },
-    constraints:        ["Go 1.21+"],
-    non_goals:          ["No UI"],
-    detected_languages: ["go"],
-    source_summary:     "Mock trace test.",
-    confidence:         "HIGH"
-  };
-
-  // Inject mock openAiAdapter so providerContract gets our callChatWithTool
-  require.cache[ADAPTER_PATH] = {
-    id: ADAPTER_PATH, filename: ADAPTER_PATH, loaded: true,
-    exports: {
-      callChatWithTool: async () => ({
-        arguments:  MOCK_IV,
-        raw:        {},
-        usage:      { prompt_tokens: 10, completion_tokens: 20, total_tokens: 30 },
-        model:      "gpt-4o",
-        latency_ms: 50
-      })
+  await provider.executeTask({
+    task_id,
+    project_id: "test_s179_proj",
+    context: {
+      schema_version: "1.0.0",
+      project_id:     "test_s179_proj",
+      source_tree: {
+        detected_languages:    ["go"],
+        file_count:             5,
+        total_size_bytes:       4096,
+        entry_points:           ["main.go"],
+        manifest_files:         {},
+        top_level_directories:  ["cmd"],
+        ast_samples:            [],
+        ignored_paths:          []
+      },
+      provider:    "mock",
+      model:       "mock-rv",
+      scenario_id: "S179"
     }
-  };
-
-  delete require.cache[CONTRACT_PATH];
-  delete require.cache[PROVIDER_PATH];
-
-  const task_id = "test_s179_" + Date.now();
-  let metaExists = false, reqExists = false, respExists = false;
-
-  try {
-    const provider = require(PROVIDER_PATH);
-    await provider.executeTask({
-      task_id,
-      project_id: "test_s179_proj",
-      context: {
-        schema_version: "1.0.0",
-        project_id:     "test_s179_proj",
-        source_tree: {
-          detected_languages: ["go"],
-          file_count:          5,
-          total_size_bytes:    4096,
-          entry_points:        ["main.go"],
-          manifest_files:      {},
-          top_level_directories: ["cmd"],
-          ast_samples:         [],
-          ignored_paths:       []
-        },
-        provider: "openai",
-        model:    "gpt-4o"
-      }
-    });
-
-    metaExists = fs.existsSync(path.join(ROOT, "artifacts", "llm", "metadata", task_id + ".json"));
-    reqExists  = fs.existsSync(path.join(ROOT, "artifacts", "llm", "requests",  task_id + ".json"));
-    respExists = fs.existsSync(path.join(ROOT, "artifacts", "llm", "responses", task_id + ".json"));
-  } finally {
-    if (origAdapter)  require.cache[ADAPTER_PATH]  = origAdapter;
-    else              delete require.cache[ADAPTER_PATH];
-    if (origContract) require.cache[CONTRACT_PATH] = origContract;
-    else              delete require.cache[CONTRACT_PATH];
-    if (origProvider) require.cache[PROVIDER_PATH] = origProvider;
-    else              delete require.cache[PROVIDER_PATH];
-  }
+  });
 
   return {
-    metadata_file_written:  metaExists,
-    requests_file_written:  reqExists,
-    responses_file_written: respExists
+    metadata_file_written:  fs.existsSync(path.join(ROOT, "artifacts", "llm", "metadata",  task_id + ".json")),
+    requests_file_written:  fs.existsSync(path.join(ROOT, "artifacts", "llm", "requests",   task_id + ".json")),
+    responses_file_written: fs.existsSync(path.join(ROOT, "artifacts", "llm", "responses",  task_id + ".json"))
   };
 }
 

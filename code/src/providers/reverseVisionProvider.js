@@ -3,12 +3,18 @@
 // Reverse-vision provider — analyzes SourceTreeAnalysis and infers a vision.md structure.
 // @see docs/10_runtime/20_INTAKE_CONTRACT.md §4 (InferredVision schema)
 // @see docs/10_runtime/20_INTAKE_CONTRACT.md §5 (Vision Lock Semantics — auto-lock PROHIBITED)
+// @see docs/10_runtime/20_INTAKE_CONTRACT.md §10 (intake_conversation_handler integration)
 //
-// NOTE: reverse_vision_role now calls agent.invoke directly (openai adapter, prompt-based JSON).
-// This provider is retained as a reference implementation and may be wired in Stage 11.4.
+// This is the canonical LLM caller for reverse_vision. reverse_vision_role dispatches here
+// for both mock and real invocations via agent.invoke { provider_id: "reverse_vision" }.
+
+const path = require("path");
 
 const { defineProvider, validateAgainstSchema } = require("./_contract/providerContract");
 const { loadPrompt }                             = require("../runtime/agents/_prompt_loader");
+
+// Resolved at module load time — avoids repeated path computation in the mock branch.
+const _MOCK_RESPONSES_PATH = path.join(__dirname, "../runtime/agents/adapters/mock_responses.json");
 
 const SYSTEM_PROMPT = loadPrompt("reverse_vision_v2");
 
@@ -38,8 +44,9 @@ const INPUT_SCHEMA = {
         detected_framework:     { type: ["string", "null"] }
       }
     },
-    provider: { type: "string" },
-    model:    { type: "string" }
+    provider:    { type: "string" },
+    model:       { type: "string" },
+    scenario_id: { type: "string" }
   }
 };
 
@@ -171,6 +178,56 @@ const _provider = defineProvider(
     fail_mode:     "FAIL_CLOSED"
   },
   async function handler({ context, contract, callChat }) {
+
+    // ── Mock branch for function-calling providers ───────────────────────────
+    //
+    // Function-calling providers cannot use the flat-prompt + SCENARIO_TAG
+    // mock-adapter pattern used by non-function-calling roles, because the
+    // adapter would need to fabricate a properly-shaped tool_call response.
+    //
+    // Pattern: when context.provider === "mock", read the scenario response
+    // from mock_responses.json keyed by scenario_id and return it directly.
+    // Trace files are still written for parity with the real path.
+    //
+    // This pattern is canonical for any future provider that uses
+    // function-calling (per Provider Contract v2).
+    // ─────────────────────────────────────────────────────────────────────────
+    if (context.provider === "mock") {
+      const scenarioId = context.scenario_id || "";
+      const mockKey    = "mock|" + (context.model || "mock-rv") + "|scenario:" + scenarioId;
+      const mockResponses = require(_MOCK_RESPONSES_PATH);
+      const entry = mockResponses[mockKey];
+      if (!entry) {
+        return {
+          status:   "FAILED",
+          output:   null,
+          metadata: { reason: "MOCK_NOT_FOUND", detail: "no mock response for key: " + mockKey, attempt: 1 }
+        };
+      }
+      let mockOutput;
+      try {
+        mockOutput = JSON.parse(entry.text);
+      } catch (e) {
+        return {
+          status:   "FAILED",
+          output:   null,
+          metadata: { reason: "MOCK_PARSE_FAILED", detail: e.message, attempt: 1 }
+        };
+      }
+      return {
+        status:   "SUCCESS",
+        output:   mockOutput,
+        metadata: {
+          model:      context.model || "mock-rv",
+          latency_ms: 0,
+          tokens_in:  entry.tokens_in  || 10,
+          tokens_out: entry.tokens_out || 20,
+          attempt:    1
+        }
+      };
+    }
+
+    // ── Real path (function-calling via openAiAdapter) ────────────────────────
     const model      = context.model || process.env.OPENAI_MODEL || "gpt-4o";
     const sourceTree = context.source_tree;
     const userPrompt = _buildUserPrompt(context.project_id, sourceTree);
