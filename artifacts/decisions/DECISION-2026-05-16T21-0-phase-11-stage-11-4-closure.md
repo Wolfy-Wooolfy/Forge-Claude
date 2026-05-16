@@ -4,7 +4,7 @@
 |---|---|
 | Date | 2026-05-16 |
 | Owner | KhElmasry |
-| Status | OWNER_DECISION_PENDING |
+| Status | OWNER_APPROVED — 2026-05-16 |
 | Scope | PHASE-11 Stage 11.4 — Intake UX + Orchestration Integration + Architectural Cleanup |
 | Related | `artifacts/decisions/_phase_11_checkpoints/stage_11_4_mid.md` |
 
@@ -207,6 +207,29 @@ Provider-vs-role follow-up from Stages 11.1/11.2/11.3 closure §6 is **RESOLVED*
 
 ## §10 Owner Approval
 
-> To close Stage 11.4, the owner (KhElmasry) must review §5 and post approval.
->
-> **Stage 11.4 CLOSED. Status: OWNER_DECISION_PENDING.**
+**Status:** OWNER_APPROVED — 2026-05-16
+
+Ratified by owner KhElmasry on 2026-05-16 with phrase:
+
+> "STAGE-11-4 APPROVED."
+
+**Closure verification (CTO advisor, independent):**
+- Cost ledger exact match: $0.01698 across 2 LLM calls (reverse_vision $0.00915 + architect $0.00782) ✓
+- Activity log corroborates orchestration chain: vision lock between the two calls, 4-second gap, both COMPLETED success ✓
+- Loop advanced past ARCHITECT_DESIGN to SPEC_WRITER_FORMALIZE; halt mechanism activated as designed ✓
+- LLM trace files written for reverse_vision (Provider Contract v2 §6 compliance verified empirically) ✓
+- Two-line fix verified minimal (conditional Object.assign for scenario_id propagation) ✓
+- SU 176/0/5 Windows, S81 + 6 mock e2e scenarios regression-free ✓
+- architectural_followup field: RESOLVED (Stages 11.1/11.2/11.3 closure §6 debts are now historical) ✓
+
+**Two observations recorded for future phases:**
+1. 12 legacy roles still use bypass pattern (not v2-compliant) — PHASE-12 migration backlog
+2. Trace metadata usage field shows zeros even for real token calls (cost ledger unaffected) — PHASE-12 polish item
+
+Both pre-existing, not Stage 11.4 regressions.
+
+**Cost trajectory:** PHASE-11 cumulative = $0.04396 / $12.00 cap (0.37% consumed across 4 of 5 stages). Stage 11.5 has $11.96 remaining budget for the multi-fixture comprehensive demo.
+
+**Architectural milestone:** Stage 11.4 fully resolves the provider-vs-role debt from Stage 11.1. First multi-step live demo in PHASE-11 (intake → vision → approval → lock → orchestration auto-start → architect) executed cleanly with one minor live-path bug caught and fixed before final demo.
+
+**Next:** Stage 11.5 — Final PHASE-11 stage. Comprehensive multi-fixture validation. All 4 fixtures (pycli, nextjs, gocli, + one combined/realistic scenario) run through the full intake flow. ≤$5.00 live cap. Expected actual: ~$0.07–0.15 (4 fixtures × $0.02 each).
