@@ -1,0 +1,17 @@
+{
+  "id": "S181",
+  "name": "full mock e2e: directory_path → intake → mock RV role → mock approve → lock vision → loop=ARCHITECT_DESIGN",
+  "description": "Stage 11.4 — full intake pipeline: directory trigger → mock reverse_vision → mock AFFIRM approval → vision locked → orchestration loop at ARCHITECT_DESIGN.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS181FullMockE2E",
+  "args": [],
+  "cleanup_project": "test_s181_proj",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "stage_is_approved",        "expected": true },
+    { "type": "state_field_equals", "field": "vision_is_locked",         "expected": true },
+    { "type": "state_field_equals", "field": "loop_at_architect_design", "expected": true }
+  ]
+}

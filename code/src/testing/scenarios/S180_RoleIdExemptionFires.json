@@ -1,0 +1,16 @@
+{
+  "id": "S180",
+  "name": "agent_budget_rule: role_id=reverse_vision skips vision-lock check; other role_id gets DENIED",
+  "description": "Stage 11.4 — agent_budget_rule exempts reverse_vision role from vision-lock check (INTAKE_CONTRACT §5); architect role is denied for unlocked vision.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS180RoleIdExemptionFires",
+  "args": [],
+  "cleanup_project": "test_s180_proj",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "reverse_vision_not_denied", "expected": true },
+    { "type": "state_field_equals", "field": "other_role_denied",         "expected": true }
+  ]
+}

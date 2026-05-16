@@ -190,5 +190,23 @@
     "tokens_in": 150,
     "tokens_out": 160,
     "finish_reason": "stop"
+  },
+  "mock|mock-rv|scenario:S172": {
+    "text": "{\"project_name\":\"todo_gocli\",\"domain\":\"cli_tool\",\"goals\":{\"primary\":\"Provide a minimal command-line TODO list manager written in Go\",\"secondary\":[\"Persist items to a local JSON file\",\"Support add/list/complete/delete operations\"]},\"constraints\":[\"Standard library only\",\"Go 1.21+\"],\"non_goals\":[\"No web UI\",\"No multi-user support\",\"No cloud sync\"],\"detected_languages\":[\"go\"],\"source_summary\":\"A minimal Go CLI TODO manager. Entry point main.go; cmd/ for commands; storage/ for JSON persistence.\",\"confidence\":\"HIGH\"}",
+    "tokens_in": 150,
+    "tokens_out": 160,
+    "finish_reason": "stop"
+  },
+  "mock|mock-rv|scenario:S174": {
+    "text": "{\"project_name\":\"todo_gocli\",\"domain\":\"cli_tool\",\"goals\":{\"primary\":\"Provide a minimal command-line TODO list manager written in Go\",\"secondary\":[\"Persist items to a local JSON file\",\"Support add/list/complete/delete operations\"]},\"constraints\":[\"Standard library only\",\"Go 1.21+\"],\"non_goals\":[\"No web UI\",\"No multi-user support\",\"No cloud sync\"],\"detected_languages\":[\"go\"],\"source_summary\":\"A minimal Go CLI TODO manager. Entry point main.go; cmd/ for commands; storage/ for JSON persistence.\",\"confidence\":\"HIGH\"}",
+    "tokens_in": 150,
+    "tokens_out": 160,
+    "finish_reason": "stop"
+  },
+  "mock|mock-rv|scenario:S181": {
+    "text": "{\"project_name\":\"todo_gocli\",\"domain\":\"cli_tool\",\"goals\":{\"primary\":\"Provide a minimal command-line TODO list manager written in Go\",\"secondary\":[\"Persist items to a local JSON file\",\"Support add/list/complete/delete operations\"]},\"constraints\":[\"Standard library only\",\"Go 1.21+\"],\"non_goals\":[\"No web UI\",\"No multi-user support\",\"No cloud sync\"],\"detected_languages\":[\"go\"],\"source_summary\":\"A minimal Go CLI TODO manager. Entry point main.go; cmd/ for commands; storage/ for JSON persistence.\",\"confidence\":\"HIGH\"}",
+    "tokens_in": 150,
+    "tokens_out": 160,
+    "finish_reason": "stop"
   }
 }

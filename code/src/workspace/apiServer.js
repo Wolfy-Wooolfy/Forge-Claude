@@ -12,6 +12,8 @@ const { createProjectReviewEngine } = require("../ai_os/projectReviewEngine");
 const { createDeliveryPackageBuilder } = require("../ai_os/deliveryPackageBuilder");
 const { createIdeationEngine } = require("../ai_os/ideationEngine");
 const { createConversationEngine } = require("../ai_os/conversationEngine");
+const { processIntakeRequest,
+        hasActiveIntakeSession }    = require("../ai_os/intake_conversation_handler");
 const { createConversationMemoryManager } = require("../ai_os/conversationMemoryManager");
 const { createDocumentationBuildLoop } = require("../ai_os/documentationBuildLoop");
 const { runVisionComplianceGate } = require("../modules/visionComplianceGate");
@@ -1654,6 +1656,12 @@ function createWorkspaceApiServer(options = {}) {
 
       if (req.method === "POST" && pathname === "/api/ai-os/chat") {
         const body = await readBody(req);
+        // Structural attachment signal → intake handler (no keyword matching on user text)
+        if (body.zip_path || body.directory_path ||
+            (body.project_id && hasActiveIntakeSession(body.project_id))) {
+          sendJson(res, 200, await processIntakeRequest(body));
+          return;
+        }
         sendJson(res, 200, await conversationEngine.processMessage(body));
         return;
       }

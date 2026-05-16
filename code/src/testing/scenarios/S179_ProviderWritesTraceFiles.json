@@ -1,0 +1,16 @@
+{
+  "id": "S179",
+  "name": "reverseVisionProvider writes LLM trace files (metadata/requests/responses) per providerTrace",
+  "description": "Stage 11.4 — reverseVisionProvider.executeTask writes artifacts/llm/metadata, requests, responses files via providerTrace.record().",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS179ProviderWritesTraceFiles",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "metadata_file_written",  "expected": true },
+    { "type": "state_field_equals", "field": "requests_file_written",  "expected": true },
+    { "type": "state_field_equals", "field": "responses_file_written", "expected": true }
+  ]
+}

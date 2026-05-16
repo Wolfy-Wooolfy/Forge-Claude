@@ -1,6 +1,6 @@
 {
   "active_project_id": "test_apiserver_s28",
-  "updated_at": "2026-05-16T15:46:38.290Z",
+  "updated_at": "2026-05-16T17:47:57.077Z",
   "projects": [
     {
       "project_id": "default_project",
@@ -12,7 +12,7 @@
         "EXECUTION_PACKAGE_PENDING_FORGE"
       ],
       "active_project_flag": false,
-      "last_updated_at": "2026-05-16T15:46:38.289Z"
+      "last_updated_at": "2026-05-16T17:47:57.076Z"
     },
     {
       "project_id": "hr",
@@ -22,7 +22,7 @@
       "active_runtime_state": "IDEATION",
       "pending_decisions": [],
       "active_project_flag": false,
-      "last_updated_at": "2026-05-16T15:46:38.290Z"
+      "last_updated_at": "2026-05-16T17:47:57.077Z"
     },
     {
       "project_id": "live_smoke",
@@ -32,7 +32,7 @@
       "active_runtime_state": "DISCUSSION",
       "pending_decisions": [],
       "active_project_flag": false,
-      "last_updated_at": "2026-05-16T15:46:38.290Z"
+      "last_updated_at": "2026-05-16T17:47:57.078Z"
     },
     {
       "project_id": "live_smoke_retry",
@@ -42,7 +42,7 @@
       "active_runtime_state": "DISCUSSION",
       "pending_decisions": [],
       "active_project_flag": false,
-      "last_updated_at": "2026-05-16T15:46:38.290Z"
+      "last_updated_at": "2026-05-16T17:47:57.078Z"
     },
     {
       "project_id": "stage_11_1_live_demo",
@@ -52,7 +52,7 @@
       "active_runtime_state": "DISCUSSION",
       "pending_decisions": [],
       "active_project_flag": false,
-      "last_updated_at": "2026-05-16T15:46:38.291Z"
+      "last_updated_at": "2026-05-16T17:47:57.078Z"
     },
     {
       "project_id": "stage_11_2_live_demo",
@@ -62,7 +62,17 @@
       "active_runtime_state": "DISCUSSION",
       "pending_decisions": [],
       "active_project_flag": false,
-      "last_updated_at": "2026-05-16T15:46:38.291Z"
+      "last_updated_at": "2026-05-16T17:47:57.078Z"
+    },
+    {
+      "project_id": "stage_11_3_live_demo",
+      "project_name": "stage_11_3_live_demo",
+      "project_status": "ACTIVE",
+      "current_phase": "DISCOVERY",
+      "active_runtime_state": "DISCUSSION",
+      "pending_decisions": [],
+      "active_project_flag": false,
+      "last_updated_at": "2026-05-16T17:47:57.078Z"
     },
     {
       "project_id": "test_pip_debug",
@@ -72,7 +82,7 @@
       "active_runtime_state": "DISCUSSION",
       "pending_decisions": [],
       "active_project_flag": false,
-      "last_updated_at": "2026-05-16T15:46:38.291Z"
+      "last_updated_at": "2026-05-16T17:47:57.079Z"
     },
     {
       "project_id": "test_pip_debug2",
@@ -82,7 +92,7 @@
       "active_runtime_state": "DISCUSSION",
       "pending_decisions": [],
       "active_project_flag": false,
-      "last_updated_at": "2026-05-16T15:46:38.291Z"
+      "last_updated_at": "2026-05-16T17:47:57.079Z"
     },
     {
       "project_id": "test_pkg_s48_debug",
@@ -92,7 +102,7 @@
       "active_runtime_state": "DISCUSSION",
       "pending_decisions": [],
       "active_project_flag": false,
-      "last_updated_at": "2026-05-16T15:46:38.291Z"
+      "last_updated_at": "2026-05-16T17:47:57.079Z"
     },
     {
       "project_id": "test_pkg_s57_debug",
@@ -102,7 +112,7 @@
       "active_runtime_state": "DISCUSSION",
       "pending_decisions": [],
       "active_project_flag": false,
-      "last_updated_at": "2026-05-16T15:46:38.291Z"
+      "last_updated_at": "2026-05-16T17:47:57.079Z"
     },
     {
       "project_id": "test_s134",
@@ -112,7 +122,7 @@
       "active_runtime_state": "DISCUSSION",
       "pending_decisions": [],
       "active_project_flag": false,
-      "last_updated_at": "2026-05-16T15:46:38.292Z"
+      "last_updated_at": "2026-05-16T17:47:57.079Z"
     },
     {
       "project_id": "_reference_todo_api",
@@ -122,7 +132,7 @@
       "active_runtime_state": "DISCUSSION",
       "pending_decisions": [],
       "active_project_flag": false,
-      "last_updated_at": "2026-05-16T15:46:38.292Z"
+      "last_updated_at": "2026-05-16T17:47:57.080Z"
     },
     {
       "project_id": "_s150_abort_test",
@@ -132,7 +142,7 @@
       "active_runtime_state": "DISCUSSION",
       "pending_decisions": [],
       "active_project_flag": false,
-      "last_updated_at": "2026-05-16T15:46:38.292Z"
+      "last_updated_at": "2026-05-16T17:47:57.080Z"
     }
   ]
 }

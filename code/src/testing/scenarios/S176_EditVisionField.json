@@ -1,0 +1,16 @@
+{
+  "id": "S176",
+  "name": "intake edit — MODIFY intent + regex → non_goals updated, state remains AWAIT_VISION_APPROVAL",
+  "description": "Stage 11.4 — MODIFY intent triggers edit regex; non_goals field updated in intake_state.json; stage stays AWAIT_VISION_APPROVAL.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS176EditVisionField",
+  "args": [],
+  "cleanup_project": "test_s176_proj",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "stage_still_awaiting", "expected": true },
+    { "type": "state_field_equals", "field": "non_goals_updated",    "expected": true }
+  ]
+}

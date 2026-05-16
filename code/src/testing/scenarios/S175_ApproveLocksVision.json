@@ -1,0 +1,17 @@
+{
+  "id": "S175",
+  "name": "intake approve — AFFIRM intent → vision_locked=true + state=APPROVED + loop at ARCHITECT_DESIGN",
+  "description": "Stage 11.4 — AFFIRM intent from owner locks vision, saves APPROVED state, starts loop at ARCHITECT_DESIGN.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS175ApproveLocksVision",
+  "args": [],
+  "cleanup_project": "test_s175_proj",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "stage_is_approved",        "expected": true },
+    { "type": "state_field_equals", "field": "vision_is_locked",         "expected": true },
+    { "type": "state_field_equals", "field": "loop_at_architect_design", "expected": true }
+  ]
+}

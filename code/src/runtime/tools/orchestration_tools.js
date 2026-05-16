@@ -24,8 +24,9 @@ const start_loop = defineTool({
   input_schema: {
     type: "object",
     properties: {
-      project_id: { type: "string", description: "Project ID for loop storage" },
-      loop_id:    { type: "string", description: "Optional loop ID; auto-generated UUID if omitted" }
+      project_id:          { type: "string", description: "Project ID for loop storage" },
+      loop_id:             { type: "string", description: "Optional loop ID; auto-generated UUID if omitted" },
+      owner_intent_source: { type: "string", description: "When 'vision_locked_intake', skips OWNER_INTENT and advances directly to ARCHITECT_DESIGN (INTAKE_CONTRACT §6)" }
     },
     required: ["project_id"]
   },
@@ -33,9 +34,10 @@ const start_loop = defineTool({
   output_schema: {
     type: "object",
     properties: {
-      loop_id:       { type: "string", description: "Loop ID (provided or generated)" },
-      current_state: { type: "string", description: "Initial state (always OWNER_INTENT)" },
-      started_at:    { type: "string", description: "ISO 8601 creation timestamp" }
+      loop_id:             { type: "string", description: "Loop ID (provided or generated)" },
+      current_state:       { type: "string", description: "Initial state (OWNER_INTENT or ARCHITECT_DESIGN for intake mode)" },
+      started_at:          { type: "string", description: "ISO 8601 creation timestamp" },
+      owner_intent_source: { type: "string", description: "Echoed if intake mode was used" }
     },
     required: ["loop_id", "current_state", "started_at"]
   },
@@ -54,8 +56,32 @@ const start_loop = defineTool({
 
   async execute(input, ctx) {
     try {
-      const { createLoop } = require("../orchestration/loop_state");
-      const graph = await createLoop(input.project_id, input.loop_id || undefined, ctx || {});
+      const { createLoop, setCurrentState, appendAuditRow } = require("../orchestration/loop_state");
+      const ctxObj = ctx || {};
+      const graph  = await createLoop(input.project_id, input.loop_id || undefined, ctxObj);
+
+      if (input.owner_intent_source === "vision_locked_intake") {
+        // Intake mode (INTAKE_CONTRACT §6): vision serves as owner intent, skip to ARCHITECT_DESIGN
+        const now = new Date().toISOString();
+        await appendAuditRow(input.project_id, graph.loop_id, {
+          ts:              now,
+          loop_id:         graph.loop_id,
+          from_state:      "OWNER_INTENT",
+          to_state:        "ARCHITECT_DESIGN",
+          transition_type: "NORMAL",
+          mock:            false,
+          cost_usd:        0,
+          role_invoked:    "intake_owner"
+        }, ctxObj);
+        await setCurrentState(input.project_id, graph.loop_id, "ARCHITECT_DESIGN", ctxObj);
+        return ok({
+          loop_id:             graph.loop_id,
+          current_state:       "ARCHITECT_DESIGN",
+          owner_intent_source: "vision_locked_intake",
+          started_at:          graph.started_at
+        });
+      }
+
       return ok({
         loop_id:       graph.loop_id,
         current_state: graph.current_state,

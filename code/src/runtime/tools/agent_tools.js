@@ -1,10 +1,37 @@
 "use strict";
 
 const crypto = require("crypto");
+const path   = require("path");
 const { defineTool, ok, failed, previewed } = require("./_contract");
 const { pickAdapter, listAdapters, getAdapters } = require("../agents/_adapter_registry");
 const { estimateCost }                            = require("../agents/_adapter_contract");
 const ledger                                      = require("../agents/cost_ledger");
+
+// ── Provider module map (provider_id → module path) ──────────────────────────
+
+const _PROVIDER_MODULES = {
+  reverse_vision: path.join(__dirname, "../../providers/reverseVisionProvider")
+};
+
+function _loadProvider(provider_id) {
+  const modulePath = _PROVIDER_MODULES[provider_id];
+  if (!modulePath) return null;
+  return require(modulePath);
+}
+
+// gpt-4o: $5/1M input, $15/1M output; gpt-4o-mini: $0.15/1M, $0.60/1M
+function _estimateCostUsd(tokensIn, tokensOut, model) {
+  const m = (model || "").toLowerCase();
+  let rateIn, rateOut;
+  if (m.includes("gpt-4o-mini")) {
+    rateIn = 0.15; rateOut = 0.60;
+  } else if (m.includes("gpt-4o")) {
+    rateIn = 5.0; rateOut = 15.0;
+  } else {
+    rateIn = 2.0; rateOut = 8.0;
+  }
+  return ((tokensIn || 0) * rateIn + (tokensOut || 0) * rateOut) / 1_000_000;
+}
 
 // ── Shared helpers ────────────────────────────────────────────────────────────
 
@@ -21,13 +48,15 @@ const tool_invoke = defineTool({
   input_schema: {
     type: "object",
     properties: {
-      provider:   { type: "string" },
-      model:      { type: "string" },
-      prompt:     { type: "string" },
-      context:    { type: "object" },
-      budget_ms:  { type: "number" },
-      budget_usd: { type: "number" },
-      project_id: { type: "string" }
+      provider:    { type: "string" },
+      model:       { type: "string" },
+      prompt:      { type: "string" },
+      context:     { type: "object" },
+      budget_ms:   { type: "number" },
+      budget_usd:  { type: "number" },
+      project_id:  { type: "string" },
+      provider_id: { type: "string" },
+      task_input:  { type: "object" }
     },
     required: ["provider", "model", "prompt", "project_id"]
   },
@@ -57,6 +86,76 @@ const tool_invoke = defineTool({
   },
 
   async execute(input, ctx) {
+    // Provider routing: bypass adapter, call registered provider module directly
+    if (input.provider_id) {
+      const prov = _loadProvider(input.provider_id);
+      if (!prov) {
+        return failed("PROVIDER_NOT_FOUND",
+          "no provider module registered for provider_id '" + input.provider_id + "'", {});
+      }
+      const invocation_id = crypto.randomUUID();
+      let provResult;
+      try {
+        provResult = await prov.executeTask({
+          task_id:    invocation_id,
+          project_id: input.project_id,
+          context:    input.task_input || {}
+        });
+      } catch (err) {
+        const errEntry = {
+          invocation_id,
+          project_id:         input.project_id,
+          provider:           input.provider_id,
+          model:              input.model || "",
+          role:               (ctx && ctx.role_id) || null,
+          tokens_in:          0,
+          tokens_out:         0,
+          latency_ms:         0,
+          cost_usd_estimated: 0,
+          cost_usd_actual:    0,
+          outcome:            "failed"
+        };
+        try { ledger.appendEntry(errEntry, { root: _root(ctx) }); } catch { /* non-fatal */ }
+        return failed("PROVIDER_INVOKE_FAILED", err.message, {});
+      }
+
+      const meta    = (provResult && provResult.metadata) || {};
+      const outcome = (provResult && provResult.status === "SUCCESS") ? "success" : "failed";
+      const costUsd = _estimateCostUsd(meta.tokens_in, meta.tokens_out, meta.model || input.model);
+
+      const provLedgerEntry = {
+        invocation_id,
+        project_id:         input.project_id,
+        provider:           input.provider_id,
+        model:              meta.model || input.model || "",
+        role:               (ctx && ctx.role_id) || null,
+        tokens_in:          meta.tokens_in  || 0,
+        tokens_out:         meta.tokens_out || 0,
+        latency_ms:         meta.latency_ms || 0,
+        cost_usd_estimated: costUsd,
+        cost_usd_actual:    costUsd,
+        outcome
+      };
+      try { ledger.appendEntry(provLedgerEntry, { root: _root(ctx) }); } catch { /* non-fatal */ }
+
+      if (outcome !== "success") {
+        const detail = meta.detail || meta.reason || "provider returned non-SUCCESS";
+        return failed("PROVIDER_FAILED", detail, {});
+      }
+
+      const provOut = {
+        text:          JSON.stringify(provResult.output),
+        tokens_in:     meta.tokens_in  || 0,
+        tokens_out:    meta.tokens_out || 0,
+        latency_ms:    meta.latency_ms || 0,
+        cost_usd:      costUsd,
+        provider:      input.provider_id,
+        model:         meta.model || input.model || "",
+        finish_reason: "tool_call"
+      };
+      return { status: "SUCCESS", output: provOut, metadata: { invocation_id, cached: false } };
+    }
+
     const adapter = pickAdapter(input.provider);
     if (!adapter) {
       return failed("PROVIDER_NOT_FOUND", "no adapter registered for provider '" + input.provider + "'", {});

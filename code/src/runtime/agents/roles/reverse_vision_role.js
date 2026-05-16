@@ -79,7 +79,7 @@ const OUTPUT_SCHEMA = {
   }
 };
 
-// ── Prompt builder ─────────────────────────────────────────────────────────────
+// ── Prompt builder (mock path only — real path routes through reverseVisionProvider) ──────────
 
 function _buildPrompt(projectId, st, scenarioTag) {
   const lines = [];
@@ -178,7 +178,7 @@ module.exports = defineRole({
       ? "SCENARIO_TAG: " + ctx.scenario_id
       : null;
 
-    const prompt = _buildPrompt(project_id, input.source_tree, scenarioTag);
+    const isMock = (provider === "mock");
 
     try {
       emitActivity({ invocation_id, project_id, role: this.id,
@@ -186,15 +186,45 @@ module.exports = defineRole({
     } catch (_e) { /* best-effort */ }
 
     let agentResult;
-    try {
-      const reg = require("../../tools/_registry").getDefaultRegistry();
-      agentResult = await reg.invoke(
-        "agent.invoke",
-        { provider, model, prompt, project_id, context: { role: this.id } },
-        { root, role_id: this.id }
-      );
-    } catch (err) {
-      return roleFailed("AGENT_INVOKE_ERROR", err.message, ctx);
+    if (isMock) {
+      // Mock path: flat prompt via adapter (used by test scenarios S160/S161/S166/S167/S170/S171)
+      const prompt = _buildPrompt(project_id, input.source_tree, scenarioTag);
+      try {
+        const reg = require("../../tools/_registry").getDefaultRegistry();
+        agentResult = await reg.invoke(
+          "agent.invoke",
+          { provider, model, prompt, project_id, context: { role: this.id } },
+          { root, role_id: this.id }
+        );
+      } catch (err) {
+        return roleFailed("AGENT_INVOKE_ERROR", err.message, ctx);
+      }
+    } else {
+      // Real path: route through reverseVisionProvider (function calling, v2 prompt)
+      try {
+        const reg = require("../../tools/_registry").getDefaultRegistry();
+        agentResult = await reg.invoke(
+          "agent.invoke",
+          {
+            provider,
+            model,
+            prompt:      "",
+            project_id,
+            provider_id: "reverse_vision",
+            task_input: {
+              schema_version: SCHEMA_VERSION,
+              project_id,
+              source_tree:    input.source_tree,
+              provider,
+              model
+            },
+            context: { role: this.id }
+          },
+          { root, role_id: this.id }
+        );
+      } catch (err) {
+        return roleFailed("AGENT_INVOKE_ERROR", err.message, ctx);
+      }
     }
 
     if (!agentResult || agentResult.status !== "SUCCESS") {

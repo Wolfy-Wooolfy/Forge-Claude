@@ -208,17 +208,18 @@ The `19_ORCHESTRATION_LOOP_CONTRACT.md` §2.2 transition table states:
 
 For intake projects, the owner intent IS the locked `vision.md`. The standard natural-language intent capture phase is skipped.
 
-### Convention (implemented in Stage 11.4)
+### Convention (IMPLEMENTED — Stage 11.4)
 
 When a project has a locked `vision.md` at loop-start time:
 
-1. `orchestration.start_loop` is called with `{ project_id, intake_mode: true }`
-2. On the first `orchestration.advance_state` call, the loop detects `intake_mode: true`
-3. The `vision.md` content is serialized and injected into the architect agent's input payload as the intent context
-4. The state machine transitions directly: `OWNER_INTENT → ARCHITECT_DESIGN`
-5. The architect receives the full vision content as its input — no additional owner interaction is needed at this step
+1. `orchestration.start_loop` is called with `{ project_id, owner_intent_source: "vision_locked_intake" }`
+2. `start_loop` immediately appends an audit row `OWNER_INTENT → ARCHITECT_DESIGN` (transition_type: NORMAL, role_invoked: intake_owner) and advances the loop state
+3. The loop starts at `ARCHITECT_DESIGN` — `OWNER_INTENT` is bypassed atomically
+4. The architect receives the locked `vision.md` content as its intent context
 
-This is an **additive convention** — it does not amend the Orchestration Loop Contract. It is implemented as intake-specific logic in the loop runner. No contract amendment needed for Stage 11.0. Implementation is deferred to Stage 11.4.
+Implementation: `code/src/runtime/tools/orchestration_tools.js` (start_loop execute, `owner_intent_source` branch).
+
+This is an **additive convention** — it does not amend the Orchestration Loop Contract. No contract amendment was needed.
 
 ---
 
@@ -301,4 +302,50 @@ All failure modes are **fail-closed**: no silent fallbacks, no partial writes, n
 
 ---
 
-**END OF INTAKE CONTRACT v1.0**
+## §10 Intake Conversation Flow (Stage 11.4)
+
+The intake conversation handler (`code/src/ai_os/intake_conversation_handler.js`) implements a state machine for chat-based intake UX.
+
+### States
+
+| State | Description |
+|---|---|
+| `AWAIT_INTAKE_TRIGGER` | No active intake. Waiting for zip/directory attachment. |
+| `INTAKING` | Transient. Running intake pipeline (zip → analyze → reverse_vision). |
+| `AWAIT_VISION_APPROVAL` | InferredVision shown to owner. Waiting for approval decision. |
+| `APPROVED` | Vision locked. Orchestration loop started. |
+| `REJECTED` | Owner rejected. Artifacts deleted. |
+
+### Trigger
+
+A **structural attachment signal** triggers intake — not keyword matching on user text (CLAUDE.md §3.3). The API dispatch layer checks:
+- `body.zip_path` or `body.directory_path` is present → route to intake handler
+- `body.project_id` has an active AWAIT_VISION_APPROVAL state → route to intake handler
+
+### Approval Intent Classification
+
+Owner messages in `AWAIT_VISION_APPROVAL` state are classified by `IntentClassificationProvider` (LLM-based):
+- `AFFIRM` → `vision.lock_vision` + `orchestration.start_loop (owner_intent_source: vision_locked_intake)`
+- `REJECT` → `fs.delete_dir` on project artifacts
+- `MODIFY` → regex `/^edit\s+(\w+(?:\.\w+)?):\s*(.+)$/i` extracts field/value → apply edit → re-display
+- `UNCLEAR` → clarification prompt re-shown
+
+### Edit-Parsable Fields
+
+`project_name`, `domain`, `goals.primary`, `goals.secondary`, `constraints`, `non_goals`
+
+### State Persistence
+
+State is persisted to `artifacts/projects/<project_id>/intake_state.json` via `fs.write_file` (L2 rule). State is read directly (reads do not require L2 tool).
+
+---
+
+## §11 LLM Trace Files (Stage 11.4)
+
+When `reverseVisionProvider` (v2) is called for real (non-mock), `providerContract.js` writes trace files automatically via `providerTrace.record()`. These files are written per-invocation.
+
+See `code/src/providers/_contract/providerTrace.js` for trace artifact format and location.
+
+---
+
+**END OF INTAKE CONTRACT v1.1** — Updated Stage 11.4

@@ -10,7 +10,7 @@
 const { defineProvider, validateAgainstSchema } = require("./_contract/providerContract");
 const { loadPrompt }                             = require("../runtime/agents/_prompt_loader");
 
-const SYSTEM_PROMPT = loadPrompt("reverse_vision_v1");
+const SYSTEM_PROMPT = loadPrompt("reverse_vision_v2");
 
 // ── Input Schema ──────────────────────────────────────────────────────────────
 
@@ -34,7 +34,8 @@ const INPUT_SCHEMA = {
         manifest_files:         { type: "object" },
         top_level_directories:  { type: "array", items: { type: "string" } },
         ast_samples:            { type: "array" },
-        ignored_paths:          { type: "array", items: { type: "string" } }
+        ignored_paths:          { type: "array", items: { type: "string" } },
+        detected_framework:     { type: ["string", "null"] }
       }
     },
     provider: { type: "string" },
@@ -78,13 +79,15 @@ const OUTPUT_TOOL = {
   }
 };
 
-// ── User prompt builder ───────────────────────────────────────────────────────
+// ── User prompt builder (port of reverse_vision_role._buildPrompt body section) ─────────────
 
 function _buildUserPrompt(projectId, st) {
   const lines = [];
+  lines.push("SOURCE TREE:");
   lines.push("PROJECT: " + projectId);
   lines.push("FILES: " + (st.file_count || 0) + " | SIZE: " + (st.total_size_bytes || 0) + " bytes");
   lines.push("LANGUAGES: " + (st.detected_languages || []).join(", "));
+  if (st.detected_framework) lines.push("FRAMEWORK: " + st.detected_framework);
 
   if (st.entry_points && st.entry_points.length > 0) {
     lines.push("ENTRY POINTS: " + st.entry_points.join(", "));
@@ -107,6 +110,32 @@ function _buildUserPrompt(projectId, st) {
     }
     if (mf.readme_excerpt) {
       lines.push("  README (excerpt): " + mf.readme_excerpt.slice(0, 300).replace(/\n/g, " "));
+    }
+    if (mf.package_json) {
+      const p = mf.package_json;
+      lines.push("  package.json: name=" + (p.name || "?") +
+        " version=" + (p.version || "?") +
+        (p.description ? " desc=" + p.description : ""));
+      const deps = Object.keys(p.dependencies || {}).slice(0, 10).join(", ");
+      if (deps) lines.push("    deps: " + deps);
+    }
+    if (mf.tsconfig) {
+      const t = mf.tsconfig;
+      lines.push("  tsconfig.json: target=" + (t.target || "?") +
+        " module=" + (t.module || "?") +
+        (t.jsx ? " jsx=" + t.jsx : "") +
+        (t.strict !== undefined ? " strict=" + t.strict : ""));
+    }
+    if (mf.next_config) {
+      lines.push("  next.config: present (" + (mf.next_config.file || "?") + ")");
+    }
+    if (mf.go_mod) {
+      const g = mf.go_mod;
+      const depStr = (g.dependencies && g.dependencies.length > 0)
+        ? " deps=" + g.dependencies.slice(0, 5).join(", ")
+        : "";
+      lines.push("  go.mod: module=" + (g.module_path || "?") +
+        " go=" + (g.go_version || "?") + depStr);
     }
   }
 
@@ -131,10 +160,10 @@ function _buildUserPrompt(projectId, st) {
 
 // ── Provider Definition ───────────────────────────────────────────────────────
 
-module.exports = defineProvider(
+const _provider = defineProvider(
   {
     id:            "reverse_vision",
-    version:       "1.0.0",
+    version:       "2.0.0",
     authority_doc: "docs/10_runtime/20_INTAKE_CONTRACT.md",
     required_capabilities: ["function_calling"],
     input_schema:  INPUT_SCHEMA,
@@ -230,3 +259,6 @@ module.exports = defineProvider(
     };
   }
 );
+
+module.exports = _provider;
+module.exports._buildUserPrompt = _buildUserPrompt;

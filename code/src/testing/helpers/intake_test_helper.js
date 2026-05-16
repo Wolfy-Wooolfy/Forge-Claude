@@ -686,6 +686,464 @@ async function runS171IntakeEndToEndGocliMock() {
   };
 }
 
+// ── Shared intake-handler mock vision (used in S175–S177 state setup) ─────────
+
+const MOCK_INTAKE_VISION = {
+  project_name:       "todo_gocli",
+  domain:             "cli_tool",
+  goals: {
+    primary:   "Provide a minimal command-line TODO list manager written in Go",
+    secondary: ["Persist items to a local JSON file", "Support add/list/complete operations"]
+  },
+  constraints:        ["Go 1.21+", "Standard library only"],
+  non_goals:          ["No UI", "No cloud sync"],
+  detected_languages: ["go"],
+  source_summary:     "7-file Go CLI project with go.mod, cmd/ and storage/ directories.",
+  confidence:         "HIGH"
+};
+
+// ── Shared helper: write unlocked vision.md + intake_state.json ───────────────
+
+async function _setupIntakeState(reg, project_id, extra_vision_fields) {
+  const { serializeFrontmatter } = require("../../ai_os/schemas/visionSchema");
+  const iv = Object.assign({}, MOCK_INTAKE_VISION, extra_vision_fields || {});
+
+  const frontmatter = {
+    project_id,
+    project_name:       iv.project_name,
+    domain:             iv.domain,
+    vision_version:     1,
+    vision_locked:      false,
+    vision_locked_at:   null,
+    locked_by_role:     null,
+    amendments_history: [],
+    goals: {
+      primary:   iv.goals.primary,
+      secondary: iv.goals.secondary || []
+    },
+    constraints: iv.constraints || [],
+    non_goals:   iv.non_goals   || []
+  };
+
+  const visionContent = serializeFrontmatter(frontmatter) +
+    "\n\n# Project Vision: " + iv.project_name + "\n\n" + (iv.source_summary || "") + "\n";
+
+  const visionPath = path.join("artifacts", "projects", project_id, "vision.md");
+  const visionRes = await reg.invoke("fs.write_file",
+    { path: visionPath, content: visionContent }, { root: ROOT, project_id });
+  if (!visionRes || visionRes.status !== "SUCCESS") return false;
+
+  const intakeState = {
+    stage:           "AWAIT_VISION_APPROVAL",
+    project_id,
+    inferred_vision: iv,
+    created_at:      new Date().toISOString()
+  };
+  const statePath = path.join("artifacts", "projects", project_id, "intake_state.json");
+  const stateRes = await reg.invoke("fs.write_file",
+    { path: statePath, content: JSON.stringify(intakeState, null, 2) }, { root: ROOT, project_id });
+  return !!(stateRes && stateRes.status === "SUCCESS");
+}
+
+// ── S172: intake handler — directory_path trigger → AWAIT_VISION_APPROVAL ─────
+
+async function runS172IntakeDirPathTrigger() {
+  const { processIntakeRequest } = require("../../ai_os/intake_conversation_handler");
+  const reg        = _makeRegistry("WORKSPACE_WRITE");
+  const project_id = "test_s172_proj";
+  const fixturePath = path.resolve(ROOT, "artifacts", "test_fixtures", "intake", "fixture_gocli");
+
+  const result = await processIntakeRequest(
+    { directory_path: fixturePath, project_id },
+    { root: ROOT, registry: reg, provider: "mock", model: "mock-rv", scenario_id: "S172" }
+  );
+
+  return {
+    stage_is_await_vision_approval: result.stage === "AWAIT_VISION_APPROVAL",
+    ok:                             result.ok === true
+  };
+}
+
+// ── S173: no attachment + no active project → NO_ACTIVE_INTAKE ────────────────
+
+async function runS173IntakeNoAttachment() {
+  const { processIntakeRequest } = require("../../ai_os/intake_conversation_handler");
+
+  const result = await processIntakeRequest(
+    { message: "hello" },
+    { root: ROOT }
+  );
+
+  return {
+    ok_is_false:    result.ok === false,
+    reason_matches: result.reason === "NO_ACTIVE_INTAKE"
+  };
+}
+
+// ── S174: sync flow — fixture_gocli intake via mock → state + vision files ────
+
+async function runS174IntakeSyncFlow() {
+  const { processIntakeRequest } = require("../../ai_os/intake_conversation_handler");
+  const { parseFrontmatter }     = require("../../ai_os/schemas/visionSchema");
+  const reg        = _makeRegistry("WORKSPACE_WRITE");
+  const project_id = "test_s174_proj";
+  const fixturePath = path.resolve(ROOT, "artifacts", "test_fixtures", "intake", "fixture_gocli");
+
+  const result = await processIntakeRequest(
+    { directory_path: fixturePath, project_id },
+    { root: ROOT, registry: reg, provider: "mock", model: "mock-rv", scenario_id: "S174" }
+  );
+
+  const stateFile  = path.join(ROOT, "artifacts", "projects", project_id, "intake_state.json");
+  const visionFile = path.join(ROOT, "artifacts", "projects", project_id, "vision.md");
+
+  const stateExists  = fs.existsSync(stateFile);
+  const visionExists = fs.existsSync(visionFile);
+
+  let visionUnlocked = false;
+  if (visionExists) {
+    const fm = parseFrontmatter(fs.readFileSync(visionFile, "utf8"));
+    visionUnlocked = !!(fm && fm.vision_locked === false);
+  }
+
+  return {
+    stage_is_await_vision_approval: result.stage === "AWAIT_VISION_APPROVAL",
+    intake_state_file_exists:        stateExists,
+    vision_file_exists:              visionExists,
+    vision_is_unlocked:              visionUnlocked
+  };
+}
+
+// ── S175: AFFIRM intent → vision locked + state APPROVED + loop ARCHITECT_DESIGN
+
+async function runS175ApproveLocksVision() {
+  const { processIntakeRequest } = require("../../ai_os/intake_conversation_handler");
+  const { parseFrontmatter }     = require("../../ai_os/schemas/visionSchema");
+  const reg        = _makeRegistry("WORKSPACE_WRITE");
+  const project_id = "test_s175_proj";
+
+  // Setup: write unlocked vision.md + AWAIT_VISION_APPROVAL state
+  const setupOk = await _setupIntakeState(reg, project_id);
+  if (!setupOk) return { stage_is_approved: false, vision_is_locked: false, loop_at_architect_design: false };
+
+  const mockAFFIRM = {
+    executeTask: async () => ({
+      status: "SUCCESS",
+      output: { intent: "AFFIRM", confidence: 0.99, clarification_question: "" }
+    })
+  };
+
+  const result = await processIntakeRequest(
+    { project_id, message: "approve" },
+    { root: ROOT, registry: reg, intent_classifier: mockAFFIRM }
+  );
+
+  if (!result.ok || result.stage !== "APPROVED") {
+    return { stage_is_approved: false, vision_is_locked: false, loop_at_architect_design: false };
+  }
+
+  // Check vision.md locked
+  const visionFile = path.join(ROOT, "artifacts", "projects", project_id, "vision.md");
+  let visionLocked = false;
+  if (fs.existsSync(visionFile)) {
+    const fm = parseFrontmatter(fs.readFileSync(visionFile, "utf8"));
+    visionLocked = !!(fm && fm.vision_locked === true);
+  }
+
+  // Check loop state
+  let loopAtArchitect = false;
+  const loopId = result.loop_id;
+  if (loopId) {
+    const statusRes = await reg.invoke("orchestration.get_status",
+      { project_id, loop_id: loopId }, { root: ROOT });
+    loopAtArchitect = !!(statusRes && statusRes.status === "SUCCESS" &&
+      statusRes.output && statusRes.output.current_state === "ARCHITECT_DESIGN");
+  }
+
+  return {
+    stage_is_approved:        result.stage === "APPROVED",
+    vision_is_locked:         visionLocked,
+    loop_at_architect_design: loopAtArchitect
+  };
+}
+
+// ── S176: MODIFY intent + edit regex → non_goals updated, still AWAIT_APPROVAL ─
+
+async function runS176EditVisionField() {
+  const { processIntakeRequest } = require("../../ai_os/intake_conversation_handler");
+  const reg        = _makeRegistry("WORKSPACE_WRITE");
+  const project_id = "test_s176_proj";
+
+  // Setup with initial non_goals
+  const setupOk = await _setupIntakeState(reg, project_id, { non_goals: ["No UI"] });
+  if (!setupOk) return { stage_still_awaiting: false, non_goals_updated: false };
+
+  const mockMODIFY = {
+    executeTask: async () => ({
+      status: "SUCCESS",
+      output: { intent: "MODIFY", confidence: 0.95, clarification_question: "" }
+    })
+  };
+
+  const result = await processIntakeRequest(
+    { project_id, message: "edit non_goals: No authentication" },
+    { root: ROOT, registry: reg, intent_classifier: mockMODIFY }
+  );
+
+  // Read updated state
+  const stateFile = path.join(ROOT, "artifacts", "projects", project_id, "intake_state.json");
+  let stageStillAwaiting = false;
+  let nonGoalsUpdated    = false;
+
+  if (fs.existsSync(stateFile)) {
+    const state = JSON.parse(fs.readFileSync(stateFile, "utf8"));
+    stageStillAwaiting = state.stage === "AWAIT_VISION_APPROVAL";
+    const ng = (state.inferred_vision && state.inferred_vision.non_goals) || [];
+    nonGoalsUpdated = Array.isArray(ng) && ng.includes("No authentication");
+  }
+
+  return {
+    stage_still_awaiting: stageStillAwaiting,
+    non_goals_updated:    nonGoalsUpdated
+  };
+}
+
+// ── S177: REJECT intent → state REJECTED + artifacts directory deleted ────────
+
+async function runS177RejectDeletesArtifacts() {
+  const { processIntakeRequest } = require("../../ai_os/intake_conversation_handler");
+  const reg        = _makeRegistry("WORKSPACE_WRITE");
+  const project_id = "test_s177_proj";
+
+  // Setup
+  const setupOk = await _setupIntakeState(reg, project_id);
+  if (!setupOk) return { stage_is_rejected: false, artifacts_deleted: false };
+
+  const mockREJECT = {
+    executeTask: async () => ({
+      status: "SUCCESS",
+      output: { intent: "REJECT", confidence: 0.99, clarification_question: "" }
+    })
+  };
+
+  const result = await processIntakeRequest(
+    { project_id, message: "reject" },
+    { root: ROOT, registry: reg, intent_classifier: mockREJECT }
+  );
+
+  const artifactsDir = path.join(ROOT, "artifacts", "projects", project_id);
+  const artifactsGone = !fs.existsSync(artifactsDir);
+
+  return {
+    stage_is_rejected: result.stage === "REJECTED",
+    artifacts_deleted: artifactsGone
+  };
+}
+
+// ── S178: start_loop with owner_intent_source → current_state=ARCHITECT_DESIGN ─
+
+async function runS178LoopStartsAtArchitectDesign() {
+  const reg        = _makeRegistry("WORKSPACE_WRITE");
+  const project_id = "test_s178_proj";
+
+  const result = await reg.invoke(
+    "orchestration.start_loop",
+    { project_id, owner_intent_source: "vision_locked_intake" },
+    { root: ROOT }
+  );
+
+  const out = (result && result.output) || {};
+
+  return {
+    current_state_is_architect_design: out.current_state === "ARCHITECT_DESIGN",
+    owner_intent_source_echoed:        out.owner_intent_source === "vision_locked_intake"
+  };
+}
+
+// ── S179: reverseVisionProvider.executeTask writes LLM trace files ─────────────
+
+async function runS179ProviderWritesTraceFiles() {
+  const ADAPTER_PATH  = require.resolve("../../providers/_contract/openAiAdapter");
+  const CONTRACT_PATH = require.resolve("../../providers/_contract/providerContract");
+  const PROVIDER_PATH = require.resolve("../../providers/reverseVisionProvider");
+
+  const origAdapter  = require.cache[ADAPTER_PATH];
+  const origContract = require.cache[CONTRACT_PATH];
+  const origProvider = require.cache[PROVIDER_PATH];
+
+  const MOCK_IV = {
+    project_name:       "todo_gocli",
+    domain:             "cli_tool",
+    goals: { primary: "Minimal Go CLI TODO manager", secondary: [] },
+    constraints:        ["Go 1.21+"],
+    non_goals:          ["No UI"],
+    detected_languages: ["go"],
+    source_summary:     "Mock trace test.",
+    confidence:         "HIGH"
+  };
+
+  // Inject mock openAiAdapter so providerContract gets our callChatWithTool
+  require.cache[ADAPTER_PATH] = {
+    id: ADAPTER_PATH, filename: ADAPTER_PATH, loaded: true,
+    exports: {
+      callChatWithTool: async () => ({
+        arguments:  MOCK_IV,
+        raw:        {},
+        usage:      { prompt_tokens: 10, completion_tokens: 20, total_tokens: 30 },
+        model:      "gpt-4o",
+        latency_ms: 50
+      })
+    }
+  };
+
+  delete require.cache[CONTRACT_PATH];
+  delete require.cache[PROVIDER_PATH];
+
+  const task_id = "test_s179_" + Date.now();
+  let metaExists = false, reqExists = false, respExists = false;
+
+  try {
+    const provider = require(PROVIDER_PATH);
+    await provider.executeTask({
+      task_id,
+      project_id: "test_s179_proj",
+      context: {
+        schema_version: "1.0.0",
+        project_id:     "test_s179_proj",
+        source_tree: {
+          detected_languages: ["go"],
+          file_count:          5,
+          total_size_bytes:    4096,
+          entry_points:        ["main.go"],
+          manifest_files:      {},
+          top_level_directories: ["cmd"],
+          ast_samples:         [],
+          ignored_paths:       []
+        },
+        provider: "openai",
+        model:    "gpt-4o"
+      }
+    });
+
+    metaExists = fs.existsSync(path.join(ROOT, "artifacts", "llm", "metadata", task_id + ".json"));
+    reqExists  = fs.existsSync(path.join(ROOT, "artifacts", "llm", "requests",  task_id + ".json"));
+    respExists = fs.existsSync(path.join(ROOT, "artifacts", "llm", "responses", task_id + ".json"));
+  } finally {
+    if (origAdapter)  require.cache[ADAPTER_PATH]  = origAdapter;
+    else              delete require.cache[ADAPTER_PATH];
+    if (origContract) require.cache[CONTRACT_PATH] = origContract;
+    else              delete require.cache[CONTRACT_PATH];
+    if (origProvider) require.cache[PROVIDER_PATH] = origProvider;
+    else              delete require.cache[PROVIDER_PATH];
+  }
+
+  return {
+    metadata_file_written:  metaExists,
+    requests_file_written:  reqExists,
+    responses_file_written: respExists
+  };
+}
+
+// ── S180: agent_budget_rule — reverse_vision exempt; other role denied ─────────
+
+async function runS180RoleIdExemptionFires() {
+  const { createAgentBudgetRule } = require("../../runtime/permission/rules/agent_budget_rule");
+  const { serializeFrontmatter }  = require("../../ai_os/schemas/visionSchema");
+  const reg        = _makeRegistry("WORKSPACE_WRITE");
+  const project_id = "test_s180_proj";
+
+  // Write an UNLOCKED vision.md so vision exists but is not locked
+  const fm = serializeFrontmatter({
+    project_id,
+    project_name:       "test_s180",
+    domain:             "cli_tool",
+    vision_version:     1,
+    vision_locked:      false,
+    vision_locked_at:   null,
+    locked_by_role:     null,
+    amendments_history: [],
+    goals:        { primary: "Test rule", secondary: [] },
+    constraints:  [],
+    non_goals:    []
+  });
+  await reg.invoke("fs.write_file",
+    { path: path.join("artifacts", "projects", project_id, "vision.md"),
+      content: fm + "\n# Test\n" },
+    { root: ROOT, project_id });
+
+  const rule      = createAgentBudgetRule({ root: ROOT });
+  const agentTool = { name: "agent.invoke" };
+  const input     = { provider: "openai", model: "gpt-4o", prompt: "test", project_id };
+
+  const check1 = rule.check(agentTool, input, { role_id: "reverse_vision" });
+  const check2 = rule.check(agentTool, input, { role_id: "architect" });
+
+  return {
+    reverse_vision_not_denied: check1.denied === false,
+    other_role_denied:         check2.denied === true && check2.reason === "VISION_NOT_LOCKED"
+  };
+}
+
+// ── S181: full mock e2e — dir_path → mock intake → mock AFFIRM → lock + loop ──
+
+async function runS181FullMockE2E() {
+  const { processIntakeRequest } = require("../../ai_os/intake_conversation_handler");
+  const { parseFrontmatter }     = require("../../ai_os/schemas/visionSchema");
+  const reg        = _makeRegistry("WORKSPACE_WRITE");
+  const project_id = "test_s181_proj";
+  const fixturePath = path.resolve(ROOT, "artifacts", "test_fixtures", "intake", "fixture_gocli");
+
+  // Step 1: trigger intake via directory_path
+  const step1 = await processIntakeRequest(
+    { directory_path: fixturePath, project_id },
+    { root: ROOT, registry: reg, provider: "mock", model: "mock-rv", scenario_id: "S181" }
+  );
+  if (!step1.ok || step1.stage !== "AWAIT_VISION_APPROVAL") {
+    return { stage_is_approved: false, vision_is_locked: false, loop_at_architect_design: false };
+  }
+
+  // Step 2: approve (AFFIRM)
+  const mockAFFIRM = {
+    executeTask: async () => ({
+      status: "SUCCESS",
+      output: { intent: "AFFIRM", confidence: 0.99, clarification_question: "" }
+    })
+  };
+
+  const step2 = await processIntakeRequest(
+    { project_id, message: "looks good to me" },
+    { root: ROOT, registry: reg, intent_classifier: mockAFFIRM }
+  );
+
+  if (!step2.ok || step2.stage !== "APPROVED") {
+    return { stage_is_approved: false, vision_is_locked: false, loop_at_architect_design: false };
+  }
+
+  // Check vision.md locked
+  const visionFile = path.join(ROOT, "artifacts", "projects", project_id, "vision.md");
+  let visionLocked = false;
+  if (fs.existsSync(visionFile)) {
+    const fm2 = parseFrontmatter(fs.readFileSync(visionFile, "utf8"));
+    visionLocked = !!(fm2 && fm2.vision_locked === true);
+  }
+
+  // Check loop state
+  let loopAtArchitect = false;
+  const loopId = step2.loop_id;
+  if (loopId) {
+    const statusRes = await reg.invoke("orchestration.get_status",
+      { project_id, loop_id: loopId }, { root: ROOT });
+    loopAtArchitect = !!(statusRes && statusRes.status === "SUCCESS" &&
+      statusRes.output && statusRes.output.current_state === "ARCHITECT_DESIGN");
+  }
+
+  return {
+    stage_is_approved:        step2.stage === "APPROVED",
+    vision_is_locked:         visionLocked,
+    loop_at_architect_design: loopAtArchitect
+  };
+}
+
 module.exports = {
   runS158IntakeZip,
   runS159AnalyzeSource,
@@ -700,5 +1158,15 @@ module.exports = {
   runS168AnalyzeSourceGoSingle,
   runS169AnalyzeSourceGocli,
   runS170ReverseVisionGocliMock,
-  runS171IntakeEndToEndGocliMock
+  runS171IntakeEndToEndGocliMock,
+  runS172IntakeDirPathTrigger,
+  runS173IntakeNoAttachment,
+  runS174IntakeSyncFlow,
+  runS175ApproveLocksVision,
+  runS176EditVisionField,
+  runS177RejectDeletesArtifacts,
+  runS178LoopStartsAtArchitectDesign,
+  runS179ProviderWritesTraceFiles,
+  runS180RoleIdExemptionFires,
+  runS181FullMockE2E
 };

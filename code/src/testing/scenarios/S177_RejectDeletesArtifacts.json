@@ -1,0 +1,16 @@
+{
+  "id": "S177",
+  "name": "intake reject — REJECT intent → state=REJECTED + project artifacts deleted",
+  "description": "Stage 11.4 — REJECT intent deletes project artifacts directory and saves REJECTED state.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS177RejectDeletesArtifacts",
+  "args": [],
+  "cleanup_project": "test_s177_proj",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "stage_is_rejected", "expected": true },
+    { "type": "state_field_equals", "field": "artifacts_deleted",  "expected": true }
+  ]
+}

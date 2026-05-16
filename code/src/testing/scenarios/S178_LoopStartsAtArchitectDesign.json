@@ -1,0 +1,16 @@
+{
+  "id": "S178",
+  "name": "start_loop with owner_intent_source=vision_locked_intake → current_state=ARCHITECT_DESIGN",
+  "description": "Stage 11.4 — orchestration.start_loop with owner_intent_source=vision_locked_intake skips OWNER_INTENT and starts at ARCHITECT_DESIGN (INTAKE_CONTRACT §6).",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS178LoopStartsAtArchitectDesign",
+  "args": [],
+  "cleanup_project": "test_s178_proj",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "current_state_is_architect_design", "expected": true },
+    { "type": "state_field_equals", "field": "owner_intent_source_echoed",        "expected": true }
+  ]
+}

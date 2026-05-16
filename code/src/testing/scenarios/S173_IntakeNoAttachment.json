@@ -1,0 +1,15 @@
+{
+  "id": "S173",
+  "name": "intake handler — no attachment + no active project returns NO_ACTIVE_INTAKE",
+  "description": "Stage 11.4 — processIntakeRequest with no zip/directory and no active project returns ok=false, reason=NO_ACTIVE_INTAKE.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS173IntakeNoAttachment",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "ok_is_false",    "expected": true },
+    { "type": "state_field_equals", "field": "reason_matches", "expected": true }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "id": "S174",
+  "name": "intake sync flow — fixture_gocli intake via mock role → vision.md unlocked + state=AWAIT_VISION_APPROVAL",
+  "description": "Stage 11.4 — full intake flow: directory_path → intake_zip → analyze_source → reverse_vision (mock) → intake_state.json + unlocked vision.md.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS174IntakeSyncFlow",
+  "args": [],
+  "cleanup_project": "test_s174_proj",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "stage_is_await_vision_approval", "expected": true },
+    { "type": "state_field_equals", "field": "intake_state_file_exists",        "expected": true },
+    { "type": "state_field_equals", "field": "vision_file_exists",              "expected": true },
+    { "type": "state_field_equals", "field": "vision_is_unlocked",              "expected": true }
+  ]
+}
