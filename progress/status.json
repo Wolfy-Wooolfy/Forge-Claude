@@ -373,8 +373,10 @@
   "phase_11": {
     "status": "IN_PROGRESS",
     "current_stage": "11.2",
+    "stages_complete": ["11.0", "11.1", "11.2"],
     "stages": {
       "11_2": {
+        "cost_actuals_usd": 0.00951,
         "status": "CLOSED",
         "decision_artifact": "artifacts/decisions/DECISION-2026-05-16T13-2-phase-11-stage-11-2-closure.md",
         "checkpoint_mid": "artifacts/decisions/_phase_11_checkpoints/stage_11_2_mid.md",

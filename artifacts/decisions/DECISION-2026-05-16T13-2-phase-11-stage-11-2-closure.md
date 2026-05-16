@@ -4,7 +4,7 @@
 |---|---|
 | Date | 2026-05-16 |
 | Owner | KhElmasry |
-| Status | OWNER_DECISION_PENDING |
+| Status | OWNER_APPROVED — 2026-05-16 |
 | Scope | PHASE-11 Stage 11.2 — JS/TS Analyzer + Next.js Framework Detection + live gpt-4o demo |
 | Related | `artifacts/decisions/_phase_11_checkpoints/stage_11_2_mid.md` |
 
@@ -127,8 +127,23 @@ S167 ✓  intake end-to-end mock — fixture_nextjs → vision.md domain=web_app
 
 ## §8 Owner Approval
 
-> To close Stage 11.2, the owner (KhElmasry) must review §5 and post approval:
->
-> "STAGE-11-2 APPROVED. GO to Stage 11.3." (or equivalent)
+**Status:** OWNER_APPROVED — 2026-05-16
 
-Until approval, `progress/status.json` remains at Stage 11.2.
+Ratified by owner KhElmasry on 2026-05-16 with phrase:
+
+> "STAGE-11-2 APPROVED. GO to Stage 11.3."
+
+**Closure verification (CTO advisor, independent):**
+- Activity log corroborates live demo (invocation_id ee144dd5-..., duration_ms 1913, outcome: success) ✓
+- InferredVision semantic quality: exceptional. domain="web_application" correct (critical framework-mapping test), all 3 non_goals captured from README, project_name exact match, goals.primary reflects framework awareness ✓
+- SU 162/0/5 Windows, S81 regression-free ✓
+- Cumulative cost math verified: $0.01835 = $0.00884 + $0.00951 ✓
+- Track A clean, v1 prompt untouched ✓
+
+**Two infrastructure observations recorded for follow-up (not Stage 11.2 issues):**
+1. Cost ledger entries get wiped by subsequent SU runs — backlog for Stage 11.4/PHASE-12
+2. No LLM trace files written due to role-bypasses-provider pattern — already in Stage 11.1 follow-up (§6 of both closure artifacts), Stage 11.4 will decide
+
+**Cost trajectory:** PHASE-11 cumulative = $0.01835 / $12.00 cap (0.15% consumed across 2 of 5 live demos). On current trajectory, entire phase closes under $0.20 actual.
+
+**Next:** Stage 11.3 — Go analyzer extension. Smallest stage yet (single language, no framework, smaller fixture). ≤$1.00 live cap. Expected actual: ~$0.01.
