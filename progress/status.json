@@ -372,9 +372,58 @@
   },
   "phase_11": {
     "status": "IN_PROGRESS",
-    "current_stage": "11.2",
-    "stages_complete": ["11.0", "11.1", "11.2"],
+    "current_stage": "11.3",
+    "stages_complete": ["11.0", "11.1", "11.2", "11.3"],
     "stages": {
+      "11_3": {
+        "status": "CLOSED",
+        "decision_artifact": "artifacts/decisions/DECISION-2026-05-16T15-5-phase-11-stage-11-3-closure.md",
+        "checkpoint_mid": "artifacts/decisions/_phase_11_checkpoints/stage_11_3_mid.md",
+        "closed_at": "2026-05-16T15:50:00.000Z",
+        "cost_actual_usd": 0.00863,
+        "live_demo": {
+          "status": "SUCCESS",
+          "project_id": "stage_11_3_live_demo",
+          "provider": "openai",
+          "model": "gpt-4o",
+          "cost_usd": 0.00863,
+          "duration_s": 2.8,
+          "kill_switch_fired": false,
+          "hard_cap_hit": false,
+          "inferred_vision": {
+            "project_name": "todo_gocli",
+            "domain": "cli_tool",
+            "confidence": "HIGH",
+            "detected_languages": ["go"],
+            "detected_framework": null
+          },
+          "vision_path": "artifacts/projects/stage_11_3_live_demo/vision.md",
+          "vision_locked": false,
+          "domain_check": "PASS — model correctly returned cli_tool"
+        },
+        "scenarios_added": ["S168", "S169", "S170", "S171"],
+        "files_created": [
+          "code/src/testing/live/stage_11_3_live_runner.js",
+          "bin/forge-stage-11-3-live-demo.js",
+          "code/src/testing/scenarios/S168_analyze_source_go_single.json",
+          "code/src/testing/scenarios/S169_analyze_source_gocli.json",
+          "code/src/testing/scenarios/S170_reverse_vision_gocli_mock.json",
+          "code/src/testing/scenarios/S171_intake_end_to_end_gocli_mock.json",
+          "artifacts/test_fixtures/intake/fixture_gocli/ (7 files)",
+          "artifacts/decisions/_phase_11_checkpoints/stage_11_3_mid.md"
+        ],
+        "files_modified": [
+          "code/src/runtime/tools/intake_tools.js",
+          "code/src/runtime/agents/adapters/mock_responses.json",
+          "code/src/testing/helpers/intake_test_helper.js",
+          "docs/10_runtime/20_INTAKE_CONTRACT.md",
+          "artifacts/vendor/tree-sitter-grammars/MANIFEST.json"
+        ],
+        "grammars_vendored": [
+          "go.wasm v0.25.0 — 217182 bytes — sha256=9504573f352b20be7f2f1911754d710622aedc15afff16d5ed8fb5645681aee7"
+        ],
+        "go_framework_detection": "DEFERRED — no dominant framework in Go ecosystem; detected_framework stays null"
+      },
       "11_2": {
         "cost_actuals_usd": 0.00951,
         "status": "CLOSED",
@@ -517,9 +566,9 @@
       }
     },
     "total_live_cap_usd": 12,
-    "cost_actuals_usd": 0.01835,
-    "total_live_cap_remaining_usd": 11.98165
+    "cost_actuals_usd": 0.02698,
+    "total_live_cap_remaining_usd": 11.97302
   },
-  "current_task": "PHASE-11-STAGE-11-2-CLOSED",
-  "last_updated": "2026-05-16T13:20:00.000Z"
+  "current_task": "PHASE-11-STAGE-11-3-CLOSED",
+  "last_updated": "2026-05-16T15:50:00.000Z"
 }

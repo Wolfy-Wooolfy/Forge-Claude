@@ -229,8 +229,12 @@ This is an **additive convention** — it does not amend the Orchestration Loop 
 | Python | tree-sitter-python v0.25.0 | 11.1 | `python.wasm` | VENDORED — ABI verified |
 | JavaScript | tree-sitter-javascript v0.25.0 | 11.2 | `javascript.wasm` | ACTIVE — ABI verified |
 | TypeScript / TSX | tree-sitter-typescript v0.23.2 | 11.2 | `typescript.wasm` | ACTIVE — ABI verified; TSX parses via TS grammar |
-| Go | tree-sitter-go | 11.3 | `go.wasm` | PENDING — Stage 11.3 |
+| Go | tree-sitter-go v0.25.0 | 11.3 | `go.wasm` | ACTIVE — ABI verified; framework detection deferred (no dominant framework in Go ecosystem) |
 | Other | — | — | — | **BLOCKED** — returns `UNSUPPORTED_LANGUAGE` |
+
+### Go framework detection note
+
+Go framework detection is deliberately not implemented. The Go ecosystem has no dominant framework analogous to Next.js for JavaScript. Common HTTP libraries (gin, echo, fiber, chi, stdlib net/http) all produce similar file trees with no reliable auto-detection heuristic. Framework detection for Go is deferred to a later phase if a clear detection signal is identified.
 
 ### Unsupported language behavior
 
