@@ -176,6 +176,14 @@ Before `vision.lock_vision` is called for any intake project, the owner MUST rev
 
 The intake runner MUST NOT call `vision.lock_vision` without explicit owner approval in chat. Any code path that calls `lock_vision` without a prior owner approval signal is a contract violation.
 
+### reverse_vision exemption in agent_budget_rule
+
+`agent_budget_rule` normally requires a locked `vision.md` before allowing `agent.invoke` calls (§2-D10). The `reverse_vision` role is exempt from this vision-lock check because intake runs before any vision exists.
+
+The exemption is implemented in `code/src/runtime/permission/rules/agent_budget_rule.js`: when the calling context carries `ctx.role_id === "reverse_vision"`, Section A (vision-lock check) is skipped. Section B (budget enforcement) still applies normally.
+
+All other roles remain subject to the vision-lock check without exception.
+
 ### vision.lock_vision compatibility with new-project flow
 
 `vision.lock_vision` (from `code/src/runtime/tools/vision_tools.js`) is compatible with intake projects. The tool calls `visionEngine.lockVision(project_id, lockedByRole)`, which only requires that `vision.md` exists on disk. No `propose_amendment` or `approve_amendment` prerequisite is needed.

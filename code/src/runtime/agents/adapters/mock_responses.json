@@ -154,5 +154,17 @@
     "tokens_in": 300,
     "tokens_out": 200,
     "finish_reason": "stop"
+  },
+  "mock|mock-rv|scenario:S160": {
+    "text": "{\"project_name\":\"todo_cli\",\"domain\":\"cli_tool\",\"goals\":{\"primary\":\"Provide a minimal command-line TODO list manager\",\"secondary\":[\"Persist items to local JSON file\",\"Support add/list/complete/delete operations\"]},\"constraints\":[\"No external runtime dependencies\",\"Python 3.10+\"],\"non_goals\":[\"Web UI\",\"Multi-user support\",\"Cloud sync\"],\"detected_languages\":[\"python\"],\"source_summary\":\"5-file Python CLI package using argparse and json. Includes pytest tests.\",\"confidence\":\"HIGH\"}",
+    "tokens_in": 100,
+    "tokens_out": 120,
+    "finish_reason": "stop"
+  },
+  "mock|mock-rv|scenario:S161": {
+    "text": "{\"project_name\":\"todo_cli\",\"domain\":\"cli_tool\",\"goals\":{\"primary\":\"Provide a minimal command-line TODO list manager\",\"secondary\":[\"Persist items to local JSON file\",\"Support add/list/complete/delete operations\"]},\"constraints\":[\"No external runtime dependencies\",\"Python 3.10+\"],\"non_goals\":[\"Web UI\",\"Multi-user support\",\"Cloud sync\"],\"detected_languages\":[\"python\"],\"source_summary\":\"5-file Python CLI package using argparse and json. Includes pytest tests.\",\"confidence\":\"HIGH\"}",
+    "tokens_in": 100,
+    "tokens_out": 120,
+    "finish_reason": "stop"
   }
 }

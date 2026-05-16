@@ -55,8 +55,13 @@ function createAgentBudgetRule(options) {
     const isMock    = provider === "mock";
 
     // ── A: Vision lock (non-mock only, §2-D10) ────────────────────────────
+    // Exemption: reverse_vision role runs before vision exists (intake flow).
+    // Vision-lock check is skipped for this role; budget check (Section B) still applies.
+    // See INTAKE_CONTRACT §5 (reverse_vision exemption).
 
-    if (!isMock && projectId) {
+    const roleId = ctx && ctx.role_id ? String(ctx.role_id) : null;
+
+    if (!isMock && projectId && roleId !== "reverse_vision") {
       try {
         const frontmatter = _visionEngine().readVisionSync(projectId);
         if (!frontmatter) {

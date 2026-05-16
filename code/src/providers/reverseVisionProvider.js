@@ -4,9 +4,8 @@
 // @see docs/10_runtime/20_INTAKE_CONTRACT.md §4 (InferredVision schema)
 // @see docs/10_runtime/20_INTAKE_CONTRACT.md §5 (Vision Lock Semantics — auto-lock PROHIBITED)
 //
-// Bypasses agent.invoke (and agent_budget_rule vision-lock check) intentionally:
-// this provider runs BEFORE any vision exists. It calls callChatWithTool directly
-// via the defineProvider callChat helper. See INTAKE_CONTRACT §5.
+// NOTE: reverse_vision_role now calls agent.invoke directly (openai adapter, prompt-based JSON).
+// This provider is retained as a reference implementation and may be wired in Stage 11.4.
 
 const { defineProvider, validateAgainstSchema } = require("./_contract/providerContract");
 const { loadPrompt }                             = require("../runtime/agents/_prompt_loader");

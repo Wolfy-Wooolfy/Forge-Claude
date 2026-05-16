@@ -1,0 +1,10 @@
+{
+  "project_id": "_s150_abort_test",
+  "loop_id": "s150_49f96a4f967e",
+  "iteration_count": 0,
+  "current_state": "ABORTED_BY_OWNER",
+  "nodes": [],
+  "edges": [],
+  "started_at": "2026-05-16T12:01:52.418Z",
+  "last_advanced_at": "2026-05-16T12:01:52.422Z"
+}

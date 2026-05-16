@@ -77,4 +77,18 @@ S162 ✓  project.analyze_source — Rust-only directory returns UNSUPPORTED_LAN
 
 ---
 
+## Architectural Fix Applied (post-review)
+
+**Issue identified:** `reverse_vision_role` was calling `reverseVisionProvider.executeTask()` directly, bypassing `agent.invoke` and `agent_budget_rule`. This made it the only role that didn't go through the standard budget/permission gate. The module comment cited INTAKE_CONTRACT §5 incorrectly (§5 governs vision lock semantics, not agent_budget_rule bypass).
+
+**Fix applied:**
+1. `agent_budget_rule.js` — Added vision-lock exemption for `ctx.role_id === "reverse_vision"`. Section A (vision lock) skipped; Section B (budget) still enforced.
+2. `reverse_vision_role.js` — Restored to `reg.invoke("agent.invoke")` pattern (same as all other roles). Prompt built inline from source_tree. JSON response parsed and validated against OUTPUT_SCHEMA.
+3. `intake_test_helper.js` — S160/S161 updated: provider cache injection removed; role called with `{ provider: "mock", model: "mock-rv", scenario_id: "S160/S161" }` so mock adapter intercepts.
+4. `mock_responses.json` — Added entries for `mock|mock-rv|scenario:S160` and `mock|mock-rv|scenario:S161`.
+5. `reverseVisionProvider.js` — Module comment corrected (no longer claims it bypasses agent.invoke; retained as reference implementation).
+6. `INTAKE_CONTRACT §5` — Added "reverse_vision exemption in agent_budget_rule" paragraph with implementation reference.
+
+**Verified:** S81 (VISION_NOT_LOCKED still enforced for all other roles) ✓. All 157 pass.
+
 ## STOP — Awaiting GO LIVE from owner before proceeding to live demo.

@@ -2,13 +2,8 @@
 
 // Reverse-Vision Role — analyzes SourceTreeAnalysis and infers InferredVision.
 // @see docs/10_runtime/20_INTAKE_CONTRACT.md §4 (InferredVision schema)
-// @see docs/10_runtime/20_INTAKE_CONTRACT.md §5 (Vision Lock Semantics)
+// @see docs/10_runtime/20_INTAKE_CONTRACT.md §5 (Vision Lock Semantics + reverse_vision exemption)
 // @see docs/10_runtime/18b_ROLE_PROMPTS.md (reverse_vision_v1)
-//
-// IMPORTANT: run() calls reverseVisionProvider.executeTask() DIRECTLY — not via
-// agent.invoke — because this role runs before any vision exists, and agent.invoke
-// triggers agent_budget_rule which rejects calls when vision is not locked.
-// This bypass is intentional and documented in INTAKE_CONTRACT §5.
 
 const { defineRole, roleOk, roleFailed } = require("../_role_contract");
 const { validate }                        = require("../_json_schema_validator");
@@ -16,7 +11,7 @@ const { loadPrompt }                      = require("../_prompt_loader");
 const { emit: emitActivity }             = require("../_activity_emitter");
 const { getIndicator }                   = require("../_activity_catalog");
 
-void loadPrompt("reverse_vision_v1");   // validates prompt id at registry load time
+const SYSTEM_PROMPT = loadPrompt("reverse_vision_v1");
 
 const SCHEMA_VERSION = "1.0.0";
 
@@ -83,6 +78,57 @@ const OUTPUT_SCHEMA = {
   }
 };
 
+// ── Prompt builder ─────────────────────────────────────────────────────────────
+
+function _buildPrompt(projectId, st, scenarioTag) {
+  const lines = [];
+  lines.push("reverse_vision|" + projectId);
+  if (scenarioTag) lines.push(scenarioTag);
+  lines.push(SYSTEM_PROMPT);
+  lines.push("\n---");
+  lines.push("SOURCE TREE:");
+  lines.push("PROJECT: " + projectId);
+  lines.push("FILES: " + (st.file_count || 0) + " | SIZE: " + (st.total_size_bytes || 0) + " bytes");
+  lines.push("LANGUAGES: " + (st.detected_languages || []).join(", "));
+
+  if (st.entry_points && st.entry_points.length > 0) {
+    lines.push("ENTRY POINTS: " + st.entry_points.join(", "));
+  }
+  if (st.top_level_directories && st.top_level_directories.length > 0) {
+    lines.push("TOP-LEVEL DIRS: " + st.top_level_directories.join(", "));
+  }
+
+  const mf = st.manifest_files || {};
+  if (Object.keys(mf).length > 0) {
+    lines.push("\nMANIFESTS:");
+    if (mf.pyproject_toml) {
+      const p = mf.pyproject_toml;
+      lines.push("  pyproject.toml: name=" + (p.name || "?") +
+        " version=" + (p.version || "?") +
+        (p.description ? " desc=" + p.description : ""));
+    }
+    if (mf.requirements_txt && mf.requirements_txt.length > 0) {
+      lines.push("  requirements.txt: " + mf.requirements_txt.slice(0, 10).join(", "));
+    }
+    if (mf.readme_excerpt) {
+      lines.push("  README (excerpt): " + mf.readme_excerpt.slice(0, 300).replace(/\n/g, " "));
+    }
+  }
+
+  const samples = st.ast_samples || [];
+  if (samples.length > 0) {
+    lines.push("\nSOURCE FILES (AST samples):");
+    for (const s of samples.slice(0, 20)) {
+      const syms = (s.top_level_symbols || []).join(", ");
+      lines.push("  " + s.file + " [" + (s.loc || "?") + " LOC]" +
+        (syms ? " — " + syms : ""));
+    }
+  }
+
+  lines.push("\nRESPOND WITH VALID JSON ONLY.");
+  return lines.join("\n");
+}
+
 // ── Role Definition ───────────────────────────────────────────────────────────
 
 module.exports = defineRole({
@@ -105,30 +151,35 @@ module.exports = defineRole({
     const project_id    = input.project_id;
     const invocation_id = (ctx && ctx.invocation_id) || null;
     const root          = (ctx && ctx.root)          || process.cwd();
+    const provider      = input.provider || (ctx && ctx.provider) || this.default_provider;
+    const model         = input.model    || (ctx && ctx.model)    || this.default_model;
 
-    // Load provider directly (not via agent.invoke — see module header).
-    const provider = require("../../../providers/reverseVisionProvider");
+    const scenarioTag = (ctx && ctx.scenario_id)
+      ? "SCENARIO_TAG: " + ctx.scenario_id
+      : null;
+
+    const prompt = _buildPrompt(project_id, input.source_tree, scenarioTag);
 
     try {
       emitActivity({ invocation_id, project_id, role: this.id,
         state: "INVOKING_ADAPTER", indicator: getIndicator(this.id, "INVOKING_ADAPTER") }, { root });
     } catch (_e) { /* best-effort */ }
 
-    let providerResult;
+    let agentResult;
     try {
-      providerResult = await provider.executeTask({
-        task_id:    "rv_" + project_id + "_" + Date.now(),
-        project_id: project_id,
-        context: {
-          schema_version: SCHEMA_VERSION,
-          project_id:     project_id,
-          source_tree:    input.source_tree,
-          provider:       (ctx && ctx.provider) || this.default_provider,
-          model:          (ctx && ctx.model)    || this.default_model
-        }
-      });
+      const reg = require("../../tools/_registry").getDefaultRegistry();
+      agentResult = await reg.invoke(
+        "agent.invoke",
+        { provider, model, prompt, project_id, context: { role: this.id } },
+        { root, role_id: this.id }
+      );
     } catch (err) {
-      return roleFailed("PROVIDER_CALL_ERROR", err.message, ctx);
+      return roleFailed("AGENT_INVOKE_ERROR", err.message, ctx);
+    }
+
+    if (!agentResult || agentResult.status !== "SUCCESS") {
+      const detail = agentResult && agentResult.metadata && agentResult.metadata.detail;
+      return roleFailed("AGENT_FAILED", detail || "agent.invoke returned non-SUCCESS", ctx);
     }
 
     try {
@@ -136,12 +187,14 @@ module.exports = defineRole({
         state: "PARSING_OUTPUT", indicator: getIndicator(this.id, "PARSING_OUTPUT") }, { root });
     } catch (_e) { /* best-effort */ }
 
-    if (!providerResult || providerResult.status !== "SUCCESS") {
-      const meta = (providerResult && providerResult.metadata) || {};
-      return roleFailed(meta.reason || "PROVIDER_FAILED", meta.detail || null, ctx);
+    let parsed;
+    try {
+      parsed = JSON.parse(agentResult.output.text);
+    } catch (e) {
+      return roleFailed("INVALID_ROLE_OUTPUT", "JSON parse failed: " + e.message, ctx);
     }
 
-    const ov = validate(providerResult.output, OUTPUT_SCHEMA);
+    const ov = validate(parsed, OUTPUT_SCHEMA);
     if (!ov.valid) return roleFailed("INVALID_ROLE_OUTPUT", ov.errors.join("; "), ctx);
 
     try {
@@ -149,13 +202,13 @@ module.exports = defineRole({
         state: "VALIDATING_SCHEMA", indicator: getIndicator(this.id, "VALIDATING_SCHEMA") }, { root });
     } catch (_e) { /* best-effort */ }
 
-    return roleOk(providerResult.output, {
+    return roleOk(parsed, {
       role:       this.id,
-      model:      (providerResult.metadata && providerResult.metadata.model)      || this.default_model,
-      tokens_in:  (providerResult.metadata && providerResult.metadata.tokens_in)  || 0,
-      tokens_out: (providerResult.metadata && providerResult.metadata.tokens_out) || 0,
-      latency_ms: (providerResult.metadata && providerResult.metadata.latency_ms) || 0,
-      attempt:    (providerResult.metadata && providerResult.metadata.attempt)    || 1
+      model,
+      provider,
+      tokens_in:  (agentResult.output && agentResult.output.tokens_in)  || 0,
+      tokens_out: (agentResult.output && agentResult.output.tokens_out) || 0,
+      latency_ms: (agentResult.output && agentResult.output.latency_ms) || 0
     });
   }
 });

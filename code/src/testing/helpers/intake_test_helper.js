@@ -126,40 +126,11 @@ async function runS159AnalyzeSource() {
   };
 }
 
-// ── S160: reverse_vision_role with mocked reverseVisionProvider ───────────────
+// ── S160: reverse_vision_role via agent.invoke with mock adapter ──────────────
 
 async function runS160ReverseVisionMock() {
-  const PROV_PATH = require.resolve("../../providers/reverseVisionProvider");
   const ROLE_PATH = require.resolve("../../runtime/agents/roles/reverse_vision_role");
-
-  // Stash originals
-  const origProv = require.cache[PROV_PATH];
-  const origRole = require.cache[ROLE_PATH];
-
-  // Inject mock provider
-  require.cache[PROV_PATH] = {
-    id: PROV_PATH, filename: PROV_PATH, loaded: true,
-    exports: {
-      id:          "reverse_vision",
-      version:     "1.0.0",
-      getContract: () => ({
-        id: "reverse_vision", version: "1.0.0",
-        input_schema:  { type: "object", required: [] },
-        output_tool:   { name: "inferred_vision", parameters: { type: "object", required: [] } },
-        required_capabilities: ["function_calling"],
-        authority_doc: "docs/10_runtime/20_INTAKE_CONTRACT.md",
-        fail_mode:     "FAIL_CLOSED"
-      }),
-      executeTask: async () => ({
-        status:   "SUCCESS",
-        output:   MOCK_VISION,
-        metadata: { model: "mock", latency_ms: 1, tokens_in: 0, tokens_out: 0, attempt: 1,
-                    provider_id: "reverse_vision", provider_version: "1.0.0" }
-      })
-    }
-  };
-
-  // Clear role so it re-requires the mock provider
+  const origRole  = require.cache[ROLE_PATH];
   delete require.cache[ROLE_PATH];
 
   let result;
@@ -179,10 +150,9 @@ async function runS160ReverseVisionMock() {
         ignored_paths:         []
       }
     };
-    result = await role.run(input, { root: ROOT });
+    // provider:"mock", model:"mock-rv", scenario_id:"S160" → mock adapter key mock|mock-rv|scenario:S160
+    result = await role.run(input, { root: ROOT, provider: "mock", model: "mock-rv", scenario_id: "S160" });
   } finally {
-    // Restore
-    if (origProv) require.cache[PROV_PATH] = origProv; else delete require.cache[PROV_PATH];
     if (origRole) require.cache[ROLE_PATH] = origRole; else delete require.cache[ROLE_PATH];
   }
 
@@ -202,30 +172,8 @@ async function runS160ReverseVisionMock() {
 
 async function runS161EndToEndMock() {
   const { serializeFrontmatter } = require("../../ai_os/schemas/visionSchema");
-  const PROV_PATH = require.resolve("../../providers/reverseVisionProvider");
   const ROLE_PATH = require.resolve("../../runtime/agents/roles/reverse_vision_role");
-
-  const origProv = require.cache[PROV_PATH];
-  const origRole = require.cache[ROLE_PATH];
-
-  require.cache[PROV_PATH] = {
-    id: PROV_PATH, filename: PROV_PATH, loaded: true,
-    exports: {
-      id:          "reverse_vision",
-      version:     "1.0.0",
-      getContract: () => ({ id: "reverse_vision", version: "1.0.0",
-        input_schema: { type: "object", required: [] },
-        output_tool:  { name: "inferred_vision", parameters: { type: "object", required: [] } },
-        required_capabilities: ["function_calling"],
-        authority_doc: "docs/10_runtime/20_INTAKE_CONTRACT.md",
-        fail_mode: "FAIL_CLOSED" }),
-      executeTask: async () => ({
-        status: "SUCCESS", output: MOCK_VISION,
-        metadata: { model: "mock", latency_ms: 1, tokens_in: 0, tokens_out: 0, attempt: 1,
-                    provider_id: "reverse_vision", provider_version: "1.0.0" }
-      })
-    }
-  };
+  const origRole  = require.cache[ROLE_PATH];
   delete require.cache[ROLE_PATH];
 
   const reg     = _makeRegistry("WORKSPACE_WRITE");
@@ -248,14 +196,16 @@ async function runS161EndToEndMock() {
     const analyzeRes = await reg.invoke("project.analyze_source", { project_id: project }, ctx);
     if (analyzeRes.status !== "SUCCESS") return { all_steps_ok: false, vision_file_exists: false, vision_is_unlocked: false };
 
-    // Step 3: infer vision (mocked)
+    // Step 3: infer vision via agent.invoke with mock adapter
+    // provider:"mock", model:"mock-rv", scenario_id:"S161" → key mock|mock-rv|scenario:S161
     const role = require(ROLE_PATH);
     const roleInput = {
       schema_version: "1.0.0",
       project_id:     project,
       source_tree:    analyzeRes.output
     };
-    const roleRes = await role.run(roleInput, { root: ROOT });
+    const roleRes = await role.run(roleInput,
+      { root: ROOT, provider: "mock", model: "mock-rv", scenario_id: "S161" });
     if (roleRes.status !== "SUCCESS") return { all_steps_ok: false, vision_file_exists: false, vision_is_unlocked: false };
 
     // Step 4: write unlocked vision.md (simulates intake controller)
@@ -297,7 +247,6 @@ async function runS161EndToEndMock() {
     allStepsOk = visionExists && visionUnlocked;
 
   } finally {
-    if (origProv) require.cache[PROV_PATH] = origProv; else delete require.cache[PROV_PATH];
     if (origRole) require.cache[ROLE_PATH] = origRole; else delete require.cache[ROLE_PATH];
   }
 
