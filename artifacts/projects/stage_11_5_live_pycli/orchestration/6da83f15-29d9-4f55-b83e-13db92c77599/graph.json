@@ -1,0 +1,10 @@
+{
+  "project_id": "stage_11_5_live_pycli",
+  "loop_id": "6da83f15-29d9-4f55-b83e-13db92c77599",
+  "iteration_count": 0,
+  "current_state": "SPEC_WRITER_FORMALIZE",
+  "nodes": [],
+  "edges": [],
+  "started_at": "2026-05-17T10:31:16.289Z",
+  "last_advanced_at": "2026-05-17T10:31:20.702Z"
+}

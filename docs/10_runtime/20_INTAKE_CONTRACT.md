@@ -348,4 +348,50 @@ See `code/src/providers/_contract/providerTrace.js` for trace artifact format an
 
 ---
 
-**END OF INTAKE CONTRACT v1.1** — Updated Stage 11.4
+---
+
+## §12 PHASE-11 Completion (Stage 11.5)
+
+**Date:** 2026-05-17
+**Status:** FEATURE COMPLETE — all 6 stages closed (11.0–11.5)
+
+### Languages: ACTIVE
+
+| Language | Grammar | Status |
+|----------|---------|--------|
+| Python | `tree-sitter-python.wasm` | ACTIVE |
+| JavaScript | `tree-sitter-javascript.wasm` | ACTIVE |
+| TypeScript | `tree-sitter-typescript.wasm` | ACTIVE |
+| Go | `tree-sitter-go.wasm` | ACTIVE |
+
+### Validated Fixture Matrix (Stage 11.5 live demo)
+
+| Fixture | Domain | Languages | Confidence | Result |
+|---------|--------|-----------|------------|--------|
+| fixture_pycli | `cli_tool` | python | HIGH | PASS |
+| fixture_nextjs | `web_application` | javascript, typescript | HIGH | PASS |
+| fixture_gocli | `cli_tool` | go | HIGH | PASS |
+
+### Cost (PHASE-11 cumulative)
+
+$0.07864 of $12.00 cap consumed (0.66%).
+
+### Production Readiness
+
+The intake feature is production-ready:
+- Owners provide an existing project directory or zip
+- Forge analyzes the source tree using tree-sitter AST analysis
+- A structured `InferredVision` is inferred by `reverseVisionProvider` (gpt-4o)
+- Vision is presented to the owner for review in chat
+- After approval, the orchestration loop auto-starts with `owner_intent_source: vision_locked_intake`
+- After rejection, project artifacts are deleted
+
+### Open Items for PHASE-12
+
+1. 12 legacy roles not yet migrated to Provider Contract v2
+2. Trace metadata `usage` field shows zeros for real token calls (cosmetic)
+3. Cost ledger truncation on SU runs (OBS-1 — tracked)
+
+---
+
+**END OF INTAKE CONTRACT v1.2** — Updated Stage 11.5 (PHASE-11 COMPLETE)

@@ -1,0 +1,16 @@
+{
+  "ts": "2026-05-17T10:31:32.233Z",
+  "provider_id": "reverse_vision",
+  "provider_version": "2.0.0",
+  "model": "gpt-4o-2024-08-06",
+  "project_id": "stage_11_5_live_gocli",
+  "status": "SUCCESS",
+  "reason": null,
+  "latency_ms": 1814,
+  "attempt": 1,
+  "usage": {
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "total_tokens": 0
+  }
+}

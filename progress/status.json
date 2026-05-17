@@ -4,9 +4,9 @@
   "current_stage": "A",
   "overall_progress_percent": 99,
   "stage_progress_percent": 100,
-  "next_phase": "PHASE-11",
-  "next_step": "Begin PHASE-11 (Existing Project Intake) per owner GO and FORGE_V2_PHASE_ROADMAP.md. Requires new decision artifact and explicit owner confirmation before starting.",
-  "last_completed_artifact": "artifacts/decisions/_phase_10_checkpoints/stage_10_5.md",
+  "next_phase": "PHASE-12",
+  "next_step": "Begin PHASE-12 (Personal Production Setup) per owner GO and FORGE_V2_PHASE_ROADMAP.md. Requires new decision artifact and explicit owner confirmation before starting.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-17T10-3-phase-11-stage-11-5-closure.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -77,9 +77,9 @@
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
-    "self_test_last_run": "2026-05-14",
-    "self_test_last_result": "151 passed, 0 failed, 5 skipped (156 total) — Stage 10.5 closed. S152/S153/S154/S155/S156 added (E2E orchestration loop: fast-path, Gate1 approve, Gate2 reject+loop, debate arbitration, VACUOUS_SKIP). summary_writer.js + e2e_loop_helper.js added. 5 SKIPs require docker.",
-    "self_test_scenarios_pass": 151,
+    "self_test_last_run": "2026-05-17",
+    "self_test_last_result": "178 passed, 0 failed, 5 skipped (183 total) — PHASE-11 CLOSED. S182 (mock e2e 3 fixtures) + S183 (PHASE-11 full regression) added. PHASE-8 hotfix: _stopProcess async (harness_runner.js). INTAKE_CONTRACT §12 added. 5 SKIPs require docker.",
+    "self_test_scenarios_pass": 178,
     "self_test_scenarios_skip": 5,
     "self_test_scenarios_fail": 0,
     "providers_registered_count": 13,
@@ -136,11 +136,11 @@
       "PHASE-7-F-3",
       "PHASE-8",
       "PHASE-9",
-      "PHASE-10"
+      "PHASE-10",
+      "PHASE-11"
     ],
-    "next": "PHASE-11",
+    "next": "PHASE-12",
     "remaining": [
-      "PHASE-11",
       "PHASE-12",
       "PHASE-13"
     ],
@@ -371,10 +371,97 @@
     "cost_actual_usd": 0
   },
   "phase_11": {
-    "status": "IN_PROGRESS",
-    "current_stage": "11.4",
-    "stages_complete": ["11.0", "11.1", "11.2", "11.3", "11.4"],
+    "status": "CLOSED",
+    "current_stage": "11.5",
+    "closed_at": "2026-05-17T10:30:00.000Z",
+    "stages_complete": ["11.0", "11.1", "11.2", "11.3", "11.4", "11.5"],
     "stages": {
+      "11_5": {
+        "status": "CLOSED",
+        "cost_actual_usd": 0.03468,
+        "decision_artifact": "artifacts/decisions/DECISION-2026-05-17T10-3-phase-11-stage-11-5-closure.md",
+        "checkpoint_mid": "artifacts/decisions/_phase_11_checkpoints/stage_11_5_mid.md",
+        "closed_at": "2026-05-17T10:30:00.000Z",
+        "live_demo": {
+          "status": "SUCCESS",
+          "fixtures": ["fixture_pycli", "fixture_nextjs", "fixture_gocli"],
+          "provider": "openai",
+          "model": "gpt-4o",
+          "total_cost_usd": 0.03468,
+          "total_duration_s": 24.4,
+          "kill_switch_fired": false,
+          "hard_cap_hit": false,
+          "all_domains_match": true,
+          "all_languages_match": true,
+          "results": {
+            "pycli": {
+              "project_id": "stage_11_5_live_pycli",
+              "loop_id": "6da83f15-29d9-4f55-b83e-13db92c77599",
+              "cost_usd": 0.01600,
+              "duration_s": 11.7,
+              "domain": "cli_tool",
+              "languages": ["python"],
+              "confidence": "HIGH",
+              "vision_locked": true,
+              "loop_state_after_halt": "SPEC_WRITER_FORMALIZE",
+              "rv_cost_usd": 0.00962,
+              "architect_cost_usd": 0.00638
+            },
+            "nextjs": {
+              "project_id": "stage_11_5_live_nextjs",
+              "loop_id": "1848b937-af9f-4189-9012-540ab58ccbf3",
+              "cost_usd": 0.00966,
+              "duration_s": 7.9,
+              "domain": "web_application",
+              "languages": ["javascript", "typescript"],
+              "confidence": "HIGH",
+              "vision_locked": true,
+              "halt_at": "vision_lock",
+              "rv_cost_usd": 0.00966
+            },
+            "gocli": {
+              "project_id": "stage_11_5_live_gocli",
+              "loop_id": "9f6502f4-e4a7-42ab-ba32-ce4ec9803d98",
+              "cost_usd": 0.00902,
+              "duration_s": 4.8,
+              "domain": "cli_tool",
+              "languages": ["go"],
+              "confidence": "HIGH",
+              "vision_locked": true,
+              "halt_at": "vision_lock",
+              "rv_cost_usd": 0.00902
+            }
+          },
+          "stop_triggers_fired": "none"
+        },
+        "scenarios_added": ["S182", "S183"],
+        "files_created": [
+          "code/src/testing/live/stage_11_5_live_runner.js",
+          "bin/forge-stage-11-5-live-demo.js",
+          "code/src/testing/scenarios/S182_intake_e2e_three_fixtures_mock.json",
+          "code/src/testing/scenarios/S183_phase11_full_regression.json",
+          "artifacts/decisions/_phase_11_checkpoints/stage_11_5_mid.md",
+          "artifacts/decisions/DECISION-2026-05-17T10-3-phase-11-stage-11-5-closure.md",
+          "artifacts/decisions/DECISION-2026-05-17T10-11-48-phase-8-stopprocess-async-fix.md"
+        ],
+        "files_modified": [
+          "code/src/testing/helpers/intake_test_helper.js",
+          "docs/10_runtime/20_INTAKE_CONTRACT.md",
+          "code/src/runtime/builtproject/harness_runner.js"
+        ],
+        "su_baseline_at_close": {
+          "pass": 178,
+          "fail": 0,
+          "skip": 5,
+          "total": 183
+        },
+        "phase_8_hotfix": {
+          "file": "code/src/runtime/builtproject/harness_runner.js",
+          "change": "_stopProcess converted to async (await process exit or 2s timeout)",
+          "decision_artifact": "artifacts/decisions/DECISION-2026-05-17T10-11-48-phase-8-stopprocess-async-fix.md",
+          "status": "OWNER_DECISION_PENDING"
+        }
+      },
       "11_4": {
         "status": "CLOSED",
         "cost_actuals_usd": 0.01698,
@@ -635,10 +722,10 @@
       }
     },
     "total_live_cap_usd": 12,
-    "cost_actuals_usd": 0.04396,
-    "total_live_cap_remaining_usd": 11.95604,
+    "cost_actuals_usd": 0.07864,
+    "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-11-STAGE-11-4-CLOSED",
-  "last_updated": "2026-05-16T21:00:00.000Z"
+  "current_task": "PHASE-11-STAGE-11-5-CLOSED",
+  "last_updated": "2026-05-17T10:30:00.000Z"
 }
