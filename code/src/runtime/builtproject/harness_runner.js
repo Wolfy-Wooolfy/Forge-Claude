@@ -111,7 +111,7 @@ async function runScenario(scenario, projectRoot) {
   } finally {
     // Teardown — stop server regardless of outcome
     if (serverProcess) {
-      _stopProcess(serverProcess);
+      await _stopProcess(serverProcess);
     }
   }
 }
@@ -142,10 +142,10 @@ function _startServer(action, projectRoot) {
 
     // Poll until port is open or timeout
     const deadline = Date.now() + timeoutMs;
-    const check = setInterval(() => {
+    const check = setInterval(async () => {
       if (Date.now() > deadline) {
         clearInterval(check);
-        _stopProcess(proc);
+        await _stopProcess(proc);
         reject(new Error(`Server did not open port ${port} within ${timeoutMs}ms`));
         return;
       }
@@ -160,13 +160,18 @@ function _startServer(action, projectRoot) {
 }
 
 function _stopProcess(proc) {
-  try {
-    if (process.platform === "win32") {
-      spawn("taskkill", ["/pid", proc.pid, "/f", "/t"], { stdio: "ignore" });
-    } else {
-      proc.kill("SIGTERM");
-    }
-  } catch (_) { /* best effort */ }
+  return new Promise((resolve) => {
+    proc.once("exit", resolve);
+    proc.once("error", resolve);
+    setTimeout(resolve, 2000); // safety timeout: Windows taskkill is async
+    try {
+      if (process.platform === "win32") {
+        spawn("taskkill", ["/pid", proc.pid, "/f", "/t"], { stdio: "ignore" });
+      } else {
+        proc.kill("SIGTERM");
+      }
+    } catch (_) { /* best effort */ }
+  });
 }
 
 function _httpRequest(execution) {

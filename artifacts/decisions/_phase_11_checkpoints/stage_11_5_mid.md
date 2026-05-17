@@ -208,6 +208,29 @@ processIntakeRequest input: `{ directory_path: <abs_path>, project_id }` ✓
 
 ---
 
+## §7-bis — Pre-Live-Demo Bug Fix (Applied 2026-05-17)
+
+**Owner decision:** Path A approved — fix is legitimate bug fix, not scope creep.
+
+**Fix applied to:** `code/src/runtime/builtproject/harness_runner.js`
+- `_stopProcess` converted from fire-and-forget to async (returns Promise, awaits process exit or 2s timeout)
+- Call sites at lines 114 and 148 updated to `await _stopProcess(...)`
+
+**Verification:**
+| Check | Result |
+|-------|--------|
+| `node --check harness_runner.js` | SYNTAX OK |
+| S120 isolation | PASS |
+| S124 isolation | PASS |
+| S120 → S124 sequential | BOTH PASS |
+| S119-S128 cluster | 5/5 PASS |
+| Full SU suite | **178/0/5** ✓ |
+| Track A | §ARC-3 exemption confirmed (child_process) |
+
+**Bug-fix decision artifact:** `artifacts/decisions/DECISION-2026-05-17T10-11-48-phase-8-stopprocess-async-fix.md`
+
+---
+
 ## §9 — Owner Decision Required
 
 **STOP** — two decisions needed before GO LIVE:
