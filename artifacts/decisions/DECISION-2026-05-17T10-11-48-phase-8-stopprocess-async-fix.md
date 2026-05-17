@@ -3,7 +3,7 @@
 **Artifact:** DECISION-2026-05-17T10-11-48-phase-8-stopprocess-async-fix.md
 **Date:** 2026-05-17
 **Phase attribution:** Bug originated PHASE-8 / Fix applied during PHASE-11.5
-**Status:** OWNER_DECISION_PENDING (ratification alongside Stage 11.5 closure)
+**Status:** OWNER_APPROVED — 2026-05-17 (ratified alongside Stage 11.5 closure)
 
 ---
 
@@ -77,6 +77,10 @@ The bug existed since PHASE-8 but was masked on the original development machine
 
 ## §7 Owner Approval
 
-**Status:** OWNER_DECISION_PENDING
+**Status:** OWNER_APPROVED — 2026-05-17
 
-To ratify: owner confirms "PHASE-8 _stopProcess fix APPROVED" in the Stage 11.5 closure ratification message. No separate ratification message required — single ratification covers both Stage 11.5 closure and this hotfix.
+Ratified by owner KhElmasry on 2026-05-17 alongside Stage 11.5 closure with phrase:
+
+> "STAGE 11.5 APPROVED."
+
+This ratification covers both the PHASE-8 _stopProcess async fix and the Stage 11.5 closure. The fix addresses a race condition in Windows taskkill that surfaced when running the test suite on a new machine. Verified by S120/S124 sequential PASS and full SU suite returning to baseline 178/0/5 Windows.

@@ -4,7 +4,7 @@
 |---|---|
 | Date | 2026-05-17 |
 | Owner | KhElmasry |
-| Status | OWNER_DECISION_PENDING |
+| Status | OWNER_APPROVED — 2026-05-17 |
 | Scope | PHASE-11 Stage 11.5 — Comprehensive Multi-Fixture Validation |
 | Related | `artifacts/decisions/_phase_11_checkpoints/stage_11_5_mid.md` |
 
@@ -248,7 +248,28 @@ Next phase: PHASE-12 (production setup — PM2 service, credential storage, lega
 
 ## §10 Owner Approval
 
-> To close Stage 11.5 and ratify PHASE-11 COMPLETE, the owner (KhElmasry) must
-> review §3–§5 and post approval.
->
-> **Stage 11.5 CLOSED. Status: OWNER_DECISION_PENDING.**
+**Status:** OWNER_APPROVED — 2026-05-17
+
+Ratified by owner KhElmasry on 2026-05-17 with phrase:
+
+> "STAGE 11.5 APPROVED."
+
+**Closure verification (CTO advisor, independent):**
+- All 3 fixtures verified: vision_locked=true, correct domain inference (pycli=cli_tool, nextjs=web_application, gocli=cli_tool) ✓
+- 3-fixture sequential execution: 17 seconds end-to-end ✓
+- Activity log corroborates: 4 LLM calls, all outcome=success ✓
+- Cost: $0.03468 per-fixture verified ✓
+- PHASE-11 cumulative $0.07864 = $0.04396 + $0.03468 exact ✓
+- Cap utilization: 0.66% of $12.00 ✓
+- SU 178/0/5 Windows, S81 + 6 mock e2e + 10 Stage 11.4 + 2 Stage 11.5 = all regression-free ✓
+- INTAKE_CONTRACT §12 PHASE-11 Completion documented ✓
+
+**PHASE-11 RATIFICATION:**
+PHASE-11 (Existing Project Intake) is OFFICIALLY COMPLETE. The intake feature is production-ready. Forge can now reverse-engineer vision from existing Python, JavaScript, TypeScript, or Go projects (with Next.js framework detection), present it to the owner in chat for approval, lock the vision, and auto-start orchestration to architect.
+
+Three observations carry forward to PHASE-12 backlog:
+1. 12 legacy roles still use bypass pattern (Provider Contract v2 migration needed)
+2. Trace metadata usage field shows zeros (observability polish)
+3. Cost ledger truncated by SU runs (infrastructure fix)
+
+**Next:** PHASE-12 — Personal Production Setup. PM2/systemd service, encrypted credential storage, backups, monitoring, legacy role migration, INSTALL.md verification. Owner re-confirmation required before PHASE-12 begins (per Lean v2 Exit policy from Stage 11.0 plan).
