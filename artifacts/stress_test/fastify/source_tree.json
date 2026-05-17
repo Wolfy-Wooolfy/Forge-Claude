@@ -1,0 +1,171 @@
+{
+  "project_id": "pcst_fastify",
+  "analyzed_at": "2026-05-17T12:33:32.162Z",
+  "root_path": "artifacts/projects/pcst_fastify/source",
+  "detected_languages": [
+    "javascript",
+    "typescript"
+  ],
+  "detected_framework": null,
+  "file_count": 392,
+  "total_size_bytes": 49497,
+  "entry_points": [],
+  "manifest_files": {
+    "package_json": {
+      "version": "0.0.1",
+      "scripts": [
+        "bundle",
+        "test"
+      ],
+      "devDependencies": [
+        "webpack",
+        "webpack-cli"
+      ]
+    },
+    "readme_excerpt": "# Bundlers test stack\n\nIn some cases, developers bundle their apps for several targets such as serverless applications.\nEven if it's not recommended by Fastify team; we need to ensure we do not break the build process.\nPlease note this might result in features behaving differently, like the version handling check for plugins.\n\n## Test bundlers\n\nThe bundler test stack has been defined separately from the rest of the Unit testing stack because it's not a\npart of the fastify lib itself. Note that t",
+    "tsconfig": {}
+  },
+  "top_level_directories": [
+    ".github",
+    "build",
+    "docs",
+    "examples",
+    "integration",
+    "lib",
+    "scripts",
+    "test",
+    "types"
+  ],
+  "ast_samples": [
+    {
+      "file": ".github/scripts/lint-ecosystem.js",
+      "language": "javascript",
+      "top_level_symbols": [
+        "function runCheck",
+        "function handleResults",
+        "function compare"
+      ],
+      "loc": 141
+    },
+    {
+      "file": "build/build-error-serializer.js",
+      "language": "javascript",
+      "top_level_symbols": [],
+      "loc": 36
+    },
+    {
+      "file": "build/build-validation.js",
+      "language": "javascript",
+      "top_level_symbols": [],
+      "loc": 170
+    },
+    {
+      "file": "build/sync-version.js",
+      "language": "javascript",
+      "top_level_symbols": [],
+      "loc": 12
+    },
+    {
+      "file": "eslint.config.js",
+      "language": "javascript",
+      "top_level_symbols": [],
+      "loc": 42
+    },
+    {
+      "file": "examples/asyncawait.js",
+      "language": "javascript",
+      "top_level_symbols": [
+        "function result"
+      ],
+      "loc": 39
+    },
+    {
+      "file": "examples/benchmark/hooks-benchmark-async-await.js",
+      "language": "javascript",
+      "top_level_symbols": [
+        "function promiseFunction",
+        "function asyncHook"
+      ],
+      "loc": 45
+    },
+    {
+      "file": "examples/benchmark/hooks-benchmark.js",
+      "language": "javascript",
+      "top_level_symbols": [],
+      "loc": 53
+    },
+    {
+      "file": "examples/benchmark/parser.js",
+      "language": "javascript",
+      "top_level_symbols": [],
+      "loc": 48
+    },
+    {
+      "file": "examples/benchmark/simple.js",
+      "language": "javascript",
+      "top_level_symbols": [],
+      "loc": 31
+    },
+    {
+      "file": "examples/benchmark/webstream.js",
+      "language": "javascript",
+      "top_level_symbols": [],
+      "loc": 28
+    },
+    {
+      "file": "examples/hooks.js",
+      "language": "javascript",
+      "top_level_symbols": [],
+      "loc": 92
+    },
+    {
+      "file": "examples/http2.js",
+      "language": "javascript",
+      "top_level_symbols": [],
+      "loc": 40
+    },
+    {
+      "file": "examples/https.js",
+      "language": "javascript",
+      "top_level_symbols": [],
+      "loc": 39
+    },
+    {
+      "file": "examples/parser.js",
+      "language": "javascript",
+      "top_level_symbols": [],
+      "loc": 54
+    },
+    {
+      "file": "examples/plugin.js",
+      "language": "javascript",
+      "top_level_symbols": [],
+      "loc": 13
+    },
+    {
+      "file": "examples/route-prefix.js",
+      "language": "javascript",
+      "top_level_symbols": [],
+      "loc": 39
+    },
+    {
+      "file": "examples/shared-schema.js",
+      "language": "javascript",
+      "top_level_symbols": [],
+      "loc": 39
+    },
+    {
+      "file": "examples/simple-stream.js",
+      "language": "javascript",
+      "top_level_symbols": [],
+      "loc": 21
+    },
+    {
+      "file": "examples/simple.js",
+      "language": "javascript",
+      "top_level_symbols": [],
+      "loc": 33
+    }
+  ],
+  "ignored_paths": []
+}

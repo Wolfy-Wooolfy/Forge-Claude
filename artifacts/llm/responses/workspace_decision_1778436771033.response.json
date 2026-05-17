@@ -1,9 +1,0 @@
-{
-  "summary": "Add login button to index page",
-  "files": [
-    {
-      "path": "web/index.html",
-      "content": "<html><body><button>Login</button></body></html>"
-    }
-  ]
-}

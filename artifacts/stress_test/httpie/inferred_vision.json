@@ -1,0 +1,22 @@
+{
+  "role_id": "reverse_vision",
+  "project_name": "pcst_httpie",
+  "domain": "cli_tool",
+  "goals": {
+    "primary": "A command-line interface tool for managing HTTP requests and responses.",
+    "secondary": []
+  },
+  "constraints": [
+    "Python"
+  ],
+  "non_goals": [
+    "No web UI",
+    "No database persistence",
+    "No authentication layer"
+  ],
+  "detected_languages": [
+    "python"
+  ],
+  "source_summary": "The codebase is a Python project that provides a command-line interface for handling HTTP requests and responses. It includes various modules for argument parsing, request formatting, and response handling. The project is structured to support command-line operations without a graphical user interface.",
+  "confidence": "HIGH"
+}

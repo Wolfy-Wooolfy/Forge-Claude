@@ -1,9 +1,0 @@
-{
-  "summary": "Update test-write.txt with new content for preview gate enforcement test.",
-  "files": [
-    {
-      "path": "artifacts/llm/outputs/test-write.txt",
-      "content": "preview gate enforcement test"
-    }
-  ]
-}

@@ -1,0 +1,24 @@
+{
+  "role_id": "reverse_vision",
+  "project_name": "pcst_fastify",
+  "domain": "web_api",
+  "goals": {
+    "primary": "A Fastify-based web API server designed to test and ensure compatibility with various bundling processes for serverless applications.",
+    "secondary": []
+  },
+  "constraints": [
+    "Requires Node.js environment",
+    "Depends on Fastify framework"
+  ],
+  "non_goals": [
+    "No database persistence",
+    "No authentication layer",
+    "No web UI"
+  ],
+  "detected_languages": [
+    "javascript",
+    "typescript"
+  ],
+  "source_summary": "This project is a Fastify-based web API server that focuses on testing and ensuring compatibility with different bundling processes, particularly for serverless applications. It includes various examples and benchmarks to validate the build process and performance under different conditions. The codebase is primarily written in JavaScript and TypeScript, with a focus on maintaining compatibility across different environments.",
+  "confidence": "HIGH"
+}

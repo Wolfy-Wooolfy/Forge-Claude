@@ -1,0 +1,26 @@
+{
+  "role_id": "reverse_vision",
+  "project_name": "Flask",
+  "domain": "web_application",
+  "goals": {
+    "primary": "A simple framework for building complex web applications using Python.",
+    "secondary": [
+      "Provide a sans-IO implementation for alternative frameworks like Quart.",
+      "Support for Celery integration for task management."
+    ]
+  },
+  "constraints": [
+    "Requires Python environment",
+    "Depends on Flask 2.3.2",
+    "Includes Celery for task management"
+  ],
+  "non_goals": [
+    "No database persistence",
+    "No authentication layer"
+  ],
+  "detected_languages": [
+    "python"
+  ],
+  "source_summary": "The codebase is a Python framework designed to facilitate the development of complex web applications. It includes a sans-IO implementation to support alternative frameworks and integrates with Celery for task management. The project is structured to allow for easy extension and customization.",
+  "confidence": "HIGH"
+}

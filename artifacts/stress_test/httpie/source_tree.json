@@ -1,0 +1,251 @@
+{
+  "project_id": "pcst_httpie",
+  "analyzed_at": "2026-05-17T12:33:05.406Z",
+  "root_path": "artifacts/projects/pcst_httpie/source",
+  "detected_languages": [
+    "python"
+  ],
+  "detected_framework": null,
+  "file_count": 265,
+  "total_size_bytes": 231587,
+  "entry_points": [
+    "httpie/manager/cli.py",
+    "httpie/manager/__main__.py",
+    "httpie/__main__.py"
+  ],
+  "manifest_files": {
+    "readme_excerpt": "# HTTPie Test Suite\r\n\r\nPlease see [CONTRIBUTING](https://github.com/httpie/cli/blob/master/CONTRIBUTING.md) for contribution and testing guidelines.\r\n",
+    "setup_py": "present_but_unparsed"
+  },
+  "top_level_directories": [
+    ".github",
+    "docs",
+    "extras",
+    "httpie",
+    "tests"
+  ],
+  "ast_samples": [
+    {
+      "file": "docs/contributors/fetch.py",
+      "language": "python",
+      "top_level_symbols": [
+        "class FinishedForNow",
+        "def main",
+        "def find_committers",
+        "def find_reporters",
+        "def merge_all_the_people",
+        "def release_date",
+        "def load_awesome_people",
+        "def fetch",
+        "def new_person",
+        "def user",
+        "def fetch_missing_users_details",
+        "def save_awesome_people",
+        "def debug"
+      ],
+      "loc": 282
+    },
+    {
+      "file": "docs/contributors/generate.py",
+      "language": "python",
+      "top_level_symbols": [
+        "def generate_snippets"
+      ],
+      "loc": 54
+    },
+    {
+      "file": "docs/installation/generate.py",
+      "language": "python",
+      "top_level_symbols": [
+        "def generate_documentation",
+        "def save_doc_file",
+        "def build_docs_structure",
+        "def clean_template_output",
+        "def load_database",
+        "def load_doc_file",
+        "def main"
+      ],
+      "loc": 86
+    },
+    {
+      "file": "extras/packaging/linux/build.py",
+      "language": "python",
+      "top_level_symbols": [
+        "def build_binaries",
+        "def build_packages",
+        "def main"
+      ],
+      "loc": 110
+    },
+    {
+      "file": "extras/packaging/linux/scripts/hooks/hook-pip.py",
+      "language": "python",
+      "top_level_symbols": [
+        "def hook"
+      ],
+      "loc": 15
+    },
+    {
+      "file": "extras/packaging/linux/scripts/httpie_cli.py",
+      "language": "python",
+      "top_level_symbols": [],
+      "loc": 6
+    },
+    {
+      "file": "extras/packaging/linux/scripts/http_cli.py",
+      "language": "python",
+      "top_level_symbols": [],
+      "loc": 6
+    },
+    {
+      "file": "extras/profiling/benchmarks.py",
+      "language": "python",
+      "top_level_symbols": [
+        "class QuietSimpleHTTPServer",
+        "class Context",
+        "class BaseRunner",
+        "class CommandRunner",
+        "class DownloadRunner",
+        "def start_server",
+        "def main"
+      ],
+      "loc": 203
+    },
+    {
+      "file": "extras/profiling/run.py",
+      "language": "python",
+      "top_level_symbols": [
+        "class Environment",
+        "class HTTPieEnvironment",
+        "class LocalCommandEnvironment",
+        "def call",
+        "def dump_results",
+        "def compare",
+        "def run",
+        "def main"
+      ],
+      "loc": 288
+    },
+    {
+      "file": "extras/scripts/generate_man_pages.py",
+      "language": "python",
+      "top_level_symbols": [
+        "class ManPageBuilder",
+        "def _escape_and_dedent",
+        "def to_man_page",
+        "def main"
+      ],
+      "loc": 189
+    },
+    {
+      "file": "httpie/adapters.py",
+      "language": "python",
+      "top_level_symbols": [
+        "class HTTPieHTTPAdapter"
+      ],
+      "loc": 14
+    },
+    {
+      "file": "httpie/cli/argparser.py",
+      "language": "python",
+      "top_level_symbols": [
+        "class HTTPieHelpFormatter",
+        "class BaseHTTPieArgumentParser",
+        "class HTTPieManagerArgumentParser",
+        "class HTTPieArgumentParser"
+      ],
+      "loc": 614
+    },
+    {
+      "file": "httpie/cli/argtypes.py",
+      "language": "python",
+      "top_level_symbols": [
+        "class KeyValueArg",
+        "class SessionNameValidator",
+        "class Escaped",
+        "class KeyValueArgType",
+        "class PromptMixin",
+        "class SSLCredentials",
+        "class AuthCredentials",
+        "class AuthCredentialsArgType",
+        "def readable_file_arg",
+        "def parse_format_options",
+        "def response_charset_type",
+        "def response_mime_type"
+      ],
+      "loc": 276
+    },
+    {
+      "file": "httpie/cli/constants.py",
+      "language": "python",
+      "top_level_symbols": [
+        "class PrettyOptions",
+        "class RequestType"
+      ],
+      "loc": 135
+    },
+    {
+      "file": "httpie/cli/definition.py",
+      "language": "python",
+      "top_level_symbols": [
+        "def format_style_help",
+        "def format_auth_help"
+      ],
+      "loc": 957
+    },
+    {
+      "file": "httpie/cli/dicts.py",
+      "language": "python",
+      "top_level_symbols": [
+        "class BaseMultiDict",
+        "class HTTPHeadersDict",
+        "class RequestJSONDataDict",
+        "class MultiValueOrderedDict",
+        "class RequestQueryParamsDict",
+        "class RequestDataDict",
+        "class MultipartRequestDataDict",
+        "class RequestFilesDict"
+      ],
+      "loc": 95
+    },
+    {
+      "file": "httpie/cli/exceptions.py",
+      "language": "python",
+      "top_level_symbols": [
+        "class ParseError"
+      ],
+      "loc": 3
+    },
+    {
+      "file": "httpie/cli/nested_json/errors.py",
+      "language": "python",
+      "top_level_symbols": [
+        "class NestedJSONSyntaxError"
+      ],
+      "loc": 28
+    },
+    {
+      "file": "httpie/cli/nested_json/interpret.py",
+      "language": "python",
+      "top_level_symbols": [
+        "def interpret_nested_json",
+        "def interpret",
+        "def wrap_with_dict",
+        "def unwrap_top_level_list_if_needed"
+      ],
+      "loc": 130
+    },
+    {
+      "file": "httpie/cli/nested_json/parse.py",
+      "language": "python",
+      "top_level_symbols": [
+        "def parse",
+        "def tokenize",
+        "def check_escaped_int",
+        "def assert_cant_happen"
+      ],
+      "loc": 194
+    }
+  ],
+  "ignored_paths": []
+}

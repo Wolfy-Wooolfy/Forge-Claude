@@ -1,24 +1,24 @@
 # PCST v1.0 — Stress Test Report
 
 Date: 2026-05-17
-Total cost: $0.01207 of $2.00 cap
-Total duration: 16.5s
-Status: SUCCESS
+Total cost: $0.06968 of $2.00 cap
+Total duration: 78.4s
+Status: PARTIAL_RED
 
 ## Per-Project Results
 
 | # | Slug | P1 | P2 | P3 | P4 | P5 | P6 | Cost | Verdict |
 |---|---|---|---|---|---|---|---|---|---|
-| 1 | flask | ✓ | ✓ | … | ✓ | ✓ | … | $0.01207 | SUCCESS |
-| 2 | httpie | — | — | — | — | — | — | (not run) |
-| 3 | fastify | — | — | — | — | — | — | (not run) |
-| 4 | tailwind-nextjs-blog | — | — | — | — | — | — | (not run) |
-| 5 | cobra | — | — | — | — | — | — | (not run) |
-| 6 | hugo | — | — | — | — | — | — | (not run) |
-| 7 | ruff | — | — | — | — | — | — | (not run) |
-| 8 | gitleaks | — | — | — | — | — | — | (not run) |
-| 9 | flask-no-readme | — | — | — | — | — | — | (not run) |
-| 10 | strapi | — | — | — | — | — | — | (not run) |
+| 1 | flask | — | — | — | — | — | — | (not run) |
+| 2 | httpie | ✓ | ✓ | … | ✓ | ✓ | … | $0.01135 | SUCCESS |
+| 3 | fastify | ✓ | ✓ | … | ✓ | ✓ | … | $0.00988 | SUCCESS |
+| 4 | tailwind-nextjs-blog | ✓ | ✓ | … | ✓ | ✓ | … | $0.01049 | SUCCESS |
+| 5 | cobra | ✓ | ✓ | … | ✓ | ✓ | … | $0.02614 | SUCCESS |
+| 6 | hugo | ✗ | — | … | — | — | … | $0.00000 | FAILED |
+| 7 | ruff | ✗ | — | … | — | — | … | $0.00000 | FAILED |
+| 8 | gitleaks | ✗ | — | … | — | — | … | $0.00000 | FAILED |
+| 9 | flask-no-readme | ✓ | ✓ | … | ✓ | ✓ | … | $0.01182 | SUCCESS |
+| 10 | strapi | ✗ | — | … | — | — | … | $0.00000 | FAILED |
 
 ## P-Check Definitions
 
@@ -35,7 +35,11 @@ Status: SUCCESS
 
 Khaled: please review the following inferred_vision.json files in chat and score Q1-Q5:
 
-1. artifacts/stress_test/flask/inferred_vision.json
+1. artifacts/stress_test/httpie/inferred_vision.json
+2. artifacts/stress_test/fastify/inferred_vision.json
+3. artifacts/stress_test/tailwind-nextjs-blog/inferred_vision.json
+4. artifacts/stress_test/cobra/inferred_vision.json
+5. artifacts/stress_test/flask-no-readme/inferred_vision.json
 
 ## Track A Compliance
 
@@ -59,5 +63,5 @@ Result: SKIPPED (--no-su-baseline)
 ## Cumulative Cost vs Budget
 
 - Cap: $2.00
-- Actual: $0.01207
-- Remaining: $1.98793
+- Actual: $0.06968
+- Remaining: $1.93032

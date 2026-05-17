@@ -735,8 +735,8 @@ async function runStressTest(options) {
       " | duration=" + ((result.duration_ms || 0) / 1000).toFixed(1) + "s" +
       " | verdict=" + result.verdict);
 
-    // Mid-checkpoint: after project #5 (cobra) in a full run (not single/resume)
-    if (!singleSlug && !resumeFrom && project.is_midpoint && !midpointDone) {
+    // Mid-checkpoint: after project #5 (cobra), any multi-project run (single excluded)
+    if (!singleSlug && project.is_midpoint && !midpointDone) {
       midpointDone = true;
       _log("══════════════════════════════════════════════════════════");
       _log("[PCST] Mid-checkpoint reached after project #5 (cobra).");

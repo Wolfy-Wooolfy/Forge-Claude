@@ -1,0 +1,22 @@
+{
+  "role_id": "reverse_vision",
+  "project_name": "pcst_cobra",
+  "domain": "cli_tool",
+  "goals": {
+    "primary": "A Go library for creating powerful modern CLI applications using the Cobra framework.",
+    "secondary": []
+  },
+  "constraints": [
+    "Go 1.15"
+  ],
+  "non_goals": [
+    "No web UI",
+    "No database persistence",
+    "No authentication layer"
+  ],
+  "detected_languages": [
+    "go"
+  ],
+  "source_summary": "This project is a Go library designed to facilitate the creation of command-line interface (CLI) applications. It leverages the Cobra framework to provide developers with tools for building modern and efficient CLI tools. The codebase includes extensive testing to ensure robust functionality.",
+  "confidence": "HIGH"
+}

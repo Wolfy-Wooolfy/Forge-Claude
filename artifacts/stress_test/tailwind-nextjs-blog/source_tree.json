@@ -1,0 +1,260 @@
+{
+  "project_id": "pcst_tailwind-nextjs-blog",
+  "analyzed_at": "2026-05-17T12:33:44.045Z",
+  "root_path": "artifacts/projects/pcst_tailwind-nextjs-blog/source",
+  "detected_languages": [
+    "javascript",
+    "typescript"
+  ],
+  "detected_framework": "next",
+  "file_count": 112,
+  "total_size_bytes": 2288317,
+  "entry_points": [
+    "app/page.tsx"
+  ],
+  "manifest_files": {
+    "next_config": {
+      "file": "next.config.js",
+      "excerpt": "const { withContentlayer } = require('next-contentlayer2')\n\nconst withBundleAnalyzer = require('@next/bundle-analyzer')({\n  enabled: process.env.ANALYZE === 'true',\n})\n\n// You might need to insert additional domains in script-src if you are using external services\nconst ContentSecurityPolicy = `\n  default-src 'self';\n  script-src 'self' 'unsafe-eval' 'unsafe-inline' giscus.app analytics.umami.is;\n  style-src 'self' 'unsafe-inline';\n  img-src * blob: data:;\n  media-src *.s3.amazonaws.com;\n  conne"
+    },
+    "package_json": {
+      "name": "tailwind-nextjs-starter-blog",
+      "version": "2.4.0",
+      "scripts": [
+        "start",
+        "dev",
+        "build",
+        "serve",
+        "analyze",
+        "lint",
+        "prepare"
+      ],
+      "dependencies": [
+        "@headlessui/react",
+        "@next/bundle-analyzer",
+        "@tailwindcss/forms",
+        "@tailwindcss/postcss",
+        "@tailwindcss/typography",
+        "body-scroll-lock",
+        "contentlayer2",
+        "esbuild",
+        "github-slugger",
+        "gray-matter",
+        "hast-util-from-html-isomorphic",
+        "image-size",
+        "next",
+        "next-contentlayer2",
+        "next-themes",
+        "pliny",
+        "postcss",
+        "react",
+        "react-dom",
+        "reading-time",
+        "rehype-autolink-headings",
+        "rehype-citation",
+        "rehype-katex",
+        "rehype-katex-notranslate",
+        "rehype-preset-minify",
+        "rehype-prism-plus",
+        "rehype-slug",
+        "remark",
+        "remark-gfm",
+        "remark-github-blockquote-alert",
+        "remark-math",
+        "tailwindcss",
+        "unist-util-visit"
+      ],
+      "devDependencies": [
+        "@eslint/eslintrc",
+        "@eslint/js",
+        "@svgr/webpack",
+        "@types/mdx",
+        "@types/react",
+        "@typescript-eslint/eslint-plugin",
+        "@typescript-eslint/parser",
+        "cross-env",
+        "eslint",
+        "eslint-config-next",
+        "eslint-config-prettier",
+        "eslint-plugin-prettier",
+        "globals",
+        "husky",
+        "lint-staged",
+        "prettier",
+        "prettier-plugin-tailwindcss",
+        "typescript"
+      ]
+    },
+    "readme_excerpt": "![tailwind-nextjs-banner](/public/static/images/twitter-card.png)\n\n# Tailwind Nextjs Starter Blog\n\n[![GitHub Repo stars](https://img.shields.io/github/stars/timlrx/tailwind-nextjs-starter-blog?style=social)](https://GitHub.com/timlrx/tailwind-nextjs-starter-blog/stargazers/)\n[![GitHub forks](https://img.shields.io/github/forks/timlrx/tailwind-nextjs-starter-blog?style=social)](https://github.com/timlrx/tailwind-nextjs-starter-blog/forks)\n[![Twitter URL](https://img.shields.io/twitter/url?style=s",
+    "tsconfig": null
+  },
+  "top_level_directories": [
+    ".devcontainer",
+    ".github",
+    ".husky",
+    ".vscode",
+    ".yarn",
+    "app",
+    "components",
+    "css",
+    "data",
+    "faq",
+    "layouts",
+    "public",
+    "scripts"
+  ],
+  "ast_samples": [
+    {
+      "file": ".yarn/releases/yarn-3.6.1.cjs",
+      "language": "javascript",
+      "top_level_symbols": [],
+      "loc": 875
+    },
+    {
+      "file": "app/about/page.tsx",
+      "language": "typescript",
+      "top_level_symbols": [
+        "function Page"
+      ],
+      "loc": 21
+    },
+    {
+      "file": "app/api/newsletter/route.ts",
+      "language": "typescript",
+      "top_level_symbols": [],
+      "loc": 12
+    },
+    {
+      "file": "app/blog/page/[page]/page.tsx",
+      "language": "typescript",
+      "top_level_symbols": [
+        "function Page"
+      ],
+      "loc": 43
+    },
+    {
+      "file": "app/blog/page.tsx",
+      "language": "typescript",
+      "top_level_symbols": [
+        "function BlogPage"
+      ],
+      "loc": 29
+    },
+    {
+      "file": "app/blog/[...slug]/page.tsx",
+      "language": "typescript",
+      "top_level_symbols": [
+        "function generateMetadata",
+        "function Page"
+      ],
+      "loc": 121
+    },
+    {
+      "file": "app/layout.tsx",
+      "language": "typescript",
+      "top_level_symbols": [
+        "function RootLayout"
+      ],
+      "loc": 112
+    },
+    {
+      "file": "app/Main.tsx",
+      "language": "typescript",
+      "top_level_symbols": [],
+      "loc": 92
+    },
+    {
+      "file": "app/not-found.tsx",
+      "language": "typescript",
+      "top_level_symbols": [
+        "function NotFound"
+      ],
+      "loc": 26
+    },
+    {
+      "file": "app/page.tsx",
+      "language": "typescript",
+      "top_level_symbols": [
+        "function Page"
+      ],
+      "loc": 10
+    },
+    {
+      "file": "app/projects/page.tsx",
+      "language": "typescript",
+      "top_level_symbols": [],
+      "loc": 36
+    },
+    {
+      "file": "app/robots.ts",
+      "language": "typescript",
+      "top_level_symbols": [
+        "function robots"
+      ],
+      "loc": 16
+    },
+    {
+      "file": "app/seo.tsx",
+      "language": "typescript",
+      "top_level_symbols": [
+        "function genPageMetadata",
+        "interface PageSEOProps"
+      ],
+      "loc": 33
+    },
+    {
+      "file": "app/sitemap.ts",
+      "language": "typescript",
+      "top_level_symbols": [
+        "function sitemap"
+      ],
+      "loc": 24
+    },
+    {
+      "file": "app/tags/page.tsx",
+      "language": "typescript",
+      "top_level_symbols": [
+        "function Page"
+      ],
+      "loc": 42
+    },
+    {
+      "file": "app/tags/[tag]/page/[page]/page.tsx",
+      "language": "typescript",
+      "top_level_symbols": [
+        "function TagPage"
+      ],
+      "loc": 54
+    },
+    {
+      "file": "app/tags/[tag]/page.tsx",
+      "language": "typescript",
+      "top_level_symbols": [
+        "function generateMetadata",
+        "function TagPage"
+      ],
+      "loc": 60
+    },
+    {
+      "file": "app/theme-providers.tsx",
+      "language": "typescript",
+      "top_level_symbols": [
+        "function ThemeProviders"
+      ],
+      "loc": 13
+    },
+    {
+      "file": "components/Card.tsx",
+      "language": "typescript",
+      "top_level_symbols": [],
+      "loc": 57
+    },
+    {
+      "file": "components/Comments.tsx",
+      "language": "typescript",
+      "top_level_symbols": [],
+      "loc": 23
+    }
+  ],
+  "ignored_paths": []
+}

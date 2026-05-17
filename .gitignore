@@ -121,6 +121,21 @@ ${APPDATA}/
 # We ignore ONLY the JSONL files, not the folder.
 
 artifacts/ai/cost_ledger.jsonl
+# Step 2 audit findings (2026-05-17) — extend §7 RUNTIME LOGS:
+artifacts/agent/activity.jsonl
+artifacts/agent/cost_ledger.jsonl
+artifacts/audit/permission_audit.jsonl
+artifacts/audit/tool_audit.jsonl
+
+# LLM forensic trace — per-call dumps, regenerable, high-volume
+artifacts/llm/metadata/
+artifacts/llm/requests/
+artifacts/llm/responses/
+artifacts/llm/outputs/
+
+# PCST intake working dirs — Forge copies source into these during intake.
+# Regenerable. Source clones are in artifacts/stress_test/<slug>/source_clone/
+artifacts/projects/pcst_*/
 
 # Per-run doctor snapshots
 
@@ -293,3 +308,14 @@ yarn-error.log*
 #   INSTRUCTIONS.md              — Forge orchestration instructions
 #
 # ============================================================================
+ 
+# -- 16. PCST INTAKE WORKING DIRS (regenerable) ----------------- 
+# PCST script runs project.intake_zip which copies source code 
+# into these dirs. Regenerable; not part of test deliverables. 
+# The actual test artifacts are in artifacts/stress_test/. 
+artifacts/projects/pcst_*/ 
+# -- 16. PCST INTAKE WORKING DIRS (regenerable) ------------------------------
+# PCST script's project.intake_zip copies source code into these dirs.
+# Regenerable; not part of test deliverables.
+# Real test artifacts live in artifacts/stress_test/<slug>/
+artifacts/projects/pcst_*/

@@ -1,0 +1,24 @@
+{
+  "role_id": "reverse_vision",
+  "project_name": "tailwind-nextjs-starter-blog",
+  "domain": "web_application",
+  "goals": {
+    "primary": "A Next.js web application that serves as a starter blog using Tailwind CSS for styling.",
+    "secondary": []
+  },
+  "constraints": [
+    "Requires Node.js environment",
+    "Uses Next.js framework",
+    "Styled with Tailwind CSS"
+  ],
+  "non_goals": [
+    "No authentication layer",
+    "No database persistence"
+  ],
+  "detected_languages": [
+    "javascript",
+    "typescript"
+  ],
+  "source_summary": "This project is a starter blog application built with Next.js and styled using Tailwind CSS. It includes various page components for displaying blog posts, tags, and other content. The application is designed to be a template for creating personal or professional blogs.",
+  "confidence": "HIGH"
+}
