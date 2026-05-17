@@ -1097,6 +1097,141 @@ async function runS181FullMockE2E() {
   };
 }
 
+// ── S182: mock e2e × 3 fixtures — intake handler → InferredVision per fixture ──
+// Uses existing mock responses: S161 (pycli), S167 (nextjs), S171 (gocli).
+// Asserts schema validity + known-domain assertions for nextjs and gocli.
+
+async function runS182IntakeE2EThreeFixturesMock() {
+  const { processIntakeRequest } = require("../../ai_os/intake_conversation_handler");
+  const reg = _makeRegistry("WORKSPACE_WRITE");
+
+  function _schemaOk(iv) {
+    return !!(iv && typeof iv.project_name === "string" && iv.project_name.length > 0 &&
+              typeof iv.domain === "string" && iv.domain.length > 0 &&
+              iv.goals && typeof iv.goals.primary === "string" &&
+              ["HIGH", "MEDIUM", "LOW"].includes(iv.confidence));
+  }
+
+  async function _runFixtureMock(fixture_subdir, project_id, scenario_id) {
+    // Pre-cleanup: ensure no stale project directory from prior runs
+    try {
+      await reg.invoke("fs.delete_dir",
+        { path: "artifacts/projects/" + project_id }, { root: ROOT });
+    } catch (_e) { /* best-effort — first run has nothing to delete */ }
+
+    const fixturePath = path.resolve(ROOT, "artifacts", "test_fixtures", "intake", fixture_subdir);
+    const res = await processIntakeRequest(
+      { directory_path: fixturePath, project_id },
+      { root: ROOT, registry: reg, provider: "mock", model: "mock-rv", scenario_id }
+    );
+    if (!res || !res.ok || res.stage !== "AWAIT_VISION_APPROVAL") {
+      return { stage_ok: false, schema_ok: false, domain: null };
+    }
+    const stateFile = path.join(ROOT, "artifacts", "projects", project_id, "intake_state.json");
+    if (!fs.existsSync(stateFile)) return { stage_ok: true, schema_ok: false, domain: null };
+    const state = JSON.parse(fs.readFileSync(stateFile, "utf8"));
+    const iv = state.inferred_vision;
+    return { stage_ok: true, schema_ok: _schemaOk(iv), domain: (iv && iv.domain) || null };
+  }
+
+  const pycliR  = await _runFixtureMock("fixture_pycli",  "test_s182_pycli",  "S161");
+  const nextjsR = await _runFixtureMock("fixture_nextjs", "test_s182_nextjs", "S167");
+  const gocliR  = await _runFixtureMock("fixture_gocli",  "test_s182_gocli",  "S171");
+
+  return {
+    pycli_stage_ok:        pycliR.stage_ok,
+    pycli_schema_ok:       pycliR.schema_ok,
+    nextjs_stage_ok:       nextjsR.stage_ok,
+    nextjs_schema_ok:      nextjsR.schema_ok,
+    nextjs_domain_correct: nextjsR.domain === "web_application",
+    gocli_stage_ok:        gocliR.stage_ok,
+    gocli_schema_ok:       gocliR.schema_ok,
+    gocli_domain_correct:  gocliR.domain === "cli_tool"
+  };
+}
+
+// ── S183: PHASE-11 full regression — grammars + role path + contract + provider ─
+// Pure file inspection — no LLM calls.
+// Verifies: grammar wasm SHA256 from MANIFEST; role has no _buildPrompt;
+// INTAKE_CONTRACT §7 marks all 4 languages ACTIVE; provider has mock branch ~line 195.
+
+async function runS183Phase11FullRegression() {
+  const crypto = require("crypto");
+
+  const MANIFEST_PATH  = path.join(ROOT, "artifacts", "vendor", "tree-sitter-grammars", "MANIFEST.json");
+  const GRAMMAR_DIR    = path.join(ROOT, "artifacts", "vendor", "tree-sitter-grammars");
+  const ROLE_PATH      = path.join(ROOT, "code", "src", "runtime", "agents", "roles", "reverse_vision_role.js");
+  const PROVIDER_PATH  = path.join(ROOT, "code", "src", "providers", "reverseVisionProvider.js");
+  const CONTRACT_PATH  = path.join(ROOT, "docs", "10_runtime", "20_INTAKE_CONTRACT.md");
+
+  // ── Grammar SHA256 checks ────────────────────────────────────────────────
+  let manifest;
+  try { manifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, "utf8")); }
+  catch (_e) { manifest = null; }
+
+  function _sha256Ok(lang) {
+    if (!manifest || !manifest.grammars || !manifest.grammars[lang]) return false;
+    const entry    = manifest.grammars[lang];
+    const wasmPath = path.join(GRAMMAR_DIR, entry.file);
+    if (!fs.existsSync(wasmPath)) return false;
+    const actual   = crypto.createHash("sha256").update(fs.readFileSync(wasmPath)).digest("hex");
+    return actual === entry.sha256;
+  }
+
+  const pythonOk     = _sha256Ok("python");
+  const javascriptOk = _sha256Ok("javascript");
+  const typescriptOk = _sha256Ok("typescript");
+  const goOk         = _sha256Ok("go");
+
+  // ── Role single path — no _buildPrompt ──────────────────────────────────
+  let roleNoBuildPrompt = false;
+  try {
+    const roleSource = fs.readFileSync(ROLE_PATH, "utf8");
+    roleNoBuildPrompt = !roleSource.includes("_buildPrompt");
+  } catch (_e) { /* false */ }
+
+  // ── INTAKE_CONTRACT §7 language ACTIVE checks ─────────────────────────
+  let contractPythonActive = false;
+  let contractJsActive     = false;
+  let contractTsActive     = false;
+  let contractGoActive     = false;
+  try {
+    const contract = fs.readFileSync(CONTRACT_PATH, "utf8");
+    // §7 rows contain "ACTIVE" and the language name in the same line
+    const lines = contract.split("\n");
+    for (const line of lines) {
+      if (line.includes("ACTIVE")) {
+        if (/Python/i.test(line))                                   contractPythonActive = true;
+        if (/JavaScript/i.test(line) && !/TypeScript/i.test(line)) contractJsActive     = true;
+        if (/TypeScript/i.test(line))                               contractTsActive     = true;
+        if (/Go\b/i.test(line))                                     contractGoActive     = true;
+      }
+    }
+  } catch (_e) { /* false */ }
+
+  // ── Provider Contract v2 — mock branch present ────────────────────────
+  // reverseVisionProvider.js must contain the mock branch at around line 195.
+  // We check that the file contains the canonical pattern for the mock branch.
+  let providerMockBranchOk = false;
+  try {
+    const providerSource = fs.readFileSync(PROVIDER_PATH, "utf8");
+    providerMockBranchOk = providerSource.includes('context.provider === "mock"');
+  } catch (_e) { /* false */ }
+
+  return {
+    python_wasm_sha256_ok:     pythonOk,
+    javascript_wasm_sha256_ok: javascriptOk,
+    typescript_wasm_sha256_ok: typescriptOk,
+    go_wasm_sha256_ok:         goOk,
+    role_no_build_prompt:      roleNoBuildPrompt,
+    contract_python_active:    contractPythonActive,
+    contract_js_active:        contractJsActive,
+    contract_ts_active:        contractTsActive,
+    contract_go_active:        contractGoActive,
+    provider_mock_branch_ok:   providerMockBranchOk
+  };
+}
+
 module.exports = {
   runS158IntakeZip,
   runS159AnalyzeSource,
@@ -1121,5 +1256,7 @@ module.exports = {
   runS178LoopStartsAtArchitectDesign,
   runS179ProviderWritesTraceFiles,
   runS180RoleIdExemptionFires,
-  runS181FullMockE2E
+  runS181FullMockE2E,
+  runS182IntakeE2EThreeFixturesMock,
+  runS183Phase11FullRegression
 };

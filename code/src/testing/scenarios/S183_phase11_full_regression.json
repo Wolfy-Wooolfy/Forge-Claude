@@ -1,0 +1,23 @@
+{
+  "id": "S183",
+  "name": "PHASE-11 full regression: grammars + role single path + contract + provider v2",
+  "description": "Stage 11.5 meta-regression. Asserts key PHASE-11 structural properties: all 4 vendored wasm grammars exist with correct SHA256 from MANIFEST; reverse_vision_role uses single path (no _buildPrompt); INTAKE_CONTRACT §7 marks all 4 languages ACTIVE; reverseVisionProvider has mock branch around line 195 (Provider Contract v2 compliant). No LLM calls — pure file inspection.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS183Phase11FullRegression",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals", "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "python_wasm_sha256_ok",      "expected": true },
+    { "type": "state_field_equals", "field": "javascript_wasm_sha256_ok",  "expected": true },
+    { "type": "state_field_equals", "field": "typescript_wasm_sha256_ok",  "expected": true },
+    { "type": "state_field_equals", "field": "go_wasm_sha256_ok",          "expected": true },
+    { "type": "state_field_equals", "field": "role_no_build_prompt",       "expected": true },
+    { "type": "state_field_equals", "field": "contract_python_active",     "expected": true },
+    { "type": "state_field_equals", "field": "contract_js_active",         "expected": true },
+    { "type": "state_field_equals", "field": "contract_ts_active",         "expected": true },
+    { "type": "state_field_equals", "field": "contract_go_active",         "expected": true },
+    { "type": "state_field_equals", "field": "provider_mock_branch_ok",    "expected": true }
+  ]
+}

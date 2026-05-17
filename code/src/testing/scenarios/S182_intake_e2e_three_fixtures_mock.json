@@ -1,0 +1,22 @@
+{
+  "id": "S182",
+  "name": "mock e2e: intake handler × 3 fixtures sequentially → valid InferredVision per fixture",
+  "description": "Stage 11.5 — runs processIntakeRequest against fixture_pycli, fixture_nextjs, fixture_gocli in sequence using mock provider. Each fixture must produce AWAIT_VISION_APPROVAL with a schema-valid InferredVision. Validates all 3 language analyzers work end-to-end through the state machine.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS182IntakeE2EThreeFixturesMock",
+  "args": [],
+  "cleanup_projects": ["test_s182_pycli", "test_s182_nextjs", "test_s182_gocli"],
+  "assertions": [
+    { "type": "status_equals", "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "pycli_stage_ok",        "expected": true },
+    { "type": "state_field_equals", "field": "pycli_schema_ok",       "expected": true },
+    { "type": "state_field_equals", "field": "nextjs_stage_ok",       "expected": true },
+    { "type": "state_field_equals", "field": "nextjs_schema_ok",      "expected": true },
+    { "type": "state_field_equals", "field": "nextjs_domain_correct", "expected": true },
+    { "type": "state_field_equals", "field": "gocli_stage_ok",        "expected": true },
+    { "type": "state_field_equals", "field": "gocli_schema_ok",       "expected": true },
+    { "type": "state_field_equals", "field": "gocli_domain_correct",  "expected": true }
+  ]
+}

@@ -1,16 +1,45 @@
 {
-  "total": 1,
-  "pass": 1,
+  "total": 6,
+  "pass": 5,
   "fail": 0,
-  "error": 0,
-  "overall_status": "PASS",
-  "ran_at": "2026-05-16T21:04:19.933Z",
+  "error": 1,
+  "overall_status": "FAIL",
+  "ran_at": "2026-05-17T09:48:00.589Z",
   "scenarios": [
+    {
+      "id": "T-1",
+      "name": "create_todo_returns_201",
+      "status": "PASS",
+      "duration_ms": 1439,
+      "assertions": [
+        {
+          "type": "http_status_equals",
+          "pass": true,
+          "reason": null
+        },
+        {
+          "type": "response_body_contains_key",
+          "pass": true,
+          "reason": null
+        },
+        {
+          "type": "response_body_field_equals",
+          "pass": true,
+          "reason": null
+        },
+        {
+          "type": "response_body_field_equals",
+          "pass": true,
+          "reason": null
+        }
+      ],
+      "error": null
+    },
     {
       "id": "T-2",
       "name": "list_todos_empty_returns_empty_array",
       "status": "PASS",
-      "duration_ms": 216,
+      "duration_ms": 342,
       "assertions": [
         {
           "type": "http_status_equals",
@@ -19,6 +48,61 @@
         },
         {
           "type": "response_body_is_array",
+          "pass": true,
+          "reason": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "T-3",
+      "name": "get_todo_not_found_returns_404",
+      "status": "PASS",
+      "duration_ms": 1161,
+      "assertions": [
+        {
+          "type": "http_status_equals",
+          "pass": true,
+          "reason": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "T-4",
+      "name": "update_todo_not_found_returns_404",
+      "status": "ERROR",
+      "duration_ms": 269,
+      "assertions": [],
+      "error": "HTTP request failed: read ECONNRESET"
+    },
+    {
+      "id": "T-5",
+      "name": "delete_todo_not_found_returns_404",
+      "status": "PASS",
+      "duration_ms": 1378,
+      "assertions": [
+        {
+          "type": "http_status_equals",
+          "pass": true,
+          "reason": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "T-6",
+      "name": "missing_title_returns_400",
+      "status": "PASS",
+      "duration_ms": 312,
+      "assertions": [
+        {
+          "type": "http_status_equals",
+          "pass": true,
+          "reason": null
+        },
+        {
+          "type": "response_body_contains_key",
           "pass": true,
           "reason": null
         }
