@@ -1,0 +1,26 @@
+{
+  "role_id": "reverse_vision",
+  "project_name": "Flask",
+  "domain": "web_application",
+  "goals": {
+    "primary": "A simple framework for building complex web applications using Python.",
+    "secondary": [
+      "Provide a CLI for managing Flask applications.",
+      "Support for asynchronous task queues with Celery integration."
+    ]
+  },
+  "constraints": [
+    "Python 3.2.0 or higher",
+    "Requires Flask 2.3.2",
+    "Dependencies include amqp, async-timeout, billiard, blinker, celery, click"
+  ],
+  "non_goals": [
+    "No database persistence",
+    "No authentication layer by default"
+  ],
+  "detected_languages": [
+    "python"
+  ],
+  "source_summary": "The codebase is a Python framework designed to facilitate the development of complex web applications. It includes a command-line interface for application management and supports integration with Celery for asynchronous task processing. The project is structured to allow alternative implementations without direct I/O operations.",
+  "confidence": "HIGH"
+}
