@@ -1,0 +1,530 @@
+{
+  "project_id": "pcst_gitleaks",
+  "analyzed_at": "2026-05-17T13:33:04.155Z",
+  "root_path": "artifacts/projects/pcst_gitleaks/source",
+  "detected_languages": [
+    "go",
+    "python"
+  ],
+  "detected_framework": null,
+  "file_count": 450,
+  "total_size_bytes": 143663,
+  "entry_points": [
+    "cmd/generate/config/main.go",
+    "main.go",
+    "testdata/archives/files/main.go",
+    "testdata/repos/nogit/main.go",
+    "testdata/repos/small/main.go",
+    "testdata/repos/staged/main.go"
+  ],
+  "manifest_files": {
+    "go_mod": {
+      "module_path": "github.com/zricethezav/gitleaks/v8",
+      "project_name": "v8",
+      "go_version": "1.24.11",
+      "dependencies": [
+        {
+          "name": "github.com/BobuSumisu/aho-corasick",
+          "version": "v1.0.3"
+        },
+        {
+          "name": "github.com/Masterminds/sprig/v3",
+          "version": "v3.3.0"
+        },
+        {
+          "name": "github.com/charmbracelet/lipgloss",
+          "version": "v0.5.0"
+        },
+        {
+          "name": "github.com/fatih/semgroup",
+          "version": "v1.2.0"
+        },
+        {
+          "name": "github.com/gitleaks/go-gitdiff",
+          "version": "v0.9.1"
+        },
+        {
+          "name": "github.com/google/go-cmp",
+          "version": "v0.6.0"
+        },
+        {
+          "name": "github.com/h2non/filetype",
+          "version": "v1.1.3"
+        },
+        {
+          "name": "github.com/hashicorp/go-version",
+          "version": "v1.7.0"
+        },
+        {
+          "name": "github.com/mholt/archives",
+          "version": "v0.1.2"
+        },
+        {
+          "name": "github.com/rs/zerolog",
+          "version": "v1.33.0"
+        },
+        {
+          "name": "github.com/spf13/cobra",
+          "version": "v1.9.1"
+        },
+        {
+          "name": "github.com/spf13/viper",
+          "version": "v1.19.0"
+        },
+        {
+          "name": "github.com/stretchr/testify",
+          "version": "v1.10.0"
+        },
+        {
+          "name": "golang.org/x/exp",
+          "version": "v0.0.0-20250218142911-aa4b98e5adaa"
+        },
+        {
+          "name": "dario.cat/mergo",
+          "version": "v1.0.1"
+        },
+        {
+          "name": "github.com/Masterminds/goutils",
+          "version": "v1.1.1"
+        },
+        {
+          "name": "github.com/Masterminds/semver/v3",
+          "version": "v3.3.0"
+        },
+        {
+          "name": "github.com/STARRY-S/zip",
+          "version": "v0.2.1"
+        },
+        {
+          "name": "github.com/andybalholm/brotli",
+          "version": "v1.1.2-0.20250424173009-453214e765f3"
+        },
+        {
+          "name": "github.com/aymanbagabas/go-osc52/v2",
+          "version": "v2.0.1"
+        },
+        {
+          "name": "github.com/bodgit/plumbing",
+          "version": "v1.3.0"
+        },
+        {
+          "name": "github.com/bodgit/sevenzip",
+          "version": "v1.6.0"
+        },
+        {
+          "name": "github.com/bodgit/windows",
+          "version": "v1.0.1"
+        },
+        {
+          "name": "github.com/dsnet/compress",
+          "version": "v0.0.2-0.20230904184137-39efe44ab707"
+        },
+        {
+          "name": "github.com/google/uuid",
+          "version": "v1.6.0"
+        },
+        {
+          "name": "github.com/hashicorp/errwrap",
+          "version": "v1.1.0"
+        },
+        {
+          "name": "github.com/hashicorp/go-multierror",
+          "version": "v1.1.1"
+        },
+        {
+          "name": "github.com/hashicorp/golang-lru/v2",
+          "version": "v2.0.7"
+        },
+        {
+          "name": "github.com/huandu/xstrings",
+          "version": "v1.5.0"
+        },
+        {
+          "name": "github.com/klauspost/compress",
+          "version": "v1.17.11"
+        },
+        {
+          "name": "github.com/klauspost/pgzip",
+          "version": "v1.2.6"
+        },
+        {
+          "name": "github.com/lucasb-eyer/go-colorful",
+          "version": "v1.2.0"
+        },
+        {
+          "name": "github.com/mattn/go-colorable",
+          "version": "v0.1.14"
+        },
+        {
+          "name": "github.com/mattn/go-isatty",
+          "version": "v0.0.20"
+        },
+        {
+          "name": "github.com/mattn/go-runewidth",
+          "version": "v0.0.14"
+        },
+        {
+          "name": "github.com/minio/minlz",
+          "version": "v1.0.0"
+        },
+        {
+          "name": "github.com/mitchellh/copystructure",
+          "version": "v1.2.0"
+        },
+        {
+          "name": "github.com/mitchellh/reflectwalk",
+          "version": "v1.0.2"
+        },
+        {
+          "name": "github.com/muesli/reflow",
+          "version": "v0.2.1-0.20210115123740-9e1d0d53df68"
+        },
+        {
+          "name": "github.com/muesli/termenv",
+          "version": "v0.15.1"
+        },
+        {
+          "name": "github.com/nwaples/rardecode/v2",
+          "version": "v2.1.0"
+        },
+        {
+          "name": "github.com/pelletier/go-toml/v2",
+          "version": "v2.2.3"
+        },
+        {
+          "name": "github.com/pierrec/lz4/v4",
+          "version": "v4.1.21"
+        },
+        {
+          "name": "github.com/rivo/uniseg",
+          "version": "v0.2.0"
+        },
+        {
+          "name": "github.com/sagikazarmark/locafero",
+          "version": "v0.7.0"
+        },
+        {
+          "name": "github.com/sagikazarmark/slog-shim",
+          "version": "v0.1.0"
+        },
+        {
+          "name": "github.com/shopspring/decimal",
+          "version": "v1.4.0"
+        },
+        {
+          "name": "github.com/sorairolake/lzip-go",
+          "version": "v0.3.5"
+        },
+        {
+          "name": "github.com/sourcegraph/conc",
+          "version": "v0.3.0"
+        },
+        {
+          "name": "github.com/tetratelabs/wazero",
+          "version": "v1.9.0"
+        },
+        {
+          "name": "github.com/therootcompany/xz",
+          "version": "v1.0.1"
+        },
+        {
+          "name": "github.com/ulikunitz/xz",
+          "version": "v0.5.12"
+        },
+        {
+          "name": "github.com/wasilibs/wazero-helpers",
+          "version": "v0.0.0-20240620070341-3dff1577cd52"
+        },
+        {
+          "name": "go.uber.org/multierr",
+          "version": "v1.11.0"
+        },
+        {
+          "name": "go4.org",
+          "version": "v0.0.0-20230225012048-214862532bf5"
+        },
+        {
+          "name": "golang.org/x/crypto",
+          "version": "v0.35.0"
+        },
+        {
+          "name": "github.com/davecgh/go-spew",
+          "version": "v1.1.2-0.20180830191138-d8f796af33cc"
+        },
+        {
+          "name": "github.com/fsnotify/fsnotify",
+          "version": "v1.8.0"
+        },
+        {
+          "name": "github.com/hashicorp/hcl",
+          "version": "v1.0.0"
+        },
+        {
+          "name": "github.com/inconshreveable/mousetrap",
+          "version": "v1.1.0"
+        },
+        {
+          "name": "github.com/lucasjones/reggen",
+          "version": "v0.0.0-20200904144131-37ba4fa293bb"
+        },
+        {
+          "name": "github.com/magiconair/properties",
+          "version": "v1.8.9"
+        },
+        {
+          "name": "github.com/mitchellh/mapstructure",
+          "version": "v1.5.0"
+        },
+        {
+          "name": "github.com/pmezard/go-difflib",
+          "version": "v1.0.1-0.20181226105442-5d4384ee4fb2"
+        },
+        {
+          "name": "github.com/spf13/afero",
+          "version": "v1.12.0"
+        },
+        {
+          "name": "github.com/spf13/cast",
+          "version": "v1.7.1"
+        },
+        {
+          "name": "github.com/spf13/pflag",
+          "version": "v1.0.6"
+        },
+        {
+          "name": "github.com/subosito/gotenv",
+          "version": "v1.6.0"
+        },
+        {
+          "name": "github.com/wasilibs/go-re2",
+          "version": "v1.9.0"
+        },
+        {
+          "name": "golang.org/x/sync",
+          "version": "v0.11.0"
+        },
+        {
+          "name": "golang.org/x/sys",
+          "version": "v0.30.0"
+        },
+        {
+          "name": "golang.org/x/text",
+          "version": "v0.22.0"
+        },
+        {
+          "name": "gopkg.in/ini.v1",
+          "version": "v1.67.0"
+        },
+        {
+          "name": "gopkg.in/yaml.v3",
+          "version": "v3.0.1"
+        }
+      ]
+    },
+    "go_sum": {
+      "entry_count": 426
+    },
+    "readme_excerpt": "# test\r\nThis is a repo used for testing gitleaks\r\n"
+  },
+  "top_level_directories": [
+    ".github",
+    "cmd",
+    "config",
+    "detect",
+    "logging",
+    "regexp",
+    "report",
+    "report_templates",
+    "scripts",
+    "sources",
+    "testdata",
+    "version"
+  ],
+  "ast_samples": [
+    {
+      "file": "cmd/detect.go",
+      "language": "go",
+      "top_level_symbols": [
+        "func init",
+        "func runDetect"
+      ],
+      "loc": 137
+    },
+    {
+      "file": "cmd/diagnostics.go",
+      "language": "go",
+      "top_level_symbols": [
+        "func NewDiagnosticsManager",
+        "method StartDiagnostics",
+        "method StopDiagnostics",
+        "method StartHttpHandler",
+        "method StartCPUProfile",
+        "method StopCPUProfile",
+        "method SetupMemoryProfile",
+        "method WriteMemoryProfile",
+        "method StartTraceProfile",
+        "method StopTraceProfile",
+        "type DiagnosticsManager"
+      ],
+      "loc": 240
+    },
+    {
+      "file": "cmd/directory.go",
+      "language": "go",
+      "top_level_symbols": [
+        "func init",
+        "func runDirectory"
+      ],
+      "loc": 75
+    },
+    {
+      "file": "cmd/generate/config/base/config.go",
+      "language": "go",
+      "top_level_symbols": [
+        "func CreateGlobalConfig"
+      ],
+      "loc": 122
+    },
+    {
+      "file": "cmd/generate/config/base/config_test.go",
+      "language": "go",
+      "top_level_symbols": [
+        "func TestConfigAllowlistRegexes",
+        "func BenchmarkConfigAllowlistRegexes",
+        "func TestConfigAllowlistPaths",
+        "func BenchmarkConfigAllowlistPaths"
+      ],
+      "loc": 204
+    },
+    {
+      "file": "cmd/generate/config/main.go",
+      "language": "go",
+      "top_level_symbols": [
+        "func main"
+      ],
+      "loc": 302
+    },
+    {
+      "file": "cmd/generate/config/rules/1password.go",
+      "language": "go",
+      "top_level_symbols": [
+        "func OnePasswordServiceAccountToken",
+        "func OnePasswordSecretKey"
+      ],
+      "loc": 82
+    },
+    {
+      "file": "cmd/generate/config/rules/adafruit.go",
+      "language": "go",
+      "top_level_symbols": [
+        "func AdafruitAPIKey"
+      ],
+      "loc": 22
+    },
+    {
+      "file": "cmd/generate/config/rules/adobe.go",
+      "language": "go",
+      "top_level_symbols": [
+        "func AdobeClientID",
+        "func AdobeClientSecret"
+      ],
+      "loc": 40
+    },
+    {
+      "file": "cmd/generate/config/rules/age.go",
+      "language": "go",
+      "top_level_symbols": [
+        "func AgeSecretKey"
+      ],
+      "loc": 22
+    },
+    {
+      "file": "cmd/generate/config/rules/airtable.go",
+      "language": "go",
+      "top_level_symbols": [
+        "func AirtableApiKey",
+        "func AirtablePersonalAccessToken"
+      ],
+      "loc": 38
+    },
+    {
+      "file": "cmd/generate/config/rules/algolia.go",
+      "language": "go",
+      "top_level_symbols": [
+        "func AlgoliaApiKey"
+      ],
+      "loc": 22
+    },
+    {
+      "file": "cmd/generate/config/rules/alibaba.go",
+      "language": "go",
+      "top_level_symbols": [
+        "func AlibabaAccessKey",
+        "func AlibabaSecretKey"
+      ],
+      "loc": 41
+    },
+    {
+      "file": "cmd/generate/config/rules/anthropic.go",
+      "language": "go",
+      "top_level_symbols": [
+        "func AnthropicApiKey",
+        "func AnthropicAdminApiKey"
+      ],
+      "loc": 70
+    },
+    {
+      "file": "cmd/generate/config/rules/artifactory.go",
+      "language": "go",
+      "top_level_symbols": [
+        "func ArtifactoryApiKey",
+        "func ArtifactoryReferenceToken"
+      ],
+      "loc": 59
+    },
+    {
+      "file": "cmd/generate/config/rules/asana.go",
+      "language": "go",
+      "top_level_symbols": [
+        "func AsanaClientID",
+        "func AsanaClientSecret"
+      ],
+      "loc": 37
+    },
+    {
+      "file": "cmd/generate/config/rules/atlassian.go",
+      "language": "go",
+      "top_level_symbols": [
+        "func Atlassian"
+      ],
+      "loc": 37
+    },
+    {
+      "file": "cmd/generate/config/rules/authress.go",
+      "language": "go",
+      "top_level_symbols": [
+        "func Authress"
+      ],
+      "loc": 32
+    },
+    {
+      "file": "cmd/generate/config/rules/aws.go",
+      "language": "go",
+      "top_level_symbols": [
+        "func AWS",
+        "func AmazonBedrockAPIKeyLongLived",
+        "func AmazonBedrockAPIKeyShortLived"
+      ],
+      "loc": 110
+    },
+    {
+      "file": "cmd/generate/config/rules/azure.go",
+      "language": "go",
+      "top_level_symbols": [
+        "func AzureActiveDirectoryClientSecret"
+      ],
+      "loc": 66
+    }
+  ],
+  "ignored_paths": []
+}

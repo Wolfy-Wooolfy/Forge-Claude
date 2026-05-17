@@ -1,0 +1,23 @@
+{
+  "role_id": "reverse_vision",
+  "project_name": "pcst_gitleaks",
+  "domain": "cli_tool",
+  "goals": {
+    "primary": "A CLI tool for testing and detecting sensitive information leaks in Git repositories.",
+    "secondary": []
+  },
+  "constraints": [
+    "Go 1.24.11"
+  ],
+  "non_goals": [
+    "No web UI",
+    "No database persistence",
+    "No authentication layer"
+  ],
+  "detected_languages": [
+    "go",
+    "python"
+  ],
+  "source_summary": "The codebase is a command-line tool designed to test and detect sensitive information leaks in Git repositories. It includes various modules for configuration, detection, and reporting, with a focus on handling different types of API keys and secrets. The project is implemented primarily in Go, with some Python scripts, and is structured to support testing and diagnostics.",
+  "confidence": "HIGH"
+}
