@@ -1,0 +1,6 @@
+# Exclude cloned OSS repos from git — these are 3-5 GB total
+# Clone commands in artifacts/decisions/DECISION-2026-05-17T11-0-pcst-plan.md §3
+*/source_clone/
+
+# Exclude any residual zip files
+*.zip
