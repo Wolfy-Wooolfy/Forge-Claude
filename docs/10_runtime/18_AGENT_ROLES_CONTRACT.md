@@ -299,6 +299,7 @@ All side effects go through `agent.invoke` (which writes to cost ledger) and the
 | §ARC-2 | `live_smoke_runner.js` | Direct `fs.writeFileSync` / `fs.mkdirSync` (test infrastructure) | `DECISION-20260511-1000-phase-7-F-3-quality-delivery-roles.md` |
 | §ARC-3 | `code/src/runtime/builtproject/harness_runner.js` | `child_process.spawn` directly for server lifecycle management (start, stdout capture, port polling, teardown) | `DECISION-202605131800-phase-8-arc-3-spawn-exception.md` |
 | §ARC-4 | `code/src/runtime/kb/manifests.js`, `code/src/runtime/kb/cost_ledger.js` (**NOTE:** distinct from §ARC-1's `code/src/runtime/agents/cost_ledger.js`) | Direct `fs` operations for atomic JSONL append (`manifests.js`: `.tmp → fsync → rename` per KB Contract §11.2; `cost_ledger.js`: `fs.appendFileSync` for line-level atomicity) — re-entrancy prevention when called from within L2 `kb.*` / `research.*` tool execute() | `DECISION-202605132000-phase-9-arc-4-kb-manifest-fs-exception.md` |
+| §ARC-5 | `code/src/runtime/secrets/secret_provider.js`, `code/src/runtime/secrets/windows_credential_manager.js`, `code/src/runtime/secrets/mac_keychain.js`, `code/src/runtime/secrets/linux_secret_service.js` | Direct `child_process.execFile` to invoke OS keychain CLIs (`security`, `cmdkey`/PowerShell, `secret-tool`). Keychain APIs do not map to the L2 tool contract — they are platform-specific system calls. NOT a license for `child_process` use outside §ARC-5 scope. | `DECISION-2026-05-18T11-30-phase-12-plan.md §6` |
 
 ---
 

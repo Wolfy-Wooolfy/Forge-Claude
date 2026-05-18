@@ -29,7 +29,8 @@ const checks = [
   require("./checks/kb_budget_status"),
   require("./checks/kb_indexed_sources_count"),
   require("./checks/research_role_registered"),
-  require("./checks/service_lifecycle")
+  require("./checks/service_lifecycle"),
+  require("./checks/secrets_in_env_var")
 ];
 
 function listChecks()  { return checks.slice(); }

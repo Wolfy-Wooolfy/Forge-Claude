@@ -1,0 +1,155 @@
+{
+  "schema_version": "1.0",
+  "ok": true,
+  "summary": "0 critical, 4 warning",
+  "counts": {
+    "pass": 23,
+    "warn": 4,
+    "fail": 0
+  },
+  "started_at": "2026-05-18T14:22:34.143Z",
+  "duration_ms": 27355,
+  "checks": [
+    {
+      "id": "node_version",
+      "status": "PASS",
+      "detail": "v24.14.1"
+    },
+    {
+      "id": "openai_api_key",
+      "status": "PASS",
+      "detail": "set, length=164"
+    },
+    {
+      "id": "env_dotfile",
+      "status": "PASS",
+      "detail": ".env present"
+    },
+    {
+      "id": "api_server_port",
+      "status": "PASS",
+      "detail": "port 4505 available"
+    },
+    {
+      "id": "web_server_port",
+      "status": "PASS",
+      "detail": "web served on API port 4505"
+    },
+    {
+      "id": "providers_registered",
+      "status": "WARN",
+      "detail": "13 registered, 12 legacy (not yet v2-compliant)"
+    },
+    {
+      "id": "tools_registered",
+      "status": "PASS",
+      "detail": "74 tools registered"
+    },
+    {
+      "id": "permission_mode",
+      "status": "PASS",
+      "detail": "mode active: WORKSPACE_WRITE"
+    },
+    {
+      "id": "status_json_valid",
+      "status": "PASS",
+      "detail": "valid v2.0, current_task=PHASE-12-STAGE-12-1-CLOSED"
+    },
+    {
+      "id": "active_project",
+      "status": "PASS",
+      "detail": "no active project (idle)"
+    },
+    {
+      "id": "missing_dependencies",
+      "status": "PASS",
+      "detail": "9 dependencies present"
+    },
+    {
+      "id": "recent_execution",
+      "status": "PASS",
+      "detail": "tool_audit.jsonl modified 0 day(s) ago"
+    },
+    {
+      "id": "disk_space",
+      "status": "WARN",
+      "detail": "artifacts/ is 451.5 MB (> 100 MB — consider archival)"
+    },
+    {
+      "id": "trace_matrix_size",
+      "status": "PASS",
+      "detail": "artifacts/llm/ is 26.2 MB"
+    },
+    {
+      "id": "shell_hardening",
+      "status": "PASS",
+      "detail": "shell.run_with_prompt registered, sudo/su hard-denied, vision lock rule present"
+    },
+    {
+      "id": "environment_detection",
+      "status": "PASS",
+      "detail": "11 detectors registered; os detector callable; env.probe_binary registered"
+    },
+    {
+      "id": "package_management",
+      "status": "PASS",
+      "detail": "9 adapters (Tier-1: 6, Tier-2: 3); pkg.install registered; no sudo adapters"
+    },
+    {
+      "id": "container_runtime",
+      "status": "WARN",
+      "detail": "2 adapter(s) registered (docker, podman); none available (docker/podman daemon not running — expected in CI)"
+    },
+    {
+      "id": "agent_runtime",
+      "status": "PASS",
+      "detail": "5 adapters registered (aider, anthropic, claude_code, mock, openai); available: mock, openai; agent.invoke OK; cost ledger writable; budget enforcer OK"
+    },
+    {
+      "id": "roles_runtime",
+      "status": "PASS",
+      "detail": "13 roles registered (architect, builder, cost_estimator, deployment, documentation, environment, quality_judge, research, reverse_vision, reviewer, security_auditor, spec_writer, test_designer); role.invoke OK"
+    },
+    {
+      "id": "builtproject_runtime",
+      "status": "PASS",
+      "detail": "L5b harness OK — 4 modules, 8 assertion types, 6 reference scenarios"
+    },
+    {
+      "id": "orchestration_runtime",
+      "status": "PASS",
+      "detail": "5 orchestration modules loaded; 6 orchestration tools registered"
+    },
+    {
+      "id": "kb_budget_status",
+      "status": "PASS",
+      "detail": "no active project (idle)"
+    },
+    {
+      "id": "kb_indexed_sources_count",
+      "status": "PASS",
+      "detail": "no active project (idle)"
+    },
+    {
+      "id": "research_role_registered",
+      "status": "PASS",
+      "detail": "research role registered; system_prompt_id=research_v1; authority=ADVISORY"
+    },
+    {
+      "id": "service_lifecycle",
+      "status": "PASS",
+      "detail": "forge-api not installed as a service — see INSTALL.md §Windows Service"
+    },
+    {
+      "id": "secrets_in_env_var",
+      "status": "WARN",
+      "detail": "OPENAI_API_KEY in environment — migrate to keychain: see INSTALL.md §Secrets"
+    }
+  ],
+  "links": {
+    "ui": "http://localhost:4505/",
+    "api": "http://localhost:4505/api/system/doctor",
+    "logs": "logs/forge.log",
+    "decisions": "artifacts/decisions/"
+  }
+}

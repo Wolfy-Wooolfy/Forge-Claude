@@ -1,0 +1,15 @@
+{
+  "id": "S195",
+  "name": "secrets — encrypted_file_provider AES-256-GCM + scrypt round trip",
+  "type": "module_call",
+  "required_mode": "READ_ONLY",
+  "module": "code/src/testing/helpers/secrets_test_helper.js",
+  "method": "runS195CryptoRoundTrip",
+  "args": {},
+  "assertions": [
+    { "type": "status_equals",      "value": "SUCCESS" },
+    { "type": "state_field_equals", "field": "output.state.round_trip_ok", "value": true },
+    { "type": "state_field_equals", "field": "output.state.algorithm",     "value": "aes-256-gcm" },
+    { "type": "state_field_equals", "field": "output.state.kdf",           "value": "scrypt" }
+  ]
+}
