@@ -746,7 +746,10 @@
         "location": "code/src/runtime/tools/intake_tools.js:109-110",
         "evidence": "hugo, ruff, strapi: ZIP_TOO_LARGE",
         "remediation_phase": "PHASE-11.6",
-        "proposal_artifact": "artifacts/decisions/DECISION-2026-05-18T09-05-phase-11-6-proposal.md"
+        "proposal_artifact": "artifacts/decisions/DECISION-2026-05-18T09-05-phase-11-6-proposal.md",
+        "remediation_status": "APPROVED_WITH_MODIFICATIONS",
+        "approved_at": "2026-05-18T09:31:12.000Z",
+        "approval_modifications_summary": "Defaults raised: entries 15000→50000, bytes 200MB→500MB, entries-upper-bound 100000→500000"
       }
     ],
     "issues_resolved_in_session": [

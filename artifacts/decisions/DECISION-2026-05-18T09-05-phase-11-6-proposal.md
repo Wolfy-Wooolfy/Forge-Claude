@@ -173,6 +173,6 @@ no data migration, no contract-version bump required.
 
 ## §9 Owner Approval
 
-_Awaiting owner (KhElmasry) go/no-go in chat._
-
-Phase 11.6 begins only after owner explicitly approves this proposal.
+Approved by CTO 2026-05-18 with modifications per CTO chat directive
+(50000/500 MB defaults, 500000 entries upper bound). Modifications to be
+reflected in D3 body or in a follow-up amendment artifact at execution time.
