@@ -726,6 +726,40 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-11-STAGE-11-5-CLOSED",
-  "last_updated": "2026-05-17T10:30:00.000Z"
+  "current_task": "PCST-V1-CLOSED-WITH-FINDINGS",
+  "last_updated": "2026-05-18T09:04:21.000Z",
+  "pcst_v1": {
+    "status": "CLOSED_WITH_FINDINGS",
+    "closed_at": "2026-05-18T09:04:21.000Z",
+    "plan_artifact": "artifacts/decisions/DECISION-2026-05-17T11-0-pcst-plan.md",
+    "closure_artifact": "artifacts/decisions/DECISION-2026-05-18T09-04-pcst-v1-closure.md",
+    "midpoint_artifact": "artifacts/decisions/_stress_test_checkpoints/midpoint.md",
+    "report_artifact": "artifacts/stress_test/STRESS_TEST_REPORT.md",
+    "projects_passed": 7,
+    "projects_blocked": 3,
+    "cost_actual_usd": 0.09315,
+    "cost_cap_usd": 2.00,
+    "findings": [
+      {
+        "id": "F1",
+        "summary": "Intake entry/size caps too restrictive (1000 entries / 50MB)",
+        "location": "code/src/runtime/tools/intake_tools.js:109-110",
+        "evidence": "hugo, ruff, strapi: ZIP_TOO_LARGE",
+        "remediation_phase": "PHASE-11.6",
+        "proposal_artifact": "artifacts/decisions/DECISION-2026-05-18T09-05-phase-11-6-proposal.md"
+      }
+    ],
+    "issues_resolved_in_session": [
+      {
+        "id": "R1",
+        "summary": "Mid-checkpoint !resumeFrom bug in stress_test_runner.js",
+        "resolution": "Fixed in PCST session; midpoint written manually"
+      },
+      {
+        "id": "R2",
+        "summary": "flask-no-readme ran twice due to R1 downstream effect",
+        "resolution": "First-run artifact canonical; no data corruption"
+      }
+    ]
+  }
 }
