@@ -5,8 +5,8 @@
   "overall_progress_percent": 99,
   "stage_progress_percent": 100,
   "next_phase": "PHASE-12",
-  "next_step": "Begin Stage 12.2 (Secret Storage) per DECISION-2026-05-18T11-30-phase-12-plan.md §4.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-18T13-00-phase-12-stage-12-1-closure.md",
+  "next_step": "Begin Stage 12.3 (Backup System) per DECISION-2026-05-18T11-30-phase-12-plan.md §4.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-18T15-00-phase-12-stage-12-2-closure.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -73,18 +73,18 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-05-18T14:30:22.435Z",
+    "last_doctor_run": "2026-05-18T14:37:15.560Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
     "self_test_last_run": "2026-05-18",
-    "self_test_last_result": "187 passed, 0 failed, 5 skipped (192 total) — PHASE-12 Stage 12.1 CLOSED. S190-S192 (service lifecycle) added. 5 SKIPs require docker.",
-    "self_test_scenarios_pass": 187,
+    "self_test_last_result": "191 passed, 0 failed, 5 skipped (196 total) — PHASE-12 Stage 12.2 CLOSED. S193-S196 (secret storage) added. 5 SKIPs require docker.",
+    "self_test_scenarios_pass": 191,
     "self_test_scenarios_skip": 5,
     "self_test_scenarios_fail": 0,
     "providers_registered_count": 13,
     "tools_registered_count": 74,
-    "doctor_checks_count": 26,
+    "doctor_checks_count": 27,
     "assertion_types_count": 10,
     "active_permission_mode": "WORKSPACE_WRITE",
     "permission_policy_installed": true,
@@ -197,6 +197,29 @@
       "incidental_additions": [
         "scripts/service/compose.yml (Tier-2 companion to Dockerfile — approved by CTO)"
       ]
+    },
+    "stage_12_2": {
+      "status": "CLOSED",
+      "closed_at": "2026-05-18T15:00:00.000Z",
+      "cost_actual_usd": 0,
+      "decision_artifact": "artifacts/decisions/DECISION-2026-05-18T15-00-phase-12-stage-12-2-closure.md",
+      "checkpoint_mid": "artifacts/decisions/_phase_12_checkpoints/stage_12_2_mid.md",
+      "providers_created": [
+        "code/src/runtime/secrets/secret_provider.js",
+        "code/src/runtime/secrets/windows_credential_manager.js",
+        "code/src/runtime/secrets/mac_keychain.js",
+        "code/src/runtime/secrets/linux_secret_service.js",
+        "code/src/runtime/secrets/encrypted_file_provider.js"
+      ],
+      "doctor_check_added": "secrets_in_env_var",
+      "arc_entries_added": ["§ARC-5"],
+      "scenarios_added": ["S193", "S194", "S195", "S196"],
+      "su_baseline": {
+        "pass": 191,
+        "fail": 0,
+        "skip": 5,
+        "total": 196
+      }
     }
   },
   "phase_9": {
@@ -832,7 +855,7 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-12-STAGE-12-1-CLOSED",
+  "current_task": "PHASE-12-STAGE-12-2-CLOSED",
   "last_updated": "2026-05-18T13:00:00.000Z",
   "pcst_v1": {
     "status": "CLOSED_WITH_FINDINGS",

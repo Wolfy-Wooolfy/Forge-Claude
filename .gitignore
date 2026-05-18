@@ -24,6 +24,9 @@
 *.pfx
 secrets/
 .secrets/
+# Source code (provider implementations) must be tracked despite the secrets/ rule above
+!code/src/runtime/secrets/
+!code/src/runtime/secrets/**
 
 # Owner-specific personal logs
 MY_FORGE_PROGRESS.md

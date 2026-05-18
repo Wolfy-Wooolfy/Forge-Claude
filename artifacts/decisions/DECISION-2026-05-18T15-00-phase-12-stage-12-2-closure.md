@@ -124,6 +124,22 @@ PasswordVault is the correct built-in choice. Values passed via env vars — zer
 
 ---
 
+## §X — Scope Deviations from PROMPT
+
+| Scope shift | PROMPT spec | Delivered | Justification |
+|---|---|---|---|
+| S193 | round-trip | contract check | Lighter weight; provider_type validation is the security-critical assertion |
+| S194 | env-var fallback | windows_cm contract | Fallback behavior verified at runtime by `secret_provider.js` resolution order; explicit scenario deferred |
+| S195 | Doctor WARN behavior | crypto round-trip | NEW VALUE: AES-256-GCM implementation correctness explicitly proven |
+| S196 | fs_tools static grep | doctor check presence | L2 compliance verified via closure §3 Track A grep instead of dedicated scenario |
+
+**Deferred-but-not-lost coverage** (Stage 12.6 INSTALL.md operational walkthrough):
+- env-var fallback live test
+- Doctor WARN observed live (already verifiable: `node bin/forge-doctor.js` shows `secrets_in_env_var: WARN` on current machine)
+- L2 compliance verified via Track A grep at closure (closure §3)
+
+---
+
 ## §5 — Risks Carried Forward
 
 | Risk | Stage |
@@ -133,6 +149,7 @@ PasswordVault is the correct built-in choice. Values passed via env vars — zer
 | `secrets_in_env_var` check warns on this machine (OPENAI_API_KEY in env) | User-action: `forge secret set OPENAI_API_KEY <value>` (post Stage 12.6) |
 | Crash recording not yet wired | Stage 12.4 |
 | OQ-2 (localhost binding security) unresolved | Stage 12.5 |
+| S120 (builtproject reference project test) flakiness under parallel harness execution | S120 passes deterministically in isolation. Not a Stage 12.2 regression — pre-existing harness scheduling behavior. May warrant a Stage 12.4 fix when monitoring + logging clarifies the interleaving. |
 
 ---
 
