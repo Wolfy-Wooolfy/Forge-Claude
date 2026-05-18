@@ -1,0 +1,20 @@
+{
+  "id": "S191",
+  "name": "service install — windows_task_scheduler_install.bat structure: Register-ScheduledTask + restart-on-failure + LogonType S4U",
+  "description": "Dry-run file inspection. Verifies windows_task_scheduler_install.bat uses PowerShell Register-ScheduledTask, configures restart-on-failure (-RestartCount, -RestartInterval), uses -LogonType S4U (no stored password), checks Node-in-PATH, and is idempotent (schtasks /delete before creating). No shell execution.",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/service_lifecycle_test_helper",
+  "method": "runS191TaskSchedulerScriptCheck",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "file_exists",         "expected": true },
+    { "type": "state_field_equals", "field": "register_task_ok",    "expected": true },
+    { "type": "state_field_equals", "field": "restart_count_ok",    "expected": true },
+    { "type": "state_field_equals", "field": "restart_interval_ok", "expected": true },
+    { "type": "state_field_equals", "field": "logon_type_ok",       "expected": true },
+    { "type": "state_field_equals", "field": "node_check_ok",       "expected": true },
+    { "type": "state_field_equals", "field": "idempotent_ok",       "expected": true }
+  ]
+}

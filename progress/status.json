@@ -5,8 +5,8 @@
   "overall_progress_percent": 99,
   "stage_progress_percent": 100,
   "next_phase": "PHASE-12",
-  "next_step": "Begin Stage 12.1 (Service Lifecycle) per DECISION-2026-05-18T11-30-phase-12-plan.md §3.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-18T12-30-phase-12-stage-12-0-closure.md",
+  "next_step": "Begin Stage 12.2 (Secret Storage) per DECISION-2026-05-18T11-30-phase-12-plan.md §4.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-18T13-00-phase-12-stage-12-1-closure.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -73,18 +73,18 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-05-15T15:44:23.036Z",
+    "last_doctor_run": "2026-05-18T13:09:37.126Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
     "self_test_last_run": "2026-05-18",
-    "self_test_last_result": "184 passed, 0 failed, 5 skipped (189 total) — PHASE-11.6 CLOSED. S184-S189 (intake capacity limits) added. 5 SKIPs require docker.",
-    "self_test_scenarios_pass": 184,
+    "self_test_last_result": "187 passed, 0 failed, 5 skipped (192 total) — PHASE-12 Stage 12.1 CLOSED. S190-S192 (service lifecycle) added. 5 SKIPs require docker.",
+    "self_test_scenarios_pass": 187,
     "self_test_scenarios_skip": 5,
     "self_test_scenarios_fail": 0,
     "providers_registered_count": 13,
     "tools_registered_count": 74,
-    "doctor_checks_count": 25,
+    "doctor_checks_count": 26,
     "assertion_types_count": 10,
     "active_permission_mode": "WORKSPACE_WRITE",
     "permission_policy_installed": true,
@@ -110,7 +110,7 @@
     "adapter_json_extraction": "ENABLED — extractJsonFromResponse in _adapter_contract.js, applied in anthropic/openai/claude_code/aider adapters (DECISION-20260512-0900 addendum)",
     "note": "PHASE-9 CLOSED. KB Runtime (L-KB-1→L-KB-5): source_acquisition, chunking_engine, embedding_engine, storage_lance (LanceDB), cost_ledger, budget_guard, retrieval, manifests, citation_engine, citation_validator, budget_guard vision-override, research_role (12th role, KNOWN-gate, deterministic findings, confidence recompute). 6 KB tools (ingest_url, retrieve, cite, list_sources, delete_source, validate_citations). 3 new doctor checks (kb_budget_status, kb_indexed_sources_count, research_role_registered). Stage 9.7 cleanup: 6 FIX items (retrieval cost ledger, rejected_low_credibility, citation_validator Pattern 4, S137, evidence cap, confidence recompute). scenarios: 128→137 (S129–S137). doctor checks: 21→24. SU assertions: ~276→314. API cost: $0.00.",
     "last_doctor_counts": {
-      "pass": 22,
+      "pass": 23,
       "warn": 3,
       "fail": 0
     }
@@ -155,13 +155,48 @@
     "plan_artifact": "artifacts/decisions/DECISION-2026-05-18T11-30-phase-12-plan.md",
     "amendment_artifact": "artifacts/decisions/DECISION-2026-05-18T12-00-roadmap-phase-12-amendment.md",
     "oq_sweep": "artifacts/audit/phase_12_oq_sweep.md",
-    "total_live_cap_usd": 3.00,
+    "total_live_cap_usd": 3,
     "cost_actuals_usd": 0,
     "stage_12_0": {
       "status": "CLOSED",
       "closed_at": "2026-05-18T12:30:00.000Z",
       "cost_actual_usd": 0,
       "decision_artifact": "artifacts/decisions/DECISION-2026-05-18T12-30-phase-12-stage-12-0-closure.md"
+    },
+    "stage_12_1": {
+      "status": "CLOSED",
+      "closed_at": "2026-05-18T13:00:00.000Z",
+      "cost_actual_usd": 0,
+      "decision_artifact": "artifacts/decisions/DECISION-2026-05-18T13-00-phase-12-stage-12-1-closure.md",
+      "checkpoint_mid": "artifacts/decisions/_phase_12_checkpoints/stage_12_1_mid.md",
+      "scripts_created": [
+        "scripts/service/windows_nssm_install.bat",
+        "scripts/service/windows_task_scheduler_install.bat",
+        "scripts/service/forge.service",
+        "scripts/service/com.forge.api.plist",
+        "scripts/service/Dockerfile",
+        "scripts/service/compose.yml"
+      ],
+      "doctor_check_added": "service_lifecycle",
+      "scenarios_added": [
+        "S190",
+        "S191",
+        "S192"
+      ],
+      "su_baseline": {
+        "pass": 187,
+        "fail": 0,
+        "skip": 5,
+        "total": 192
+      },
+      "descoped_to_stage_12_4": [
+        "scripts/service/crash_recorder.bat",
+        "scripts/service/crash_recorder.sh",
+        "recentExecution.js crash-timestamp extension"
+      ],
+      "incidental_additions": [
+        "scripts/service/compose.yml (Tier-2 companion to Dockerfile — approved by CTO)"
+      ]
     }
   },
   "phase_9": {
@@ -389,7 +424,14 @@
     "status": "CLOSED",
     "current_stage": "11.5",
     "closed_at": "2026-05-17T10:30:00.000Z",
-    "stages_complete": ["11.0", "11.1", "11.2", "11.3", "11.4", "11.5"],
+    "stages_complete": [
+      "11.0",
+      "11.1",
+      "11.2",
+      "11.3",
+      "11.4",
+      "11.5"
+    ],
     "stages": {
       "11_5": {
         "status": "CLOSED",
@@ -399,7 +441,11 @@
         "closed_at": "2026-05-17T10:30:00.000Z",
         "live_demo": {
           "status": "SUCCESS",
-          "fixtures": ["fixture_pycli", "fixture_nextjs", "fixture_gocli"],
+          "fixtures": [
+            "fixture_pycli",
+            "fixture_nextjs",
+            "fixture_gocli"
+          ],
           "provider": "openai",
           "model": "gpt-4o",
           "total_cost_usd": 0.03468,
@@ -412,10 +458,12 @@
             "pycli": {
               "project_id": "stage_11_5_live_pycli",
               "loop_id": "6da83f15-29d9-4f55-b83e-13db92c77599",
-              "cost_usd": 0.01600,
+              "cost_usd": 0.016,
               "duration_s": 11.7,
               "domain": "cli_tool",
-              "languages": ["python"],
+              "languages": [
+                "python"
+              ],
               "confidence": "HIGH",
               "vision_locked": true,
               "loop_state_after_halt": "SPEC_WRITER_FORMALIZE",
@@ -428,7 +476,10 @@
               "cost_usd": 0.00966,
               "duration_s": 7.9,
               "domain": "web_application",
-              "languages": ["javascript", "typescript"],
+              "languages": [
+                "javascript",
+                "typescript"
+              ],
               "confidence": "HIGH",
               "vision_locked": true,
               "halt_at": "vision_lock",
@@ -440,7 +491,9 @@
               "cost_usd": 0.00902,
               "duration_s": 4.8,
               "domain": "cli_tool",
-              "languages": ["go"],
+              "languages": [
+                "go"
+              ],
               "confidence": "HIGH",
               "vision_locked": true,
               "halt_at": "vision_lock",
@@ -449,7 +502,10 @@
           },
           "stop_triggers_fired": "none"
         },
-        "scenarios_added": ["S182", "S183"],
+        "scenarios_added": [
+          "S182",
+          "S183"
+        ],
         "files_created": [
           "code/src/testing/live/stage_11_5_live_runner.js",
           "bin/forge-stage-11-5-live-demo.js",
@@ -498,7 +554,9 @@
             "project_name": "todo_cli",
             "domain": "cli_tool",
             "confidence": "HIGH",
-            "detected_languages": ["python"]
+            "detected_languages": [
+              "python"
+            ]
           },
           "loop_id": "0c90059d-beb0-46b5-961b-5a61700468bb",
           "loop_state_after_halt": "SPEC_WRITER_FORMALIZE",
@@ -508,7 +566,16 @@
           "stop_triggers_fired": "none"
         },
         "scenarios_added": [
-          "S172", "S173", "S174", "S175", "S176", "S177", "S178", "S179", "S180", "S181"
+          "S172",
+          "S173",
+          "S174",
+          "S175",
+          "S176",
+          "S177",
+          "S178",
+          "S179",
+          "S180",
+          "S181"
         ],
         "files_created": [
           "code/src/ai_os/intake_conversation_handler.js",
@@ -565,14 +632,21 @@
             "project_name": "todo_gocli",
             "domain": "cli_tool",
             "confidence": "HIGH",
-            "detected_languages": ["go"],
+            "detected_languages": [
+              "go"
+            ],
             "detected_framework": null
           },
           "vision_path": "artifacts/projects/stage_11_3_live_demo/vision.md",
           "vision_locked": false,
           "domain_check": "PASS — model correctly returned cli_tool"
         },
-        "scenarios_added": ["S168", "S169", "S170", "S171"],
+        "scenarios_added": [
+          "S168",
+          "S169",
+          "S170",
+          "S171"
+        ],
         "files_created": [
           "code/src/testing/live/stage_11_3_live_runner.js",
           "bin/forge-stage-11-3-live-demo.js",
@@ -615,14 +689,23 @@
             "project_name": "nextjs_tasks_demo",
             "domain": "web_application",
             "confidence": "HIGH",
-            "detected_languages": ["javascript", "typescript"],
+            "detected_languages": [
+              "javascript",
+              "typescript"
+            ],
             "detected_framework": "next"
           },
           "vision_path": "artifacts/projects/stage_11_2_live_demo/vision.md",
           "vision_locked": false,
           "domain_check": "PASS — model correctly returned web_application (not web_api)"
         },
-        "scenarios_added": ["S163", "S164", "S165", "S166", "S167"],
+        "scenarios_added": [
+          "S163",
+          "S164",
+          "S165",
+          "S166",
+          "S167"
+        ],
         "files_created": [
           "code/src/testing/live/stage_11_2_live_runner.js",
           "bin/forge-stage-11-2-live-demo.js",
@@ -667,12 +750,20 @@
             "project_name": "todo_cli",
             "domain": "cli_tool",
             "confidence": "HIGH",
-            "detected_languages": ["python"]
+            "detected_languages": [
+              "python"
+            ]
           },
           "vision_path": "artifacts/projects/stage_11_1_live_demo/vision.md",
           "vision_locked": false
         },
-        "scenarios_added": ["S158", "S159", "S160", "S161", "S162"],
+        "scenarios_added": [
+          "S158",
+          "S159",
+          "S160",
+          "S161",
+          "S162"
+        ],
         "files_created": [
           "code/src/runtime/tools/intake_tools.js",
           "code/src/testing/helpers/intake_test_helper.js",
@@ -741,8 +832,8 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-12-STAGE-12-0-CLOSED",
-  "last_updated": "2026-05-18T12:30:00.000Z",
+  "current_task": "PHASE-12-STAGE-12-1-CLOSED",
+  "last_updated": "2026-05-18T13:00:00.000Z",
   "pcst_v1": {
     "status": "CLOSED_WITH_FINDINGS",
     "closed_at": "2026-05-18T09:04:21.000Z",
@@ -753,7 +844,7 @@
     "projects_passed": 7,
     "projects_blocked": 3,
     "cost_actual_usd": 0.09315,
-    "cost_cap_usd": 2.00,
+    "cost_cap_usd": 2,
     "findings": [
       {
         "id": "F1",
@@ -795,7 +886,10 @@
         "MAX_ZIP_BYTES_before": 52428800,
         "MAX_ZIP_BYTES_after": 524288000,
         "env_override_added": true,
-        "error_messages_fixed": ["line_515", "line_551"]
+        "error_messages_fixed": [
+          "line_515",
+          "line_551"
+        ]
       },
       "intake_contract_md": {
         "section_added": "Capacity Limits (subsection of §2)",
@@ -803,10 +897,27 @@
         "version_after": "v1.3"
       }
     },
-    "scenarios_added": ["S184", "S185", "S186", "S187", "S188", "S189"],
+    "scenarios_added": [
+      "S184",
+      "S185",
+      "S186",
+      "S187",
+      "S188",
+      "S189"
+    ],
     "su_baseline": {
-      "red_phase":   { "pass": 178, "fail": 6, "skip": 5, "total": 189 },
-      "green_phase": { "pass": 184, "fail": 0, "skip": 5, "total": 189 }
+      "red_phase": {
+        "pass": 178,
+        "fail": 6,
+        "skip": 5,
+        "total": 189
+      },
+      "green_phase": {
+        "pass": 184,
+        "fail": 0,
+        "skip": 5,
+        "total": 189
+      }
     },
     "cost_actual_usd": 0
   }

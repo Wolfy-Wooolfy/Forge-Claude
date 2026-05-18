@@ -1,0 +1,23 @@
+{
+  "id": "S190",
+  "name": "service install — windows_nssm_install.bat structure: actions + NSSM check + Node check + idempotency",
+  "description": "Dry-run file inspection. Verifies windows_nssm_install.bat has all 5 actions (install/uninstall/start/stop/status), NSSM-in-PATH check, Node-in-PATH check, idempotent remove-before-install, and AppRestartDelay (10s crash recovery). No shell execution.",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/service_lifecycle_test_helper",
+  "method": "runS190NssmScriptCheck",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "file_exists",         "expected": true },
+    { "type": "state_field_equals", "field": "install_action_ok",   "expected": true },
+    { "type": "state_field_equals", "field": "uninstall_action_ok", "expected": true },
+    { "type": "state_field_equals", "field": "start_action_ok",     "expected": true },
+    { "type": "state_field_equals", "field": "stop_action_ok",      "expected": true },
+    { "type": "state_field_equals", "field": "status_action_ok",    "expected": true },
+    { "type": "state_field_equals", "field": "nssm_check_ok",       "expected": true },
+    { "type": "state_field_equals", "field": "node_check_ok",       "expected": true },
+    { "type": "state_field_equals", "field": "idempotent_ok",       "expected": true },
+    { "type": "state_field_equals", "field": "restart_delay_ok",    "expected": true }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "id": "S192",
+  "name": "service_lifecycle Doctor check — present in Doctor output, status PASS (not installed yet is not a failure)",
+  "description": "Runs forge-doctor and asserts the service_lifecycle check exists in the output and returns PASS (not FAIL). On Windows dev machine where forge-api is not installed, the check returns PASS with detail 'not installed yet'. On Linux/macOS/other, also returns PASS. FAIL status would indicate a code error, not a missing service.",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/service_lifecycle_test_helper",
+  "method": "runS192ServiceLifecycleDoctorCheck",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "doctor_ran",                   "expected": true },
+    { "type": "state_field_equals", "field": "service_lifecycle_present",    "expected": true },
+    { "type": "state_field_equals", "field": "service_lifecycle_status_valid", "expected": true }
+  ]
+}

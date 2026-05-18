@@ -28,7 +28,8 @@ const checks = [
   require("./checks/orchestration_runtime"),
   require("./checks/kb_budget_status"),
   require("./checks/kb_indexed_sources_count"),
-  require("./checks/research_role_registered")
+  require("./checks/research_role_registered"),
+  require("./checks/service_lifecycle")
 ];
 
 function listChecks()  { return checks.slice(); }
