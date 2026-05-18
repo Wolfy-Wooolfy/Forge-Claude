@@ -9,6 +9,7 @@
 
 const path = require("path");
 const fs   = require("fs");
+const os   = require("os");
 
 const ROOT = process.cwd();
 
@@ -1232,6 +1233,160 @@ async function runS183Phase11FullRegression() {
   };
 }
 
+// ── S184–S189: ZIP capacity hardening (PHASE-11.6) ────────────────────────────
+
+// Creates a zip with (totalEntries - 2) directory entries (skipped by isDirectory check at
+// intake_tools.js:500) and 2 real JS file entries. entries.length === totalEntries.
+// isDirectory fires for names ending in "/" (adm-zip zipEntry.js:252, lastChar === 47).
+function _buildEntriesZip(totalEntries, label) {
+  const AdmZip   = require("adm-zip");
+  const zip      = new AdmZip();
+  const dirCount = totalEntries - 2;
+  for (let i = 0; i < dirCount; i++) {
+    zip.addFile("d" + String(i).padStart(8, "0") + "/", Buffer.alloc(0));
+  }
+  zip.addFile("src/index.js", Buffer.from("module.exports={};\n"));
+  zip.addFile("src/util.js",  Buffer.from("module.exports={};\n"));
+  const zipPath = path.join(os.tmpdir(), "forge-test-" + label + ".zip");
+  zip.writeZip(zipPath);
+  return { zipPath, cleanup: () => { try { fs.unlinkSync(zipPath); } catch (_) {} } };
+}
+
+// Creates a zip with 1 file entry of bytesCount all-0x61 bytes (highly compressible).
+// On-disk zip size is tiny; bytesCount bytes are in RAM only during getData() decompression.
+function _buildBytesZip(bytesCount, label) {
+  const AdmZip = require("adm-zip");
+  const zip    = new AdmZip();
+  zip.addFile("data/payload.dat", Buffer.alloc(bytesCount, 0x61));
+  const zipPath = path.join(os.tmpdir(), "forge-test-" + label + ".zip");
+  zip.writeZip(zipPath);
+  return { zipPath, cleanup: () => { try { fs.unlinkSync(zipPath); } catch (_) {} } };
+}
+
+// S184: exactly 50000 entries at new default cap → PASS
+// RED (old cap=1000): 50000 > 1000 → ZIP_TOO_LARGE. GREEN (new cap=50000): 50000 ≤ 50000 → PASS.
+async function runS184IntakeZipEntriesAtCap() {
+  const { zipPath, cleanup } = _buildEntriesZip(50000, "s184");
+  try {
+    const reg       = _makeRegistry("WORKSPACE_WRITE");
+    const projectId = "test_s184_proj";
+    const ctx       = { root: ROOT, project_id: projectId };
+    const result    = await reg.invoke("project.intake_zip",
+      { project_id: projectId, zip_path: zipPath }, ctx);
+    return { setup_ok: true, status_ok: result.status === "SUCCESS" };
+  } finally {
+    cleanup();
+  }
+}
+
+// S185: 50001 entries, one over new default cap → ZIP_TOO_LARGE with detail containing "50000"
+// RED (old cap): detail = "cap: 1000", detail.includes("50000") = false.
+// GREEN (new cap): detail = "cap: 50000", detail.includes("50000") = true.
+async function runS185IntakeZipEntriesOverCap() {
+  const { zipPath, cleanup } = _buildEntriesZip(50001, "s185");
+  try {
+    const reg       = _makeRegistry("WORKSPACE_WRITE");
+    const projectId = "test_s185_proj";
+    const ctx       = { root: ROOT, project_id: projectId };
+    const result    = await reg.invoke("project.intake_zip",
+      { project_id: projectId, zip_path: zipPath }, ctx);
+    const detail    = (result.metadata && result.metadata.detail) || "";
+    return {
+      setup_ok:                  true,
+      status_is_failed:          result.status === "FAILED",
+      reason_is_zip_too_large:   !!(result.metadata && result.metadata.reason === "ZIP_TOO_LARGE"),
+      detail_mentions_cap_50000: detail.includes("50000")
+    };
+  } finally {
+    cleanup();
+  }
+}
+
+// S186: FORGE_INTAKE_MAX_ENTRIES=60000 env override, 55000 entries → PASS
+// RED (old code, no env reading): 55000 > 1000 → ZIP_TOO_LARGE.
+// GREEN (new IIFE reads env=60000): 55000 ≤ 60000 → PASS.
+async function runS186IntakeZipEnvOverrideEntries() {
+  const INTAKE_PATH = require.resolve(path.join(ROOT, "code/src/runtime/tools/intake_tools.js"));
+  delete require.cache[INTAKE_PATH];
+  process.env.FORGE_INTAKE_MAX_ENTRIES = "60000";
+  const { zipPath, cleanup } = _buildEntriesZip(55000, "s186");
+  try {
+    const reg       = _makeRegistry("WORKSPACE_WRITE");
+    const projectId = "test_s186_proj";
+    const ctx       = { root: ROOT, project_id: projectId };
+    const result    = await reg.invoke("project.intake_zip",
+      { project_id: projectId, zip_path: zipPath }, ctx);
+    return { setup_ok: true, status_ok: result.status === "SUCCESS" };
+  } finally {
+    cleanup();
+    delete process.env.FORGE_INTAKE_MAX_ENTRIES;
+    delete require.cache[INTAKE_PATH];
+  }
+}
+
+// S187: 52428801 bytes (50 MB + 1 byte), between old 50 MB cap and new 500 MB cap → PASS
+// RED (old MAX_ZIP_BYTES=52428800): 52428801 > 52428800 → ZIP_TOO_LARGE.
+// GREEN (new MAX_ZIP_BYTES=524288000): 52428801 ≤ 524288000 → PASS.
+async function runS187IntakeZipBytesAtCap() {
+  const { zipPath, cleanup } = _buildBytesZip(52428801, "s187");
+  try {
+    const reg       = _makeRegistry("WORKSPACE_WRITE");
+    const projectId = "test_s187_proj";
+    const ctx       = { root: ROOT, project_id: projectId };
+    const result    = await reg.invoke("project.intake_zip",
+      { project_id: projectId, zip_path: zipPath }, ctx);
+    return { setup_ok: true, status_ok: result.status === "SUCCESS" };
+  } finally {
+    cleanup();
+  }
+}
+
+// S188: 524288001 bytes (500 MB + 1 byte), one over new 500 MB cap → ZIP_TOO_LARGE
+// RED (old code): detail = "...50 MB cap" (hard-coded literal) → detail.includes("500 MB cap") = false.
+// GREEN (new code): detail = "...500 MB cap" (computed) → detail.includes("500 MB cap") = true.
+// NOTE: ~500 MB RAM required during getData() decompression (all-0x61 bytes decompress from ~1 MB zip).
+async function runS188IntakeZipBytesOverCap() {
+  const { zipPath, cleanup } = _buildBytesZip(524288001, "s188");
+  try {
+    const reg       = _makeRegistry("WORKSPACE_WRITE");
+    const projectId = "test_s188_proj";
+    const ctx       = { root: ROOT, project_id: projectId };
+    const result    = await reg.invoke("project.intake_zip",
+      { project_id: projectId, zip_path: zipPath }, ctx);
+    const detail    = (result.metadata && result.metadata.detail) || "";
+    return {
+      setup_ok:                   true,
+      status_is_failed:           result.status === "FAILED",
+      reason_is_zip_too_large:    !!(result.metadata && result.metadata.reason === "ZIP_TOO_LARGE"),
+      detail_mentions_500_mb_cap: detail.includes("500 MB cap")
+    };
+  } finally {
+    cleanup();
+  }
+}
+
+// S189: FORGE_INTAKE_MAX_BYTES=104857600 (100 MB) env override, 52428801 bytes → PASS
+// RED (old code, no env reading): 52428801 > 52428800 (old cap) → ZIP_TOO_LARGE.
+// GREEN (new IIFE reads env=104857600): 52428801 ≤ 104857600 → PASS.
+async function runS189IntakeZipEnvOverrideBytes() {
+  const INTAKE_PATH = require.resolve(path.join(ROOT, "code/src/runtime/tools/intake_tools.js"));
+  delete require.cache[INTAKE_PATH];
+  process.env.FORGE_INTAKE_MAX_BYTES = "104857600";
+  const { zipPath, cleanup } = _buildBytesZip(52428801, "s189");
+  try {
+    const reg       = _makeRegistry("WORKSPACE_WRITE");
+    const projectId = "test_s189_proj";
+    const ctx       = { root: ROOT, project_id: projectId };
+    const result    = await reg.invoke("project.intake_zip",
+      { project_id: projectId, zip_path: zipPath }, ctx);
+    return { setup_ok: true, status_ok: result.status === "SUCCESS" };
+  } finally {
+    cleanup();
+    delete process.env.FORGE_INTAKE_MAX_BYTES;
+    delete require.cache[INTAKE_PATH];
+  }
+}
+
 module.exports = {
   runS158IntakeZip,
   runS159AnalyzeSource,
@@ -1258,5 +1413,11 @@ module.exports = {
   runS180RoleIdExemptionFires,
   runS181FullMockE2E,
   runS182IntakeE2EThreeFixturesMock,
-  runS183Phase11FullRegression
+  runS183Phase11FullRegression,
+  runS184IntakeZipEntriesAtCap,
+  runS185IntakeZipEntriesOverCap,
+  runS186IntakeZipEnvOverrideEntries,
+  runS187IntakeZipBytesAtCap,
+  runS188IntakeZipBytesOverCap,
+  runS189IntakeZipEnvOverrideBytes
 };

@@ -106,8 +106,14 @@ const JS_ENTRY_BASES = new Set([
 const GO_ENTRY_BASES = new Set(["main.go"]);
 
 const MAX_AST_FILES   = 20;
-const MAX_ZIP_ENTRIES = 1000;
-const MAX_ZIP_BYTES   = 50 * 1024 * 1024;
+const MAX_ZIP_ENTRIES = (() => {
+  const v = parseInt(process.env.FORGE_INTAKE_MAX_ENTRIES, 10);
+  return (Number.isInteger(v) && v >= 1 && v <= 500000) ? v : 50000;
+})();
+const MAX_ZIP_BYTES = (() => {
+  const v = parseInt(process.env.FORGE_INTAKE_MAX_BYTES, 10);
+  return (Number.isInteger(v) && v >= 1048576 && v <= 2147483648) ? v : (500 * 1024 * 1024);
+})();
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -506,7 +512,7 @@ const intake_zip = defineTool({
         const data = entry.getData();
         totalBytes += data.length;
         if (totalBytes > MAX_ZIP_BYTES) {
-          return failed("ZIP_TOO_LARGE", "unpacked size exceeds 50 MB cap");
+          return failed("ZIP_TOO_LARGE", "unpacked size exceeds " + Math.floor(MAX_ZIP_BYTES / (1024 * 1024)) + " MB cap");
         }
 
         const absDestPath = path.join(targetDir, entryName);
@@ -542,7 +548,7 @@ const intake_zip = defineTool({
         const content = readRes.output.content;
         totalBytes += readRes.output.size || 0;
         if (totalBytes > MAX_ZIP_BYTES) {
-          return failed("ZIP_TOO_LARGE", "total size exceeds 50 MB cap");
+          return failed("ZIP_TOO_LARGE", "total size exceeds " + Math.floor(MAX_ZIP_BYTES / (1024 * 1024)) + " MB cap");
         }
 
         const absDestPath = path.join(targetDir, relPath);

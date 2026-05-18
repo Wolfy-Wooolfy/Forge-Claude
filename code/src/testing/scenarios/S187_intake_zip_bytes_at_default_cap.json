@@ -1,0 +1,14 @@
+{
+  "id": "S187",
+  "description": "project.intake_zip — 52428801 bytes (50 MB + 1), above old cap, under new 500 MB cap → SUCCESS",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS187IntakeZipBytesAtCap",
+  "cleanup_project": "test_s187_proj",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "setup_ok",  "expected": true },
+    { "type": "state_field_equals", "field": "status_ok", "expected": true }
+  ]
+}

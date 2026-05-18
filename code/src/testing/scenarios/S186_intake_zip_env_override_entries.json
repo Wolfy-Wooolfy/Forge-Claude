@@ -1,0 +1,14 @@
+{
+  "id": "S186",
+  "description": "project.intake_zip — FORGE_INTAKE_MAX_ENTRIES=60000 env override, 55000 entries → SUCCESS",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS186IntakeZipEnvOverrideEntries",
+  "cleanup_project": "test_s186_proj",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "setup_ok",  "expected": true },
+    { "type": "state_field_equals", "field": "status_ok", "expected": true }
+  ]
+}

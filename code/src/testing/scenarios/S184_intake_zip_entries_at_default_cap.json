@@ -1,0 +1,14 @@
+{
+  "id": "S184",
+  "description": "project.intake_zip — exactly 50000 entries at new default cap → SUCCESS",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS184IntakeZipEntriesAtCap",
+  "cleanup_project": "test_s184_proj",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "setup_ok",  "expected": true },
+    { "type": "state_field_equals", "field": "status_ok", "expected": true }
+  ]
+}

@@ -73,6 +73,28 @@ The tool accepts **exactly one** of the following (mutually exclusive):
 
 Both variants copy or extract source into `artifacts/projects/<project_id>/source/`. The original source is never modified.
 
+### Capacity Limits
+
+`project.intake_zip` enforces two hard caps **before** any extraction or LLM call. When either cap is exceeded the tool returns `failed("ZIP_TOO_LARGE", ...)` immediately; no files are written, no cost is incurred.
+
+| Constant | Default | Env Override | Valid Range | Enforcement Lines |
+|---|---|---|---|---|
+| `MAX_ZIP_ENTRIES` | 50 000 | `FORGE_INTAKE_MAX_ENTRIES` | 1 – 500 000 | `intake_tools.js:495` (zip), `:533` (directory) |
+| `MAX_ZIP_BYTES` | 500 MB (524 288 000 B) | `FORGE_INTAKE_MAX_BYTES` | 1 MB – 2 GB | `intake_tools.js:514` (zip), `:550` (directory) |
+
+Both constants are evaluated **at module load time** via IIFE. Re-setting the env variable after the module is loaded has no effect; the process must be restarted (or the module cache cleared in tests).
+
+**Env-override examples:**
+
+```sh
+FORGE_INTAKE_MAX_ENTRIES=75000 node ...
+FORGE_INTAKE_MAX_BYTES=1073741824 node ...   # 1 GB
+```
+
+**Validation:** out-of-bounds values fall back to defaults silently (fail-lenient override, fail-closed cap).
+
+**Rationale for defaults:** 50 000 entries covers the largest public OSS corpus tested in PCST v1.0 (ruff, 10 510 files) with 4.8× headroom. 500 MB covers large monorepos with headroom over tree-sitter parse memory limits. Operators running unusually large repos can set the env overrides without a code change.
+
 ---
 
 ## §3 Source Tree Schema
@@ -394,4 +416,4 @@ The intake feature is production-ready:
 
 ---
 
-**END OF INTAKE CONTRACT v1.2** — Updated Stage 11.5 (PHASE-11 COMPLETE)
+**END OF INTAKE CONTRACT v1.3** — Updated PHASE-11.6 (Capacity Limits addendum)

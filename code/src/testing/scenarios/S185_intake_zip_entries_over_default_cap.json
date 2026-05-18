@@ -1,0 +1,16 @@
+{
+  "id": "S185",
+  "description": "project.intake_zip — 50001 entries, one over new default cap → ZIP_TOO_LARGE with cap: 50000",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS185IntakeZipEntriesOverCap",
+  "cleanup_project": "test_s185_proj",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "setup_ok",                  "expected": true },
+    { "type": "state_field_equals", "field": "status_is_failed",          "expected": true },
+    { "type": "state_field_equals", "field": "reason_is_zip_too_large",   "expected": true },
+    { "type": "state_field_equals", "field": "detail_mentions_cap_50000", "expected": true }
+  ]
+}

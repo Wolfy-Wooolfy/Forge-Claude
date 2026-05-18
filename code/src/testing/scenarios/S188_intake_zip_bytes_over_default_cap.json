@@ -1,0 +1,16 @@
+{
+  "id": "S188",
+  "description": "project.intake_zip — 524288001 bytes (500 MB + 1), over new 500 MB cap → ZIP_TOO_LARGE with 500 MB cap",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS188IntakeZipBytesOverCap",
+  "cleanup_project": "test_s188_proj",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "setup_ok",                   "expected": true },
+    { "type": "state_field_equals", "field": "status_is_failed",           "expected": true },
+    { "type": "state_field_equals", "field": "reason_is_zip_too_large",    "expected": true },
+    { "type": "state_field_equals", "field": "detail_mentions_500_mb_cap", "expected": true }
+  ]
+}

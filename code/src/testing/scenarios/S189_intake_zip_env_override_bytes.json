@@ -1,0 +1,14 @@
+{
+  "id": "S189",
+  "description": "project.intake_zip — FORGE_INTAKE_MAX_BYTES=104857600 (100 MB) env override, 52428801 bytes → SUCCESS",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_test_helper",
+  "method": "runS189IntakeZipEnvOverrideBytes",
+  "cleanup_project": "test_s189_proj",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "setup_ok",  "expected": true },
+    { "type": "state_field_equals", "field": "status_ok", "expected": true }
+  ]
+}
