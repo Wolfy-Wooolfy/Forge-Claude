@@ -1,0 +1,51 @@
+# ── Forge API Server — systemd unit file ────────────────────────────────────
+# Tier 1 (ship + review) — Linux systemd service definition.
+# No closure verification required for PHASE-12 (Windows is Tier-1 primary).
+#
+# Installation: see INSTALL.md §Linux Service, or run:
+#   install-linux-systemd.sh  (Stage 12.6 companion — copies this file and
+#                              substitutes FORGE_DIR / FORGE_USER placeholders)
+#
+# Placeholders replaced at install time:
+#   FORGE_DIR  — absolute path to the Forge repo root (e.g. /home/user/forge)
+#   FORGE_USER — OS user that owns the Forge installation
+# ────────────────────────────────────────────────────────────────────────────
+
+[Unit]
+Description=Forge AI OS — Personal Production API Server
+Documentation=file:FORGE_DIR/INSTALL.md
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=FORGE_USER
+WorkingDirectory=FORGE_DIR
+
+ExecStart=/usr/bin/env node FORGE_DIR/start-api.js
+
+# Restart on crash (10 second delay matches Plan §2-D1 Tier-1 recovery spec)
+Restart=on-failure
+RestartSec=10
+
+# Log to systemd journal (use: journalctl -u forge-api -f)
+# Also mirrors to files once D4 log_writer is active
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=forge-api
+
+# Environment — override at install time or via EnvironmentFile=
+Environment=NODE_ENV=production
+Environment=FORGE_API_PORT=3100
+# EnvironmentFile=FORGE_DIR/.env   (uncomment if using .env file)
+
+# Crash recorder hook (Stage 12.1 Group B) — uncomment after crash_recorder.sh exists:
+# ExecStopPost=FORGE_DIR/scripts/service/crash_recorder.sh $EXIT_CODE $EXIT_STATUS
+
+# Resource limits (sensible defaults for a personal production setup)
+LimitNOFILE=65536
+
+[Install]
+# Use multi-user.target for system service (requires sudo)
+# Use default.target for user service (systemctl --user enable forge-api)
+WantedBy=multi-user.target

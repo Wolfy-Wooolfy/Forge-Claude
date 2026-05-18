@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+
+<!--
+  Forge API Server — macOS launchd plist
+  Tier 1 (ship + review) — macOS launchd service definition.
+  No closure verification required for PHASE-12 (Windows is Tier-1 primary).
+
+  Installation: see INSTALL.md §macOS Service, or run:
+    install-macos-launchd.sh  (Stage 12.6 companion — copies this file with
+                               FORGE_DIR substituted into ~/Library/LaunchAgents/)
+
+  Placeholders replaced at install time:
+    FORGE_DIR — absolute path to the Forge repo root (e.g. /Users/user/forge)
+
+  Manual install:
+    1. Replace FORGE_DIR in this file
+    2. cp com.forge.api.plist ~/Library/LaunchAgents/
+    3. launchctl load ~/Library/LaunchAgents/com.forge.api.plist
+
+  To unload:
+    launchctl unload ~/Library/LaunchAgents/com.forge.api.plist
+
+  Crash recorder hook (Stage 12.1 Group B): add <key>ExitTimeout</key> and
+  a wrapper script reference after crash_recorder.sh exists (see INSTALL.md).
+-->
+
+<plist version="1.0">
+<dict>
+
+  <!-- Service identity -->
+  <key>Label</key>
+  <string>com.forge.api</string>
+
+  <!-- Launch command: node start-api.js -->
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/local/bin/node</string>
+    <string>FORGE_DIR/start-api.js</string>
+  </array>
+
+  <!-- Working directory (repo root) -->
+  <key>WorkingDirectory</key>
+  <string>FORGE_DIR</string>
+
+  <!-- Keep alive: restart automatically on crash -->
+  <key>KeepAlive</key>
+  <true/>
+
+  <!-- Start on login -->
+  <key>RunAtLoad</key>
+  <true/>
+
+  <!-- Log files (matches D4 log_writer paths) -->
+  <key>StandardOutPath</key>
+  <string>FORGE_DIR/logs/forge.log</string>
+  <key>StandardErrorPath</key>
+  <string>FORGE_DIR/logs/forge.error.log</string>
+
+  <!-- Environment variables -->
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>NODE_ENV</key>
+    <string>production</string>
+    <key>FORGE_API_PORT</key>
+    <string>3100</string>
+    <key>PATH</key>
+    <string>/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
+
+  <!-- Throttle interval: prevent restart loops (10 seconds matches D1/Plan §2) -->
+  <key>ThrottleInterval</key>
+  <integer>10</integer>
+
+</dict>
+</plist>

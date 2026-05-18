@@ -127,7 +127,7 @@ Scheduler on Windows (the primary verification target).
 | Security model | Implicit | Explicit: localhost binding + capability tokens + UID pinning (D5) |
 | Backup size constraint | "tar.gz under 200 MB" | No size constraint; DEFAULT_EXCLUDE list controls PII (content-based) |
 | Effort estimate | 5–7 days | 8–10 days |
-| PM2 | Mentioned | Removed (superseded by NSSM/Task Scheduler/systemd/launchd) |
+| PM2 (Windows path) | Mentioned as example | Replaced by NSSM or Task Scheduler (PM2 on Windows is historically weak; Linux/macOS systemd/launchd unchanged) |
 
 All changes are **additive** (new scope added) or **refinements** (vague description
 made precise). No original PHASE-12 deliverable is removed:
