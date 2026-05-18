@@ -2,17 +2,17 @@
   "id": "S194",
   "name": "secrets — windows_credential_manager.js API contract",
   "type": "module_call",
-  "required_mode": "READ_ONLY",
-  "module": "code/src/testing/helpers/secrets_test_helper.js",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/secrets_test_helper",
   "method": "runS194WindowsCMContract",
-  "args": {},
+  "args": [],
   "assertions": [
-    { "type": "status_equals",      "value": "SUCCESS" },
-    { "type": "state_field_equals", "field": "output.state.exports_get",          "value": true },
-    { "type": "state_field_equals", "field": "output.state.exports_set",          "value": true },
-    { "type": "state_field_equals", "field": "output.state.exports_delete",       "value": true },
-    { "type": "state_field_equals", "field": "output.state.exports_is_available", "value": true },
-    { "type": "state_field_equals", "field": "output.state.type_correct",         "value": true },
-    { "type": "state_field_equals", "field": "output.state.win_availability_ok",  "value": true }
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "exports_get",          "expected": true },
+    { "type": "state_field_equals", "field": "exports_set",          "expected": true },
+    { "type": "state_field_equals", "field": "exports_delete",       "expected": true },
+    { "type": "state_field_equals", "field": "exports_is_available", "expected": true },
+    { "type": "state_field_equals", "field": "type_correct",         "expected": true },
+    { "type": "state_field_equals", "field": "win_availability_ok",  "expected": true }
   ]
 }

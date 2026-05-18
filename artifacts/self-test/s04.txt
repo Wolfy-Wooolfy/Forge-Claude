@@ -1,1 +1,0 @@
-S04 self-test write — WORKSPACE_WRITE allows file creation
