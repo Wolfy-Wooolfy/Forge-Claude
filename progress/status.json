@@ -5,8 +5,8 @@
   "overall_progress_percent": 99,
   "stage_progress_percent": 100,
   "next_phase": "PHASE-12",
-  "next_step": "Begin PHASE-12 (Personal Production Setup) per owner GO and FORGE_V2_PHASE_ROADMAP.md. Requires new decision artifact and explicit owner confirmation before starting.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-17T10-3-phase-11-stage-11-5-closure.md",
+  "next_step": "Begin Stage 12.1 (Service Lifecycle) per DECISION-2026-05-18T11-30-phase-12-plan.md §3.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-18T12-30-phase-12-stage-12-0-closure.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -77,9 +77,9 @@
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
-    "self_test_last_run": "2026-05-17",
-    "self_test_last_result": "178 passed, 0 failed, 5 skipped (183 total) — PHASE-11 CLOSED. S182 (mock e2e 3 fixtures) + S183 (PHASE-11 full regression) added. PHASE-8 hotfix: _stopProcess async (harness_runner.js). INTAKE_CONTRACT §12 added. 5 SKIPs require docker.",
-    "self_test_scenarios_pass": 178,
+    "self_test_last_run": "2026-05-18",
+    "self_test_last_result": "184 passed, 0 failed, 5 skipped (189 total) — PHASE-11.6 CLOSED. S184-S189 (intake capacity limits) added. 5 SKIPs require docker.",
+    "self_test_scenarios_pass": 184,
     "self_test_scenarios_skip": 5,
     "self_test_scenarios_fail": 0,
     "providers_registered_count": 13,
@@ -147,7 +147,22 @@
     "deferred": [
       "PHASE-7-D",
       "PHASE-14"
-    ]
+    ],
+    "phase_12_amendment": "DECISION-2026-05-18T12-00-roadmap-phase-12-amendment.md — Windows Tier-1, secret keychain, security model explicit, effort 5-7→8-10 days"
+  },
+  "phase_12": {
+    "status": "IN_PROGRESS",
+    "plan_artifact": "artifacts/decisions/DECISION-2026-05-18T11-30-phase-12-plan.md",
+    "amendment_artifact": "artifacts/decisions/DECISION-2026-05-18T12-00-roadmap-phase-12-amendment.md",
+    "oq_sweep": "artifacts/audit/phase_12_oq_sweep.md",
+    "total_live_cap_usd": 3.00,
+    "cost_actuals_usd": 0,
+    "stage_12_0": {
+      "status": "CLOSED",
+      "closed_at": "2026-05-18T12:30:00.000Z",
+      "cost_actual_usd": 0,
+      "decision_artifact": "artifacts/decisions/DECISION-2026-05-18T12-30-phase-12-stage-12-0-closure.md"
+    }
   },
   "phase_9": {
     "stage": "CLOSED",
@@ -726,8 +741,8 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-11-6-CLOSED",
-  "last_updated": "2026-05-18T10:07:00.000Z",
+  "current_task": "PHASE-12-STAGE-12-0-CLOSED",
+  "last_updated": "2026-05-18T12:30:00.000Z",
   "pcst_v1": {
     "status": "CLOSED_WITH_FINDINGS",
     "closed_at": "2026-05-18T09:04:21.000Z",
