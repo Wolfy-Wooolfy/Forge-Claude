@@ -933,6 +933,9 @@
   },
   "current_task": "PHASE-12-STAGE-12-4-CLOSED",
   "last_updated": "2026-05-19T09:30:00.000Z",
+  "findings_open": [
+    "FINDING-2026-05-19-s137-live-openai-call"
+  ],
   "pcst_v1": {
     "status": "CLOSED_WITH_FINDINGS",
     "closed_at": "2026-05-18T09:04:21.000Z",
