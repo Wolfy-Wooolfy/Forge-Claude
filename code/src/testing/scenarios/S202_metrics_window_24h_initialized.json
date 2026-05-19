@@ -1,0 +1,16 @@
+{
+  "id": "S202",
+  "name": "monitoring — metrics_window_24h initialized with 7 fields + idempotent",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/monitoring_test_helper",
+  "method": "runS202MetricsWindowInitialized",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "all_fields_present",    "expected": true },
+    { "type": "state_field_equals", "field": "window_start_ts_set",   "expected": true },
+    { "type": "state_field_equals", "field": "other_field_preserved", "expected": true },
+    { "type": "state_field_equals", "field": "idempotent",            "expected": true }
+  ]
+}

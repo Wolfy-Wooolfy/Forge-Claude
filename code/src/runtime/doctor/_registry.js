@@ -31,7 +31,10 @@ const checks = [
   require("./checks/research_role_registered"),
   require("./checks/service_lifecycle"),
   require("./checks/secrets_in_env_var"),
-  require("./checks/backup_status")
+  require("./checks/backup_status"),
+  require("./checks/logging_status"),
+  require("./checks/metrics_available"),
+  require("./checks/alert_webhook")
 ];
 
 function listChecks()  { return checks.slice(); }

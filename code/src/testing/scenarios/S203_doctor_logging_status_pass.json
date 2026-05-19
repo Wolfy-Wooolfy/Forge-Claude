@@ -1,0 +1,14 @@
+{
+  "id": "S203",
+  "name": "doctor — logging_status PASS when logs/ present, WARN when missing",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/monitoring_test_helper",
+  "method": "runS203DoctorLoggingStatus",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "pass_with_logs_dir",    "expected": "PASS" },
+    { "type": "state_field_equals", "field": "warn_without_logs_dir", "expected": "WARN" }
+  ]
+}

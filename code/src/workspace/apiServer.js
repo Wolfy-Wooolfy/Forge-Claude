@@ -1887,6 +1887,57 @@ function createWorkspaceApiServer(options = {}) {
         return;
       }
 
+      // ── Alerts ──────────────────────────────────────────────────────────────
+      // POST /api/alerts/test — fires a test payload to FORGE_ALERT_WEBHOOK_URL.
+      // 503 if env var absent (webhook disabled). Does NOT route failures through
+      // log_writer to avoid alert-about-alert re-entrancy.
+
+      if (req.method === "POST" && pathname === "/api/alerts/test") {
+        const webhookUrl = process.env.FORGE_ALERT_WEBHOOK_URL;
+        if (!webhookUrl) {
+          sendJson(res, 503, {
+            error:  "webhook not configured",
+            detail: "FORGE_ALERT_WEBHOOK_URL is not set — see INSTALL.md §Alerts"
+          });
+          return;
+        }
+
+        const reg = getDefaultRegistry();
+        const payload = JSON.stringify({
+          type:    "forge.alert.test",
+          source:  "forge-api",
+          ts:      new Date().toISOString(),
+          message: "Forge alert webhook test — delivery confirmed"
+        });
+
+        const postResult = await reg.invoke(
+          "http.post",
+          {
+            url:        webhookUrl,
+            body:       payload,
+            headers:    { "content-type": "application/json" },
+            timeout_ms: 10000
+          },
+          { root }
+        );
+
+        if (postResult.status !== "SUCCESS") {
+          sendJson(res, 502, {
+            error:  "webhook delivery failed",
+            detail: postResult.error || "http.post returned non-SUCCESS"
+          });
+          return;
+        }
+
+        sendJson(res, 200, {
+          ok:                   true,
+          webhook_url_configured: true,
+          status_code:          postResult.output.status_code,
+          detail:               "test alert delivered"
+        });
+        return;
+      }
+
       sendJson(res, 404, { error: "Not found" });
     } catch (err) {
       sendJson(res, 500, { error: err && err.message ? err.message : "Internal server error" });
