@@ -1,0 +1,15 @@
+{
+  "id": "S200",
+  "name": "backup — backup.restore round-trip and ENFORCEMENT_DENIED in WORKSPACE_WRITE",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/backup_test_helper",
+  "method": "runS200BackupRestoreRoundTrip",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "denied_in_workspace_write", "expected": true },
+    { "type": "state_field_equals", "field": "content_matches",           "expected": true },
+    { "type": "state_field_equals", "field": "restored_count",            "expected": 2 }
+  ]
+}

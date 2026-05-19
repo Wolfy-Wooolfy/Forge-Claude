@@ -280,9 +280,11 @@ const backup_restore = defineTool({
   },
   async execute(input, ctx) {
     const AdmZip = require("adm-zip");
-    const { getDefaultRegistry } = require("./_registry");
-    const reg  = getDefaultRegistry();
+    const { getDefaultRegistry, createRegistry } = require("./_registry");
     const root = (ctx && ctx.root) || process.cwd();
+
+    // Reads use default registry (fs.exists is READ_ONLY-safe at any mode)
+    const reg = getDefaultRegistry();
 
     // Verify archive exists via L2 (path must be within ctx.root for L2 check)
     const existsResult = await reg.invoke("fs.exists", { path: input.path }, ctx);
@@ -297,6 +299,17 @@ const backup_restore = defineTool({
     } catch (e) {
       return failed("ARCHIVE_CORRUPT", "Cannot open archive: " + e.message);
     }
+
+    // Writes use a local DANGER_FULL_ACCESS registry — restore must write to arbitrary
+    // paths within root (e.g. hello.txt at root level). The outer DANGER_FULL_ACCESS gate
+    // in permissionPolicy already secured this execution path.
+    const { createPolicy } = require("../permission/permissionPolicy");
+    const dangerPolicy = createPolicy({ active_mode: "DANGER_FULL_ACCESS" });
+    const writeReg     = createRegistry({ root });
+    writeReg.load();
+    writeReg.setAuthorizeFunction(
+      (tool, input_, c) => dangerPolicy.authorize(tool, input_, c)
+    );
 
     const entries        = zip.getEntries();
     let   extractedCount = 0;
@@ -317,7 +330,7 @@ const backup_restore = defineTool({
       try {
         const data        = entry.getData();
         // Write via L2 base64 — Track A clean (no direct fs.*Sync in this file)
-        const writeResult = await reg.invoke(
+        const writeResult = await writeReg.invoke(
           "fs.write_file",
           { path: entryName, content: data.toString("base64"), encoding: "base64" },
           ctx
@@ -342,4 +355,6 @@ const backup_restore = defineTool({
 
 // ── Export tool family (auto-discovered by tools _registry.js) ───────────────
 
-module.exports = [backup_create, backup_verify, backup_export, backup_restore];
+module.exports = {
+  tools: [backup_create, backup_verify, backup_export, backup_restore]
+};

@@ -1,0 +1,18 @@
+{
+  "id": "S197",
+  "name": "backup — backup.create applies DEFAULT_EXCLUDE correctly",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/backup_test_helper",
+  "method": "runS197BackupCreateExcludes",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "requests_excluded",      "expected": true },
+    { "type": "state_field_equals", "field": "responses_excluded",     "expected": true },
+    { "type": "state_field_equals", "field": "env_excluded",           "expected": true },
+    { "type": "state_field_equals", "field": "node_modules_excluded",  "expected": true },
+    { "type": "state_field_equals", "field": "metadata_kept",          "expected": true },
+    { "type": "state_field_equals", "field": "project_file_kept",      "expected": true }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "S199",
+  "name": "backup — Doctor check warns when backup is stale (> 7 days)",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/backup_test_helper",
+  "method": "runS199DoctorWarnsOnStaleBackup",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "doctor_status",        "expected": "WARN" },
+    { "type": "state_field_equals", "field": "contains_days_warning", "expected": true }
+  ]
+}

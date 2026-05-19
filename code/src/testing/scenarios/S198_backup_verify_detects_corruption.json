@@ -1,0 +1,15 @@
+{
+  "id": "S198",
+  "name": "backup — backup.verify detects ZIP corruption",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/backup_test_helper",
+  "method": "runS198BackupVerifyDetectsCorruption",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "valid_backup_was_ok",      "expected": true },
+    { "type": "state_field_equals", "field": "verify_returned_failure",  "expected": true },
+    { "type": "state_field_equals", "field": "ok",                       "expected": false }
+  ]
+}

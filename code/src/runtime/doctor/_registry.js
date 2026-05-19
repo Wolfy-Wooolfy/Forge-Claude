@@ -30,7 +30,8 @@ const checks = [
   require("./checks/kb_indexed_sources_count"),
   require("./checks/research_role_registered"),
   require("./checks/service_lifecycle"),
-  require("./checks/secrets_in_env_var")
+  require("./checks/secrets_in_env_var"),
+  require("./checks/backup_status")
 ];
 
 function listChecks()  { return checks.slice(); }
