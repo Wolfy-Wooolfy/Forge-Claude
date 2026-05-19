@@ -151,8 +151,54 @@ async function runS203DoctorLoggingStatus() {
   }
 }
 
+// ── S209: Doctor runs with all 34 checks, no FAIL, all PHASE-12 checks present ──
+
+const PHASE_12_CHECK_IDS = [
+  "service_lifecycle",
+  "secrets_in_env_var",
+  "backup_status",
+  "logging_status",
+  "metrics_available",
+  "alert_webhook",
+  "api_binding",
+  "api_auth_token",
+  "uid_pin_match"
+];
+
+async function runS209DoctorPhase12ChecksPass() {
+  const { runDoctor } = require("../../runtime/doctor/runDoctor");
+
+  let result;
+  try {
+    result = await runDoctor({ write_report: false, update_status: false });
+  } catch (_err) {
+    return {
+      doctor_ran:                 false,
+      check_count:                0,
+      phase12_checks_all_present: false,
+      phase12_fail_count:         0
+    };
+  }
+
+  const checks   = (result && result.checks) || [];
+  const checkIds = checks.map((c) => c.id);
+
+  // Count only PHASE-12 check failures (pre-existing env-dependent failures like
+  // openai_api_key are excluded — they are not PHASE-12 additions).
+  const phase12Checks    = checks.filter((c) => PHASE_12_CHECK_IDS.includes(c.id));
+  const phase12FailCount = phase12Checks.filter((c) => c.status === "FAIL").length;
+
+  return {
+    doctor_ran:                 !!result,
+    check_count:                checks.length,
+    phase12_checks_all_present: PHASE_12_CHECK_IDS.every((id) => checkIds.includes(id)),
+    phase12_fail_count:         phase12FailCount
+  };
+}
+
 module.exports = {
   runS201LogWriterRotation,
   runS202MetricsWindowInitialized,
-  runS203DoctorLoggingStatus
+  runS203DoctorLoggingStatus,
+  runS209DoctorPhase12ChecksPass
 };

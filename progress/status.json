@@ -6,7 +6,7 @@
   "stage_progress_percent": 100,
   "next_phase": "PHASE-12",
   "next_step": "Begin Stage 12.7 per DECISION-2026-05-18T11-30-phase-12-plan.md §3 Stage 12.7.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-19T15-00-phase-12-stage-12-5-closure.md",
+  "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-19T17-30-phase-12-stage-12-6-closure.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -73,7 +73,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-05-19T15:00:00.000Z",
+    "last_doctor_run": "2026-05-19T14:40:56.613Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,

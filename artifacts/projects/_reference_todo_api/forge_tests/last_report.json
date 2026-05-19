@@ -4,13 +4,13 @@
   "fail": 0,
   "error": 0,
   "overall_status": "PASS",
-  "ran_at": "2026-05-19T12:23:14.735Z",
+  "ran_at": "2026-05-19T14:38:27.945Z",
   "scenarios": [
     {
       "id": "T-2",
       "name": "list_todos_empty_returns_empty_array",
       "status": "PASS",
-      "duration_ms": 1486,
+      "duration_ms": 890,
       "assertions": [
         {
           "type": "http_status_equals",

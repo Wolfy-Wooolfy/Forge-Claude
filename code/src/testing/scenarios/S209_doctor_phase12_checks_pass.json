@@ -1,0 +1,17 @@
+{
+  "id": "S209",
+  "name": "doctor — all PHASE-12 checks registered and no PHASE-12 check in FAIL status",
+  "description": "Stage 12.7 closure regression. Verifies that all 34 Doctor checks (including PHASE-12 additions: service_lifecycle, secrets_in_env_var, backup_status, logging_status, metrics_available, alert_webhook, api_auth_token, api_binding, uid_pin_match) are registered, and that none of the 9 PHASE-12 specific checks returns FAIL. Pre-existing environment-dependent failures (e.g. openai_api_key when OPENAI_API_KEY is unset) are excluded from the PHASE-12 FAIL count — they are not PHASE-12 additions. Uses existing state_field_equals assertion type — no new assertion types needed. Note: the plan artifact referenced 'tool_called', 'response_contains_field', 'response_field_count', 'response_no_failures' assertion types which do not exist in the runner; the state_field_equals approach is the established pattern (per S192, S196, S203). Note: plan-specified 'doctor_ok: true' assertion superseded — pre-existing failures outside PHASE-12 scope would cause spurious FAIL.",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/monitoring_test_helper",
+  "method": "runS209DoctorPhase12ChecksPass",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "doctor_ran",                 "expected": true },
+    { "type": "state_field_equals", "field": "check_count",                "expected": 34 },
+    { "type": "state_field_equals", "field": "phase12_checks_all_present", "expected": true },
+    { "type": "state_field_equals", "field": "phase12_fail_count",         "expected": 0 }
+  ]
+}

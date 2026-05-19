@@ -1,0 +1,21 @@
+{
+  "id": "S208",
+  "name": "PHASE-12 full regression: service, secrets, backup, logging, auth, binding, uid_pin",
+  "description": "Stage 12.7 meta-regression. Mirrors the S183 pattern (Phase 11 full regression). Asserts key PHASE-12 structural properties by file inspection — no LLM calls, no real OS APIs touched. Verifies: service lifecycle module loads; secret_provider exports the 4-tier resolution chain; backup tools registered (create, verify, restore, export); log_writer exists with §ARC-6 boundary respected; auth middleware registered on api_server; api_server binds 127.0.0.1 default (OQ-2 fix); uid_pin module exports checkOrCreateUidPin; all 6 §ARC entries documented in 18_AGENT_ROLES_CONTRACT.md (NO §ARC-7). Note: the plan artifact (DECISION-2026-05-18T11-30-phase-12-plan.md) referenced a 'baseline/' subdirectory for this file — superseded by repo convention; all scenarios live in code/src/testing/scenarios/ directly.",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/phase_12_regression_helper",
+  "method": "runS208Phase12FullRegression",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "service_lifecycle_module_ok",   "expected": true },
+    { "type": "state_field_equals", "field": "secret_provider_chain_ok",      "expected": true },
+    { "type": "state_field_equals", "field": "backup_tools_registered_ok",    "expected": true },
+    { "type": "state_field_equals", "field": "log_writer_arc6_boundary_ok",   "expected": true },
+    { "type": "state_field_equals", "field": "auth_middleware_present_ok",    "expected": true },
+    { "type": "state_field_equals", "field": "api_binding_default_ok",        "expected": true },
+    { "type": "state_field_equals", "field": "uid_pin_format_ok",             "expected": true },
+    { "type": "state_field_equals", "field": "arc_count_equals_six",          "expected": true }
+  ]
+}
