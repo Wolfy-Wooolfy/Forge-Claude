@@ -34,7 +34,10 @@ const checks = [
   require("./checks/backup_status"),
   require("./checks/logging_status"),
   require("./checks/metrics_available"),
-  require("./checks/alert_webhook")
+  require("./checks/alert_webhook"),
+  require("./checks/api_binding"),
+  require("./checks/api_auth_token"),
+  require("./checks/uid_pin_match")
 ];
 
 function listChecks()  { return checks.slice(); }

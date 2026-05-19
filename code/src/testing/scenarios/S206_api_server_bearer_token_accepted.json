@@ -1,0 +1,14 @@
+{
+  "id": "S206",
+  "name": "api server — Bearer token accepted on protected endpoint",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/api_server_test_helper",
+  "method": "runS206AuthAccepted",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "auth_accepted",   "expected": true },
+    { "type": "state_field_equals", "field": "token_length_64", "expected": true }
+  ]
+}

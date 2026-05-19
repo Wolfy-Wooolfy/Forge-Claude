@@ -1,0 +1,13 @@
+{
+  "id": "S204",
+  "name": "api server — binds to 127.0.0.1 by default (OQ-2 fixed)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/api_server_test_helper",
+  "method": "runS204BindingCheck",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "binds_127_0_0_1", "expected": true }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": "S205",
+  "name": "api server — unauthenticated request returns 401",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/api_server_test_helper",
+  "method": "runS205UnauthRejected",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "unauth_returns_401", "expected": true }
+  ]
+}

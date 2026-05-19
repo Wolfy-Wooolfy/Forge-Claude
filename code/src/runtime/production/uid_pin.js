@@ -44,8 +44,9 @@ async function checkOrCreateUidPin({ root }) {
     throw new Error("UID_PIN_PARSE_FAILED: corrupted " + PIN_REL);
   }
 
-  const userMismatch = identity.username !== null && pin.username !== null &&
-                       identity.username !== pin.username;
+  // username: any inequality (including null vs non-null) counts as mismatch
+  const userMismatch = identity.username !== pin.username;
+  // uid: only compared when both sides are non-null (POSIX-only; null on Windows)
   const uidMismatch  = identity.uid !== null && pin.uid !== null &&
                        identity.uid !== pin.uid;
 

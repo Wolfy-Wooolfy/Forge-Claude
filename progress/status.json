@@ -5,8 +5,8 @@
   "overall_progress_percent": 99,
   "stage_progress_percent": 100,
   "next_phase": "PHASE-12",
-  "next_step": "Begin Stage 12.5 (Security Model) per DECISION-2026-05-18T11-30-phase-12-plan.md §3 Stage 12.5.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-19T09-30-phase-12-stage-12-4-closure.md",
+  "next_step": "Begin Stage 12.6 per DECISION-2026-05-18T11-30-phase-12-plan.md §3 Stage 12.6.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-19T15-00-phase-12-stage-12-5-closure.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -73,18 +73,18 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-05-19T11:50:51.922Z",
+    "last_doctor_run": "2026-05-19T15:00:00.000Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
     "self_test_last_run": "2026-05-19",
-    "self_test_last_result": "198 passed, 0 failed, 5 skipped (203 total) — PHASE-12 Stage 12.4 CLOSED. S201-S203 (log_writer, metrics_window_24h, logging_status Doctor) added. 5 SKIPs require docker.",
-    "self_test_scenarios_pass": 198,
+    "self_test_last_result": "202 passed, 0 failed, 5 skipped (207 total) — PHASE-12 Stage 12.5 CLOSED. S204-S207 (api_server binding/auth/uid_mismatch) added. OQ-2 resolved (127.0.0.1 default). 5 SKIPs require docker.",
+    "self_test_scenarios_pass": 202,
     "self_test_scenarios_skip": 5,
     "self_test_scenarios_fail": 0,
     "providers_registered_count": 13,
     "tools_registered_count": 78,
-    "doctor_checks_count": 31,
+    "doctor_checks_count": 34,
     "assertion_types_count": 10,
     "active_permission_mode": "WORKSPACE_WRITE",
     "permission_policy_installed": true,
@@ -110,8 +110,8 @@
     "adapter_json_extraction": "ENABLED — extractJsonFromResponse in _adapter_contract.js, applied in anthropic/openai/claude_code/aider adapters (DECISION-20260512-0900 addendum)",
     "note": "PHASE-9 CLOSED. KB Runtime (L-KB-1→L-KB-5): source_acquisition, chunking_engine, embedding_engine, storage_lance (LanceDB), cost_ledger, budget_guard, retrieval, manifests, citation_engine, citation_validator, budget_guard vision-override, research_role (12th role, KNOWN-gate, deterministic findings, confidence recompute). 6 KB tools (ingest_url, retrieve, cite, list_sources, delete_source, validate_citations). 3 new doctor checks (kb_budget_status, kb_indexed_sources_count, research_role_registered). Stage 9.7 cleanup: 6 FIX items (retrieval cost ledger, rejected_low_credibility, citation_validator Pattern 4, S137, evidence cap, confidence recompute). scenarios: 128→137 (S129–S137). doctor checks: 21→24. SU assertions: ~276→314. API cost: $0.00.",
     "last_doctor_counts": {
-      "pass": 25,
-      "warn": 6,
+      "pass": 26,
+      "warn": 8,
       "fail": 0
     }
   },
@@ -155,6 +155,7 @@
     "plan_artifact": "artifacts/decisions/DECISION-2026-05-18T11-30-phase-12-plan.md",
     "amendment_artifact": "artifacts/decisions/DECISION-2026-05-18T12-00-roadmap-phase-12-amendment.md",
     "oq_sweep": "artifacts/audit/phase_12_oq_sweep.md",
+    "oq_2_status": "RESOLVED",
     "total_live_cap_usd": 3,
     "cost_actuals_usd": 0,
     "stage_12_0": {
@@ -295,6 +296,54 @@
         "§X.2 — Rollback D4 step 4 collapse (no handlers file to delete)",
         "§X.3 — metrics_initializer.js direct-fs (runDoctor.js codebase precedent)",
         "§X.4 — §ARC-6 extended to include fs.unlinkSync (Windows EEXIST rotation fix)"
+      ]
+    },
+    "stage_12_5": {
+      "status": "CLOSED",
+      "closed_at": "2026-05-19T15:00:00.000Z",
+      "cost_actual_usd": 0,
+      "decision_artifact": "artifacts/decisions/DECISION-2026-05-19T15-00-phase-12-stage-12-5-closure.md",
+      "checkpoint_mid": "artifacts/decisions/_phase_12_checkpoints/stage_12_5_mid.md",
+      "oq_2_resolved": true,
+      "files_created": [
+        "code/src/runtime/production/uid_pin.js",
+        "code/src/runtime/doctor/checks/api_binding.js",
+        "code/src/runtime/doctor/checks/api_auth_token.js",
+        "code/src/runtime/doctor/checks/uid_pin_match.js",
+        "code/src/testing/helpers/api_server_test_helper.js"
+      ],
+      "files_modified": [
+        "code/src/workspace/apiServer.js",
+        "code/src/runtime/permission/permissionRules.js",
+        "code/src/runtime/secrets/secret_provider.js",
+        "code/src/runtime/secrets/encrypted_file_provider.js",
+        "code/src/runtime/doctor/_registry.js",
+        "start-api.js"
+      ],
+      "doctor_checks_added": [
+        "api_binding",
+        "api_auth_token",
+        "uid_pin_match"
+      ],
+      "scenarios_added": [
+        "S204",
+        "S205",
+        "S206",
+        "S207"
+      ],
+      "su_baseline": {
+        "pass": 202,
+        "fail": 0,
+        "skip": 5,
+        "total": 207
+      },
+      "incidental_refinements": [
+        "§X.1 — web/.forge-session SYSTEM_SESSION_FILE exception in permissionRules.js",
+        "§X.2 — secret_provider + encrypted_file_provider test isolation (FORGE_SECRET_PROVIDER, FORGE_SECRET_STORE_PATH, _resetForTest)",
+        "§X.3 — start() promoted to async",
+        "§X.4 — host field exposed in createWorkspaceApiServer() return object",
+        "§X.5 — _activeToken !== null guard (auth only enforced after start() — S25-S29 regression fix)",
+        "§X.6 — uid_pin.js option B: userMismatch = identity.username !== pin.username (null bypass prevented)"
       ]
     }
   },
@@ -931,8 +980,8 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-12-STAGE-12-4-CLOSED",
-  "last_updated": "2026-05-19T09:30:00.000Z",
+  "current_task": "PHASE-12-STAGE-12-5-CLOSED",
+  "last_updated": "2026-05-19T15:00:00.000Z",
   "findings_open": [
     "FINDING-2026-05-19-s137-live-openai-call"
   ],
