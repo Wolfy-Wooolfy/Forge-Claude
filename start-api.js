@@ -20,8 +20,8 @@ const port = Number(
 
 createWorkspaceApiServer({ port })
   .start()
-  .then(({ port: actualPort }) => {
-    console.log(`Forge API server running at http://localhost:${actualPort}`);
+  .then(({ port: actualPort, host: actualHost }) => {
+    console.log(`Forge API server running at http://${actualHost}:${actualPort}`);
   })
   .catch((err) => {
     console.error("[FATAL] Failed to start Forge API server:");

@@ -11,6 +11,16 @@ const PROVIDER_ORDER = [
 
 async function _resolveProvider() {
   if (_provider) return _provider;
+  const forced = process.env.FORGE_SECRET_PROVIDER;
+  if (forced) {
+    try {
+      const p = require("./" + forced);
+      if (await Promise.resolve(p.isAvailable())) {
+        _provider = p;
+        return p;
+      }
+    } catch (_) {}
+  }
   for (const modPath of PROVIDER_ORDER) {
     const p = require(modPath);
     const available = await Promise.resolve(p.isAvailable());
@@ -20,6 +30,10 @@ async function _resolveProvider() {
     }
   }
   return null;
+}
+
+function _resetForTest() {
+  _provider = null;
 }
 
 async function get(key) {
@@ -46,4 +60,4 @@ async function provider_type() {
   return p.type;
 }
 
-module.exports = { get, set, delete: del, provider_type };
+module.exports = { get, set, delete: del, provider_type, _resetForTest };

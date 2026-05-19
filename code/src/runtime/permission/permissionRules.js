@@ -150,6 +150,15 @@ function checkScope(tool, input, ctx, dataMode) {
     }
   }
 
+  // System session file — written once per boot by the security init (Stage 12.5)
+  if (norm === "web/.forge-session") {
+    if (dataMode === "READ_ONLY") {
+      return { applicable: true, allowed: false, reason: "SCOPE_READ_ONLY",
+               detail: "READ_ONLY mode cannot write to '" + norm + "'" };
+    }
+    return { applicable: true, allowed: true, reason: "SYSTEM_SESSION_FILE" };
+  }
+
   // Check FORGE_SELF_PREFIXES (code/, docs/, etc.)
   for (const prefix of FORGE_SELF_PREFIXES) {
     if (_matchesPrefix(norm, prefix)) {

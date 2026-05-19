@@ -18,7 +18,7 @@ const SCRYPT_N   = 16384;
  * §ARC-style architectural decision artifact.
  */
 function _homeCtx() {
-  return { root: os.homedir() };
+  return { root: process.env.FORGE_SECRET_STORE_PATH || os.homedir() };
 }
 
 function _deriveKey(password, salt) {

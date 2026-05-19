@@ -35,6 +35,8 @@ function createWorkspaceApiServer(options = {}) {
   const root = path.resolve(options.root || process.cwd());
   const port = Number(options.port || process.env.FORGE_WORKSPACE_API_PORT || 3100);
 
+  let _activeToken = null;
+
   const llmRoot = path.resolve(root, "artifacts/llm");
   const decisionsRoot = path.resolve(root, "artifacts/decisions");
   const approvalPolicyPath = path.resolve(root, "artifacts/llm/approval_policy.json");
@@ -1560,8 +1562,49 @@ function createWorkspaceApiServer(options = {}) {
         return;
       }
 
+      // (a) Block any request targeting a .forge-session file
+      if (pathname.endsWith("/.forge-session") || pathname === "/.forge-session") {
+        const logWriter = require("../runtime/logging/log_writer");
+        logWriter.warn("forge-session access blocked", { method: req.method, pathname });
+        sendJson(res, 404, { error: "Not found" });
+        return;
+      }
+
+      // (b) Auth middleware — enforced only after start() sets _activeToken.
+      // If _activeToken is null the server was not initialised via start() (test
+      // scenario runner starts server directly via server.listen()) — skip auth.
+      if (_activeToken !== null) {
+        const _authExempt =
+          (req.method === "GET" && pathname === "/api/system/health") ||
+          (req.method === "GET" && pathname === "/api/system/doctor");
+        if (!_authExempt) {
+          const _authHeader = req.headers["authorization"] || "";
+          const _token = _authHeader.startsWith("Bearer ") ? _authHeader.slice(7) : null;
+          if (!_token || _token !== _activeToken) {
+            sendJson(res, 401, { error: "Unauthorized" });
+            return;
+          }
+        }
+      }
+
       if (req.method === "GET" && pathname === "/health") {
         sendJson(res, 200, { ok: true, service: "forge-workspace-api" });
+        return;
+      }
+
+      if (req.method === "GET" && pathname === "/api/system/health") {
+        sendJson(res, 200, { ok: true, service: "forge-workspace-api", ts: new Date().toISOString() });
+        return;
+      }
+
+      if (req.method === "GET" && pathname === "/api/system/doctor") {
+        try {
+          const { runDoctor } = require("../runtime/doctor/runDoctor");
+          const results = await runDoctor({ root });
+          sendJson(res, 200, { ok: true, results });
+        } catch (err) {
+          sendJson(res, 500, { ok: false, error: err && err.message ? err.message : "doctor failed" });
+        }
         return;
       }
 
@@ -1946,12 +1989,48 @@ function createWorkspaceApiServer(options = {}) {
 
   return {
     port,
+    host: process.env.FORGE_BIND_HOST || "127.0.0.1",
     server,
-    start() {
+    async start() {
+      const crypto          = require("crypto");
+      const logWriter       = require("../runtime/logging/log_writer");
+      const secretProvider  = require("../runtime/secrets/secret_provider");
+      const { checkOrCreateUidPin }    = require("../runtime/production/uid_pin");
       const { ensureMetricsWindow24h } = require("../runtime/logging/metrics_initializer");
+      const reg = getDefaultRegistry();
+
+      // (1) UID pin check — throws Error("UID_PIN_MISMATCH: ...") on mismatch
+      await checkOrCreateUidPin({ root });
+
+      // (2) Generate 32-byte capability token
+      const token = crypto.randomBytes(32).toString("hex");
+
+      // (3) Store via secret_provider (§ARC-5 authorized)
+      await secretProvider.set("forge.capability_token", token);
+
+      // (4) Write web/.forge-session via L2 (permissionRules SYSTEM_SESSION_FILE exception)
+      const sessionContent =
+        "# FORGE-SESSION — DO NOT SERVE EXTERNALLY\n" +
+        JSON.stringify({ token, ts: new Date().toISOString() }) + "\n";
+      await reg.invoke(
+        "fs.write_file",
+        { path: "web/.forge-session", content: sessionContent },
+        { root }
+      );
+
+      // (5) Inject active token into request handler closure
+      _activeToken = token;
+
+      // (6) Initialise metrics window
       ensureMetricsWindow24h({ root });
+
+      // (7) Bind and listen
+      const host = process.env.FORGE_BIND_HOST || "127.0.0.1";
+      if (host !== "127.0.0.1" && host !== "localhost") {
+        logWriter.warn("non-localhost binding detected", { host });
+      }
       return new Promise((resolve) => {
-        server.listen(port, () => resolve({ port }));
+        server.listen(port, host, () => resolve({ port, host }));
       });
     }
   };
