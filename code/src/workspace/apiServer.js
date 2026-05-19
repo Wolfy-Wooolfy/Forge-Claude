@@ -1897,6 +1897,8 @@ function createWorkspaceApiServer(options = {}) {
     port,
     server,
     start() {
+      const { ensureMetricsWindow24h } = require("../runtime/logging/metrics_initializer");
+      ensureMetricsWindow24h({ root });
       return new Promise((resolve) => {
         server.listen(port, () => resolve({ port }));
       });
