@@ -5,7 +5,7 @@
   "overall_progress_percent": 99,
   "stage_progress_percent": 100,
   "next_phase": "PHASE-12",
-  "next_step": "Begin Stage 12.4 (INSTALL.md + §ARC docs gap) per DECISION-2026-05-18T11-30-phase-12-plan.md §5.",
+  "next_step": "Begin Stage 12.4 (Monitoring + Doctor Extensions) per DECISION-2026-05-18T11-30-phase-12-plan.md §3 Stage 12.4.",
   "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-19T08-30-phase-12-stage-12-3-closure.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",

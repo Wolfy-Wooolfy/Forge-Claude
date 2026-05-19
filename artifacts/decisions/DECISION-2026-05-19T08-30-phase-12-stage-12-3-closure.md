@@ -4,6 +4,7 @@
 **Stage:** 12.3 — Backup System
 **Status:** CLOSED — All closure-gate conditions met
 **Owner approval:** Required before `current_task` transitions to Stage 12.4
+**Plan Authority:** `artifacts/decisions/DECISION-2026-05-18T11-30-phase-12-plan.md`
 
 ---
 
