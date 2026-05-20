@@ -1,0 +1,17 @@
+{
+  "id": "S211",
+  "name": "nssm_helper: multi-encoding Buffer detection (4 unit tests for _decodeNssmBuffer)",
+  "description": "Bug B4 regression guard. Verifies that _decodeNssmBuffer() (in scripts/install/_nssm_helper.js) correctly handles: (1) UTF-8 input, (2) UTF-16 LE input (real NSSM 2.24 piped stderr on Windows), (3) invalid/no-version input returns error shape, (4) combined empty-stdout + UTF-16 LE-stderr mirrors real execution. Authority: stage_12_7_amended_mid.md §18 (Bug B4).",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/nssm_helper_test_helper",
+  "method": "runS211NssmHelperMultiEncoding",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "case1_utf8_detected",           "expected": true },
+    { "type": "state_field_equals", "field": "case2_utf16le_detected",        "expected": true },
+    { "type": "state_field_equals", "field": "case3_invalid_returns_error",   "expected": true },
+    { "type": "state_field_equals", "field": "case4_stderr_utf16le_detected", "expected": true }
+  ]
+}

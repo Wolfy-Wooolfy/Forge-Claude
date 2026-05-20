@@ -15,6 +15,7 @@ const fs             = require("fs");
 const path           = require("path");
 const http           = require("http");
 const { execSync }   = require("child_process");
+const { verifyNssmVersion } = require("./_nssm_helper");
 
 async function runPostVerify(opts) {
   const root        = opts.root        || process.cwd();
@@ -47,20 +48,21 @@ function _verifyDoctorFirst(installDir, evidenceDir) {
 }
 
 function _verifyNssmVersion(nssmPath, evidenceDir) {
-  const cmd = nssmPath ? '"' + nssmPath + '" version' : "nssm version";
-  let out = "";
-  try {
-    out = execSync(cmd, { encoding: "utf8", timeout: 8000, stdio: "pipe" });
-  } catch (e) {
-    out = (e.stdout || "") + (e.stderr || "");
-  }
-  if (!out.includes("2.24")) {
+  if (!nssmPath) throw new Error("nssmPath is required for NSSM version verification.");
+
+  const result = verifyNssmVersion(nssmPath);
+
+  if (!result.ok) {
     throw new Error(
-      "NSSM version check failed — output does not contain '2.24'.\nGot: " + out.slice(0, 300)
+      "NSSM version check failed — '2.24' not found in any tested encoding.\n" +
+      "Error: " + result.error + "\n" +
+      "Raw bytes (first 100): " + result.rawHex + "\n" +
+      "As UTF-8: " + result.utf8
     );
   }
+
   _writeEvidence(evidenceDir, "step_06_nssm_sha256.txt",
-    "RESULT: PASS\n\nnssm version confirms 2.24:\n\n" + out
+    "RESULT: PASS\n\nnssm version confirms 2.24 (" + result.encoding + "):\n\n" + result.versionLine
   );
 }
 

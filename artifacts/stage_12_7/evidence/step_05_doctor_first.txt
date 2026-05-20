@@ -1,0 +1,44 @@
+RESULT: PASS
+
+
+✓ HEALTHY — 0 critical, 5 warning
+
+  ✓  node_version                 v24.14.1
+  ✓  openai_api_key               set, length=164
+  ✓  env_dotfile                  .env present
+  ✓  api_server_port              port 4505 available
+  ✓  web_server_port              web served on API port 4505
+  ⚠  providers_registered         13 registered, 12 legacy (not yet v2-compliant)
+  ✓  tools_registered             78 tools registered
+  ✓  permission_mode              mode active: WORKSPACE_WRITE
+  ✓  status_json_valid            valid v2.0, current_task=PHASE-12-STAGE-12-6-CLOSED
+  ✓  active_project               no active project (idle)
+  ✓  missing_dependencies         9 dependencies present
+  ✓  recent_execution             tool_audit.jsonl modified 0 day(s) ago
+  ⚠  disk_space                   artifacts/ is 323.6 MB (> 100 MB — consider archival)
+  ✓  trace_matrix_size            artifacts/llm/ is 27.9 MB
+  ✓  shell_hardening              shell.run_with_prompt registered, sudo/su hard-denied, vision lock rule present
+  ✓  environment_detection        11 detectors registered; os detector callable; env.probe_binary registered
+  ✓  package_management           9 adapters (Tier-1: 6, Tier-2: 3); pkg.install registered; no sudo adapters
+  ⚠  container_runtime            2 adapter(s) registered (docker, podman); none available (docker/podman daemon not running — expected in CI)
+  ✓  agent_runtime                5 adapters registered (aider, anthropic, claude_code, mock, openai); available: mock, openai; agent.invoke OK; cost ledger writable; budget enforcer OK
+  ✓  roles_runtime                13 roles registered (architect, builder, cost_estimator, deployment, documentation, environment, quality_judge, research, reverse_vision, reviewer, security_auditor, spec_writer, test_designer); role.invoke OK
+  ✓  builtproject_runtime         L5b harness OK — 4 modules, 8 assertion types, 6 reference scenarios
+  ✓  orchestration_runtime        5 orchestration modules loaded; 6 orchestration tools registered
+  ✓  kb_budget_status             no active project (idle)
+  ✓  kb_indexed_sources_count     no active project (idle)
+  ✓  research_role_registered     research role registered; system_prompt_id=research_v1; authority=ADVISORY
+  ✓  service_lifecycle            forge-api not installed as a service — see INSTALL.md §Windows Service
+  ⚠  secrets_in_env_var           OPENAI_API_KEY in environment — migrate to keychain: see INSTALL.md §Secrets
+  ✓  backup_status                no backups yet — `forge backup create` after first setup (see INSTALL.md §Backup)
+  ✓  logging_status               logs/ directory present
+  ✓  metrics_available            metrics_window_24h initialized (window_start: 2026-05-20T11:11:23.369Z)
+  ✓  alert_webhook                FORGE_ALERT_WEBHOOK_URL not set — webhook alerts disabled (optional; see INSTALL.md §Alerts)
+  ✓  api_binding                  FORGE_BIND_HOST not set — server binds to 127.0.0.1 (secure default)
+  ⚠  api_auth_token               Capability token not found — API server may not have been started: not_found
+  ✓  uid_pin_match                Service-account equivalence: pinned=KHALEDSAYED$ (Local System) current=Khaled.Sayed on same machine (pinned_at=2026-05-20T11:11:22.620Z)
+
+  duration: 7266ms
+  report:   artifacts/health/doctor_2026-05-20T11-11-26-035Z.json
+
+

@@ -1,9 +1,9 @@
 # Stage 12.7 (Amended) — Automated Installer — Mid-Checkpoint
 
-**Date:** 2026-05-20T11:30 (updated 2026-05-20T14:00 — Bugs B1+B2+B3 fixed + GETTING_STARTED.md + S210)
+**Date:** 2026-05-20T11:30 (updated 2026-05-20T15:00 — Bugs B1+B2+B3+B4 fixed + GETTING_STARTED.md + S210 + S211)
 **Stage:** 12.7 — Automated Installer (Amendment supersedes manual walkthrough)
 **Amendment authority:** `DECISION-2026-05-20T10-00-stage-12-7-amendment-automated-installer.md`
-**Status:** MID — Phase B complete + Bugs B1+B2+B3 fixed. STOP — owner re-runs installer to verify.
+**Status:** MID — Phase B complete + Bugs B1+B2+B3+B4 fixed. STOP — owner re-runs installer to verify.
 
 ---
 
@@ -34,6 +34,11 @@
 | **Bug B3 fix** | `code/src/runtime/doctor/checks/uid_pin_match.js` (service-account equivalence) | ✓ FIXED 2026-05-20T14:00 |
 | **S210 scenario** | `code/src/testing/scenarios/S210_uid_pin_service_account_equivalence.json` | ✓ DONE 2026-05-20T14:00 |
 | **S210 helper** | `code/src/testing/helpers/uid_pin_identity_helper.js` | ✓ DONE 2026-05-20T14:00 |
+| **Bug B4 fix** | `scripts/install/_nssm_helper.js` (shared verifyNssmVersion + _decodeNssmBuffer) | ✓ FIXED 2026-05-20T15:00 |
+| **Bug B4 fix** | `scripts/install/install_orchestrator.js` (refactored to use _nssm_helper) | ✓ FIXED 2026-05-20T15:00 |
+| **Bug B4 fix** | `scripts/install/post_verify.js` (refactored to use _nssm_helper) | ✓ FIXED 2026-05-20T15:00 |
+| **S211 scenario** | `code/src/testing/scenarios/S211_nssm_helper_multi_encoding.json` | ✓ DONE 2026-05-20T15:00 |
+| **S211 helper** | `code/src/testing/helpers/nssm_helper_test_helper.js` | ✓ DONE 2026-05-20T15:00 |
 | Installer entry point | `bin/forge-install.js` | ✓ DONE |
 | Preflight checker | `scripts/install/preflight.js` | ✓ DONE |
 | Install orchestrator (11 steps, rollback) | `scripts/install/install_orchestrator.js` | ✓ DONE |
@@ -332,6 +337,56 @@ After confirmed successful install → Phase C (closure artifact + status.json).
 ## §17 — STOP — Owner Re-Runs Installer (Bug B3)
 
 **STOP.** Bug B3 fixed. Owner must re-run `node bin/forge-install.js` to verify.
+
+NSSM is already placed at `C:\tools\nssm-2.24\win64\nssm.exe` — no re-download needed.
+
+After confirmed successful install → Phase C (closure artifact + status.json).
+
+---
+
+## §18 — Bug B4 — UTF-16 LE Encoding Recurred in post_verify.js (Fixed 2026-05-20T15:00)
+
+**Discovered:** Owner's 4th install attempt. Reached step 9/11 (post_verify), failed inside the evidence-collection phase (`_verifyNssmVersion`). Same root cause as Bug B2 (NSSM 2.24 UTF-16 LE on piped stderr), but in a different file — `scripts/install/post_verify.js`. The B2 fix was applied only to `install_orchestrator.js` and missed the duplicate logic in `post_verify.js`.
+
+**Rollback status (B4 attempt):** Clean. `C:\Forge` removed via auto-rollback. Fail-Closed confirmed working (4th successive clean rollback).
+
+**Root cause of duplication:** Bug B2 fix was written inline in `_stepVerifyNssm` in `install_orchestrator.js`. The `post_verify.js` had its own separate `_verifyNssmVersion` function using the same broken `encoding:"utf8"` pattern — the B2 fix was never applied there.
+
+**Fix — three files:**
+
+1. **Created `scripts/install/_nssm_helper.js`** — shared utility with two exports:
+   - `verifyNssmVersion(nssmPath)` — runs `nssm version`, captures raw Buffers, tries 4 decodings (`utf8`, `utf16le`, `latin1`, `ascii`), returns `{ ok, encoding, versionLine }` or `{ ok, error, rawHex, utf8 }`.
+   - `_decodeNssmBuffer(combined)` — exported separately for deterministic unit testing without spawning a real NSSM process.
+
+2. **Refactored `scripts/install/install_orchestrator.js` `_stepVerifyNssm`** — replaced the 30-line inline multi-encoding logic with a 6-line call to `verifyNssmVersion(_nssmPath)`. Error message preserves the same hex dump and UTF-8 preview for forensic diagnosis.
+
+3. **Refactored `scripts/install/post_verify.js` `_verifyNssmVersion`** — replaced broken `encoding:"utf8"` + fallback string pattern with `verifyNssmVersion(nssmPath)` call. Added guard: throws immediately if `nssmPath` is null (was previously silently falling back to `nssm version` on PATH — which could mask the correct binary).
+
+**NSSM output parser audit (grep across `scripts/install/` and `code/src/runtime/`):**
+- `rollback.js` — uses NSSM for `stop`/`remove` commands only; does NOT parse NSSM output. Not affected.
+- `service_lifecycle.js` (Doctor check) — uses `nssm status forge-api` → checks for `SERVICE_RUNNING` text (pure ASCII, no encoding issue). Not affected.
+- No other NSSM version-output parsers exist. B4 fix is complete.
+
+**S211 added:** `S211_nssm_helper_multi_encoding.json` + `nssm_helper_test_helper.js` — 4 test cases for `_decodeNssmBuffer`:
+1. UTF-8 buffer with "2.24" → `encoding: "utf8"` detected
+2. UTF-16 LE buffer (real NSSM 2.24 piped stderr) → `encoding: "utf16le"` detected
+3. Buffer with no "2.24" → `ok: false` error shape returned
+4. Combined empty stdout + UTF-16 LE stderr → `encoding: "utf16le"` detected (mirrors real execution)
+
+**Full suite results (two independent runs):**
+- Run 1: **206 pass / 0 fail / 5 skip / 211 total** ✓ (11m 33s) — S208 ✓, S209 ✓, S210 ✓, S211 ✓
+- Run 2: **206 pass / 0 fail / 5 skip / 211 total** ✓ (17m 14s) — all same ✓
+- 5 skips = S58, S62, S65, S67, S68 (docker not installed — pre-existing)
+
+**Post-fix dry-run:** `node bin/forge-install.js --dry-run` — all 11 steps ✓, exit 0. NSSM found at `C:\tools\nssm-2.24\win64\nssm.exe` ✓.
+
+**Track A:** `_nssm_helper.js` is a new file within §ARC-3 scope (install scripts, `execSync` deviation already authorized). `install_orchestrator.js` and `post_verify.js` are both §ARC-3. No new §ARC entries. §ARC count stays 6. Cost: $0.00.
+
+---
+
+## §19 — STOP — Owner Re-Runs Installer (Bug B4)
+
+**STOP.** Bug B4 fixed. Owner must re-run `node bin/forge-install.js` to verify.
 
 NSSM is already placed at `C:\tools\nssm-2.24\win64\nssm.exe` — no re-download needed.
 
