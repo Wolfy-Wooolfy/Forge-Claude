@@ -1,9 +1,9 @@
 # Stage 12.7 (Amended) — Automated Installer — Mid-Checkpoint
 
-**Date:** 2026-05-20T11:30 (updated 2026-05-20T13:30 — Bug B1 + Bug B2 fixed + GETTING_STARTED.md)
+**Date:** 2026-05-20T11:30 (updated 2026-05-20T14:00 — Bugs B1+B2+B3 fixed + GETTING_STARTED.md + S210)
 **Stage:** 12.7 — Automated Installer (Amendment supersedes manual walkthrough)
 **Amendment authority:** `DECISION-2026-05-20T10-00-stage-12-7-amendment-automated-installer.md`
-**Status:** MID — Phase B complete + Bugs B1 + B2 fixed. STOP — owner re-runs installer to verify.
+**Status:** MID — Phase B complete + Bugs B1+B2+B3 fixed. STOP — owner re-runs installer to verify.
 
 ---
 
@@ -30,6 +30,10 @@
 | Amendment decision artifact | `artifacts/decisions/DECISION-2026-05-20T10-00-stage-12-7-amendment-automated-installer.md` | ✓ DONE |
 | **Bug B1 fix** | `scripts/install/install_orchestrator.js` (`_stepVerifyNssm`) | ✓ FIXED 2026-05-20T13:00 |
 | **Owner guide** | `GETTING_STARTED.md` (root) | ✓ DONE 2026-05-20T13:00 |
+| **Bug B2 fix** | `scripts/install/install_orchestrator.js` (`_stepVerifyNssm` UTF-16 LE) | ✓ FIXED 2026-05-20T13:30 |
+| **Bug B3 fix** | `code/src/runtime/doctor/checks/uid_pin_match.js` (service-account equivalence) | ✓ FIXED 2026-05-20T14:00 |
+| **S210 scenario** | `code/src/testing/scenarios/S210_uid_pin_service_account_equivalence.json` | ✓ DONE 2026-05-20T14:00 |
+| **S210 helper** | `code/src/testing/helpers/uid_pin_identity_helper.js` | ✓ DONE 2026-05-20T14:00 |
 | Installer entry point | `bin/forge-install.js` | ✓ DONE |
 | Preflight checker | `scripts/install/preflight.js` | ✓ DONE |
 | Install orchestrator (11 steps, rollback) | `scripts/install/install_orchestrator.js` | ✓ DONE |
@@ -287,6 +291,40 @@ After confirmed successful install → Phase C (closure artifact + status.json).
 ## §15 — STOP — Owner Re-Runs Installer (Bug B2)
 
 **STOP.** Bug B2 fixed. Owner must re-run `node bin/forge-install.js` to verify.
+
+NSSM is already placed at `C:\tools\nssm-2.24\win64\nssm.exe` — no re-download needed.
+
+After confirmed successful install → Phase C (closure artifact + status.json).
+
+---
+
+## §16 — Bug B3 — uid_pin_match false positive on NSSM-installed services (Fixed 2026-05-20T14:00)
+
+**Discovered:** Owner's 3rd install attempt. Reached step 9/11 (post_verify), failed on Doctor: "1 critical: uid_pin_match — Username mismatch: pinned=KHALEDSAYED$ current=Khaled.Sayed".
+
+**Root cause:** NSSM installs services as Local System by default. Local System manifests as `<COMPUTERNAME>$` (e.g., `KHALEDSAYED$`). When `post_verify` ran `forge-doctor.js` in the interactive PowerShell context, the Doctor's `uid_pin_match` check compared `KHALEDSAYED$` (pinned by the service) vs `Khaled.Sayed` (interactive user) and reported FAIL — a false positive.
+
+**Verified by independent reproduction on owner's machine.** Manually installed and started `forge-api` via NSSM, ran Doctor in interactive PowerShell. Reproduced exact error: `✗ uid_pin_match: Username mismatch: pinned=KHALEDSAYED$ current=Khaled.Sayed`.
+
+**Fix:** Extracted `isIdentityMatch({ username }, { username }, _opts)` function into `uid_pin_match.js`. On `win32` platform, recognizes that `COMPUTERNAME$` (Local System computer account) is equivalent to any interactive user on the same machine — verified by matching `pinned.username.slice(0,-1)` against `os.hostname()`.
+
+**Security preserved:** Still rejects (1) different human usernames, (2) computer account from a different hostname (Forge folder copied to another machine), (3) `COMPUTERNAME$` identity on non-Windows platforms. Only relaxes the legitimate Windows service-vs-interactive-user pattern on the SAME machine.
+
+**Surgical change:** Only `uid_pin_match.js` (Doctor check) modified. `uid_pin.js` (server-side `checkOrCreateUidPin`) unchanged. S207 tests `uid_pin.js` → unaffected.
+
+**S210 added:** `S210_uid_pin_service_account_equivalence.json` + `uid_pin_identity_helper.js` — 5 test cases via dependency injection `_opts: { _platform, _hostname }`. All 5 pass (verified by direct helper call). S208 (arc_count_equals_six) re-verified: PASS. Full suite running in background (210 total: 205 pass / 0 fail / 5 skip expected).
+
+**Post-fix dry-run:** `node bin/forge-install.js --dry-run` — all 11 steps ✓, exit 0.
+
+**Rollback status (B3 attempt):** Clean. `C:\Forge` removed via auto-rollback.
+
+**Track A:** `uid_pin_match.js` is a Doctor check (production runtime read-only). `uid_pin_identity_helper.js` is test infrastructure (§ARC convention: test helpers may use direct require). No new §ARC entries. §ARC count stays 6. Cost: $0.00.
+
+---
+
+## §17 — STOP — Owner Re-Runs Installer (Bug B3)
+
+**STOP.** Bug B3 fixed. Owner must re-run `node bin/forge-install.js` to verify.
 
 NSSM is already placed at `C:\tools\nssm-2.24\win64\nssm.exe` — no re-download needed.
 
