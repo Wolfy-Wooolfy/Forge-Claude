@@ -259,27 +259,29 @@ async function _stepVerifyNssm(dryRun) {
     return;
   }
 
-  let versionOut;
+  // NSSM 2.24 exits non-zero when called with `version` (no service name) and
+  // prints usage + version to stderr. Capture both streams; check string content,
+  // not the exit code.
+  let output = "";
   try {
-    versionOut = execSync('"' + _nssmPath + '" version', {
+    output = execSync('"' + _nssmPath + '" version', {
       encoding: "utf8",
       timeout: 5000,
-      stdio: "pipe"
+      stdio: ["ignore", "pipe", "pipe"]
     });
   } catch (err) {
+    output = (err.stdout || "") + (err.stderr || "");
+  }
+
+  if (!output.includes("2.24")) {
     throw new Error(
-      "NSSM at '" + _nssmPath + "' failed to execute. " +
-      "Verify the binary is valid NSSM 2.24.\n" +
-      "Error: " + (err && err.message)
+      "NSSM at '" + _nssmPath + "' did not report version 2.24.\n" +
+      "Output: " + (output.slice(0, 300) || "(empty)")
     );
   }
 
-  if (!versionOut || !versionOut.includes("2.24")) {
-    throw new Error(
-      "NSSM version mismatch. Expected output to contain '2.24', got:\n" +
-      String(versionOut).slice(0, 200)
-    );
-  }
+  const versionLine = output.split("\n").find((l) => l.includes("Version "));
+  if (versionLine) console.log("\n  Detected: " + versionLine.trim());
 }
 
 async function _stepInstallService(dryRun) {

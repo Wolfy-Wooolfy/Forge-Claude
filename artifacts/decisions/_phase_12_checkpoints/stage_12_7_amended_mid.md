@@ -1,9 +1,9 @@
 # Stage 12.7 (Amended) — Automated Installer — Mid-Checkpoint
 
-**Date:** 2026-05-20T11:30
+**Date:** 2026-05-20T11:30 (updated 2026-05-20T13:00 — Bug fix B1 + GETTING_STARTED.md)
 **Stage:** 12.7 — Automated Installer (Amendment supersedes manual walkthrough)
 **Amendment authority:** `DECISION-2026-05-20T10-00-stage-12-7-amendment-automated-installer.md`
-**Status:** MID — Phase B (implementation) complete and dry-run validated. Awaiting CTO review. STOP — do not run real install until CTO GO.
+**Status:** MID — Phase B complete + Bug B1 fixed. STOP — owner re-runs installer to verify fix.
 
 ---
 
@@ -28,6 +28,8 @@
 | Deliverable | File | Status |
 |---|---|---|
 | Amendment decision artifact | `artifacts/decisions/DECISION-2026-05-20T10-00-stage-12-7-amendment-automated-installer.md` | ✓ DONE |
+| **Bug B1 fix** | `scripts/install/install_orchestrator.js` (`_stepVerifyNssm`) | ✓ FIXED 2026-05-20T13:00 |
+| **Owner guide** | `GETTING_STARTED.md` (root) | ✓ DONE 2026-05-20T13:00 |
 | Installer entry point | `bin/forge-install.js` | ✓ DONE |
 | Preflight checker | `scripts/install/preflight.js` | ✓ DONE |
 | Install orchestrator (11 steps, rollback) | `scripts/install/install_orchestrator.js` | ✓ DONE |
@@ -190,6 +192,66 @@ Do NOT run `node bin/forge-install.js` (real install) until the CTO reviews this
 2. NSSM must be pre-placed at `C:\tools\nssm-2.24\win64\nssm.exe` (or press Enter when prompted to place it during install)
 3. Installer runs all 11 steps, writes 10 evidence files to `artifacts/stage_12_7/evidence/`
 4. CTO reviews populated evidence directory → Phase C (closure artifact + status.json)
+
+---
+
+## §11 — Bug B1 — nssm_verify False Negative (Fixed 2026-05-20T13:00)
+
+**Discovered:** During owner's real install run on Windows machine.
+
+**Symptom:** `[nssm_verify] Running... ✗` — installer reported NSSM as invalid despite correct output.
+
+**Owner output (verbatim):**
+```
+Error: NSSM at 'C:\tools\nssm-2.24\win64\nssm.exe' failed to execute.
+Command failed: "C:\tools\nssm-2.24\win64\nssm.exe" version
+NSSM: The non-sucking service manager
+Version 2.24 64-bit, 2014-08-31
+Usage: nssm <option> [<args> ...]
+...
+```
+
+**Root cause:** NSSM 2.24 exits non-zero when called with `version` (no service name) and prints usage to stderr. The original `_stepVerifyNssm` used a try/catch that threw on any non-zero exit, discarding the stderr output containing "Version 2.24".
+
+**Why dry-run didn't catch it:** Dry-run skips actual NSSM execution (no binary on dev machine). Only the real install on Windows triggers this code path.
+
+**Fix applied (`scripts/install/install_orchestrator.js` — `_stepVerifyNssm`):**
+- Capture both stdout and stderr from the error object when `execSync` throws
+- Check `output.includes("2.24")` — string content, not exit code
+- Print the detected version line for operator visibility
+
+**Rollback status:** Rollback triggered cleanly on the failed run. `C:\Forge` removed. Diagnostic dump saved to `C:\Forge_install_failure_2026-05-20T09-30-32\`. **Fail-Closed principle confirmed working in production.**
+
+**Track A:** Bug fix touches only `scripts/install/install_orchestrator.js` — already in §ARC-3 scope. No new §ARC entries. §ARC count stays 6. Cost: $0.00.
+
+---
+
+## §12 — GETTING_STARTED.md (Added 2026-05-20T13:00)
+
+Owner request:
+> "محتاجين نعمل ملف نوثق بيه خطوات التشغيل لاول مرة لان انا ممكن اشغله من كذا جهاز مختلف"
+
+**File created:** `GETTING_STARTED.md` (root)
+
+**Content:** 12-section Arabic+English guide covering:
+- Node.js install, repo clone, NSSM 2.24 download + SHA-256 verify
+- Administrator PowerShell, one-command install
+- Post-install verification (browser + Get-Service + forge-doctor)
+- Troubleshooting table (4 common errors + fixes)
+- Daily use, new machine setup, uninstall steps
+- Links to INSTALL.md, production contract, amendment artifact
+
+**Track A:** Documentation file, no §ARC implications.
+
+---
+
+## §13 — STOP — Owner Re-Runs Installer
+
+**STOP.** Bug B1 fixed. Owner must re-run `node bin/forge-install.js` to verify the fix.
+
+NSSM is already at `C:\tools\nssm-2.24\win64\nssm.exe` (placed during previous attempt — no re-download needed).
+
+After confirmed successful install → Phase C (closure artifact + status.json).
 
 ---
 
