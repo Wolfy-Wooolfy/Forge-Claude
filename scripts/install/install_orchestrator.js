@@ -54,6 +54,7 @@ async function runInstall(options) {
     { id: "npm_install",         fn: () => _stepNpmInstall(dryRun),             rollbackable: true  },
     { id: "nssm_locate_or_wait", fn: () => _stepLocateOrPromptNssm(dryRun),     rollbackable: false },
     { id: "nssm_verify",         fn: () => _stepVerifyNssm(dryRun),             rollbackable: false },
+    { id: "migrate_secrets",     fn: () => _stepMigrateSecrets(dryRun),         rollbackable: false },
     { id: "service_install",     fn: () => _stepInstallService(dryRun),         rollbackable: true  },
     { id: "service_start",       fn: () => _stepStartService(dryRun),           rollbackable: true  },
     { id: "post_verify",         fn: () => _stepPostVerify(root, dryRun),       rollbackable: true  },
@@ -273,6 +274,43 @@ async function _stepVerifyNssm(dryRun) {
   }
 
   console.log("\n  Detected: " + result.versionLine + " (encoding: " + result.encoding + ")");
+}
+
+async function _stepMigrateSecrets(dryRun) {
+  if (dryRun) {
+    console.log("\n  Would migrate OPENAI_API_KEY from env to keychain (one-time, idempotent).");
+    return;
+  }
+
+  const sp = require(path.join(INSTALL_DIR, "code", "src", "runtime", "secrets", "secret_provider"));
+
+  // Idempotent: skip if already in keychain
+  const existing = await sp.get("openai_api_key");
+  if (existing && existing.ok && existing.value) {
+    console.log("\n  OPENAI_API_KEY already in keychain — no migration needed.");
+    return;
+  }
+
+  const envKey = process.env.OPENAI_API_KEY;
+  if (!envKey) {
+    throw new Error(
+      "OPENAI_API_KEY not found in environment.\n" +
+      "Set it in PowerShell before running the installer:\n" +
+      "  $env:OPENAI_API_KEY = \"sk-...\"\n" +
+      "Or set it permanently in System Properties → Environment Variables."
+    );
+  }
+
+  const result = await sp.set("openai_api_key", envKey);
+  if (!result || !result.ok) {
+    throw new Error(
+      "Failed to store OPENAI_API_KEY in keychain.\n" +
+      "Reason: " + (result && result.reason ? result.reason : "unknown") + "\n" +
+      "On Windows, this writes to Credential Manager — ensure your user account has access."
+    );
+  }
+
+  console.log("\n  OPENAI_API_KEY migrated to Windows Credential Manager (one-time).");
 }
 
 async function _stepInstallService(dryRun) {

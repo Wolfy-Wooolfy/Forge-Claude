@@ -1,0 +1,16 @@
+{
+  "id": "S212",
+  "name": "openai_api_key Doctor check consults secret_provider before env var",
+  "description": "Bug B5 regression guard. Verifies that openaiApiKey.js Doctor check consults secret_provider.get() first (keychain) before falling back to process.env.OPENAI_API_KEY. Uses Module._load mock to inject a fake secret_provider. Authority: stage_12_7_amended_mid.md §20 (Bug B5).",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/doctor_check_helper",
+  "method": "runS212OpenaiApiKeyConsultsKeychain",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "case1_keychain_present_passes",     "expected": true },
+    { "type": "state_field_equals", "field": "case2_keychain_absent_env_present", "expected": true },
+    { "type": "state_field_equals", "field": "case3_neither_returns_fail",         "expected": true }
+  ]
+}

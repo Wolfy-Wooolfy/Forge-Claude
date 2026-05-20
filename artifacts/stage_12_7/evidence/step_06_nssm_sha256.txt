@@ -1,0 +1,5 @@
+RESULT: PASS
+
+nssm version confirms 2.24 (utf16le):
+
+Version 2.24 64-bit, 2014-08-31

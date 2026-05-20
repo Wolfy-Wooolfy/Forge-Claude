@@ -115,11 +115,11 @@ async function _verifyCrashRecovery(serviceName, apiPort, evidenceDir) {
     // PID may have already exited; continue — NSSM restart is what we're testing
   }
 
-  // 3. Wait up to 30s for NSSM to restart the service
-  const recovered = await _pollForRunning(serviceName, 30000, 2000);
+  // 3. Wait up to 60s — NSSM AppRestartDelay=10s + Node startup needs headroom
+  const recovered = await _pollForRunning(serviceName, 60000, 2000);
   if (!recovered) {
     throw new Error(
-      "Service " + serviceName + " did not recover within 30s after crash test.\n" +
+      "Service " + serviceName + " did not recover within 60s after crash test.\n" +
       "Killed PID: " + pid
     );
   }

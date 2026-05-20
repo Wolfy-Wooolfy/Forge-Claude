@@ -1,9 +1,9 @@
 # Stage 12.7 (Amended) — Automated Installer — Mid-Checkpoint
 
-**Date:** 2026-05-20T11:30 (updated 2026-05-20T15:00 — Bugs B1+B2+B3+B4 fixed + GETTING_STARTED.md + S210 + S211)
+**Date:** 2026-05-20T11:30 (updated 2026-05-20T16:00 — Bugs B1–B6 fixed + GETTING_STARTED.md + S210–S212)
 **Stage:** 12.7 — Automated Installer (Amendment supersedes manual walkthrough)
 **Amendment authority:** `DECISION-2026-05-20T10-00-stage-12-7-amendment-automated-installer.md`
-**Status:** MID — Phase B complete + Bugs B1+B2+B3+B4 fixed. STOP — owner re-runs installer to verify.
+**Status:** MID — Phase B complete + Bugs B1–B6 fixed. STOP — owner re-runs installer to verify.
 
 ---
 
@@ -39,6 +39,12 @@
 | **Bug B4 fix** | `scripts/install/post_verify.js` (refactored to use _nssm_helper) | ✓ FIXED 2026-05-20T15:00 |
 | **S211 scenario** | `code/src/testing/scenarios/S211_nssm_helper_multi_encoding.json` | ✓ DONE 2026-05-20T15:00 |
 | **S211 helper** | `code/src/testing/helpers/nssm_helper_test_helper.js` | ✓ DONE 2026-05-20T15:00 |
+| **Bug B5 fix** | `code/src/runtime/doctor/checks/openaiApiKey.js` (consults secret_provider) | ✓ FIXED 2026-05-20T16:00 |
+| **Bug B5 fix** | `scripts/install/install_orchestrator.js` (migrate_secrets step added) | ✓ FIXED 2026-05-20T16:00 |
+| **Bug B5 fix** | `scripts/install/rollback.js` (migrate_secrets undo case added) | ✓ FIXED 2026-05-20T16:00 |
+| **Bug B6 fix** | `scripts/install/post_verify.js` (crash recovery 30s → 60s) | ✓ FIXED 2026-05-20T16:00 |
+| **S212 scenario** | `code/src/testing/scenarios/S212_openai_api_key_check_consults_keychain.json` | ✓ DONE 2026-05-20T16:00 |
+| **S212 helper** | `code/src/testing/helpers/doctor_check_helper.js` | ✓ DONE 2026-05-20T16:00 |
 | Installer entry point | `bin/forge-install.js` | ✓ DONE |
 | Preflight checker | `scripts/install/preflight.js` | ✓ DONE |
 | Install orchestrator (11 steps, rollback) | `scripts/install/install_orchestrator.js` | ✓ DONE |
@@ -390,6 +396,63 @@ After confirmed successful install → Phase C (closure artifact + status.json).
 ## §19 — STOP — Owner Re-Runs Installer (Bug B4)
 
 **STOP.** Bug B4 fixed. Owner must re-run `node bin/forge-install.js` to verify.
+
+NSSM is already placed at `C:\tools\nssm-2.24\win64\nssm.exe` — no re-download needed.
+
+After confirmed successful install → Phase C (closure artifact + status.json).
+
+---
+
+## §20 — Bug B5 — Doctor openai_api_key check stale (Fixed 2026-05-20T16:00)
+
+**Discovered:** 5th install attempt. `post_verify` step_10 evidence (Doctor API call from service context) showed `openai_api_key: FAIL — "OPENAI_API_KEY not set"`, while step_05 (Doctor called from interactive PowerShell context) showed PASS.
+
+**Root cause:** `openaiApiKey.js` Doctor check predates Stage 12.2's `secret_provider` abstraction. It only checked `process.env.OPENAI_API_KEY`. NSSM Windows services run as Local System with isolated environment — user-level env vars do NOT propagate to the service. The key lived only in the owner's PowerShell session, not in Windows Credential Manager. Even after Stage 12.2 added keychain support, the check never consulted it.
+
+**Two-part fix:**
+
+**Fix 5a — Updated `openaiApiKey.js`:** Now calls `secret_provider.get("openai_api_key")` first. If the keychain has the key, returns `PASS` with `"from keychain, length=N"`. Falls back to `process.env.OPENAI_API_KEY` if keychain is empty. Changed from sync to async (`fn()` → `async fn()`). Doctor runner already uses `await Promise.resolve(check.fn(ctx))` — no change needed there.
+
+**Fix 5b — New install step `migrate_secrets`:** Added between `nssm_verify` and `service_install` in the installer STEPS array. Reads `OPENAI_API_KEY` from env, stores it via `secret_provider.set()` in Windows Credential Manager. Idempotent: skips if the key is already in the keychain. Requires `secret_provider` from `INSTALL_DIR` (repo already copied by `copy_repo` step). Rollback intentionally leaves the keychain entry in place — it's a user secret, not install state. Re-running after rollback correctly sees it as already migrated and skips.
+
+**S212 added:** `S212_openai_api_key_check_consults_keychain.json` + `doctor_check_helper.js` — 3 test cases using `Module._load` monkeypatching to inject a fake `secret_provider`: (1) keychain present → PASS with `"from keychain"`, (2) keychain absent + env present → PASS with `"from env"`, (3) neither → FAIL.
+
+**Track A:** `openaiApiKey.js` is a Doctor check (production runtime read-only). `install_orchestrator.js` and `rollback.js` are §ARC-3 scope. No new §ARC entries. §ARC count stays 6. Cost: $0.00.
+
+---
+
+## §21 — Bug B6 — Crash Recovery Timeout 30s → 60s (Fixed 2026-05-20T16:00)
+
+**Discovered:** Same 5th install attempt. `post_verify` step_11 (crash recovery) timed out after 30 seconds. NSSM `AppRestartDelay=10000ms` + Node.js app startup on real Windows hardware ≈ 15–25 seconds combined. The 30-second window was too tight.
+
+**Fix:** In `_verifyCrashRecovery` (`post_verify.js`): changed `_pollForRunning(serviceName, 30000, 2000)` to `_pollForRunning(serviceName, 60000, 2000)`. Comment updated. Error message updated to "did not recover within 60s". No scenario change needed (S208 tests via forge-doctor.js, not the timeout constant).
+
+**Track A:** `post_verify.js` is §ARC-3 scope. §ARC count stays 6. Cost: $0.00.
+
+---
+
+## §22 — Full Suite (B5+B6 — 2026-05-20T16:00)
+
+**Full suite results (authoritative single-process run):**
+- **207 pass / 0 fail / 5 skip / 212 total** ✓ (7m 22s)
+- S208 ✓, S209 ✓, S210 ✓, S211 ✓, S212 ✓
+- 5 skips = S58, S62, S65, S67, S68 (docker not installed — pre-existing)
+
+**Dry-run:** `node bin/forge-install.js --dry-run` — all **12 steps** ✓, exit 0.
+`migrate_secrets` step appears between `nssm_verify` and `service_install` as expected.
+
+---
+
+## §23 — STOP — Owner Re-Runs Installer (Bugs B5+B6)
+
+**STOP.** Bugs B5 and B6 fixed. Owner must re-run `node bin/forge-install.js` to verify.
+
+**Pre-requisite:** Set `OPENAI_API_KEY` in the Administrator PowerShell session before running the installer. The `migrate_secrets` step will read it from there and store it in Windows Credential Manager.
+
+```powershell
+$env:OPENAI_API_KEY = "sk-..."
+node bin/forge-install.js
+```
 
 NSSM is already placed at `C:\tools\nssm-2.24\win64\nssm.exe` — no re-download needed.
 

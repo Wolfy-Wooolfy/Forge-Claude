@@ -16,6 +16,7 @@ const { execSync } = require("child_process");
 const ROLLBACK_ORDER = [
   "service_start",
   "service_install",
+  "migrate_secrets",
   "npm_install",
   "copy_repo"
 ];
@@ -49,6 +50,9 @@ async function runRollback(opts) {
           break;
         case "service_install":
           await _undoServiceInstall(serviceName, nssmPath, log);
+          break;
+        case "migrate_secrets":
+          _log(log, "migrate_secrets: keychain entry left in place (idempotent for re-run).");
           break;
         case "npm_install":
           _log(log, "npm_install: no action required (directory cleanup handles it).");

@@ -29,5 +29,5 @@
     "source_summary": "A minimal Next.js 14 App Router project implementing an in-memory task tracker. Exposes a REST API at /api/tasks and renders tasks server-side on the home page. Written in TypeScript with React.",
     "confidence": "HIGH"
   },
-  "created_at": "2026-05-20T11:41:23.974Z"
+  "created_at": "2026-05-20T12:24:21.558Z"
 }

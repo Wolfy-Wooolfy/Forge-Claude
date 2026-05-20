@@ -15,8 +15,8 @@ RESULT: PASS
   ✓  active_project               no active project (idle)
   ✓  missing_dependencies         9 dependencies present
   ✓  recent_execution             tool_audit.jsonl modified 0 day(s) ago
-  ⚠  disk_space                   artifacts/ is 323.6 MB (> 100 MB — consider archival)
-  ✓  trace_matrix_size            artifacts/llm/ is 27.9 MB
+  ⚠  disk_space                   artifacts/ is 328.5 MB (> 100 MB — consider archival)
+  ✓  trace_matrix_size            artifacts/llm/ is 28.4 MB
   ✓  shell_hardening              shell.run_with_prompt registered, sudo/su hard-denied, vision lock rule present
   ✓  environment_detection        11 detectors registered; os detector callable; env.probe_binary registered
   ✓  package_management           9 adapters (Tier-1: 6, Tier-2: 3); pkg.install registered; no sudo adapters
@@ -32,13 +32,13 @@ RESULT: PASS
   ⚠  secrets_in_env_var           OPENAI_API_KEY in environment — migrate to keychain: see INSTALL.md §Secrets
   ✓  backup_status                no backups yet — `forge backup create` after first setup (see INSTALL.md §Backup)
   ✓  logging_status               logs/ directory present
-  ✓  metrics_available            metrics_window_24h initialized (window_start: 2026-05-20T11:11:23.369Z)
+  ✓  metrics_available            metrics_window_24h initialized (window_start: 2026-05-20T12:00:15.694Z)
   ✓  alert_webhook                FORGE_ALERT_WEBHOOK_URL not set — webhook alerts disabled (optional; see INSTALL.md §Alerts)
   ✓  api_binding                  FORGE_BIND_HOST not set — server binds to 127.0.0.1 (secure default)
   ⚠  api_auth_token               Capability token not found — API server may not have been started: not_found
-  ✓  uid_pin_match                Service-account equivalence: pinned=KHALEDSAYED$ (Local System) current=Khaled.Sayed on same machine (pinned_at=2026-05-20T11:11:22.620Z)
+  ✓  uid_pin_match                Service-account equivalence: pinned=KHALEDSAYED$ (Local System) current=Khaled.Sayed on same machine (pinned_at=2026-05-20T12:00:07.964Z)
 
-  duration: 7266ms
-  report:   artifacts/health/doctor_2026-05-20T11-11-26-035Z.json
+  duration: 9778ms
+  report:   artifacts/health/doctor_2026-05-20T12-00-11-080Z.json
 
 
