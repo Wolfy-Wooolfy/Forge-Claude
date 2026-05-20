@@ -259,29 +259,57 @@ async function _stepVerifyNssm(dryRun) {
     return;
   }
 
-  // NSSM 2.24 exits non-zero when called with `version` (no service name) and
-  // prints usage + version to stderr. Capture both streams; check string content,
-  // not the exit code.
-  let output = "";
+  // NSSM 2.24 (2014 Windows binary) exits non-zero when called with `version`
+  // AND may output UTF-16 LE on piped stderr. Capture raw Buffers and try
+  // multiple decodings — do NOT assume UTF-8.
+  let stdoutBuf = Buffer.alloc(0);
+  let stderrBuf = Buffer.alloc(0);
+
   try {
-    output = execSync('"' + _nssmPath + '" version', {
-      encoding: "utf8",
+    // Omit encoding → execSync returns a Buffer (raw bytes)
+    const result = execSync('"' + _nssmPath + '" version', {
       timeout: 5000,
       stdio: ["ignore", "pipe", "pipe"]
     });
+    if (result) stdoutBuf = Buffer.isBuffer(result) ? result : Buffer.from(result);
   } catch (err) {
-    output = (err.stdout || "") + (err.stderr || "");
+    if (err.stdout) stdoutBuf = Buffer.isBuffer(err.stdout) ? err.stdout : Buffer.from(err.stdout);
+    if (err.stderr) stderrBuf = Buffer.isBuffer(err.stderr) ? err.stderr : Buffer.from(err.stderr);
   }
 
-  if (!output.includes("2.24")) {
+  const combined = Buffer.concat([stdoutBuf, stderrBuf]);
+
+  // Try each encoding until "2.24" is found
+  const encodings = ["utf8", "utf16le", "latin1", "ascii"];
+  let detectedEncoding  = null;
+  let detectedVersionLine = null;
+  const decodings = {};
+
+  for (const enc of encodings) {
+    const decoded = combined.toString(enc);
+    decodings[enc] = decoded;
+    if (decoded.includes("2.24")) {
+      detectedEncoding    = enc;
+      detectedVersionLine = decoded.split(/\r?\n/).find((l) => l.includes("Version "));
+      break;
+    }
+  }
+
+  if (!detectedEncoding) {
     throw new Error(
-      "NSSM at '" + _nssmPath + "' did not report version 2.24.\n" +
-      "Output: " + (output.slice(0, 300) || "(empty)")
+      "NSSM at '" + _nssmPath + "' did not report version 2.24 " +
+      "in any tested encoding (utf8, utf16le, latin1, ascii).\n" +
+      "Raw bytes (first 100): " +
+        Array.from(combined.slice(0, 100)).map((b) => b.toString(16).padStart(2, "0")).join(" ") + "\n" +
+      "As UTF-8: " + decodings.utf8.slice(0, 200)
     );
   }
 
-  const versionLine = output.split("\n").find((l) => l.includes("Version "));
-  if (versionLine) console.log("\n  Detected: " + versionLine.trim());
+  if (detectedVersionLine) {
+    console.log("\n  Detected: " + detectedVersionLine.trim() + " (encoding: " + detectedEncoding + ")");
+  } else {
+    console.log("\n  Detected: NSSM 2.24 (encoding: " + detectedEncoding + ")");
+  }
 }
 
 async function _stepInstallService(dryRun) {

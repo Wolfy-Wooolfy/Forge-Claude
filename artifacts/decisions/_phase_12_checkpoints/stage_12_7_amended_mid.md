@@ -1,9 +1,9 @@
 # Stage 12.7 (Amended) — Automated Installer — Mid-Checkpoint
 
-**Date:** 2026-05-20T11:30 (updated 2026-05-20T13:00 — Bug fix B1 + GETTING_STARTED.md)
+**Date:** 2026-05-20T11:30 (updated 2026-05-20T13:30 — Bug B1 + Bug B2 fixed + GETTING_STARTED.md)
 **Stage:** 12.7 — Automated Installer (Amendment supersedes manual walkthrough)
 **Amendment authority:** `DECISION-2026-05-20T10-00-stage-12-7-amendment-automated-installer.md`
-**Status:** MID — Phase B complete + Bug B1 fixed. STOP — owner re-runs installer to verify fix.
+**Status:** MID — Phase B complete + Bugs B1 + B2 fixed. STOP — owner re-runs installer to verify.
 
 ---
 
@@ -250,6 +250,45 @@ Owner request:
 **STOP.** Bug B1 fixed. Owner must re-run `node bin/forge-install.js` to verify the fix.
 
 NSSM is already at `C:\tools\nssm-2.24\win64\nssm.exe` (placed during previous attempt — no re-download needed).
+
+After confirmed successful install → Phase C (closure artifact + status.json).
+
+---
+
+## §14 — Bug B2 — NSSM UTF-16 LE Encoding Mismatch (Fixed 2026-05-20T13:30)
+
+**Discovered:** Owner re-ran installer after B1 fix. Same step (`nssm_verify`) failed with different error: "did not report version 2.24" — despite output visually showing "Version 2.24 64-bit, 2014-08-31".
+
+**Root cause:** NSSM 2.24 (2014 Windows binary) outputs UTF-16 LE on piped stderr. Node's `encoding: "utf8"` reads each character interleaved with null bytes (` `). The JS string becomes `"V e r s i o n   2 . 2 4 ..."` — `output.includes("2.24")` returns false because no consecutive UTF-8 bytes `"2.24"` exist.
+
+**Verified by simulation:**
+- UTF-16 LE bytes of "2.24": `32 00 2e 00 32 00 34 00`
+- Read as UTF-8: `"2 . 2 4 "`
+- `includes("2.24")` → **false**
+
+**Why B1 didn't cover this:** B1 correctly fixed the non-zero exit handling, but assumed UTF-8 stderr. Linux mock NSSM prints UTF-8; real NSSM 2.24 Windows binary prints UTF-16 LE.
+
+**Fix (`scripts/install/install_orchestrator.js` — `_stepVerifyNssm`):**
+- Omit `encoding` option → `execSync` returns raw `Buffer` (not string)
+- Capture stdout and stderr Buffers from both success and error paths
+- Concatenate → try 4 decodings: `utf8`, `utf16le`, `latin1`, `ascii`
+- `includes("2.24")` checked in each decoded string; first match wins
+- Logs detected encoding + version line for operator visibility
+- If ALL 4 encodings fail → dumps first 100 raw bytes as hex for forensic diagnosis
+
+**Post-fix dry-run:** `node bin/forge-install.js --dry-run` — all 11 steps ✓, exit 0. NSSM now detected at `C:\tools\nssm-2.24\win64\nssm.exe` (placed by owner in prior attempt — no re-download needed).
+
+**Rollback status (B2 attempt):** Clean. `C:\Forge` removed. Diagnostic dump at `C:\Forge_install_failure_2026-05-20T09-46-36\`.
+
+**Track A:** Touches only `scripts/install/install_orchestrator.js` (§ARC-3 scope). No new §ARC entries. §ARC count stays 6. Cost: $0.00.
+
+---
+
+## §15 — STOP — Owner Re-Runs Installer (Bug B2)
+
+**STOP.** Bug B2 fixed. Owner must re-run `node bin/forge-install.js` to verify.
+
+NSSM is already placed at `C:\tools\nssm-2.24\win64\nssm.exe` — no re-download needed.
 
 After confirmed successful install → Phase C (closure artifact + status.json).
 
