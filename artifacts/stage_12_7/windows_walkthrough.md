@@ -1,3 +1,7 @@
+> **DEPRECATED 2026-05-20** — Superseded by the automated installer (`bin/forge-install.js`).
+> See `artifacts/decisions/DECISION-2026-05-20T10-00-stage-12-7-amendment-automated-installer.md`.
+> This file is kept for audit trail only. **DO NOT execute manually.**
+
 # PHASE-12 Stage 12.7 — Windows Clean-Machine Walkthrough Script
 
 **Authority:** `artifacts/decisions/DECISION-2026-05-18T11-30-phase-12-plan.md` §3 Stage 12.7, §1.2
