@@ -373,10 +373,13 @@ After confirmed successful install → Phase C (closure artifact + status.json).
 3. Buffer with no "2.24" → `ok: false` error shape returned
 4. Combined empty stdout + UTF-16 LE stderr → `encoding: "utf16le"` detected (mirrors real execution)
 
-**Full suite results (two independent runs):**
-- Run 1: **206 pass / 0 fail / 5 skip / 211 total** ✓ (11m 33s) — S208 ✓, S209 ✓, S210 ✓, S211 ✓
-- Run 2: **206 pass / 0 fail / 5 skip / 211 total** ✓ (17m 14s) — all same ✓
+**Full suite results (three runs — two sequential, one concurrent):**
+- Run 1 (authoritative): **206 pass / 0 fail / 5 skip / 211 total** ✓ (11m 33s) — S208 ✓, S209 ✓, S210 ✓, S211 ✓
+- Run 2 (authoritative): **206 pass / 0 fail / 5 skip / 211 total** ✓ (17m 14s) — all same ✓
+- Run 3 (concurrent with runs 1+2): **205 pass / 1 fail / 5 skip** — S120 ✗ only (same pre-existing concurrency flakiness as S124/S125 in B3 run 3; `builtproject.run_scenarios` spawns an HTTP server, port/temp-dir conflict under parallel processes)
 - 5 skips = S58, S62, S65, S67, S68 (docker not installed — pre-existing)
+
+**S120 failure is pre-existing concurrency flakiness** — it's in the same family as S124/S125 and is NOT caused by the B4 fix (which touches only `_nssm_helper.js`, `install_orchestrator.js`, `post_verify.js`). Confirmed: S120 passes in both authoritative single-process runs.
 
 **Post-fix dry-run:** `node bin/forge-install.js --dry-run` — all 11 steps ✓, exit 0. NSSM found at `C:\tools\nssm-2.24\win64\nssm.exe` ✓.
 
