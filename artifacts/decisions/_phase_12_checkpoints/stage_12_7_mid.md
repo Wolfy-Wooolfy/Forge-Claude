@@ -195,6 +195,7 @@ After both → **GO** for Phase C (closure artifact + status.json patch + final 
 **Modified:**
 - `code/src/testing/helpers/monitoring_test_helper.js` (added `runS209DoctorPhase12ChecksPass`)
 - `progress/status.json` (pre-task: `last_completed_artifact` flipped to Stage 12.6 closure)
+- `artifacts/stage_12_7/windows_walkthrough.md` (post-CTO review: Step 12a fixed — `Invoke-WebRequest` throws on non-2xx; replaced with try/catch to correctly capture 401 status code. CTO Observation 1 applied.)
 
 ---
 

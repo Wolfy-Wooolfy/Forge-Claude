@@ -201,8 +201,13 @@ Get-Service forge-api | Select-Object Name, Status
 **Action:**
 ```powershell
 # Step 12a: unauthenticated request should return 401
-$r = Invoke-WebRequest -Uri "http://127.0.0.1:3100/api/projects/list" -UseBasicParsing -ErrorAction SilentlyContinue
-Write-Output "Unauth status: $($r.StatusCode)"
+# Note: Invoke-WebRequest throws on non-2xx; catch the exception to read the status code.
+try {
+    $r = Invoke-WebRequest -Uri "http://127.0.0.1:3100/api/projects/list" -UseBasicParsing
+    Write-Output "Unauth status: $($r.StatusCode) (UNEXPECTED — expected 401)"
+} catch {
+    Write-Output "Unauth status: $($_.Exception.Response.StatusCode.value__)"
+}
 
 # Step 12b: find and read the session file
 $forgePath = "$PWD"
