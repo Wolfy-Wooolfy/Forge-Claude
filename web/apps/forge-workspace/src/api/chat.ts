@@ -61,7 +61,7 @@ export async function* chatStream(
 export interface ClarificationAnswerRequest {
   project_id: string
   project_name?: string
-  answers: Record<string, string>
+  answers: { raw_answer: string; answered_questions: string[] }
 }
 
 export interface ClarificationAnswerResponse {
