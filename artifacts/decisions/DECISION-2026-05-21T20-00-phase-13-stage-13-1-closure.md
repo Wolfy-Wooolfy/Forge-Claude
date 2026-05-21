@@ -66,11 +66,11 @@ Stage 13.1 delivered the complete foundation for the `web/apps/forge-workspace/`
 | 1 | `npm run build` exits 0 (after §1.C scaffold) | PASS — exit 0, 6.18s |
 | 2 | TypeScript strict: zero `any`, zero type errors | PASS — `grep -rn ": any" src/` → 0 matches (exit 1) |
 | 3 | `npm run build` exits 0 (after §1.D API client) | PASS — exit 0 |
-| 4 | Bundle ≤ 500 KB gzip initial chunk | PASS — vendor: 53.37 KB + app: 1.65 KB = **55.02 KB gzip** (444 KB headroom) |
+| 4 | Bundle ≤ 500 KB gzip initial chunk | PASS — vendor: 53.37 KB + css: 2.60 KB + js: 1.65 KB + html: 0.31 KB = **57.93 KB gzip** (442 KB headroom) |
 | 5 | Zero `any` in `src/` (grep) | PASS — 0 matches |
 | 6 | All 5 route stubs reachable | PASS — ChatView, ProjectsView, VisionView, KBView, DoctorView all present |
 | 7 | All 24 endpoints have typed client functions | PASS — 2 auth + 3 chat + 4 projects + 11 ai + 4 governance = 24 |
-| 8 | Backend untouched; SU baseline 207/0/5 | PASS — `git diff HEAD -- code/src/ web/server.js apiServer.js` → 0 changes; `node bin/forge-test.js` → **207 passed, 0 failed, 5 skipped (212 total)** |
+| 8 | Backend untouched; SU baseline 207/0/5 | PASS — `git diff HEAD -- code/src/ web/server.js apiServer.js` → 0 changes; owner-machine run: `ALL PASS — 207 passed, 0 failed, 5 skipped (212 total)` (duration 544619ms). CTO Linux run showed 8 failures (S48, S120–S127, S137) — all environment-dependent (network sandbox / docker / LanceDB init), not regressions; all PASS on Windows owner machine. |
 | 9 | Closure decision artifact written | THIS DOCUMENT |
 | 10 | Final checkpoint written | `artifacts/decisions/_phase_13_checkpoints/stage_13_1.md` |
 

@@ -73,7 +73,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-05-21T13:23:11.934Z",
+    "last_doctor_run": "2026-05-21T13:54:42.877Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
@@ -1096,7 +1096,7 @@
         "decision_artifact": "artifacts/decisions/DECISION-2026-05-21T20-00-phase-13-stage-13-1-closure.md",
         "checkpoint_mid": "artifacts/decisions/_phase_13_checkpoints/stage_13_1_mid.md",
         "checkpoint_final": "artifacts/decisions/_phase_13_checkpoints/stage_13_1.md",
-        "bundle_gzip_kb": 55.02,
+        "bundle_gzip_kb": 57.93,
         "bundle_budget_kb": 500,
         "endpoints_covered": 24,
         "su_baseline": {

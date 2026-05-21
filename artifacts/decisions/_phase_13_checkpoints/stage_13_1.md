@@ -51,11 +51,11 @@
 | 1 | Build exits 0 (post-scaffold) | PASS |
 | 2 | Zero `any`, zero TS errors | PASS |
 | 3 | Build exits 0 (post-API client) | PASS |
-| 4 | Bundle ≤ 500 KB gzip | PASS (55.02 KB) |
+| 4 | Bundle ≤ 500 KB gzip | PASS (57.93 KB — vendor 53.37 + css 2.60 + js 1.65 + html 0.31) |
 | 5 | grep `: any` → 0 | PASS |
 | 6 | 5 route stubs present | PASS |
 | 7 | 24 endpoints typed | PASS |
-| 8 | Backend untouched; SU 207/0/5 | PASS |
+| 8 | Backend untouched; SU 207/0/5 | PASS — owner-machine summary line: `ALL PASS — 207 passed, 0 failed, 5 skipped (212 total)` (544619ms). CTO Linux delta: 8 env-dependent failures (S48, S120–S127, S137) — not regressions. |
 | 9 | Closure decision artifact | PASS |
 | 10 | Final checkpoint | THIS DOCUMENT |
 
