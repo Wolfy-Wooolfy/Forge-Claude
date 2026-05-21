@@ -1,3 +1,10 @@
+/**
+ * DEPRECATED 2026-05-21 — superseded by INSTALL_FORGE.bat / RUN_FORGE.bat + pm2.
+ * Reason: NSSM 2014 binary surfaced 7 Windows-compat bugs (B1-B7) +
+ * orphan-process bug (B8). Replaced with two-file pm2 setup.
+ * Authority: DECISION-2026-05-21-pm2-two-file-setup-supersedes-nssm.md
+ * Retained for audit trail only. Do not run.
+ */
 "use strict";
 
 /**

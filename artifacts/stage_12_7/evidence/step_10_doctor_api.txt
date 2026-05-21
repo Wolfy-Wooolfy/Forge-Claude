@@ -13,8 +13,8 @@ GET http://127.0.0.1:3100/api/system/doctor
       "warn": 4,
       "fail": 1
     },
-    "started_at": "2026-05-20T12:00:21.188Z",
-    "duration_ms": 6695,
+    "started_at": "2026-05-21T08:02:55.240Z",
+    "duration_ms": 8584,
     "checks": [
       {
         "id": "node_version",
@@ -24,7 +24,7 @@ GET http://127.0.0.1:3100/api/system/doctor
       {
         "id": "openai_api_key",
         "status": "FAIL",
-        "detail": "OPENAI_API_KEY not set"
+        "detail": "OPENAI_API_KEY not set in keychain or environment"
       },
       {
         "id": "env_dotfile",
@@ -79,12 +79,12 @@ GET http://127.0.0.1:3100/api/system/doctor
       {
         "id": "disk_space",
         "status": "WARN",
-        "detail": "artifacts/ is 328.5 MB (> 100 MB — consider archival)"
+        "detail": "artifacts/ is 338.3 MB (> 100 MB — consider archival)"
       },
       {
         "id": "trace_matrix_size",
         "status": "PASS",
-        "detail": "artifacts/llm/ is 28.4 MB"
+        "detail": "artifacts/llm/ is 29.4 MB"
       },
       {
         "id": "shell_hardening",
@@ -164,7 +164,7 @@ GET http://127.0.0.1:3100/api/system/doctor
       {
         "id": "metrics_available",
         "status": "PASS",
-        "detail": "metrics_window_24h initialized (window_start: 2026-05-20T12:00:15.694Z)"
+        "detail": "metrics_window_24h initialized (window_start: 2026-05-21T08:02:42.044Z)"
       },
       {
         "id": "alert_webhook",
@@ -179,12 +179,12 @@ GET http://127.0.0.1:3100/api/system/doctor
       {
         "id": "api_auth_token",
         "status": "WARN",
-        "detail": "Capability token not found — API server may not have been started: not_found"
+        "detail": "Capability token not found — API server may not have been started: keychain_error: Command failed: powershell.exe -NoProfile -NonInteractive -Command $ErrorActionPreference = 'Stop'; Add-Type -TypeDefinition @\"; using System;; using System.Runtime.InteropServices;; using System.Text;; public class CredRead {;   [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Unicode)];   public struct CREDENTIAL {;     public uint Flags;;     public uint Type;;     public IntPtr TargetName;;     public IntPtr Comment;;     public System.Runtime.InteropServices.ComTypes.FILETIME LastWritten;;     public uint CredentialBlobSize;;     public IntPtr CredentialBlob;;     public uint Persist;;     public uint AttributeCount;;     public IntPtr Attributes;;     public IntPtr TargetAlias;;     public IntPtr UserName;;   };   [DllImport(\"advapi32.dll\", EntryPoint=\"CredReadW\", CharSet=CharSet.Unicode, SetLastError=true)];   public static extern bool CredRead(string target, uint type, uint reservedFlag, out IntPtr credentialPtr);;   [DllImport(\"advapi32.dll\", SetLastError=true)];   public static extern void CredFree(IntPtr cred);;   public static string ReadGeneric(string target) {;     IntPtr ptr;;     if (!CredRead(target, 1, 0, out ptr)) return null;;     try {;       CREDENTIAL c = (CREDENTIAL)Marshal.PtrToStructure(ptr, typeof(CREDENTIAL));;       if (c.CredentialBlobSize == 0) return \"\";;       byte[] bytes = new byte[c.CredentialBlobSize];;       Marshal.Copy(c.CredentialBlob, bytes, 0, (int)c.CredentialBlobSize);;       return Encoding.Unicode.GetString(bytes);;     } finally {;       CredFree(ptr);;     };   }; }; \"@; $result = [CredRead]::ReadGeneric($env:FORGE_TARGET); if ($result -eq $null) { Write-Output 'NOT_FOUND' } else { Write-Output $result }\nAt line:1 char:61\r\n+ $ErrorActionPreference = 'Stop'; Add-Type -TypeDefinition @\"; using S ...\r\n+                                                             ~\r\nNo characters are allowed after a here-string header but before the end of the line.\r\n    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException\r\n    + FullyQualifiedErrorId : UnexpectedCharactersAfterHereStringHeader\r\n \r\n"
       },
       {
         "id": "uid_pin_match",
         "status": "PASS",
-        "detail": "UID pin matches current user (username=KHALEDSAYED$, pinned_at=2026-05-20T12:00:07.964Z)"
+        "detail": "UID pin matches current user (username=KHALEDSAYED$, pinned_at=2026-05-21T08:02:41.437Z)"
       }
     ],
     "links": {
@@ -193,6 +193,6 @@ GET http://127.0.0.1:3100/api/system/doctor
       "logs": "logs/forge.log",
       "decisions": "artifacts/decisions/"
     },
-    "report_path": "artifacts/health/doctor_2026-05-20T12-00-21-188Z.json"
+    "report_path": "artifacts/health/doctor_2026-05-21T08-02-55-240Z.json"
   }
 }

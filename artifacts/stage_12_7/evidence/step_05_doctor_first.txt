@@ -4,7 +4,7 @@ RESULT: PASS
 ✓ HEALTHY — 0 critical, 5 warning
 
   ✓  node_version                 v24.14.1
-  ✓  openai_api_key               set, length=164
+  ✓  openai_api_key               from env, length=164
   ✓  env_dotfile                  .env present
   ✓  api_server_port              port 4505 available
   ✓  web_server_port              web served on API port 4505
@@ -15,8 +15,8 @@ RESULT: PASS
   ✓  active_project               no active project (idle)
   ✓  missing_dependencies         9 dependencies present
   ✓  recent_execution             tool_audit.jsonl modified 0 day(s) ago
-  ⚠  disk_space                   artifacts/ is 328.5 MB (> 100 MB — consider archival)
-  ✓  trace_matrix_size            artifacts/llm/ is 28.4 MB
+  ⚠  disk_space                   artifacts/ is 338.3 MB (> 100 MB — consider archival)
+  ✓  trace_matrix_size            artifacts/llm/ is 29.4 MB
   ✓  shell_hardening              shell.run_with_prompt registered, sudo/su hard-denied, vision lock rule present
   ✓  environment_detection        11 detectors registered; os detector callable; env.probe_binary registered
   ✓  package_management           9 adapters (Tier-1: 6, Tier-2: 3); pkg.install registered; no sudo adapters
@@ -32,13 +32,21 @@ RESULT: PASS
   ⚠  secrets_in_env_var           OPENAI_API_KEY in environment — migrate to keychain: see INSTALL.md §Secrets
   ✓  backup_status                no backups yet — `forge backup create` after first setup (see INSTALL.md §Backup)
   ✓  logging_status               logs/ directory present
-  ✓  metrics_available            metrics_window_24h initialized (window_start: 2026-05-20T12:00:15.694Z)
+  ✓  metrics_available            metrics_window_24h initialized (window_start: 2026-05-21T08:02:42.044Z)
   ✓  alert_webhook                FORGE_ALERT_WEBHOOK_URL not set — webhook alerts disabled (optional; see INSTALL.md §Alerts)
   ✓  api_binding                  FORGE_BIND_HOST not set — server binds to 127.0.0.1 (secure default)
-  ⚠  api_auth_token               Capability token not found — API server may not have been started: not_found
-  ✓  uid_pin_match                Service-account equivalence: pinned=KHALEDSAYED$ (Local System) current=Khaled.Sayed on same machine (pinned_at=2026-05-20T12:00:07.964Z)
+  ⚠  api_auth_token               Capability token not found — API server may not have been started: keychain_error: Command failed: powershell.exe -NoProfile -NonInteractive -Command $ErrorActionPreference = 'Stop'; Add-Type -TypeDefinition @"; using System;; using System.Runtime.InteropServices;; using System.Text;; public class CredRead {;   [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Unicode)];   public struct CREDENTIAL {;     public uint Flags;;     public uint Type;;     public IntPtr TargetName;;     public IntPtr Comment;;     public System.Runtime.InteropServices.ComTypes.FILETIME LastWritten;;     public uint CredentialBlobSize;;     public IntPtr CredentialBlob;;     public uint Persist;;     public uint AttributeCount;;     public IntPtr Attributes;;     public IntPtr TargetAlias;;     public IntPtr UserName;;   };   [DllImport("advapi32.dll", EntryPoint="CredReadW", CharSet=CharSet.Unicode, SetLastError=true)];   public static extern bool CredRead(string target, uint type, uint reservedFlag, out IntPtr credentialPtr);;   [DllImport("advapi32.dll", SetLastError=true)];   public static extern void CredFree(IntPtr cred);;   public static string ReadGeneric(string target) {;     IntPtr ptr;;     if (!CredRead(target, 1, 0, out ptr)) return null;;     try {;       CREDENTIAL c = (CREDENTIAL)Marshal.PtrToStructure(ptr, typeof(CREDENTIAL));;       if (c.CredentialBlobSize == 0) return "";;       byte[] bytes = new byte[c.CredentialBlobSize];;       Marshal.Copy(c.CredentialBlob, bytes, 0, (int)c.CredentialBlobSize);;       return Encoding.Unicode.GetString(bytes);;     } finally {;       CredFree(ptr);;     };   }; }; "@; $result = [CredRead]::ReadGeneric($env:FORGE_TARGET); if ($result -eq $null) { Write-Output 'NOT_FOUND' } else { Write-Output $result }
+At line:1 char:61
++ $ErrorActionPreference = 'Stop'; Add-Type -TypeDefinition @"; using S ...
++                                                             ~
+No characters are allowed after a here-string header but before the end of the line.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : UnexpectedCharactersAfterHereStringHeader
+ 
 
-  duration: 9778ms
-  report:   artifacts/health/doctor_2026-05-20T12-00-11-080Z.json
+  ✓  uid_pin_match                Service-account equivalence: pinned=KHALEDSAYED$ (Local System) current=Khaled.Sayed on same machine (pinned_at=2026-05-21T08:02:41.437Z)
+
+  duration: 10047ms
+  report:   artifacts/health/doctor_2026-05-21T08-02-44-868Z.json
 
 

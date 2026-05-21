@@ -1,0 +1,6 @@
+{"ts":"2026-05-21T08:39:32.089Z","loop_id":"791acd74-c981-4345-babd-9052012c93ac","from_state":"OWNER_INTENT","to_state":"ARCHITECT_DESIGN","transition_type":"NORMAL","role_invoked":null,"mock":true,"cost_usd":0}
+{"ts":"2026-05-21T08:39:32.257Z","loop_id":"791acd74-c981-4345-babd-9052012c93ac","from_state":"ARCHITECT_DESIGN","to_state":"SPEC_WRITER_FORMALIZE","transition_type":"NORMAL","role_invoked":null,"mock":true,"cost_usd":0}
+{"ts":"2026-05-21T08:39:32.367Z","loop_id":"791acd74-c981-4345-babd-9052012c93ac","from_state":"SPEC_WRITER_FORMALIZE","to_state":"REVIEWER_SPEC","transition_type":"NORMAL","role_invoked":null,"mock":true,"cost_usd":0}
+{"ts":"2026-05-21T08:39:32.479Z","loop_id":"791acd74-c981-4345-babd-9052012c93ac","from_state":"REVIEWER_SPEC","to_state":"COST_ESTIMATE","transition_type":"NORMAL","role_invoked":null,"mock":true,"cost_usd":0}
+{"ts":"2026-05-21T08:39:32.586Z","loop_id":"791acd74-c981-4345-babd-9052012c93ac","from_state":"COST_ESTIMATE","to_state":"ENV_REPORT","transition_type":"NORMAL","role_invoked":null,"mock":true,"cost_usd":0}
+{"ts":"2026-05-21T08:39:32.634Z","loop_id":"791acd74-c981-4345-babd-9052012c93ac","from_state":"ENV_REPORT","to_state":"TEST_DESIGN","transition_type":"GATE_APPROVE","role_invoked":null,"mock":true,"cost_usd":0,"owner_gate_id":1}
