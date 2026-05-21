@@ -312,13 +312,27 @@ yarn-error.log*
 #
 # ============================================================================
  
-# -- 16. PCST INTAKE WORKING DIRS (regenerable) ----------------- 
-# PCST script runs project.intake_zip which copies source code 
-# into these dirs. Regenerable; not part of test deliverables. 
-# The actual test artifacts are in artifacts/stress_test/. 
-artifacts/projects/pcst_*/ 
 # -- 16. PCST INTAKE WORKING DIRS (regenerable) ------------------------------
 # PCST script's project.intake_zip copies source code into these dirs.
 # Regenerable; not part of test deliverables.
 # Real test artifacts live in artifacts/stress_test/<slug>/
 artifacts/projects/pcst_*/
+
+
+# -- 17. RUNTIME ARTIFACTS (machine-generated, regenerable) ------------------
+# Doctor snapshots, self-test outputs, env fingerprints, orchestration logs,
+# built-project runtime state, uid pin, and session files.
+
+artifacts/health/
+artifacts/self-test/
+artifacts/env/
+artifacts/projects/*/orchestration/
+artifacts/projects/*/forge_tests/last_report.json
+artifacts/projects/*/forge_tests/loopback_signal.json
+artifacts/projects/*/intake_state.json
+artifacts/projects/project_registry.json
+artifacts/projects/*/kb/exports/
+artifacts/stage_*/evidence/
+progress/uid_pin.json
+web/.forge-session
+.pm2/
