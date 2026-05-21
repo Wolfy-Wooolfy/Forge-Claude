@@ -4,8 +4,8 @@
   "current_stage": "A",
   "overall_progress_percent": 99,
   "stage_progress_percent": 100,
-  "next_phase": "PHASE-12",
-  "next_step": "Begin Stage 12.7 per DECISION-2026-05-18T11-30-phase-12-plan.md §3 Stage 12.7.",
+  "next_phase": "PHASE-13",
+  "next_step": "PHASE-12 CLOSED. PHASE-13 (Conversational UX Polish) is next per roadmap but requires a fresh decision artifact and owner approval before it may begin.",
   "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-19T17-30-phase-12-stage-12-6-closure.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
@@ -73,13 +73,13 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-05-21T09:32:24.622Z",
+    "last_doctor_run": "2026-05-21T11:29:46.249Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
-    "self_test_last_run": "2026-05-19",
-    "self_test_last_result": "202 passed, 0 failed, 5 skipped (207 total) — PHASE-12 Stage 12.5 CLOSED. S204-S207 (api_server binding/auth/uid_mismatch) added. OQ-2 resolved (127.0.0.1 default). 5 SKIPs require docker.",
-    "self_test_scenarios_pass": 202,
+    "self_test_last_run": "2026-05-21",
+    "self_test_last_result": "207 passed, 0 failed, 5 skipped (212 total) — PHASE-12 Stage 12.7 CLOSED. S208-S212 added (phase12 regression, doctor checks, uid_pin service account, nssm helper encoding, openai keychain). pm2 two-file setup field-proven on owner machine. 5 SKIPs require docker.",
+    "self_test_scenarios_pass": 207,
     "self_test_scenarios_skip": 5,
     "self_test_scenarios_fail": 0,
     "providers_registered_count": 13,
@@ -146,11 +146,11 @@
       "PHASE-8",
       "PHASE-9",
       "PHASE-10",
-      "PHASE-11"
+      "PHASE-11",
+      "PHASE-12"
     ],
-    "next": "PHASE-12",
+    "next": "PHASE-13",
     "remaining": [
-      "PHASE-12",
       "PHASE-13"
     ],
     "deferred": [
@@ -160,7 +160,9 @@
     "phase_12_amendment": "DECISION-2026-05-18T12-00-roadmap-phase-12-amendment.md — Windows Tier-1, secret keychain, security model explicit, effort 5-7→8-10 days"
   },
   "phase_12": {
-    "status": "IN_PROGRESS",
+    "status": "CLOSED",
+    "closed_at": "2026-05-21T14:00:00.000Z",
+    "closure_artifact": "artifacts/decisions/DECISION-2026-05-21T14-00-stage-12-7-closure.md",
     "plan_artifact": "artifacts/decisions/DECISION-2026-05-18T11-30-phase-12-plan.md",
     "amendment_artifact": "artifacts/decisions/DECISION-2026-05-18T12-00-roadmap-phase-12-amendment.md",
     "oq_sweep": "artifacts/audit/phase_12_oq_sweep.md",
@@ -376,6 +378,72 @@
         "§X.5 — _activeToken !== null guard (auth only enforced after start() — S25-S29 regression fix)",
         "§X.6 — uid_pin.js option B: userMismatch = identity.username !== pin.username (null bypass prevented)"
       ]
+    },
+    "stage_12_7": {
+      "status": "CLOSED",
+      "closed_at": "2026-05-21T14:00:00.000Z",
+      "cost_actual_usd": 0,
+      "decision_artifact": "artifacts/decisions/DECISION-2026-05-21T14-00-stage-12-7-closure.md",
+      "checkpoint_final": "artifacts/decisions/_phase_12_checkpoints/stage_12_7.md",
+      "checkpoint_mid": "artifacts/decisions/_phase_12_checkpoints/stage_12_7_amended_mid.md",
+      "amendment_artifact": "artifacts/decisions/DECISION-2026-05-20T10-00-stage-12-7-amendment-automated-installer.md",
+      "pm2_migration_artifact": "artifacts/decisions/DECISION-2026-05-21-pm2-two-file-setup-supersedes-nssm.md",
+      "install_target": "D:\\ForgeAI (fallback C:\\ForgeAI)",
+      "bugs_resolved": [
+        "B1",
+        "B2",
+        "B3",
+        "B4",
+        "B5",
+        "B6",
+        "B7",
+        "B8",
+        "B9"
+      ],
+      "files_created": [
+        "INSTALL_FORGE.bat",
+        "RUN_FORGE.bat",
+        "STOP_FORGE.bat",
+        "ecosystem.config.js",
+        "GETTING_STARTED.md (replaced)"
+      ],
+      "files_deprecated": [
+        "bin/forge-install.js",
+        "scripts/install/preflight.js",
+        "scripts/install/install_orchestrator.js",
+        "scripts/install/rollback.js",
+        "scripts/install/post_verify.js",
+        "scripts/install/_nssm_helper.js"
+      ],
+      "scenarios_added": [
+        "S210",
+        "S211",
+        "S212"
+      ],
+      "su_baseline": {
+        "pass": 207,
+        "fail": 0,
+        "skip": 5,
+        "total": 212
+      },
+      "real_world_test": {
+        "machine": "owner Windows 10",
+        "date": "2026-05-21",
+        "result": "SUCCESS",
+        "install_target": "D:\\ForgeAI",
+        "clone_ok": true,
+        "npm_install_ok": true,
+        "pm2_forge_online": true,
+        "pm2_restarts": 0,
+        "desktop_shortcuts_created": true,
+        "startup_folder_configured": true
+      },
+      "arc_count_unchanged": 6,
+      "gitignore_cleanup": {
+        "section_added": "§17 Runtime Artifacts",
+        "files_untracked": 1506,
+        "commit": "68124a6"
+      }
     }
   },
   "phase_9": {
@@ -1011,8 +1079,8 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-12-STAGE-12-6-CLOSED",
-  "last_updated": "2026-05-19T17:30:00.000Z",
+  "current_task": "PHASE-12-CLOSED",
+  "last_updated": "2026-05-21T14:00:00.000Z",
   "findings_open": [
     "FINDING-2026-05-19-s137-live-openai-call"
   ],
