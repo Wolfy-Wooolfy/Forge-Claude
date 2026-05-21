@@ -5,8 +5,8 @@
   "overall_progress_percent": 99,
   "stage_progress_percent": 100,
   "next_phase": "PHASE-13",
-  "next_step": "PHASE-13 Stage 13.2 PENDING — Chat Interface (ChatView SSE streaming, project selector, message history). Owner CTO verification of Stage 13.1 required first.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-21T20-00-phase-13-stage-13-1-closure.md",
+  "next_step": "PHASE-13 Stage 13.3 PENDING — Project Management View (project list / create / activate / delete; active-project context panel). Owner CTO verification of Stage 13.2 required first.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-21T22-00-phase-13-stage-13-2-closure.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -73,7 +73,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-05-21T13:54:42.877Z",
+    "last_doctor_run": "2026-05-21T14:44:59.706Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
@@ -1079,11 +1079,11 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-13-STAGE-13.2-PENDING",
-  "last_updated": "2026-05-21T20:00:00.000Z",
+  "current_task": "PHASE-13-STAGE-13.3-PENDING",
+  "last_updated": "2026-05-21T22:00:00.000Z",
   "phase_13": {
     "status": "IN_PROGRESS",
-    "current_stage": "13.2",
+    "current_stage": "13.3",
     "decision_artifact": "artifacts/decisions/DECISION-2026-05-21T16-30-phase-13-conversational-ux-polish.md",
     "started_at": "2026-05-21T16:30:00.000Z",
     "cost_actual_usd": 0,
@@ -1137,6 +1137,41 @@
           "web/apps/forge-workspace/src/api/governance.ts",
           "web/apps/forge-workspace/src/api/index.ts",
           "web/apps/forge-workspace/API_ENDPOINT_MAP.md"
+        ]
+      },
+      "13_2": {
+        "status": "CLOSED",
+        "started_at": "2026-05-21T20:00:00.000Z",
+        "closed_at": "2026-05-21T22:00:00.000Z",
+        "decision_artifact": "artifacts/decisions/DECISION-2026-05-21T22-00-phase-13-stage-13-2-closure.md",
+        "checkpoint_mid": "artifacts/decisions/_phase_13_checkpoints/stage_13_2_mid.md",
+        "checkpoint_final": "artifacts/decisions/_phase_13_checkpoints/stage_13_2.md",
+        "bundle_gzip_kb": 70.81,
+        "bundle_budget_kb": 500,
+        "playwright_added": true,
+        "playwright_tests_pass": 2,
+        "su_baseline": {
+          "pass": 207,
+          "fail": 0,
+          "skip": 5,
+          "total": 212
+        },
+        "arc_count_unchanged": 6,
+        "backend_untouched": true,
+        "type_fix_from_stage_13_1": "ClarificationAnswerRequest.answers: Record<string,string> → {raw_answer: string; answered_questions: string[]}",
+        "files_created": [
+          "web/apps/forge-workspace/src/lib/detectLanguage.ts",
+          "web/apps/forge-workspace/src/components/chat/types.ts",
+          "web/apps/forge-workspace/src/components/chat/MessageBubble.tsx",
+          "web/apps/forge-workspace/src/components/chat/QuickReplies.tsx",
+          "web/apps/forge-workspace/src/components/chat/ChatInput.tsx",
+          "web/apps/forge-workspace/playwright.config.ts",
+          "web/apps/forge-workspace/e2e/chat_send_receive.spec.ts"
+        ],
+        "files_modified": [
+          "web/apps/forge-workspace/src/views/ChatView.tsx",
+          "web/apps/forge-workspace/package.json",
+          "web/apps/forge-workspace/src/api/chat.ts"
         ]
       }
     }
