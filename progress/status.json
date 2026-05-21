@@ -5,8 +5,8 @@
   "overall_progress_percent": 99,
   "stage_progress_percent": 100,
   "next_phase": "PHASE-13",
-  "next_step": "PHASE-12 CLOSED. PHASE-13 (Conversational UX Polish) is next per roadmap but requires a fresh decision artifact and owner approval before it may begin.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-19T17-30-phase-12-stage-12-6-closure.md",
+  "next_step": "PHASE-13 Stage 13.1 IN_PROGRESS — Scaffold + Build Pipeline + API Client Layer. Decision artifact committed. Next: scaffold web/apps/forge-workspace/, then mid-checkpoint before API client layer.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-21T14-00-stage-12-7-closure.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -1079,8 +1079,22 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-12-CLOSED",
-  "last_updated": "2026-05-21T14:00:00.000Z",
+  "current_task": "PHASE-13-STAGE-13.1-IN-PROGRESS",
+  "last_updated": "2026-05-21T16:30:00.000Z",
+  "phase_13": {
+    "status": "IN_PROGRESS",
+    "current_stage": "13.1",
+    "decision_artifact": "artifacts/decisions/DECISION-2026-05-21T16-30-phase-13-conversational-ux-polish.md",
+    "started_at": "2026-05-21T16:30:00.000Z",
+    "cost_actual_usd": 0,
+    "total_live_cap_usd": 3,
+    "stages": {
+      "13_1": {
+        "status": "IN_PROGRESS",
+        "started_at": "2026-05-21T16:30:00.000Z"
+      }
+    }
+  },
   "findings_open": [
     "FINDING-2026-05-19-s137-live-openai-call"
   ],

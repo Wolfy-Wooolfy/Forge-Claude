@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/components/ui/button.tsx","./src/lib/utils.ts","./src/views/chatview.tsx","./src/views/doctorview.tsx","./src/views/kbview.tsx","./src/views/projectsview.tsx","./src/views/visionview.tsx"],"version":"5.9.3"}
