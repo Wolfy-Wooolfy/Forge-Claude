@@ -21,7 +21,7 @@
 
 ### §1.C — Scaffold (React 18 + Vite 5 + TypeScript strict + Tailwind + shadcn/ui)
 - Build: exit 0, 6.18s
-- Bundle baseline: vendor 53.37 KB gzip + app 1.65 KB gzip = **55.02 KB gzip total**
+- Bundle baseline: vendor 53.37 KB + css 2.60 KB + js 1.65 KB + html 0.31 KB = **57.93 KB gzip total**
 - TypeScript: strict mode, zero `any`, zero errors
 - Routes: 5 stubs — /chat, /projects, /vision, /kb, /doctor
 
