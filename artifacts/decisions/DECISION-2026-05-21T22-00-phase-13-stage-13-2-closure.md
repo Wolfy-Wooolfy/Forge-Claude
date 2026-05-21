@@ -4,7 +4,7 @@
 > **Date:** 2026-05-21  
 > **Phase:** PHASE-13 (Conversational UX Polish)  
 > **Stage:** 13.2 — Chat View  
-> **Owner approval:** pending CTO independent verification (STOP point)
+> **Owner approval:** CTO verified 2026-05-21; all 8 conditions confirmed.
 
 ---
 
@@ -44,7 +44,7 @@ Stage 13.2 delivered the full ChatView implementation:
 | 2 | `npm run build` exits 0 | PASS — exit 0, 12.28s |
 | 3 | Bundle gzip < 500 KB | PASS — **70.81 KB gzip** (0.30 html + 3.06 css + 14.07 js + 53.38 vendor). Delta +12.88 KB from 13.1 baseline. Headroom: 429 KB |
 | 4 | TypeScript strict; `grep -rn ": any" src/` → 0 | PASS — exit 1 (0 matches) |
-| 5 | Playwright `chat_send_receive` PASS — literal summary line | PASS — `2 passed (50.1s)` |
+| 5 | Playwright `chat_send_receive` PASS — literal summary line | PASS — `2 passed (27.0s)` (owner-machine run; CTO container cannot download the Playwright browser — owner machine is the verification source for e2e, same tie-breaker as the SU baseline) |
 | 6 | Backend untouched; SU baseline 207/0/5 — literal summary line | PASS — backend md5 unchanged (git diff → 0 files); owner-machine SU: `ALL PASS — 207 passed, 0 failed, 5 skipped (212 total)` (duration 468725ms) |
 | 7 | Closure decision artifact written | THIS DOCUMENT |
 | 8 | Final checkpoint written | `artifacts/decisions/_phase_13_checkpoints/stage_13_2.md` |

@@ -45,7 +45,7 @@
 | `sends a message and receives a streamed response` | intake→IDEATION_READY, SSE stream with `['Hello', ' world']` chunks | user message visible; `'Hello world'` in assistant bubble; no stream-cursor; phase=`'ready'` |
 | `clarification answer round-trip` | intake→CLARIFICATION_REQUIRED, answerClarification→IDEATION_READY | question text visible; quick replies visible; `'Discovery complete.'` after answer; phase=`'ready'` |
 
-Run result: `2 passed (50.1s)`
+Run result: `2 passed (27.0s)` (owner-machine run)
 
 ### §1.E — chat.ts type fix (Stage 13.1 deliverable, corrected in Stage 13.2)
 
@@ -79,7 +79,7 @@ Run result: `2 passed (50.1s)`
 | 2 | `npm run build` exits 0 | PASS — `✓ built in 12.28s` |
 | 3 | Bundle < 500 KB gzip | PASS — **70.81 KB gzip** (vendor 53.38 + js 14.07 + css 3.06 + html 0.30). Delta +12.88 KB from 13.1 baseline. Headroom: 429 KB |
 | 4 | TypeScript strict; zero `any` | PASS — `grep -rn ": any" src/` exit 1 (0 matches) |
-| 5 | Playwright `chat_send_receive` PASS | PASS — `2 passed (50.1s)` |
+| 5 | Playwright `chat_send_receive` PASS | PASS — `2 passed (27.0s)` (owner-machine run) |
 | 6 | Backend untouched; SU 207/0/5 | PASS — backend md5 unchanged; owner-machine summary: `ALL PASS — 207 passed, 0 failed, 5 skipped (212 total)` (468725ms) |
 | 7 | Closure decision artifact | PASS — `artifacts/decisions/DECISION-2026-05-21T22-00-phase-13-stage-13-2-closure.md` |
 | 8 | Final checkpoint | THIS DOCUMENT |
