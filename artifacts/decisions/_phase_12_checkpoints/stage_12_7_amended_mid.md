@@ -460,4 +460,58 @@ After confirmed successful install → Phase C (closure artifact + status.json).
 
 ---
 
+## §24 — Bug B7 — windows_credential_manager.js WinRT → cmdkey + CredReadW Rewrite + S206 Fix (2026-05-20)
+
+**Discovered:** Owner re-ran installer after B5+B6. The `migrate_secrets` step completed without error, but after `service_start` the `openai_api_key` Doctor check still showed FAIL from the service context — same symptom as B5. Investigation revealed the root cause was deeper: the keychain write itself was silently failing.
+
+**Root cause — B7:** The original `windows_credential_manager.js` used `Windows.Security.Credentials.PasswordVault` (WinRT API) via `Add-AppxPackage`/`Get-AppxPackage`. WinRT's `PasswordVault` is unavailable on Desktop PowerShell (non-UWP context). `isAvailable()` always returned `false` → `secret_provider` fell through to `encrypted_file_provider` as the selected provider → credentials were stored in an encrypted file per user, not in Windows Credential Manager → NSSM's Local System service account could not access the file (different user context) → Doctor reported FAIL from service.
+
+**Fix — B7 rewrite (`code/src/runtime/secrets/windows_credential_manager.js`):**
+- `isAvailable()`: replaced WinRT detection with `execFileSync("where.exe", ["cmdkey"])` — cmdkey (XP-era stable CLI) is universally present on Windows
+- `set()`: `cmdkey /generic:<target> /user:forge /pass:<value>` — writes to the user's credential vault; idempotent (overwrites if exists)
+- `get()`: PowerShell C# P/Invoke to `advapi32.dll!CredReadW` via `Add-Type` — stable XP-era native API for credential retrieval; cmdkey cannot read passwords back
+- `del()`: `cmdkey /delete:<target>` — treats "not found" as success
+- Environment sanitation: `_buildEnv()` strips all env vars matching `api_?key|token|secret|password|credential` before spawning subprocesses
+- §ARC-5 exception comment preserved; `Windows.Security.Credentials.PasswordVault (WinRT)` intentionally NOT used (documented)
+
+**S206 regression — root cause:** After B7, `isAvailable()` returns `true` → `windows_credential_manager` is now selected as the provider. `apiServer.start()` calls `secretProvider.set("forge.capability_token", token)` which now succeeds. The regression was in the test harness: when S205 ran before S206 in the full suite, S206 failed with "socket hang up". Root cause: S205's `_httpGet` response creates a keep-alive TCP socket in `http.globalAgent`'s pool. `_teardown` called `server.close()` — which stops accepting new connections but does NOT force-close existing keep-alive connections. If the OS reused S205's port for S206's server (port 0 → OS-assigned, reusable after close), S206's `_httpGet` pulled the stale S205 socket from the pool. Before B7, `encrypted_file_provider` was selected and `start()` was slightly slower (no real keychain write), masking the timing window. After B7, `windows_credential_manager` is selected and `start()` is faster (cmdkey write is fast), exposing the race.
+
+**Fix — S206 (`code/src/testing/helpers/api_server_test_helper.js`) — two changes:**
+
+1. `_teardown`: Added `server.closeAllConnections()` (Node.js 18.2+, confirmed on v24.14.1) before `server.close()` — force-closes all server-side connections including keep-alive sockets, preventing lingering connections from blocking `server.close()` or contaminating the next test's port.
+
+2. `_httpGet`: Added `agent: false` to the HTTP request options — bypasses `http.globalAgent` connection pool entirely. Each test request creates a fresh TCP socket. Prevents stale pooled sockets (from the previous test's server) from being reused when the OS reassigns the same port.
+
+**Verification:**
+- `node bin/forge-test.js --scenario S205 --scenario S206` → **both pass** ✓ (1220ms)
+- `node bin/forge-test.js` → **207 pass / 0 fail / 5 skip / 212 total** ✓
+- `node bin/forge-install.js --dry-run` → **12 steps ✓, exit 0**
+
+```
+[DRY-RUN:migrate_secrets] — ✓
+NSSM found at: C:\tools\nssm-2.24\win64\nssm.exe — ✓
+ALL 12 steps ✓
+```
+
+**Track A:** `windows_credential_manager.js` is §ARC-5 scope (authorized by DECISION-2026-05-18T11-30-phase-12-plan.md §6). `api_server_test_helper.js` is test infrastructure (§ARC convention). No new §ARC entries. §ARC count stays **6**. Cost: **$0.00**.
+
+---
+
+## §25 — STOP — Owner Re-Runs Installer (Bug B7)
+
+**STOP.** Bug B7 fixed (Windows Credential Manager now works via cmdkey + CredReadW). S206 regression fixed (test harness keep-alive socket isolation). Full suite 207/0/5 ✓. Dry-run 12 steps ✓, exit 0.
+
+Owner must re-run `node bin/forge-install.js` to verify the keychain write now succeeds end-to-end (both `migrate_secrets` and the service-context Doctor check should PASS).
+
+```powershell
+$env:OPENAI_API_KEY = "sk-..."
+node bin/forge-install.js
+```
+
+NSSM is already placed at `C:\tools\nssm-2.24\win64\nssm.exe` — no re-download needed.
+
+After confirmed successful install → Phase C (closure artifact + status.json).
+
+---
+
 **END OF STAGE 12.7 (AMENDED) MID-CHECKPOINT**

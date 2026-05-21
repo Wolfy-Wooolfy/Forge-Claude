@@ -1,0 +1,190 @@
+{
+  "schema_version": "1.0",
+  "ok": true,
+  "summary": "0 critical, 8 warning",
+  "counts": {
+    "pass": 26,
+    "warn": 8,
+    "fail": 0
+  },
+  "started_at": "2026-05-20T14:24:09.151Z",
+  "duration_ms": 11015,
+  "checks": [
+    {
+      "id": "node_version",
+      "status": "PASS",
+      "detail": "v24.14.1"
+    },
+    {
+      "id": "openai_api_key",
+      "status": "PASS",
+      "detail": "from env, length=164"
+    },
+    {
+      "id": "env_dotfile",
+      "status": "PASS",
+      "detail": ".env present"
+    },
+    {
+      "id": "api_server_port",
+      "status": "PASS",
+      "detail": "port 4505 available"
+    },
+    {
+      "id": "web_server_port",
+      "status": "PASS",
+      "detail": "web served on API port 4505"
+    },
+    {
+      "id": "providers_registered",
+      "status": "WARN",
+      "detail": "13 registered, 12 legacy (not yet v2-compliant)"
+    },
+    {
+      "id": "tools_registered",
+      "status": "PASS",
+      "detail": "78 tools registered"
+    },
+    {
+      "id": "permission_mode",
+      "status": "PASS",
+      "detail": "mode active: READ_ONLY"
+    },
+    {
+      "id": "status_json_valid",
+      "status": "PASS",
+      "detail": "valid v2.0, current_task=PHASE-12-STAGE-12-6-CLOSED"
+    },
+    {
+      "id": "active_project",
+      "status": "PASS",
+      "detail": "no active project (idle)"
+    },
+    {
+      "id": "missing_dependencies",
+      "status": "PASS",
+      "detail": "9 dependencies present"
+    },
+    {
+      "id": "recent_execution",
+      "status": "PASS",
+      "detail": "tool_audit.jsonl modified 0 day(s) ago"
+    },
+    {
+      "id": "disk_space",
+      "status": "WARN",
+      "detail": "artifacts/ is 481.8 MB (> 100 MB — consider archival)"
+    },
+    {
+      "id": "trace_matrix_size",
+      "status": "PASS",
+      "detail": "artifacts/llm/ is 28.9 MB"
+    },
+    {
+      "id": "shell_hardening",
+      "status": "PASS",
+      "detail": "shell.run_with_prompt registered, sudo/su hard-denied, vision lock rule present"
+    },
+    {
+      "id": "environment_detection",
+      "status": "PASS",
+      "detail": "11 detectors registered; os detector callable; env.probe_binary registered"
+    },
+    {
+      "id": "package_management",
+      "status": "PASS",
+      "detail": "9 adapters (Tier-1: 6, Tier-2: 3); pkg.install registered; no sudo adapters"
+    },
+    {
+      "id": "container_runtime",
+      "status": "WARN",
+      "detail": "2 adapter(s) registered (docker, podman); none available (docker/podman daemon not running — expected in CI)"
+    },
+    {
+      "id": "agent_runtime",
+      "status": "PASS",
+      "detail": "5 adapters registered (aider, anthropic, claude_code, mock, openai); available: mock, openai; agent.invoke OK; cost ledger writable; budget enforcer OK"
+    },
+    {
+      "id": "roles_runtime",
+      "status": "PASS",
+      "detail": "13 roles registered (architect, builder, cost_estimator, deployment, documentation, environment, quality_judge, research, reverse_vision, reviewer, security_auditor, spec_writer, test_designer); role.invoke OK"
+    },
+    {
+      "id": "builtproject_runtime",
+      "status": "PASS",
+      "detail": "L5b harness OK — 4 modules, 8 assertion types, 6 reference scenarios"
+    },
+    {
+      "id": "orchestration_runtime",
+      "status": "PASS",
+      "detail": "5 orchestration modules loaded; 6 orchestration tools registered"
+    },
+    {
+      "id": "kb_budget_status",
+      "status": "PASS",
+      "detail": "no active project (idle)"
+    },
+    {
+      "id": "kb_indexed_sources_count",
+      "status": "PASS",
+      "detail": "no active project (idle)"
+    },
+    {
+      "id": "research_role_registered",
+      "status": "PASS",
+      "detail": "research role registered; system_prompt_id=research_v1; authority=ADVISORY"
+    },
+    {
+      "id": "service_lifecycle",
+      "status": "PASS",
+      "detail": "forge-api not installed as a service — see INSTALL.md §Windows Service"
+    },
+    {
+      "id": "secrets_in_env_var",
+      "status": "WARN",
+      "detail": "OPENAI_API_KEY in environment — migrate to keychain: see INSTALL.md §Secrets"
+    },
+    {
+      "id": "backup_status",
+      "status": "PASS",
+      "detail": "no backups yet — `forge backup create` after first setup (see INSTALL.md §Backup)"
+    },
+    {
+      "id": "logging_status",
+      "status": "WARN",
+      "detail": "logs/ directory not yet created — will be initialized on first log write"
+    },
+    {
+      "id": "metrics_available",
+      "status": "WARN",
+      "detail": "metrics_window_24h not initialized — start the API server once to populate"
+    },
+    {
+      "id": "alert_webhook",
+      "status": "PASS",
+      "detail": "FORGE_ALERT_WEBHOOK_URL not set — webhook alerts disabled (optional; see INSTALL.md §Alerts)"
+    },
+    {
+      "id": "api_binding",
+      "status": "PASS",
+      "detail": "FORGE_BIND_HOST not set — server binds to 127.0.0.1 (secure default)"
+    },
+    {
+      "id": "api_auth_token",
+      "status": "WARN",
+      "detail": "Capability token not found — API server may not have been started: keychain_error: Command failed: powershell.exe -NoProfile -NonInteractive -Command $ErrorActionPreference = 'Stop'; Add-Type -TypeDefinition @\"; using System;; using System.Runtime.InteropServices;; using System.Text;; public class CredRead {;   [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Unicode)];   public struct CREDENTIAL {;     public uint Flags;;     public uint Type;;     public IntPtr TargetName;;     public IntPtr Comment;;     public System.Runtime.InteropServices.ComTypes.FILETIME LastWritten;;     public uint CredentialBlobSize;;     public IntPtr CredentialBlob;;     public uint Persist;;     public uint AttributeCount;;     public IntPtr Attributes;;     public IntPtr TargetAlias;;     public IntPtr UserName;;   };   [DllImport(\"advapi32.dll\", EntryPoint=\"CredReadW\", CharSet=CharSet.Unicode, SetLastError=true)];   public static extern bool CredRead(string target, uint type, uint reservedFlag, out IntPtr credentialPtr);;   [DllImport(\"advapi32.dll\", SetLastError=true)];   public static extern void CredFree(IntPtr cred);;   public static string ReadGeneric(string target) {;     IntPtr ptr;;     if (!CredRead(target, 1, 0, out ptr)) return null;;     try {;       CREDENTIAL c = (CREDENTIAL)Marshal.PtrToStructure(ptr, typeof(CREDENTIAL));;       if (c.CredentialBlobSize == 0) return \"\";;       byte[] bytes = new byte[c.CredentialBlobSize];;       Marshal.Copy(c.CredentialBlob, bytes, 0, (int)c.CredentialBlobSize);;       return Encoding.Unicode.GetString(bytes);;     } finally {;       CredFree(ptr);;     };   }; }; \"@; $result = [CredRead]::ReadGeneric($env:FORGE_TARGET); if ($result -eq $null) { Write-Output 'NOT_FOUND' } else { Write-Output $result }\nAt line:1 char:61\r\n+ $ErrorActionPreference = 'Stop'; Add-Type -TypeDefinition @\"; using S ...\r\n+                                                             ~\r\nNo characters are allowed after a here-string header but before the end of the line.\r\n    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException\r\n    + FullyQualifiedErrorId : UnexpectedCharactersAfterHereStringHeader\r\n \r\n"
+    },
+    {
+      "id": "uid_pin_match",
+      "status": "WARN",
+      "detail": "progress/uid_pin.json not found — API server has not been started via start() yet"
+    }
+  ],
+  "links": {
+    "ui": "http://localhost:4505/",
+    "api": "http://localhost:4505/api/system/doctor",
+    "logs": "logs/forge.log",
+    "decisions": "artifacts/decisions/"
+  }
+}

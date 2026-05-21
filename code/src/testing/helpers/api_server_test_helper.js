@@ -19,7 +19,8 @@ function _httpGet(baseUrl, reqPath, token) {
       port:     Number(parsed.port),
       path:     reqPath,
       method:   "GET",
-      headers:  token ? { Authorization: "Bearer " + token } : {}
+      headers:  token ? { Authorization: "Bearer " + token } : {},
+      agent:    false  // no keep-alive pool — prevents stale-socket interference between tests
     };
     const req = http.request(options, (res) => {
       let body = "";
@@ -73,6 +74,9 @@ async function _teardown(instance, savedEnv) {
   secretProvider._resetForTest();
   _restoreEnv(savedEnv);
   if (instance && instance.server) {
+    if (typeof instance.server.closeAllConnections === "function") {
+      instance.server.closeAllConnections();
+    }
     await new Promise((resolve) => instance.server.close(resolve));
   }
 }
