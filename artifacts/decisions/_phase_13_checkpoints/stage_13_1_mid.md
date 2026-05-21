@@ -15,6 +15,11 @@ Path: `artifacts/decisions/DECISION-2026-05-21T16-30-phase-13-conversational-ux-
 Content: exact approved text, verbatim — not re-authored.
 Verified: file exists on disk, written before any scaffold code.
 
+**Amendment (per CTO mid-checkpoint review):** Decision artifact replaced with
+approved text on 2026-05-21. Two defects corrected: (1) Status changed from
+DRAFT to APPROVED, (2) line-count figure removed from §1 Purpose. Greps
+`DRAFT` and `2256|2662` both return 0 matches after correction.
+
 ---
 
 ## §2 — status.json updated

@@ -1,7 +1,7 @@
 # DECISION-2026-05-21T16-30-phase-13-conversational-ux-polish
 
 > **Type:** Track B Phase Activation Decision
-> **Status:** DRAFT — pending owner approval in chat
+> **Status:** APPROVED — owner approved in chat 2026-05-21
 > **Authored:** 2026-05-21
 > **Authority chain:** DECISION-20260508-phase-0-closure-and-blueprint-prep.md
 >   → DECISION-20260509-vision-shift-track-b.md
@@ -20,8 +20,8 @@ governance rule 3, every Track B phase requires a fresh decision artifact and
 explicit owner approval before any code is written. This decision artifact
 satisfies that requirement.
 
-PHASE-13 replaces the legacy single-file `web/index.html` (2662 lines of
-vanilla HTML/CSS/JS) with a modern React application, adds voice input and
+PHASE-13 replaces the legacy single-file `web/index.html` with a modern
+React application, adds voice input and
 visual feedback, and brings the Forge workspace UI to a production-quality
 standard now that the orchestration layer beneath it (L1–L5, Track A + the
 Track B capability phases 7-A through 12) is complete.
@@ -211,14 +211,17 @@ cost actual: $0.00.
 
 ## 9. Approval
 
-This decision is binding only after the owner replies "approved" or equivalent
-in chat. Until then it is DRAFT and PHASE-13 may not begin.
+**APPROVED — 2026-05-21.**
 
-Upon approval:
-- `progress/status.json.next_step` is set to point at PHASE-13 Stage 13.1.
-- PROMPT-STAGE-13.1.md is authored (against a verified post-PHASE-12-closure
-  repository snapshot).
+Owner approved in chat on 2026-05-21 by sending PROMPT-STAGE-13.1 immediately
+after this decision artifact was shared for review. Stage 13.1 is IN_PROGRESS
+as of approval.
+
+Actions taken upon approval:
+- `progress/status.json.next_step` updated to point at PHASE-13 Stage 13.1.
+- `progress/status.json.phase_13` block added (`status: "IN_PROGRESS"`, `current_stage: "13.1"`).
+- `progress/status.json.current_task` set to `PHASE-13-STAGE-13.1-IN-PROGRESS`.
 
 ---
 
-**END OF DECISION DRAFT**
+**END OF DECISION**
