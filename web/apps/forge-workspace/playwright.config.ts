@@ -3,9 +3,11 @@ import { defineConfig, devices } from '@playwright/test'
 export default defineConfig({
   testDir: './e2e',
   timeout: 30_000,
+  reporter: [['list'], ['html', { outputFolder: 'playwright-report', open: 'never' }]],
   use: {
     baseURL: 'http://localhost:5173',
-    trace: 'retain-on-failure',
+    trace: 'on',
+    screenshot: 'on',
   },
   webServer: {
     command: 'npm run dev',
