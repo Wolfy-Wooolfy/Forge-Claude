@@ -32,7 +32,7 @@ export default function App() {
   return (
     <div className="flex h-screen bg-gray-950 text-gray-100">
       <nav className="w-48 flex-shrink-0 border-r border-gray-800 flex flex-col gap-1 p-3">
-        <div className="mb-4 px-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <div className="mb-4 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
           Forge
         </div>
         <NavItem to="/chat">Chat</NavItem>

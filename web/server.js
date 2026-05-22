@@ -832,6 +832,37 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    if (req.method === "GET" && req.url.startsWith("/assets/")) {
+      const assetsRoot = path.resolve(webRoot, "assets");
+      const relativePath = decodeURIComponent(req.url.slice(1));
+      const targetPath = path.resolve(webRoot, relativePath);
+      if (!isWithin(assetsRoot, targetPath) || !fs.existsSync(targetPath)) {
+        sendJson(res, 404, { error: "Asset not found" });
+        return;
+      }
+      const mimeMap = {
+        ".js": "application/javascript; charset=utf-8",
+        ".css": "text/css; charset=utf-8",
+        ".html": "text/html; charset=utf-8",
+        ".svg": "image/svg+xml",
+        ".png": "image/png",
+        ".ico": "image/x-icon",
+        ".woff2": "font/woff2",
+        ".woff": "font/woff",
+      };
+      const ext = path.extname(targetPath).toLowerCase();
+      const contentType = mimeMap[ext] || "application/octet-stream";
+      const content = fs.readFileSync(targetPath);
+      res.writeHead(200, { "Content-Type": contentType });
+      res.end(content);
+      return;
+    }
+
+    if (req.method === "GET" && !req.url.startsWith("/api/")) {
+      sendText(res, 200, fs.readFileSync(indexPath, "utf-8"), "text/html; charset=utf-8");
+      return;
+    }
+
     sendJson(res, 404, { error: "Not found" });
   } catch (err) {
     sendJson(res, 500, { error: err.message || "Server error" });

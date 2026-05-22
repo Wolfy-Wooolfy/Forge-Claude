@@ -99,8 +99,8 @@ export function ChatInput({ disabled, onSend }: ChatInputProps) {
         disabled={disabled}
         placeholder="اكتب رسالتك..."
         className={cn(
-          'flex-1 resize-none rounded-md border border-input bg-background px-3 py-2 text-sm',
-          'placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring',
+          'flex-1 resize-none rounded-md border border-input bg-gray-800 px-3 py-2 text-sm',
+          'placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-ring',
           'min-h-[40px] max-h-[160px] overflow-y-auto',
           disabled && 'opacity-50 cursor-not-allowed'
         )}

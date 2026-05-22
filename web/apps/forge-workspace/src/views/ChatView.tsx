@@ -254,10 +254,11 @@ export default function ChatView() {
     <div className="flex flex-col h-full gap-4 p-4" data-testid="chat-view">
 
       {/* Project ID selector — replaced by project picker in Stage 13.3 */}
-      <div className="flex items-center gap-2 text-xs text-muted-foreground flex-shrink-0">
+      <div className="flex items-center gap-2 text-xs text-gray-400 flex-shrink-0">
         <span>Project:</span>
         <input
           data-testid="project-id-input"
+          aria-label="Project ID"
           value={projectId}
           onChange={(e) => setProjectId(e.target.value)}
           className="border border-input rounded px-2 py-0.5 text-xs bg-background text-foreground w-48"
@@ -273,7 +274,7 @@ export default function ChatView() {
         className="flex-1 overflow-y-auto flex flex-col pr-1 min-h-0"
       >
         {state.messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-muted-foreground text-sm gap-2">
+          <div className="flex flex-col items-center justify-center h-full text-gray-400 text-sm gap-2">
             <span className="text-2xl">⚡</span>
             <span>Send a message to start</span>
           </div>
