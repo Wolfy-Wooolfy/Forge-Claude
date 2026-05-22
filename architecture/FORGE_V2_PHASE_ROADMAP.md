@@ -742,6 +742,12 @@ code/src/runtime/tools/orchestration_tools.js           — L2 tools
 
 ---
 
+### **[Track B]** PHASE-15 — Vision + KB Frontend Views *(deferred)*
+
+**Status.** **DEFERRED** — added 2026-05-22 per `DECISION-2026-05-22T10-00-phase-13-scope-amendment-kb-vision-stubs.md`. Vision and KB HTTP read endpoints + full frontend views. Opens after PHASE-13, requires own decision artifact + owner approval. Depends on PHASE-13.
+
+---
+
 ### **[Track B]** PHASE-11 — Existing Project Intake + Reverse Architect Agent
 
 **Goal.** Same as original (user uploads existing project → Forge analyzes → enters the same orchestration loop) **plus** the 4 specific flows defined in `DECISION-20260510-vision-shift-multi-agent-conductor.md` Section 7.
@@ -847,6 +853,7 @@ PHASE-13 (Frontend Refactor)
   |
   v (deferred)
 PHASE-14 (Legacy Support)
+PHASE-15 (Vision + KB Frontend Views) — deferred, PHASE-13 complete
 
 PHASE-7-D (Browser Automation) — independent placeholder, sequenced as needed
 ```

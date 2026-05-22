@@ -5,8 +5,8 @@
   "overall_progress_percent": 99,
   "stage_progress_percent": 100,
   "next_phase": "PHASE-13",
-  "next_step": "PHASE-13 Stage 13.3 PENDING — Project Management View (project list / create / activate / delete; active-project context panel). Owner CTO verification of Stage 13.2 required first.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-21T22-00-phase-13-stage-13-2-closure.md",
+  "next_step": "PHASE-13 Stage 13.5 PENDING — Cutover + Performance + Closure (legacy web/index.html retired; bundle < 500 KB gzip; Lighthouse > 90; 4 Playwright scenarios; phase closure). Owner CTO verification of Stage 13.4 required first.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-22T12-00-phase-13-stage-13-4-closure.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -1079,11 +1079,11 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-13-STAGE-13.4-PENDING",
-  "last_updated": "2026-05-22T00:00:00.000Z",
+  "current_task": "PHASE-13-STAGE-13.5-PENDING",
+  "last_updated": "2026-05-22T12:00:00.000Z",
   "phase_13": {
     "status": "IN_PROGRESS",
-    "current_stage": "13.4",
+    "current_stage": "13.5",
     "decision_artifact": "artifacts/decisions/DECISION-2026-05-21T16-30-phase-13-conversational-ux-polish.md",
     "started_at": "2026-05-21T16:30:00.000Z",
     "cost_actual_usd": 0,
@@ -1204,6 +1204,41 @@
         "files_modified": [
           "web/apps/forge-workspace/src/views/ProjectsView.tsx",
           "web/apps/forge-workspace/playwright.config.ts"
+        ]
+      },
+      "13_4": {
+        "status": "CLOSED",
+        "started_at": "2026-05-22T10:00:00.000Z",
+        "closed_at": "2026-05-22T12:00:00.000Z",
+        "decision_artifact": "artifacts/decisions/DECISION-2026-05-22T12-00-phase-13-stage-13-4-closure.md",
+        "scope_amendment_artifact": "artifacts/decisions/DECISION-2026-05-22T10-00-phase-13-scope-amendment-kb-vision-stubs.md",
+        "checkpoint_mid": "artifacts/decisions/_phase_13_checkpoints/stage_13_4_mid.md",
+        "checkpoint_final": "artifacts/decisions/_phase_13_checkpoints/stage_13_4.md",
+        "bundle_gzip_kb": 74.57,
+        "bundle_budget_kb": 500,
+        "playwright_tests_pass": 10,
+        "playwright_report_committed": true,
+        "su_baseline": {
+          "pass": 207,
+          "fail": 0,
+          "skip": 5,
+          "total": 212
+        },
+        "arc_count_unchanged": 6,
+        "backend_untouched": true,
+        "phase_15_added_to_roadmap": true,
+        "files_created": [
+          "web/apps/forge-workspace/src/api/system.ts",
+          "web/apps/forge-workspace/e2e/doctor_indicator.spec.ts",
+          "web/apps/forge-workspace/e2e/route_stubs_present.spec.ts",
+          "artifacts/decisions/DECISION-2026-05-22T10-00-phase-13-scope-amendment-kb-vision-stubs.md"
+        ],
+        "files_modified": [
+          "web/apps/forge-workspace/src/api/index.ts",
+          "web/apps/forge-workspace/src/views/DoctorView.tsx",
+          "web/apps/forge-workspace/src/views/VisionView.tsx",
+          "web/apps/forge-workspace/src/views/KBView.tsx",
+          "architecture/FORGE_V2_PHASE_ROADMAP.md"
         ]
       }
     }
