@@ -742,9 +742,7 @@ code/src/runtime/tools/orchestration_tools.js           — L2 tools
 
 ---
 
-### **[Track B]** PHASE-15 — Vision + KB Frontend Views *(deferred)*
-
-**Status.** **DEFERRED** — added 2026-05-22 per `DECISION-2026-05-22T10-00-phase-13-scope-amendment-kb-vision-stubs.md`. Vision and KB HTTP read endpoints + full frontend views. Opens after PHASE-13, requires own decision artifact + owner approval. Depends on PHASE-13.
+**PHASE-15 (deferred)** — Vision + KB Frontend Views; added 2026-05-22 per `DECISION-2026-05-22T10-00-phase-13-scope-amendment-kb-vision-stubs.md`; requires own decision artifact + owner approval; depends on PHASE-13.
 
 ---
 

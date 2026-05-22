@@ -1,0 +1,601 @@
+{
+  "config": {
+    "configFile": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\playwright.config.ts",
+    "rootDir": "D:/S/Halo/Tech/Forge-Claude/web/apps/forge-workspace/e2e",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 4
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "D:/S/Halo/Tech/Forge-Claude/web/apps/forge-workspace/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "D:/S/Halo/Tech/Forge-Claude/web/apps/forge-workspace/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "html",
+        {
+          "outputFolder": "playwright-report",
+          "open": "never"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "playwright-report/report.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.60.0",
+    "workers": 6,
+    "webServer": {
+      "command": "npm run dev",
+      "url": "http://localhost:5173",
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [
+    {
+      "title": "chat_send_receive.spec.ts",
+      "file": "chat_send_receive.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "chat_send_receive",
+          "file": "chat_send_receive.spec.ts",
+          "line": 15,
+          "column": 6,
+          "specs": [
+            {
+              "title": "sends a message and receives a streamed response (incremental render)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1559,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T14:59:18.962Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\chat_send_receive-chat-sen-f737c-esponse-incremental-render--chromium\\test-finished-1.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\chat_send_receive-chat-sen-f737c-esponse-incremental-render--chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "f5e257c22cd572c0a7b9-1858de513a35f7c13cc9",
+              "file": "chat_send_receive.spec.ts",
+              "line": 25,
+              "column": 3
+            },
+            {
+              "title": "clarification answer round-trip — CLARIFICATION_REQUIRED → answer → IDEATION_READY",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 862,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T14:59:20.831Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\chat_send_receive-chat-sen-c923f-D-→-answer-→-IDEATION-READY-chromium\\test-finished-1.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\chat_send_receive-chat-sen-c923f-D-→-answer-→-IDEATION-READY-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "f5e257c22cd572c0a7b9-9a9cb57f287171744c9c",
+              "file": "chat_send_receive.spec.ts",
+              "line": 71,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "doctor_indicator.spec.ts",
+      "file": "doctor_indicator.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "doctor_indicator",
+          "file": "doctor_indicator.spec.ts",
+          "line": 49,
+          "column": 6,
+          "specs": [
+            {
+              "title": "all checks pass → green indicator",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1048,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T14:59:19.004Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\doctor_indicator-doctor-in-70b16-ecks-pass-→-green-indicator-chromium\\test-finished-1.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\doctor_indicator-doctor-in-70b16-ecks-pass-→-green-indicator-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5cf495a6ff26ca076ff9-243bfb6d6a026057b952",
+              "file": "doctor_indicator.spec.ts",
+              "line": 50,
+              "column": 3
+            },
+            {
+              "title": "checks with warnings → yellow indicator",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 733,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T14:59:20.398Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\doctor_indicator-doctor-in-10e30-warnings-→-yellow-indicator-chromium\\test-finished-1.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\doctor_indicator-doctor-in-10e30-warnings-→-yellow-indicator-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5cf495a6ff26ca076ff9-2110a53f74d02b976374",
+              "file": "doctor_indicator.spec.ts",
+              "line": 67,
+              "column": 3
+            },
+            {
+              "title": "checks with failures → red indicator",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 563,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T14:59:21.181Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\doctor_indicator-doctor-in-c9707-th-failures-→-red-indicator-chromium\\test-finished-1.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\doctor_indicator-doctor-in-c9707-th-failures-→-red-indicator-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5cf495a6ff26ca076ff9-7e29534de659c9874ea9",
+              "file": "doctor_indicator.spec.ts",
+              "line": 84,
+              "column": 3
+            },
+            {
+              "title": "check list renders all items with correct status",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 489,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T14:59:21.791Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\doctor_indicator-doctor-in-4f6e1-l-items-with-correct-status-chromium\\test-finished-1.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\doctor_indicator-doctor-in-4f6e1-l-items-with-correct-status-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5cf495a6ff26ca076ff9-1454807842f366ec0b4d",
+              "file": "doctor_indicator.spec.ts",
+              "line": 101,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "project_lifecycle.spec.ts",
+      "file": "project_lifecycle.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "project_lifecycle",
+          "file": "project_lifecycle.spec.ts",
+          "line": 30,
+          "column": 6,
+          "specs": [
+            {
+              "title": "default_project has no delete button (delete protection)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 1141,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T14:59:18.989Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\project_lifecycle-project--3a34b-e-button-delete-protection--chromium\\test-finished-1.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\project_lifecycle-project--3a34b-e-button-delete-protection--chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2c3aa6f406079f2721a9-85a8d71514a393dd9135",
+              "file": "project_lifecycle.spec.ts",
+              "line": 33,
+              "column": 3
+            },
+            {
+              "title": "project lifecycle: create → activate → delete",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 1388,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T14:59:20.417Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\project_lifecycle-project--89670--create-→-activate-→-delete-chromium\\test-finished-1.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\project_lifecycle-project--89670--create-→-activate-→-delete-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2c3aa6f406079f2721a9-717e78a477ef6b8ee570",
+              "file": "project_lifecycle.spec.ts",
+              "line": 62,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "route_stubs_present.spec.ts",
+      "file": "route_stubs_present.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "route_stubs_present",
+          "file": "route_stubs_present.spec.ts",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "/vision route renders vision stub",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 1193,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T14:59:18.963Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\route_stubs_present-route--6b447-n-route-renders-vision-stub-chromium\\test-finished-1.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\route_stubs_present-route--6b447-n-route-renders-vision-stub-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a0e13dd39967129529a4-a7e4e52588ce0632ebd4",
+              "file": "route_stubs_present.spec.ts",
+              "line": 4,
+              "column": 3
+            },
+            {
+              "title": "/kb route renders kb stub",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 583,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T14:59:20.395Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\route_stubs_present-route--0cf2c-nt-kb-route-renders-kb-stub-chromium\\test-finished-1.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\route_stubs_present-route--0cf2c-nt-kb-route-renders-kb-stub-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a0e13dd39967129529a4-e5e08538d4ed48794cea",
+              "file": "route_stubs_present.spec.ts",
+              "line": 11,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-05-22T14:59:16.475Z",
+    "duration": 6083.796,
+    "expected": 10,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

@@ -223,6 +223,8 @@ yarn-error.log*
 *.tgz
 *.rar
 *.7z
+# Playwright HTML report data — narrow exception so CTO can inspect test results
+!web/apps/forge-workspace/playwright-report/data/*.zip
 
 
 # -- 15. ROOT-LEVEL SCRATCH TEST INPUTS (cleanup candidates) -----------------
