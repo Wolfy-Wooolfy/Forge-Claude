@@ -744,6 +744,8 @@ code/src/runtime/tools/orchestration_tools.js           — L2 tools
 
 **PHASE-15 (deferred)** — Vision + KB Frontend Views; added 2026-05-22 per `DECISION-2026-05-22T10-00-phase-13-scope-amendment-kb-vision-stubs.md`; requires own decision artifact + owner approval; depends on PHASE-13.
 
+**PHASE-13.6** — Backend Health Fixes — fix forge-test.js exit code + S184–S189 undefined titles; opens immediately after PHASE-13; requires its own decision artifact + owner approval.
+
 ---
 
 ### **[Track B]** PHASE-11 — Existing Project Intake + Reverse Architect Agent
