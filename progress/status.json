@@ -4,8 +4,8 @@
   "current_stage": "A",
   "overall_progress_percent": 99,
   "stage_progress_percent": 100,
-  "next_phase": null,
-  "next_step": "PHASE-13 and PHASE-13.6 complete. PHASE-14 (Legacy Support) and PHASE-15 (Vision/KB views) remain on the roadmap as DEFERRED — each requires its own decision artifact and owner approval before starting. No phase is active.",
+  "next_phase": "PHASE-15",
+  "next_step": "PHASE-15 Stage 15.1 in progress — backend Vision + KB sources read endpoints (GET /api/vision, GET /api/kb/sources). Mid-checkpoint pending.",
   "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-23T00-00-phase-13-6-closure.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
@@ -73,7 +73,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-05-23T08:57:08.922Z",
+    "last_doctor_run": "2026-05-23T09:49:43.799Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
@@ -110,8 +110,8 @@
     "adapter_json_extraction": "ENABLED — extractJsonFromResponse in _adapter_contract.js, applied in anthropic/openai/claude_code/aider adapters (DECISION-20260512-0900 addendum)",
     "note": "PHASE-9 CLOSED. KB Runtime (L-KB-1→L-KB-5): source_acquisition, chunking_engine, embedding_engine, storage_lance (LanceDB), cost_ledger, budget_guard, retrieval, manifests, citation_engine, citation_validator, budget_guard vision-override, research_role (12th role, KNOWN-gate, deterministic findings, confidence recompute). 6 KB tools (ingest_url, retrieve, cite, list_sources, delete_source, validate_citations). 3 new doctor checks (kb_budget_status, kb_indexed_sources_count, research_role_registered). Stage 9.7 cleanup: 6 FIX items (retrieval cost ledger, rejected_low_credibility, citation_validator Pattern 4, S137, evidence cap, confidence recompute). scenarios: 128→137 (S129–S137). doctor checks: 21→24. SU assertions: ~276→314. API cost: $0.00.",
     "last_doctor_counts": {
-      "pass": 28,
-      "warn": 6,
+      "pass": 27,
+      "warn": 7,
       "fail": 0
     },
     "metrics_window_24h": {
@@ -151,8 +151,10 @@
       "PHASE-13",
       "PHASE-13.6"
     ],
-    "next": null,
-    "remaining": [],
+    "next": "PHASE-15",
+    "remaining": [
+      "PHASE-15"
+    ],
     "deferred": [
       "PHASE-7-D",
       "PHASE-14"
@@ -1079,8 +1081,8 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "NONE-ACTIVE",
-  "last_updated": "2026-05-23T00:00:00.000Z",
+  "current_task": "PHASE-15-STAGE-15.1",
+  "last_updated": "2026-05-23T10:00:00.000Z",
   "phase_13_6": {
     "status": "CLOSED",
     "closed_at": "2026-05-23T00:00:00.000Z",
@@ -1089,7 +1091,14 @@
     "checkpoint": "artifacts/decisions/_phase_13_6_checkpoints/stage_13_6_1.md",
     "defect_1": "WITHDRAWN — CTO mis-diagnosis. forge-test.js exit code was correct throughout. $? = 0 was observed from a piped command (tail), not from the node process. No code changed.",
     "defect_2": "FIXED — Added name field to S184-S189 scenario JSON files. No logic changed.",
-    "scenarios_fixed": ["S184", "S185", "S186", "S187", "S188", "S189"],
+    "scenarios_fixed": [
+      "S184",
+      "S185",
+      "S186",
+      "S187",
+      "S188",
+      "S189"
+    ],
     "su_baseline": {
       "pass": 207,
       "fail": 0,

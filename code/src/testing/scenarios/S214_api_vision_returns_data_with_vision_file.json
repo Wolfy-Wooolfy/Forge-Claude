@@ -1,0 +1,18 @@
+{
+  "id": "S214",
+  "name": "api vision — GET /api/vision with valid vision.md returns frontmatter + body",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/vision_kb_test_helper",
+  "method": "runS214VisionData",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "http_status",        "expected": 200 },
+    { "type": "state_field_equals", "field": "ok",                 "expected": true },
+    { "type": "state_field_equals", "field": "vision_is_null",     "expected": false },
+    { "type": "state_field_equals", "field": "has_frontmatter",    "expected": true },
+    { "type": "state_field_equals", "field": "project_name_match", "expected": true },
+    { "type": "state_field_equals", "field": "vision_version",     "expected": 1 }
+  ]
+}

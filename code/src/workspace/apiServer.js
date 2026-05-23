@@ -1981,6 +1981,20 @@ function createWorkspaceApiServer(options = {}) {
         return;
       }
 
+      // ── PHASE-15: Vision + KB read endpoints ────────────────────────────────
+      // GET /api/vision — read current project vision (wraps visionEngine.getCurrentVision)
+      if (req.method === "GET" && pathname === "/api/vision") {
+        const projectId = requestUrl.searchParams.get("project_id") || readActiveProjectId();
+        try {
+          const { createVisionEngine } = require("../ai_os/visionEngine");
+          const vision = await createVisionEngine({ root }).getCurrentVision(projectId);
+          sendJson(res, 200, { ok: true, project_id: projectId, vision });
+        } catch (err) {
+          sendJson(res, 500, { ok: false, error: err && err.message ? err.message : "VISION_READ_FAILED" });
+        }
+        return;
+      }
+
       sendJson(res, 404, { error: "Not found" });
     } catch (err) {
       sendJson(res, 500, { error: err && err.message ? err.message : "Internal server error" });
