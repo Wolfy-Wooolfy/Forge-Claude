@@ -31,6 +31,11 @@ const {
 } = require("./workspaceHelpers");
 const ProviderRouter = require("../providers/providerRouter");
 
+function isWithin(parentPath, childPath) {
+  const relative = path.relative(parentPath, childPath);
+  return relative && !relative.startsWith("..") && !path.isAbsolute(relative) || relative === "";
+}
+
 function createWorkspaceApiServer(options = {}) {
   const root = path.resolve(options.root || process.cwd());
   const port = Number(options.port || process.env.FORGE_WORKSPACE_API_PORT || 3100);
@@ -1574,7 +1579,10 @@ function createWorkspaceApiServer(options = {}) {
       // If _activeToken is null the server was not initialised via start() (test
       // scenario runner starts server directly via server.listen()) — skip auth.
       if (_activeToken !== null) {
+        // Security boundary is /api/* — the HTML shell and its assets are public by design.
+        const _isApiRoute = pathname.startsWith("/api/");
         const _authExempt =
+          !_isApiRoute ||
           (req.method === "GET" && pathname === "/api/system/health") ||
           (req.method === "GET" && pathname === "/api/system/doctor");
         if (!_authExempt) {
@@ -1585,6 +1593,52 @@ function createWorkspaceApiServer(options = {}) {
             return;
           }
         }
+      }
+
+      // ── Static file handlers (Handler A + B) ─────────────────────────────────
+      // Handler A — GET / and GET /index.html
+      if (req.method === "GET" && (pathname === "/" || pathname === "/index.html")) {
+        const reg = getDefaultRegistry();
+        const r   = await reg.invoke("fs.read_file", { path: "web/index.html" }, { root });
+        if (r.status === "SUCCESS") {
+          res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+          res.end(r.output.content);
+        } else {
+          sendJson(res, 404, { error: "Not found" });
+        }
+        return;
+      }
+
+      // Handler B — GET /assets/* (path-traversal guarded by isWithin)
+      if (req.method === "GET" && pathname.startsWith("/assets/")) {
+        const assetsRoot = path.resolve(root, "web", "assets");
+        const filePath   = path.resolve(root, "web" + pathname);
+        if (!isWithin(assetsRoot, filePath)) {
+          sendJson(res, 404, { error: "Not found" });
+          return;
+        }
+        const ext      = path.extname(pathname).toLowerCase();
+        const mimeTypes = {
+          ".js":    "application/javascript; charset=utf-8",
+          ".css":   "text/css; charset=utf-8",
+          ".html":  "text/html; charset=utf-8",
+          ".svg":   "image/svg+xml",
+          ".png":   "image/png",
+          ".ico":   "image/x-icon",
+          ".woff2": "font/woff2",
+          ".woff":  "font/woff"
+        };
+        const contentType = mimeTypes[ext] || "application/octet-stream";
+        const relPath = path.relative(root, filePath).replace(/\\/g, "/");
+        const reg = getDefaultRegistry();
+        const r   = await reg.invoke("fs.read_file", { path: relPath }, { root });
+        if (r.status === "SUCCESS") {
+          res.writeHead(200, { "Content-Type": contentType });
+          res.end(r.output.content);
+        } else {
+          sendJson(res, 404, { error: "Not found" });
+        }
+        return;
       }
 
       if (req.method === "GET" && pathname === "/health") {
@@ -2009,6 +2063,20 @@ function createWorkspaceApiServer(options = {}) {
           sendJson(res, 200, { ok: true, project_id: projectId, scope, sources: result.output.sources, count: result.output.count });
         } catch (err) {
           sendJson(res, 500, { ok: false, error: err && err.message ? err.message : "KB_LIST_SOURCES_FAILED" });
+        }
+        return;
+      }
+
+      // Handler C — SPA fallback: GET non-/api/* routes → serve index.html
+      // Catches /chat, /projects, /vision, /kb, /doctor (React Router client-side routes).
+      if (req.method === "GET" && !pathname.startsWith("/api/")) {
+        const reg = getDefaultRegistry();
+        const r   = await reg.invoke("fs.read_file", { path: "web/index.html" }, { root });
+        if (r.status === "SUCCESS") {
+          res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+          res.end(r.output.content);
+        } else {
+          sendJson(res, 404, { error: "Not found" });
         }
         return;
       }

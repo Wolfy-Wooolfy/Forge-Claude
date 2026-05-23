@@ -6,7 +6,7 @@
   "stage_progress_percent": 100,
   "next_phase": "NONE-ALL-ROADMAP-PHASES-COMPLETE",
   "next_step": "NONE-ACTIVE. PHASE-14 (Legacy Support) remains deferred; CTO and owner will decide separately.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-23T14-00-phase-15-closure.md",
+  "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-23T18-30-phase-13-7-closure.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -73,13 +73,13 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-05-23T17:45:33.840Z",
+    "last_doctor_run": "2026-05-23T18:18:59.846Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
     "self_test_last_run": "2026-05-23",
-    "self_test_last_result": "210 passed, 0 failed, 5 skipped (215 total) — PHASE-15 CLOSED. Stage 15.2 is frontend-only (no SU scenarios added). Backend unchanged from Stage 15.1 baseline.",
-    "self_test_scenarios_pass": 210,
+    "self_test_last_result": "211 passed, 0 failed, 5 skipped (216 total) — PHASE-13.7 CLOSED. S216 GREEN. Auth gate fix + static handlers + relative API base + frontend rebuild.",
+    "self_test_scenarios_pass": 211,
     "self_test_scenarios_skip": 5,
     "self_test_scenarios_fail": 0,
     "providers_registered_count": 13,
@@ -150,6 +150,7 @@
       "PHASE-12",
       "PHASE-13",
       "PHASE-13.6",
+      "PHASE-13.7",
       "PHASE-15"
     ],
     "next": null,
@@ -1082,7 +1083,36 @@
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
   "current_task": "NONE-ACTIVE",
-  "last_updated": "2026-05-23T15:00:00.000Z",
+  "last_updated": "2026-05-23T18:30:00.000Z",
+  "phase_13_7": {
+    "status": "CLOSED",
+    "closed_at": "2026-05-23T18:30:00.000Z",
+    "decision_artifact": "artifacts/decisions/DECISION-2026-05-23T16-30-phase-13-7-auth-gate-fix.md",
+    "closure_artifact": "artifacts/decisions/DECISION-2026-05-23T18-30-phase-13-7-closure.md",
+    "type": "corrective — production defect (auth gate blocked React SPA shell)",
+    "root_cause": "pm2 starts apiServer.js only; web/server.js (port 3000) never started; auth gate blocked GET / with 401",
+    "fix_summary": "Single-server consolidation: apiServer.js (port 3100) now serves SPA + API. Auth gate boundary moved to /api/* only. Frontend rebuilt with relative API base (no hardcoded localhost:3100).",
+    "arc_ledger_count": 6,
+    "arc_ledger_unchanged": true,
+    "files_modified": [
+      "code/src/workspace/apiServer.js",
+      "code/src/testing/helpers/api_server_test_helper.js",
+      "web/apps/forge-workspace/src/api/base.ts",
+      "web/index.html",
+      "web/assets/index-DWIuvs7j.js",
+      "web/assets/index-C_BaNzCE.css",
+      "web/assets/vendor-D0xakLYA.js"
+    ],
+    "scenarios_added": ["S216"],
+    "scenarios_modified": ["S205 (endpoint /health → /api/ai/approval-policy)", "S206 (same endpoint change)"],
+    "su_baseline": {
+      "pass": 211,
+      "fail": 0,
+      "skip": 5,
+      "total": 216
+    },
+    "smoke_test": "PASS (in-process with active token: GET / → 200 HTML, GET /chat → 200 HTML, GET /assets/*.js → 200 JS, GET /api/projects → 401)"
+  },
   "phase_15": {
     "status": "CLOSED",
     "closed_at": "2026-05-23T14:00:00.000Z",

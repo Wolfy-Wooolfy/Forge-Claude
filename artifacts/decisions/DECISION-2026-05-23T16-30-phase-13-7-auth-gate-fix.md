@@ -1,6 +1,6 @@
 # DECISION — PHASE-13.7: Production Auth-Gate Fix
 
-> **Status:** APPROVED — owner approved in chat 2026-05-23  
+> **Status:** CLOSED — executed and verified 2026-05-23  
 > **Date:** 2026-05-23  
 > **Phase:** PHASE-13.7 (corrective — same family as PHASE-13.6)  
 > **Track:** A (backend — `code/src/workspace/apiServer.js`) + limited frontend (`base.ts` only)  

@@ -1,7 +1,7 @@
 import { ApiError } from './types'
 
 export function getApiBase(): string {
-  return import.meta.env.VITE_API_BASE ?? 'http://localhost:3100'
+  return import.meta.env.VITE_API_BASE ?? ''
 }
 
 export async function apiFetch<T>(

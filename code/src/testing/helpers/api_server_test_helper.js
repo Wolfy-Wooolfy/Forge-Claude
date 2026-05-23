@@ -143,8 +143,8 @@ async function runS205UnauthRejected() {
     const addr   = instance.server.address();
     const base   = "http://127.0.0.1:" + addr.port;
 
-    // /health requires auth (not exempt); no token → 401
-    const resp = await _httpGet(base, "/health", null);
+    // /api/ai/approval-policy is an /api/* route (not exempt); no token → 401
+    const resp = await _httpGet(base, "/api/ai/approval-policy", null);
     return { unauth_returns_401: resp.status === 401 };
   } finally {
     await _teardown(instance, savedEnv);
@@ -170,8 +170,8 @@ async function runS206AuthAccepted() {
     const sessionJson    = JSON.parse(sessionLines[1]);
     const token          = sessionJson.token;
 
-    // /health requires auth; with correct Bearer token → 200
-    const resp = await _httpGet(base, "/health", token);
+    // /api/ai/approval-policy is an /api/* route; with correct Bearer token → 200
+    const resp = await _httpGet(base, "/api/ai/approval-policy", token);
     return {
       auth_accepted:     resp.status === 200,
       token_length_64:   token.length === 64,
@@ -260,43 +260,44 @@ async function runS216AuthGateExemptsStaticRoutes() {
   let instance    = null;
 
   try {
-    // Seed tempDir/web/ with the current build artifacts.
-    const webSrc    = path.join(REAL_ROOT, "web");
+    // Seed tempDir/web/ with minimal stub files (environment-independent —
+    // does not require a real React build to be present on the test machine).
     const webDest   = path.join(tempDir, "web");
     const assetsDst = path.join(webDest, "assets");
     fs.mkdirSync(assetsDst, { recursive: true });
-    fs.copyFileSync(path.join(webSrc, "index.html"), path.join(webDest, "index.html"));
-    for (const f of fs.readdirSync(path.join(webSrc, "assets"))) {
-      fs.copyFileSync(path.join(webSrc, "assets", f), path.join(assetsDst, f));
-    }
+    fs.writeFileSync(path.join(webDest, "index.html"), "<html><body>Forge</body></html>", "utf8");
+    fs.writeFileSync(path.join(assetsDst, "stub.js"),  "// stub", "utf8");
 
     // Boot with auth active (_activeToken set via start()).
     instance = await _bootServer(tempDir, "s216-test-key");
     const { port: p } = instance.server.address();
     const base = "http://127.0.0.1:" + p;
 
-    // Pick the first JS asset for assertion 4.
-    const firstJs = fs.readdirSync(assetsDst).find(f => f.endsWith(".js"))
-                    || fs.readdirSync(assetsDst)[0];
-
     // HTTP assertions 1–5 (no Authorization header on any request).
-    const r1 = await _httpGetFull(base, "/",                    null); // GET /
-    const r2 = await _httpGetFull(base, "/index.html",          null); // GET /index.html
-    const r3 = await _httpGetFull(base, "/chat",                null); // GET /chat (SPA fallback)
-    const r4 = await _httpGetFull(base, "/assets/" + firstJs,  null); // GET /assets/<js>
-    const r5 = await _httpGetFull(base, "/api/projects",        null); // GET /api/projects
+    const r1 = await _httpGetFull(base, "/",               null); // GET /
+    const r2 = await _httpGetFull(base, "/index.html",     null); // GET /index.html
+    const r3 = await _httpGetFull(base, "/chat",           null); // GET /chat (SPA fallback)
+    const r4 = await _httpGetFull(base, "/assets/stub.js", null); // GET /assets/stub.js
+    const r5 = await _httpGetFull(base, "/api/projects",   null); // GET /api/projects
 
     // Assertion 6: no hardcoded absolute API URL in the real built JS assets.
+    // Fail-closed: if real assets dir is missing or contains no JS, treat as URL found
+    // (forces the assertion RED until the bundle is rebuilt with the relative base).
     const realAssetsDir    = path.join(REAL_ROOT, "web", "assets");
-    let   hardcodedUrlFound = false;
-    for (const f of fs.readdirSync(realAssetsDir)) {
-      if (!f.endsWith(".js")) continue;
-      const content = fs.readFileSync(path.join(realAssetsDir, f), "utf8");
-      if (content.includes("localhost:3100") || content.includes("127.0.0.1:3100")) {
-        hardcodedUrlFound = true;
-        break;
+    let   hardcodedUrlFound = true; // fail-closed default
+    try {
+      const jsFiles = fs.readdirSync(realAssetsDir).filter(f => f.endsWith(".js"));
+      if (jsFiles.length > 0) {
+        hardcodedUrlFound = false;
+        for (const f of jsFiles) {
+          const content = fs.readFileSync(path.join(realAssetsDir, f), "utf8");
+          if (content.includes("localhost:3100") || content.includes("127.0.0.1:3100")) {
+            hardcodedUrlFound = true;
+            break;
+          }
+        }
       }
-    }
+    } catch (_) { /* assets dir missing or unreadable → keep fail-closed */ }
 
     return {
       root_200:          r1.status === 200,
@@ -310,7 +311,6 @@ async function runS216AuthGateExemptsStaticRoutes() {
       // debug fields (informational, not directly asserted)
       r1_status: r1.status, r2_status: r2.status,
       r3_status: r3.status, r4_status: r4.status,
-      r4_path:   "/assets/" + firstJs,
       r5_status: r5.status, hardcoded_url_found: hardcodedUrlFound
     };
   } finally {
