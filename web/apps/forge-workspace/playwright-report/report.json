@@ -11,7 +11,7 @@
     "grepInvert": null,
     "maxFailures": 0,
     "metadata": {
-      "actualWorkers": 4
+      "actualWorkers": 5
     },
     "preserveOutput": "always",
     "projects": [
@@ -20,7 +20,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 4
+          "actualWorkers": 5
         },
         "id": "chromium",
         "name": "chromium",
@@ -99,12 +99,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1676,
+                      "duration": 2153,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-22T16:18:13.689Z",
+                      "startTime": "2026-05-23T12:52:01.854Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -144,12 +144,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 988,
+                      "duration": 1278,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-22T16:18:15.711Z",
+                      "startTime": "2026-05-23T12:52:04.347Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -206,12 +206,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 1,
                       "status": "passed",
-                      "duration": 1317,
+                      "duration": 1430,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-22T16:18:13.720Z",
+                      "startTime": "2026-05-23T12:52:01.913Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -251,12 +251,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 1,
                       "status": "passed",
-                      "duration": 726,
+                      "duration": 1047,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-22T16:18:15.447Z",
+                      "startTime": "2026-05-23T12:52:03.724Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -296,12 +296,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 1,
                       "status": "passed",
-                      "duration": 647,
+                      "duration": 1021,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-22T16:18:16.235Z",
+                      "startTime": "2026-05-23T12:52:04.859Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -341,12 +341,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 1,
                       "status": "passed",
-                      "duration": 459,
+                      "duration": 461,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-22T16:18:16.923Z",
+                      "startTime": "2026-05-23T12:52:05.931Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -368,6 +368,158 @@
               "id": "5cf495a6ff26ca076ff9-1454807842f366ec0b4d",
               "file": "doctor_indicator.spec.ts",
               "line": 101,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "kb_view.spec.ts",
+      "file": "kb_view.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "kb_view",
+          "file": "kb_view.spec.ts",
+          "line": 26,
+          "column": 6,
+          "specs": [
+            {
+              "title": "no sources → shows empty state",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 1386,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-23T12:52:01.937Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\kb_view-kb-view-no-sources-→-shows-empty-state-chromium\\test-finished-1.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\kb_view-kb-view-no-sources-→-shows-empty-state-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dd26afb89beb6e92fb15-d523a5b056435381ad05",
+              "file": "kb_view.spec.ts",
+              "line": 27,
+              "column": 3
+            },
+            {
+              "title": "one source → shows source list with title and content type",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 986,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-23T12:52:03.728Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\kb_view-kb-view-one-source-0b574-with-title-and-content-type-chromium\\test-finished-1.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\kb_view-kb-view-one-source-0b574-with-title-and-content-type-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dd26afb89beb6e92fb15-624ad8202c0f463e1c1b",
+              "file": "kb_view.spec.ts",
+              "line": 49,
+              "column": 3
+            },
+            {
+              "title": "source without title → falls back to URL",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 918,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-23T12:52:04.806Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\kb_view-kb-view-source-without-title-→-falls-back-to-URL-chromium\\test-finished-1.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\kb_view-kb-view-source-without-title-→-falls-back-to-URL-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dd26afb89beb6e92fb15-556dec43cbf19638c3a2",
+              "file": "kb_view.spec.ts",
+              "line": 77,
               "column": 3
             }
           ]
@@ -400,15 +552,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
                       "status": "passed",
-                      "duration": 1328,
+                      "duration": 1468,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-22T16:18:13.726Z",
+                      "startTime": "2026-05-23T12:52:01.939Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -445,15 +597,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
                       "status": "passed",
-                      "duration": 1509,
+                      "duration": 1993,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-22T16:18:15.470Z",
+                      "startTime": "2026-05-23T12:52:03.875Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -482,20 +634,20 @@
       ]
     },
     {
-      "title": "route_stubs_present.spec.ts",
-      "file": "route_stubs_present.spec.ts",
+      "title": "vision_view.spec.ts",
+      "file": "vision_view.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "route_stubs_present",
-          "file": "route_stubs_present.spec.ts",
-          "line": 3,
+          "title": "vision_view",
+          "file": "vision_view.spec.ts",
+          "line": 25,
           "column": 6,
           "specs": [
             {
-              "title": "/vision route renders vision stub",
+              "title": "vision: null → shows empty state",
               "ok": true,
               "tags": [],
               "tests": [
@@ -507,26 +659,26 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 3,
-                      "parallelIndex": 3,
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
                       "status": "passed",
-                      "duration": 1431,
+                      "duration": 1605,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-22T16:18:13.696Z",
+                      "startTime": "2026-05-23T12:52:01.861Z",
                       "annotations": [],
                       "attachments": [
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\route_stubs_present-route--6b447-n-route-renders-vision-stub-chromium\\test-finished-1.png"
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\vision_view-vision-view-vision-null-→-shows-empty-state-chromium\\test-finished-1.png"
                         },
                         {
                           "name": "trace",
                           "contentType": "application/zip",
-                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\route_stubs_present-route--6b447-n-route-renders-vision-stub-chromium\\trace.zip"
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\vision_view-vision-view-vision-null-→-shows-empty-state-chromium\\trace.zip"
                         }
                       ]
                     }
@@ -534,13 +686,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "a0e13dd39967129529a4-a7e4e52588ce0632ebd4",
-              "file": "route_stubs_present.spec.ts",
-              "line": 4,
+              "id": "7d5358873dd2fe3b2bcf-51adfc3bc3ca9ae3a692",
+              "file": "vision_view.spec.ts",
+              "line": 26,
               "column": 3
             },
             {
-              "title": "/kb route renders kb stub",
+              "title": "vision data → shows project name, domain, body",
               "ok": true,
               "tags": [],
               "tests": [
@@ -552,26 +704,26 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 3,
-                      "parallelIndex": 3,
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
                       "status": "passed",
-                      "duration": 628,
+                      "duration": 1046,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-22T16:18:15.447Z",
+                      "startTime": "2026-05-23T12:52:03.707Z",
                       "annotations": [],
                       "attachments": [
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\route_stubs_present-route--0cf2c-nt-kb-route-renders-kb-stub-chromium\\test-finished-1.png"
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\vision_view-vision-view-vi-b8b01-ws-project-name-domain-body-chromium\\test-finished-1.png"
                         },
                         {
                           "name": "trace",
                           "contentType": "application/zip",
-                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\route_stubs_present-route--0cf2c-nt-kb-route-renders-kb-stub-chromium\\trace.zip"
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\vision_view-vision-view-vi-b8b01-ws-project-name-domain-body-chromium\\trace.zip"
                         }
                       ]
                     }
@@ -579,9 +731,54 @@
                   "status": "expected"
                 }
               ],
-              "id": "a0e13dd39967129529a4-e5e08538d4ed48794cea",
-              "file": "route_stubs_present.spec.ts",
-              "line": 11,
+              "id": "7d5358873dd2fe3b2bcf-16a9024b4a45867c6336",
+              "file": "vision_view.spec.ts",
+              "line": 42,
+              "column": 3
+            },
+            {
+              "title": "vision locked → shows Locked badge",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 959,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-23T12:52:04.845Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\vision_view-vision-view-vision-locked-→-shows-Locked-badge-chromium\\test-finished-1.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "D:\\S\\Halo\\Tech\\Forge-Claude\\web\\apps\\forge-workspace\\test-results\\vision_view-vision-view-vision-locked-→-shows-Locked-badge-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7d5358873dd2fe3b2bcf-1b8aa8fe421a5834ff3c",
+              "file": "vision_view.spec.ts",
+              "line": 67,
               "column": 3
             }
           ]
@@ -591,9 +788,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-05-22T16:18:11.059Z",
-    "duration": 6643.302000000001,
-    "expected": 10,
+    "startTime": "2026-05-23T12:51:58.697Z",
+    "duration": 8113.52,
+    "expected": 14,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0
