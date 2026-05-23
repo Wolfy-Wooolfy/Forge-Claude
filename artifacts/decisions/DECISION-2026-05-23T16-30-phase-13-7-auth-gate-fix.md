@@ -1,6 +1,6 @@
 # DECISION — PHASE-13.7: Production Auth-Gate Fix
 
-> **Status:** OPEN — awaiting CTO review + owner approval before any code  
+> **Status:** CTO-APPROVED (2026-05-23) — awaiting owner approval before any code  
 > **Date:** 2026-05-23  
 > **Phase:** PHASE-13.7 (corrective — same family as PHASE-13.6)  
 > **Track:** A (backend — `code/src/workspace/apiServer.js`)  
@@ -184,9 +184,15 @@ session-file write (same pattern as `_resetForTest` in `secret_provider.js`).
 ## §6 Constraints
 
 - **Track A:** Only `code/src/workspace/apiServer.js` and its test helper. No frontend changes.
-- **§ARC ledger:** stays at 6. The `fs.readFileSync` calls in the new static handlers are
-  inside `apiServer.js`'s own request handler — same precedent as `metrics_initializer.js`
-  (§ARC-6: direct-fs in server-owned infrastructure, approved in Stage 12.4).
+- **§ARC ledger:** The §ARC classification of the static file-read path will be verified at
+  Step 0 against the actual ledger entries. The **preferred path is L2-tool reads**
+  (`reg.invoke("fs.read_file", ...)`) for both `web/index.html` and `web/assets/*` — this
+  eliminates the §ARC question entirely since all file I/O would pass through the registered
+  tool layer as required by L2. If a blocker is found with the L2 path (e.g. permission scope
+  incompatibility), the direct-`fs.readFileSync` path will be evaluated against the actual
+  §ARC ledger at that time; if it requires a new §ARC entry, the phase STOPS and a separate
+  decision artifact is raised before proceeding. The ledger count of 6 is not assumed to stay
+  at 6 — it is confirmed or updated at Step 0.
 - **No new npm dependencies.**
 - **No TypeScript.** Backend is Vanilla Node.js / CommonJS (`"use strict"`).
 - **Test-first (§11.5):** S216 written and confirmed RED before `apiServer.js` is changed.
@@ -195,18 +201,18 @@ session-file write (same pattern as `_resetForTest` in `secret_provider.js`).
 
 ---
 
-## §7 Open Questions for CTO Sign-Off
+## §7 Open Questions — RESOLVED by CTO (2026-05-23)
 
-**OQ-1 — `start()` isolation for tests:**
-`start()` currently calls `checkOrCreateUidPin`, `secretProvider.set`, and writes
-`web/.forge-session` via L2 registry. For test isolation, proposed: add `{ _testMode: true }`
-option to `start()` that skips pin-check and session-file write but still sets `_activeToken`.
-Alternative: `process.env.FORGE_TEST_MODE=1` flag. CTO to confirm preferred mechanism.
+**OQ-1 — `start()` isolation for tests:** RESOLVED.
+Use `{ _testMode: true }` option parameter — NOT an env var. Env var is global state that can
+leak between scenarios or persist after a test; the option is explicit, scoped, and
+self-clearing. Consistent with the existing `_resetForTest` pattern in `secret_provider.js`.
 
-**OQ-2 — `window.__FORGE_API_BASE__` injection:**
-`web/server.js` injects this on `GET /`. `apiServer.js` will NOT inject it (confirmed vestigial
-per Stage 13.5 §4). CTO to confirm no regression risk for users whose `VITE_API_BASE` differs
-from the default port 3100 setup.
+**OQ-2 — `window.__FORGE_API_BASE__` injection:** RESOLVED — no regression risk.
+The injection being vestigial was already documented in Stage 13.5 §4 and its mid-checkpoint.
+React reads `import.meta.env.VITE_API_BASE` baked at build time. `apiServer.js` correctly does
+not inject it. The custom-port limitation is a known Stage 13.5 deferred item, not a 13.7
+regression.
 
 ---
 
@@ -221,6 +227,6 @@ from the default port 3100 setup.
 
 ---
 
-**Awaiting CTO review and owner `APPROVED` signal before Stage 13.7-0 begins.**
+**CTO review complete (2026-05-23). Awaiting owner `APPROVED` signal before Stage 13.7-0 begins.**
 
 **END OF DECISION DRAFT**
