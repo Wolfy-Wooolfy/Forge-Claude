@@ -4,8 +4,8 @@
   "current_stage": "A",
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
-  "next_phase": null,
-  "next_step": "PHASE-15 CLOSED — ALL PHASES COMPLETE. No next phase.",
+  "next_phase": "NONE-ALL-ROADMAP-PHASES-COMPLETE",
+  "next_step": "NONE-ACTIVE. PHASE-14 (Legacy Support) remains deferred; CTO and owner will decide separately.",
   "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-23T14-00-phase-15-closure.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
@@ -73,7 +73,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-05-23T10:05:22.014Z",
+    "last_doctor_run": "2026-05-23T14:57:43.857Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
@@ -1081,8 +1081,8 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-15 CLOSED — ALL PHASES COMPLETE",
-  "last_updated": "2026-05-23T14:00:00.000Z",
+  "current_task": "NONE-ACTIVE",
+  "last_updated": "2026-05-23T15:00:00.000Z",
   "phase_15": {
     "status": "CLOSED",
     "closed_at": "2026-05-23T14:00:00.000Z",
@@ -1112,7 +1112,7 @@
       "playwright_tests_pass": 14,
       "playwright_tests_total": 14,
       "playwright_report_committed": true,
-      "bundle_gzip_kb": 71.90,
+      "bundle_gzip_kb": 71.9,
       "bundle_budget_kb": 500,
       "zero_any": true,
       "backend_untouched": true,
