@@ -1,0 +1,20 @@
+{
+  "id": "S216",
+  "name": "auth gate exempts static routes when _activeToken is set (PHASE-13.7 regression guard)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/api_server_test_helper",
+  "method": "runS216AuthGateExemptsStaticRoutes",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "root_200",         "expected": true },
+    { "type": "state_field_equals", "field": "root_html",        "expected": true },
+    { "type": "state_field_equals", "field": "index_html_200",   "expected": true },
+    { "type": "state_field_equals", "field": "spa_route_200",    "expected": true },
+    { "type": "state_field_equals", "field": "spa_route_html",   "expected": true },
+    { "type": "state_field_equals", "field": "asset_200",        "expected": true },
+    { "type": "state_field_equals", "field": "api_route_401",    "expected": true },
+    { "type": "state_field_equals", "field": "no_hardcoded_url", "expected": true }
+  ]
+}

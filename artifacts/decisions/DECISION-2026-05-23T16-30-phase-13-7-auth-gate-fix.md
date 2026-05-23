@@ -1,6 +1,6 @@
 # DECISION — PHASE-13.7: Production Auth-Gate Fix
 
-> **Status:** CTO-APPROVED with scope addition (2026-05-23) — awaiting owner approval before any code  
+> **Status:** APPROVED — owner approved in chat 2026-05-23  
 > **Date:** 2026-05-23  
 > **Phase:** PHASE-13.7 (corrective — same family as PHASE-13.6)  
 > **Track:** A (backend — `code/src/workspace/apiServer.js`) + limited frontend (`base.ts` only)  

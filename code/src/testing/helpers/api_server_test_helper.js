@@ -9,7 +9,7 @@ const path = require("path");
 const os   = require("os");
 const http = require("http");
 
-// ── HTTP helper ───────────────────────────────────────────────────────────────
+// ── HTTP helpers ──────────────────────────────────────────────────────────────
 
 function _httpGet(baseUrl, reqPath, token) {
   return new Promise((resolve, reject) => {
@@ -32,6 +32,32 @@ function _httpGet(baseUrl, reqPath, token) {
   });
 }
 
+// Like _httpGet but also captures the Content-Type response header.
+function _httpGetFull(baseUrl, reqPath, token) {
+  return new Promise((resolve, reject) => {
+    const parsed = new URL(baseUrl);
+    const options = {
+      hostname: parsed.hostname,
+      port:     Number(parsed.port),
+      path:     reqPath,
+      method:   "GET",
+      headers:  token ? { Authorization: "Bearer " + token } : {},
+      agent:    false
+    };
+    const req = http.request(options, (res) => {
+      let body = "";
+      res.on("data", (chunk) => { body += chunk; });
+      res.on("end",  () => resolve({
+        status:      res.statusCode,
+        body,
+        contentType: res.headers["content-type"] || ""
+      }));
+    });
+    req.on("error", reject);
+    req.end();
+  });
+}
+
 // ── Boot helper (calls start() — sets _activeToken) ──────────────────────────
 
 async function _bootServer(tempDir, secretKey) {
@@ -40,9 +66,14 @@ async function _bootServer(tempDir, secretKey) {
   const secretProvider            = require("../../runtime/secrets/secret_provider");
 
   // Force encrypted_file provider pointing at tempDir (no keychain contamination)
-  process.env.FORGE_SECRET_PROVIDER   = "encrypted_file";
-  process.env.FORGE_SECRET_STORE_PATH = tempDir;
-  process.env.FORGE_SECRET_KEY        = secretKey;
+  process.env.FORGE_SECRET_PROVIDER    = "encrypted_file";
+  process.env.FORGE_SECRET_STORE_PATH  = tempDir;
+  process.env.FORGE_SECRET_KEY         = secretKey;
+  // Force random OS-assigned port: createWorkspaceApiServer uses
+  // `options.port || process.env.FORGE_WORKSPACE_API_PORT || 3100`.
+  // Passing port:0 (number) is falsy, so the fallback fires. Setting
+  // the env var to the string "0" (truthy) routes correctly to port 0.
+  process.env.FORGE_WORKSPACE_API_PORT = "0";
 
   resetDefaultRegistry();
   resetDefaultPolicy();
@@ -56,9 +87,10 @@ async function _bootServer(tempDir, secretKey) {
 
 function _saveEnv() {
   return {
-    FORGE_SECRET_PROVIDER:   process.env.FORGE_SECRET_PROVIDER,
-    FORGE_SECRET_STORE_PATH: process.env.FORGE_SECRET_STORE_PATH,
-    FORGE_SECRET_KEY:        process.env.FORGE_SECRET_KEY
+    FORGE_SECRET_PROVIDER:    process.env.FORGE_SECRET_PROVIDER,
+    FORGE_SECRET_STORE_PATH:  process.env.FORGE_SECRET_STORE_PATH,
+    FORGE_SECRET_KEY:         process.env.FORGE_SECRET_KEY,
+    FORGE_WORKSPACE_API_PORT: process.env.FORGE_WORKSPACE_API_PORT
   };
 }
 
@@ -211,9 +243,86 @@ async function runS207UidMismatch() {
   }
 }
 
+// ── S216: auth gate exempts static routes when _activeToken is set ─────────────
+//
+// RED phase (before the fix): GET /, /index.html, /chat, /assets/* all return
+// 401 because _authExempt only covers the two health endpoints. After Stage
+// 13.7-2 applies the auth-gate fix and static handlers, all five routes return
+// 200/HTML and only /api/* routes remain 401-gated.
+//
+// tempDir is seeded with the real web/ build so the static handlers (post-fix)
+// can serve files without touching the live workspace.
+
+async function runS216AuthGateExemptsStaticRoutes() {
+  const REAL_ROOT = path.resolve(__dirname, "../../../..");
+  const tempDir   = fs.mkdtempSync(path.join(os.tmpdir(), "forge-s216-"));
+  const savedEnv  = _saveEnv();
+  let instance    = null;
+
+  try {
+    // Seed tempDir/web/ with the current build artifacts.
+    const webSrc    = path.join(REAL_ROOT, "web");
+    const webDest   = path.join(tempDir, "web");
+    const assetsDst = path.join(webDest, "assets");
+    fs.mkdirSync(assetsDst, { recursive: true });
+    fs.copyFileSync(path.join(webSrc, "index.html"), path.join(webDest, "index.html"));
+    for (const f of fs.readdirSync(path.join(webSrc, "assets"))) {
+      fs.copyFileSync(path.join(webSrc, "assets", f), path.join(assetsDst, f));
+    }
+
+    // Boot with auth active (_activeToken set via start()).
+    instance = await _bootServer(tempDir, "s216-test-key");
+    const { port: p } = instance.server.address();
+    const base = "http://127.0.0.1:" + p;
+
+    // Pick the first JS asset for assertion 4.
+    const firstJs = fs.readdirSync(assetsDst).find(f => f.endsWith(".js"))
+                    || fs.readdirSync(assetsDst)[0];
+
+    // HTTP assertions 1–5 (no Authorization header on any request).
+    const r1 = await _httpGetFull(base, "/",                    null); // GET /
+    const r2 = await _httpGetFull(base, "/index.html",          null); // GET /index.html
+    const r3 = await _httpGetFull(base, "/chat",                null); // GET /chat (SPA fallback)
+    const r4 = await _httpGetFull(base, "/assets/" + firstJs,  null); // GET /assets/<js>
+    const r5 = await _httpGetFull(base, "/api/projects",        null); // GET /api/projects
+
+    // Assertion 6: no hardcoded absolute API URL in the real built JS assets.
+    const realAssetsDir    = path.join(REAL_ROOT, "web", "assets");
+    let   hardcodedUrlFound = false;
+    for (const f of fs.readdirSync(realAssetsDir)) {
+      if (!f.endsWith(".js")) continue;
+      const content = fs.readFileSync(path.join(realAssetsDir, f), "utf8");
+      if (content.includes("localhost:3100") || content.includes("127.0.0.1:3100")) {
+        hardcodedUrlFound = true;
+        break;
+      }
+    }
+
+    return {
+      root_200:          r1.status === 200,
+      root_html:         r1.contentType.includes("text/html"),
+      index_html_200:    r2.status === 200,
+      spa_route_200:     r3.status === 200,
+      spa_route_html:    r3.contentType.includes("text/html"),
+      asset_200:         r4.status === 200,
+      api_route_401:     r5.status === 401,
+      no_hardcoded_url:  !hardcodedUrlFound,
+      // debug fields (informational, not directly asserted)
+      r1_status: r1.status, r2_status: r2.status,
+      r3_status: r3.status, r4_status: r4.status,
+      r4_path:   "/assets/" + firstJs,
+      r5_status: r5.status, hardcoded_url_found: hardcodedUrlFound
+    };
+  } finally {
+    await _teardown(instance, savedEnv);
+    try { fs.rmSync(tempDir, { recursive: true, force: true }); } catch (_) {}
+  }
+}
+
 module.exports = {
   runS204BindingCheck,
   runS205UnauthRejected,
   runS206AuthAccepted,
-  runS207UidMismatch
+  runS207UidMismatch,
+  runS216AuthGateExemptsStaticRoutes
 };
