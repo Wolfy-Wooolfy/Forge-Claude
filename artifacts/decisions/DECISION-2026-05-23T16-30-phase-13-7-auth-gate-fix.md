@@ -1,9 +1,9 @@
 # DECISION — PHASE-13.7: Production Auth-Gate Fix
 
-> **Status:** CTO-APPROVED (2026-05-23) — awaiting owner approval before any code  
+> **Status:** CTO-APPROVED with scope addition (2026-05-23) — awaiting owner approval before any code  
 > **Date:** 2026-05-23  
 > **Phase:** PHASE-13.7 (corrective — same family as PHASE-13.6)  
-> **Track:** A (backend — `code/src/workspace/apiServer.js`)  
+> **Track:** A (backend — `code/src/workspace/apiServer.js`) + limited frontend (`base.ts` only)  
 > **§ARC ledger:** stays at 6 (no new ARC exceptions)  
 > **Owner approval required:** YES — no code written until explicit approval in chat
 
@@ -120,7 +120,51 @@ Catches /chat, /projects, /vision, /kb, /doctor
 **`isWithin` helper:** `apiServer.js` currently lacks this function. Copy verbatim from
 `web/server.js` lines 29–32 as a top-scope helper in `apiServer.js`. No new dependency.
 
-### §2.4 Files NOT touched
+### §2.4 Relative API Base (base.ts + frontend rebuild)
+
+**Problem (surfaced by CTO, 2026-05-23):**
+`web/apps/forge-workspace/src/api/base.ts` line 4:
+```ts
+return import.meta.env.VITE_API_BASE ?? 'http://localhost:3100'
+```
+`localhost:3100` is baked into the built JS as an absolute URL. Two consequences:
+- Port 3100 is frozen — any future port change requires a full rebuild.
+- LAN access fails — a browser on another device calls its own `localhost`, not the server.
+
+**Why PHASE-13.7 fixes it without extra work:**
+Once the same server (port 3100) serves both the SPA and the API, the frontend does not need
+to know the origin at all. `fetch('/api/...')` resolves to whatever origin delivered the page.
+A relative base is simpler, not more complex — it removes a hardcoded assumption.
+
+**Change:**
+```ts
+// before
+export function getApiBase(): string {
+  return import.meta.env.VITE_API_BASE ?? 'http://localhost:3100'
+}
+
+// after
+export function getApiBase(): string {
+  return import.meta.env.VITE_API_BASE ?? ''
+}
+```
+
+Empty string `''` → `apiFetch('/api/projects', ...)` constructs `'' + '/api/projects'` =
+`'/api/projects'`, which the browser resolves to the same origin. Correct for same-origin serving.
+
+**Step 0 verification (before writing code):**
+Confirm that:
+1. `apiFetch` constructs URLs as `${getApiBase()}${path}` — verified: `base.ts` line 11.
+2. All `path` arguments in `chat.ts`, `projects.ts`, `ai.ts`, `governance.ts`, `system.ts`,
+   `vision.ts`, `kb.ts` start with `/` — if any path is relative itself, `'' + 'relative/path'`
+   would break. Must verify no such case exists before writing the change.
+3. SPA routing (`/chat`, `/projects`, etc.) is React Router client-side — not affected by
+   `getApiBase()`. Handler C in §2.3 ensures server-side refreshes still work.
+
+**Rebuild:** After changing `base.ts`, run `npm run build` from
+`web/apps/forge-workspace/`. The new `web/assets/*.js` must contain no `localhost:3100`.
+
+### §2.5 Files NOT touched
 
 `web/server.js` stays as-is (dev use / legacy). `ecosystem.config.js` is already correct.
 `GETTING_STARTED.md` needs no change (still points users to port 3100). All `docs/**` files
@@ -147,9 +191,11 @@ Assertions (all deterministic):
   3. GET /chat         (no Authorization header) → HTTP 200, Content-Type ∋ "text/html"
   4. GET /assets/<first file in web/assets/> (no auth) → HTTP 200
   5. GET /api/projects (no Authorization header) → HTTP 401
+  6. File check: grep web/assets/*.js for 'localhost:3100' and '127.0.0.1:3100' → 0 matches
 ```
 
 Assertion 5 proves that adding static-route exemptions did NOT widen the API auth boundary.
+Assertion 6 proves the baked-in absolute URL is absent from the rebuilt bundle.
 
 `startTestServerWithAuth()` will be added to `code/src/testing/helpers/api_server_test_helper.js`.
 Proposed isolation mechanism: pass `_testMode: true` to `start()`, which skips pin-check and
@@ -161,9 +207,9 @@ session-file write (same pattern as `_resetForTest` in `secret_provider.js`).
 
 | # | Condition |
 |---|-----------|
-| 1 | Step 0 pre-flight passes (web/index.html present, web/assets/ non-empty) |
-| 2 | S216 all 5 assertions GREEN |
-| 3 | Full SU suite: 211 passed / 0 failed / 5 skipped (215+1=216 total scenarios) |
+| 1 | Step 0 pre-flight passes (web/index.html present, web/assets/ non-empty; all API paths start with `/`; §ARC path confirmed or L2 confirmed) |
+| 2 | S216 all 6 assertions GREEN (including assertion 6: no localhost:3100 in built assets) |
+| 3 | Full SU suite: 211 passed / 0 failed / 5 skipped (216 total scenarios) |
 | 4 | `apiServer.js` auth-gate diff matches §2.2 exactly — no wider change |
 | 5 | Manual smoke: `curl http://127.0.0.1:3100/` returns HTML (200) with Forge token in env |
 | 6 | `progress/status.json` updated; this artifact's status set to CLOSED |
@@ -175,6 +221,8 @@ session-file write (same pattern as `_resetForTest` in `secret_provider.js`).
 | File | Change |
 |------|--------|
 | `code/src/workspace/apiServer.js` | Auth-gate fix (§2.2) + `isWithin` helper + three static handlers (§2.3) — ≈ 50 lines added |
+| `web/apps/forge-workspace/src/api/base.ts` | `getApiBase()` fallback: `'http://localhost:3100'` → `''` (one line) |
+| `web/index.html` + `web/assets/*.js` | Rebuilt output — baked absolute URL replaced by relative; existing hashed chunks replaced by new build |
 | `code/src/testing/helpers/api_server_test_helper.js` | Add `startTestServerWithAuth()` — ≈ 25 lines |
 | `code/src/testing/scenarios/S216_auth_gate_exempts_static_routes_when_token_active.json` | New scenario |
 | `progress/status.json` | Add `phase_13_7` block; update `last_completed_artifact`, `last_updated` |
@@ -183,7 +231,10 @@ session-file write (same pattern as `_resetForTest` in `secret_provider.js`).
 
 ## §6 Constraints
 
-- **Track A:** Only `code/src/workspace/apiServer.js` and its test helper. No frontend changes.
+- **Track A:** `code/src/workspace/apiServer.js` and its test helper. **Limited frontend change:**
+  `base.ts` only (`getApiBase()` fallback, one line) + frontend rebuild. No structural React
+  change; no new components; no routing change. The frontend remains exempt from Track A's
+  L2/permission constraints — it is pure TypeScript with no direct fs/shell access.
 - **§ARC ledger:** The §ARC classification of the static file-read path will be verified at
   Step 0 against the actual ledger entries. The **preferred path is L2-tool reads**
   (`reg.invoke("fs.read_file", ...)`) for both `web/index.html` and `web/assets/*` — this
@@ -220,9 +271,9 @@ regression.
 
 | Stage | Work |
 |-------|------|
-| 13.7-0 | Step 0 pre-flight; confirm `web/index.html` present; OQ-1 + OQ-2 resolved |
-| 13.7-1 | Write S216; confirm RED; write `startTestServerWithAuth()` in test helper |
-| 13.7-2 | Apply auth-gate fix + `isWithin` helper + static handlers to `apiServer.js`; S216 → GREEN; full suite; manual curl smoke |
+| 13.7-0 | Step 0 pre-flight: verify `web/index.html` present + `web/assets/` non-empty; verify all `apiFetch` path args start with `/`; confirm §ARC path (L2 preferred); OQs already resolved |
+| 13.7-1 | Write S216 (6 assertions); confirm RED; write `startTestServerWithAuth()` in test helper |
+| 13.7-2 | Apply auth-gate fix + `isWithin` helper + static handlers to `apiServer.js`; change `base.ts`; rebuild frontend; S216 → GREEN; full suite; manual curl smoke |
 | 13.7-3 | Closure artifact; update `progress/status.json` |
 
 ---
