@@ -1995,6 +1995,24 @@ function createWorkspaceApiServer(options = {}) {
         return;
       }
 
+      // GET /api/kb/sources — list KB source records for a project (wraps kb.list_sources)
+      if (req.method === "GET" && pathname === "/api/kb/sources") {
+        const projectId = requestUrl.searchParams.get("project_id") || readActiveProjectId();
+        const scope     = requestUrl.searchParams.get("scope") || "project";
+        try {
+          const reg    = getDefaultRegistry();
+          const result = await reg.invoke("kb.list_sources", { project_id: projectId, scope }, { root });
+          if (result.status !== "SUCCESS") {
+            sendJson(res, 500, { ok: false, error: (result.metadata && result.metadata.reason) || "KB_LIST_SOURCES_FAILED" });
+            return;
+          }
+          sendJson(res, 200, { ok: true, project_id: projectId, scope, sources: result.output.sources, count: result.output.count });
+        } catch (err) {
+          sendJson(res, 500, { ok: false, error: err && err.message ? err.message : "KB_LIST_SOURCES_FAILED" });
+        }
+        return;
+      }
+
       sendJson(res, 404, { error: "Not found" });
     } catch (err) {
       sendJson(res, 500, { error: err && err.message ? err.message : "Internal server error" });

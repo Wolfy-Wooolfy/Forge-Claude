@@ -139,4 +139,28 @@ async function runS214VisionData() {
   }
 }
 
-module.exports = { runS213VisionNull, runS214VisionData };
+// ── S215: GET /api/kb/sources — empty project → sources [], count 0 ──────────
+
+async function runS215KbSourcesEmpty() {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "forge-s215-"));
+  let instance  = null;
+  try {
+    instance = await _bootNoAuth(tempDir);
+    const addr = instance.server.address();
+    const resp = await _httpGet("127.0.0.1", addr.port,
+      "/api/kb/sources?project_id=test_proj_s215");
+    const body = resp.body;
+    return {
+      http_status:      resp.status,
+      ok:               body && body.ok === true,
+      sources_empty:    body && Array.isArray(body.sources) && body.sources.length === 0,
+      count_zero:       body && body.count === 0,
+      scope_is_project: body && body.scope === "project"
+    };
+  } finally {
+    await _teardown(instance);
+    try { fs.rmSync(tempDir, { recursive: true, force: true }); } catch (_) {}
+  }
+}
+
+module.exports = { runS213VisionNull, runS214VisionData, runS215KbSourcesEmpty };

@@ -1,0 +1,17 @@
+{
+  "id": "S215",
+  "name": "api kb/sources — GET /api/kb/sources with no sources returns empty array",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/vision_kb_test_helper",
+  "method": "runS215KbSourcesEmpty",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "http_status",       "expected": 200 },
+    { "type": "state_field_equals", "field": "ok",                "expected": true },
+    { "type": "state_field_equals", "field": "sources_empty",     "expected": true },
+    { "type": "state_field_equals", "field": "count_zero",        "expected": true },
+    { "type": "state_field_equals", "field": "scope_is_project",  "expected": true }
+  ]
+}
