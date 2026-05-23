@@ -4,8 +4,8 @@
   "current_stage": "A",
   "overall_progress_percent": 99,
   "stage_progress_percent": 100,
-  "next_phase": "PHASE-14",
-  "next_step": "PHASE-13.6 is CLOSED. PHASE-13.6 was the last item in the planned roadmap remaining list. Any subsequent work requires a new owner decision and explicit phase definition.",
+  "next_phase": null,
+  "next_step": "PHASE-13 and PHASE-13.6 complete. PHASE-14 (Legacy Support) and PHASE-15 (Vision/KB views) remain on the roadmap as DEFERRED — each requires its own decision artifact and owner approval before starting. No phase is active.",
   "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-23T00-00-phase-13-6-closure.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
@@ -151,7 +151,7 @@
       "PHASE-13",
       "PHASE-13.6"
     ],
-    "next": "PHASE-14",
+    "next": null,
     "remaining": [],
     "deferred": [
       "PHASE-7-D",
@@ -1079,7 +1079,7 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-14-PENDING",
+  "current_task": "NONE-ACTIVE",
   "last_updated": "2026-05-23T00:00:00.000Z",
   "phase_13_6": {
     "status": "CLOSED",
