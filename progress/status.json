@@ -5,8 +5,8 @@
   "overall_progress_percent": 99,
   "stage_progress_percent": 100,
   "next_phase": "PHASE-15",
-  "next_step": "PHASE-15 Stage 15.1 complete — pending CTO snapshot verification. After confirmation: Stage 15.2 (React Vision + KB views replace stubs).",
-  "last_completed_artifact": "artifacts/decisions/_phase_15_checkpoints/stage_15_1.md",
+  "next_step": "PHASE-15 Stage 15.1 CLOSED. Stage 15.2 (React VisionView + KBView replace stubs — consume GET /api/vision + GET /api/kb/sources) pending fresh PROMPT from owner.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-23T12-00-phase-15-stage-15-1-closure.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -1081,13 +1081,15 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-15-STAGE-15.1-PENDING-CLOSURE",
+  "current_task": "PHASE-15-STAGE-15.2-PENDING-PROMPT",
   "last_updated": "2026-05-23T12:00:00.000Z",
   "phase_15": {
     "status": "IN_PROGRESS",
     "decision_artifact": "artifacts/decisions/DECISION-2026-05-23T10-00-phase-15-vision-kb-frontend-views.md",
     "stage_15_1": {
-      "status": "PENDING_CLOSURE",
+      "status": "CLOSED",
+      "closed_at": "2026-05-23T12:00:00.000Z",
+      "closure_artifact": "artifacts/decisions/DECISION-2026-05-23T12-00-phase-15-stage-15-1-closure.md",
       "started_at": "2026-05-23T10:00:00.000Z",
       "checkpoint_mid": "artifacts/decisions/_phase_15_checkpoints/stage_15_1_mid.md",
       "checkpoint_final": "artifacts/decisions/_phase_15_checkpoints/stage_15_1.md",
