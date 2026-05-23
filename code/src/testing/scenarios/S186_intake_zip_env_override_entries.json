@@ -1,5 +1,6 @@
 {
   "id": "S186",
+  "name": "intake_zip env override entries — 60000 cap, 55000 entries → SUCCESS",
   "description": "project.intake_zip — FORGE_INTAKE_MAX_ENTRIES=60000 env override, 55000 entries → SUCCESS",
   "type": "module_call",
   "permission": "WORKSPACE_WRITE",

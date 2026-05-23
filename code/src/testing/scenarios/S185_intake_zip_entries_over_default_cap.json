@@ -1,5 +1,6 @@
 {
   "id": "S185",
+  "name": "intake_zip entries over cap — 50001 entries → ZIP_TOO_LARGE",
   "description": "project.intake_zip — 50001 entries, one over new default cap → ZIP_TOO_LARGE with cap: 50000",
   "type": "module_call",
   "permission": "WORKSPACE_WRITE",

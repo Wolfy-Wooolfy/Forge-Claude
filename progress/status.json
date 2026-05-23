@@ -4,9 +4,9 @@
   "current_stage": "A",
   "overall_progress_percent": 99,
   "stage_progress_percent": 100,
-  "next_phase": "PHASE-13.6",
-  "next_step": "PHASE-13.6 PENDING — Backend Health Fixes (forge-test.js exit code + S184-S189 undefined titles). Requires own decision artifact + owner approval before starting.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-22T16-30-phase-13-closure.md",
+  "next_phase": "PHASE-14",
+  "next_step": "PHASE-13.6 is CLOSED. PHASE-13.6 was the last item in the planned roadmap remaining list. Any subsequent work requires a new owner decision and explicit phase definition.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-23T00-00-phase-13-6-closure.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -73,12 +73,12 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-05-22T16:19:12.251Z",
+    "last_doctor_run": "2026-05-23T08:57:08.922Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
-    "self_test_last_run": "2026-05-21",
-    "self_test_last_result": "207 passed, 0 failed, 5 skipped (212 total) — PHASE-12 Stage 12.7 CLOSED. S208-S212 added (phase12 regression, doctor checks, uid_pin service account, nssm helper encoding, openai keychain). pm2 two-file setup field-proven on owner machine. 5 SKIPs require docker.",
+    "self_test_last_run": "2026-05-23",
+    "self_test_last_result": "207 passed, 0 failed, 5 skipped (212 total) — PHASE-13.6 CLOSED. S184-S189 name fields added; SU baseline unchanged. 5 SKIPs require docker.",
     "self_test_scenarios_pass": 207,
     "self_test_scenarios_skip": 5,
     "self_test_scenarios_fail": 0,
@@ -148,12 +148,11 @@
       "PHASE-10",
       "PHASE-11",
       "PHASE-12",
-      "PHASE-13"
-    ],
-    "next": "PHASE-13.6",
-    "remaining": [
+      "PHASE-13",
       "PHASE-13.6"
     ],
+    "next": "PHASE-14",
+    "remaining": [],
     "deferred": [
       "PHASE-7-D",
       "PHASE-14"
@@ -1080,8 +1079,26 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-13.6-PENDING",
-  "last_updated": "2026-05-22T16:30:00.000Z",
+  "current_task": "PHASE-14-PENDING",
+  "last_updated": "2026-05-23T00:00:00.000Z",
+  "phase_13_6": {
+    "status": "CLOSED",
+    "closed_at": "2026-05-23T00:00:00.000Z",
+    "activation_artifact": "artifacts/decisions/DECISION-2026-05-22T18-00-phase-13-6-backend-health-fixes.md",
+    "closure_artifact": "artifacts/decisions/DECISION-2026-05-23T00-00-phase-13-6-closure.md",
+    "checkpoint": "artifacts/decisions/_phase_13_6_checkpoints/stage_13_6_1.md",
+    "defect_1": "WITHDRAWN — CTO mis-diagnosis. forge-test.js exit code was correct throughout. $? = 0 was observed from a piped command (tail), not from the node process. No code changed.",
+    "defect_2": "FIXED — Added name field to S184-S189 scenario JSON files. No logic changed.",
+    "scenarios_fixed": ["S184", "S185", "S186", "S187", "S188", "S189"],
+    "su_baseline": {
+      "pass": 207,
+      "fail": 0,
+      "skip": 5,
+      "total": 212
+    },
+    "arc_count_unchanged": 6,
+    "cost_actual_usd": 0
+  },
   "phase_13": {
     "status": "CLOSED",
     "closed_at": "2026-05-22T16:30:00.000Z",
@@ -1215,7 +1232,7 @@
         "decision_artifact": "artifacts/decisions/DECISION-2026-05-22T16-30-phase-13-stage-13-5-closure.md",
         "checkpoint_mid": "artifacts/decisions/_phase_13_checkpoints/stage_13_5_mid.md",
         "checkpoint_final": "artifacts/decisions/_phase_13_checkpoints/stage_13_5.md",
-        "bundle_gzip_kb": 74.30,
+        "bundle_gzip_kb": 74.3,
         "bundle_budget_kb": 500,
         "lighthouse_performance": 100,
         "lighthouse_accessibility": 100,

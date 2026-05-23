@@ -1,5 +1,6 @@
 {
   "id": "S184",
+  "name": "intake_zip entries at cap — 50000 entries → SUCCESS",
   "description": "project.intake_zip — exactly 50000 entries at new default cap → SUCCESS",
   "type": "module_call",
   "permission": "WORKSPACE_WRITE",

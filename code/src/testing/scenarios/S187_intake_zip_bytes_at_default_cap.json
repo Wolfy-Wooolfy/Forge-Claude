@@ -1,5 +1,6 @@
 {
   "id": "S187",
+  "name": "intake_zip bytes at cap — 50 MB+1, under 500 MB default → SUCCESS",
   "description": "project.intake_zip — 52428801 bytes (50 MB + 1), above old cap, under new 500 MB cap → SUCCESS",
   "type": "module_call",
   "permission": "WORKSPACE_WRITE",

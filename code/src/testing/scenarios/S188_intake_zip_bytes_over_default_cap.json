@@ -1,5 +1,6 @@
 {
   "id": "S188",
+  "name": "intake_zip bytes over cap — 500 MB+1 → ZIP_TOO_LARGE",
   "description": "project.intake_zip — 524288001 bytes (500 MB + 1), over new 500 MB cap → ZIP_TOO_LARGE with 500 MB cap",
   "type": "module_call",
   "permission": "WORKSPACE_WRITE",

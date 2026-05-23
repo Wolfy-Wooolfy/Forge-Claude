@@ -1,5 +1,6 @@
 {
   "id": "S189",
+  "name": "intake_zip env override bytes — 100 MB cap, 50 MB+1 → SUCCESS",
   "description": "project.intake_zip — FORGE_INTAKE_MAX_BYTES=104857600 (100 MB) env override, 52428801 bytes → SUCCESS",
   "type": "module_call",
   "permission": "WORKSPACE_WRITE",

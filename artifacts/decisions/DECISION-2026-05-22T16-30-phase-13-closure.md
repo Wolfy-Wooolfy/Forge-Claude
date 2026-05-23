@@ -82,6 +82,8 @@ SU scenarios S184–S189 (added in PHASE-11.6 for intake capacity limits) render
 
 Both issues are operational inconveniences only — no data corruption, no incorrect test outcomes.
 
+_Update (2026-05-23, PHASE-13.6): Issue 1 (forge-test.js exit code) was withdrawn as a CTO mis-diagnosis — the exit code was correct throughout; the "exit 0 with failures" observation was caused by reading `$?` from a piped command (`node forge-test.js | tail`), which reflects the exit code of `tail`, not `node`. No code was changed. Issue 2 (S184–S189 "undefined" titles) was fixed in PHASE-13.6 by adding a `"name"` field to all 6 scenario JSON files. SU baseline remains 207/0/5. See `artifacts/decisions/DECISION-2026-05-23T00-00-phase-13-6-closure.md`._
+
 ---
 
 ## §5 Closure Gate — 10 Conditions
