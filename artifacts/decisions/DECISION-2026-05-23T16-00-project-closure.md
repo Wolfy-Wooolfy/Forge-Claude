@@ -2,7 +2,7 @@
 
 > **Artifact ID:** DECISION-2026-05-23T16-00-project-closure
 > **Type:** Project-level closure
-> **Status:** APPROVED — owner confirmed in chat 2026-05-23
+> **Status:** AMENDED — PHASE-13.7 post-closure corrective applied 2026-05-23; project now genuinely complete and usable
 > **Authored:** 2026-05-23
 > **Authority:** Blueprint Part H + FORGE_V2_PHASE_ROADMAP.md
 
@@ -15,10 +15,10 @@ Forge v2.0 — as defined by `FORGE_V2_BLUEPRINT.md` and
 the roadmap has been delivered, closed against a deterministic
 closure gate, and independently verified.
 
-## 2. Phases delivered (25)
+## 2. Phases delivered (26)
 
 PHASE-0, 0.5, 1, 2, 3, 4, 5, 5.1, 6, 7-A, 7-B, 7-C (1/2/3), 7-E,
-7-F (1/2/3), 8, 9, 10, 10-gap-fixes, 11, 11.6, 12, 13, 13.6, 15.
+7-F (1/2/3), 8, 9, 10, 10-gap-fixes, 11, 11.6, 12, 13, 13.6, 13.7, 15.
 
 `progress/status.json`: `roadmap_summary.remaining = []`,
 `overall_progress_percent = 100`.
@@ -66,6 +66,44 @@ Forge v2.0 is formally CLOSED in a stable, verified state. No phase
 is active. No work is pending. Any future work — including PHASE-14
 — is new scope requiring a fresh decision artifact and owner
 approval.
+
+---
+
+## Amendment — PHASE-13.7 (applied 2026-05-23)
+
+After this artifact was issued, a production defect was discovered:
+`http://127.0.0.1:3100/` returned `{"error":"Unauthorized"}` when
+Forge was started via pm2. Root cause: the auth gate in `apiServer.js`
+blocked the React SPA shell (`GET /`, `/assets/*`, SPA routes), and
+`web/server.js` (the static server on port 3000) was never started
+by pm2.
+
+PHASE-13.7 was opened as a corrective phase (decision artifact:
+`DECISION-2026-05-23T16-30-phase-13-7-auth-gate-fix.md`). The fix:
+
+- Auth gate boundary moved to `/api/*` only — the HTML shell and its
+  assets are public by design.
+- `apiServer.js` (port 3100) now serves the React SPA shell directly
+  via three L2-tool static handlers (Handler A: `GET /` +
+  `/index.html`, Handler B: `GET /assets/*`, Handler C: SPA fallback
+  for React Router routes).
+- `getApiBase()` fallback changed from `'http://localhost:3100'` to
+  `''` (relative) — eliminates the hardcoded absolute URL from the
+  built bundle.
+- Frontend rebuilt: no `localhost:3100` in any built JS asset.
+- §ARC ledger unchanged at 6. All file reads via L2 `fs.read_file`.
+- Regression guard S216 added and confirmed GREEN.
+- Full SU suite: 211 passed / 0 failed / 5 skipped (216 total).
+
+PHASE-13.7 was independently verified by the CTO (S216 confirmed
+RED-by-defect on revert, GREEN post-fix; suite 203/8/5 on Linux
+reflecting known environment delta — no regression).
+
+**The project is now genuinely complete and usable.** The React
+workspace is reachable at `http://127.0.0.1:3100/` after
+`pm2 restart forge`.
+
+Closure artifact: `DECISION-2026-05-23T18-30-phase-13-7-closure.md`
 
 ---
 
