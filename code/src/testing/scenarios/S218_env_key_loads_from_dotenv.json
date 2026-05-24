@@ -1,0 +1,14 @@
+{
+  "id": "S218",
+  "name": "env_loader — OPENAI_API_KEY loads from .env when no ambient key is set",
+  "description": "Stage 13.8-5 regression guard. Verifies that loadDotEnv() reads OPENAI_API_KEY from a .env file and sets process.env.OPENAI_API_KEY when no ambient value is present. RED (before 13.8-6): env_loader.js does not exist → key_loaded false. GREEN (after 13.8-6): key loaded correctly.",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/env_loader_test_helper",
+  "method": "runS218EnvKeyLoading",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "key_loaded", "expected": true }
+  ]
+}

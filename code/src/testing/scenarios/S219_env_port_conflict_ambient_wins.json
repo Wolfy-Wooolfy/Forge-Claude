@@ -1,0 +1,14 @@
+{
+  "id": "S219",
+  "name": "env_loader — ambient FORGE_API_PORT is not overridden by stale .env value (ambient wins)",
+  "description": "Stage 13.8-5 regression guard. When process.env.FORGE_API_PORT is already set to '3100' (ambient — as pm2 injects from ecosystem.config.js) and .env contains the stale FORGE_API_PORT=4100, loadDotEnv() must NOT override the ambient value. RED (before 13.8-6): env_loader.js does not exist → port_ambient_preserved false. GREEN (after 13.8-6): ambient value preserved.",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/env_loader_test_helper",
+  "method": "runS219PortAmbientWins",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "port_ambient_preserved", "expected": true }
+  ]
+}
