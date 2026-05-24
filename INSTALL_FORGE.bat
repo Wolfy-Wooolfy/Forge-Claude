@@ -69,14 +69,15 @@ for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":3100" ^| findstr "LISTENING
     taskkill /F /PID %%a >nul 2>&1
 )
 
-:: ── Step 6: pm2 start + save ──────────────────────────────────────
-echo [6/8] Starting Forge via pm2...
+:: ── Step 6: Clear any saved pm2 forge process ─────────────────────
+:: pm2 is now OPTIONAL / interactive-only (via RUN_FORGE.bat).
+:: Task Scheduler is the sole boot mechanism. Any saved pm2 forge
+:: process must be cleared so it cannot race Task Scheduler at boot.
+echo [6/8] Clearing saved pm2 forge process (pm2 is interactive-only)...
 cd /d "%ROOT%"
-call pm2 start ecosystem.config.js --update-env
-if errorlevel 1 goto :err_pm2_start
-call pm2 save --force
-if errorlevel 1 echo WARNING: pm2 save failed — auto-resurrect on next boot may not work.
-echo [OK] Forge running via pm2.
+call pm2 delete forge >nul 2>&1
+call pm2 save --force >nul 2>&1
+echo [OK] pm2 state cleared — no forge process saved.
 
 :: ── Step 7: Auto-start on boot (Task Scheduler) ──────────────────
 echo [7/8] Configuring Windows startup via Task Scheduler...
@@ -133,17 +134,11 @@ echo ERROR: pm2 global install failed.
 pause
 exit /b 1
 
-:err_pm2_start
-echo.
-echo ERROR: pm2 could not start Forge. Run: pm2 logs forge
-pause
-exit /b 1
-
 :success
 echo.
 echo ================================================================
-echo   FORGE installed and running from: %ROOT%
-echo   Starts automatically with Windows.
-echo   Use the Desktop shortcuts to run/stop manually.
+echo   FORGE installed from: %ROOT%
+echo   Starts automatically at Windows logon ^(Task Scheduler^).
+echo   Use RUN_FORGE.bat for an interactive manual start ^(pm2^).
 echo ================================================================
 echo.

@@ -12,8 +12,8 @@ setlocal enabledelayedexpansion
 ::   windows_task_scheduler_install.bat stop      — stop running task
 ::   windows_task_scheduler_install.bat status    — check task status
 ::
-:: Restart on failure: 3 attempts, 30-second delay between attempts.
-:: Task runs as LOGON_S4U (current user, no stored password required).
+:: Restart on failure: 3 attempts, 1-minute delay between attempts.
+:: Task runs as current user via AtLogOn trigger (no S4U, no stored password).
 ::
 :: Idempotent: safe to re-run install on an existing task (removes and recreates).
 :: ────────────────────────────────────────────────────────────────────────────
@@ -81,7 +81,7 @@ echo.
 echo [OK] ForgeAPI task installed.
 echo      Task name : %TASK_NAME%
 echo      Forge dir : %FORGE_DIR%
-echo      Trigger   : On logon (user: %USERNAME%), restart 3x on failure (30s delay)
+echo      Trigger   : On logon (user: %USERNAME%), restart 3x on failure (1min delay)
 echo.
 echo To verify: schtasks /query /tn ForgeAPI /v /fo LIST
 exit /b 0
