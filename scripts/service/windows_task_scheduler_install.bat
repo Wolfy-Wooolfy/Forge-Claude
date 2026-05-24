@@ -61,9 +61,8 @@ echo [INFO] Creating ^"%TASK_NAME%^" via PowerShell Register-ScheduledTask...
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "$action   = New-ScheduledTaskAction -Execute '%NODE_EXE%' -Argument 'start-api.js' -WorkingDirectory '%FORGE_DIR%';" ^
   "$trigger  = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME;" ^
-  "$settings = New-ScheduledTaskSettingsSet -RestartCount 3 -RestartInterval (New-TimeSpan -Seconds 30) -ExecutionTimeLimit ([TimeSpan]::Zero) -MultipleInstances IgnoreNew;" ^
-  "$principal= New-ScheduledTaskPrincipal -UserId $env:USERNAME -LogonType S4U -RunLevel Highest;" ^
-  "Register-ScheduledTask -TaskName '%TASK_NAME%' -Action $action -Trigger $trigger -Settings $settings -Principal $principal -Force | Out-Null;" ^
+  "$settings = New-ScheduledTaskSettingsSet -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1) -ExecutionTimeLimit ([TimeSpan]::Zero) -MultipleInstances IgnoreNew;" ^
+  "Register-ScheduledTask -TaskName '%TASK_NAME%' -Action $action -Trigger $trigger -Settings $settings -Force | Out-Null;" ^
   "Write-Host '[OK] Task registered.'"
 
 if errorlevel 1 (
