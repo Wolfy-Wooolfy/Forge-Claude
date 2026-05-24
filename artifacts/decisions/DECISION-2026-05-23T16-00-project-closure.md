@@ -2,7 +2,7 @@
 
 > **Artifact ID:** DECISION-2026-05-23T16-00-project-closure
 > **Type:** Project-level closure
-> **Status:** AMENDED — PHASE-13.7 post-closure corrective applied 2026-05-23; project now genuinely complete and usable
+> **Status:** AMENDED (×2) — PHASE-13.7 corrective 2026-05-23; PHASE-16 corrective 2026-05-24 (see §Amendment-2 below)
 > **Authored:** 2026-05-23
 > **Authority:** Blueprint Part H + FORGE_V2_PHASE_ROADMAP.md
 
@@ -104,6 +104,42 @@ workspace is reachable at `http://127.0.0.1:3100/` after
 `pm2 restart forge`.
 
 Closure artifact: `DECISION-2026-05-23T18-30-phase-13-7-closure.md`
+
+---
+
+## §Amendment-2 — 2026-05-24 — PHASE-16 corrective phase opened
+
+**The "complete and usable" declaration above was premature.**
+
+The first real owner-use session (2026-05-24) revealed that Forge is
+mechanically correct but not usable for the core purpose: a
+non-technical owner cannot use it to build an app. The root cause is
+structural: Forge has no free-form conversation mode. Every message
+enters the pipeline state machine immediately, causing a question loop
+with no exit.
+
+This closure artifact is amended to record that closure was premature
+and that **PHASE-16 (UX Closure Gap)** follows as an authorized
+corrective phase.
+
+**PHASE-16 authority:** `DECISION-2026-05-24T16-00-phase-16-ux-closure-gap.md`
+
+**PHASE-16 scope:** 6 stages — Conversation Mode (G1 BLOCKER),
+Intake UI (G2 BLOCKER), Shared Project State (G10), Doctor Fixes
+(G3/G5), UX Polish (G6–G9), Provider Contract v2 Completion (G4).
+
+**Closure gate rule change:** Every PHASE-16 stage closes against a
+user *outcome* (owner real-use test with screenshot), not a widget's
+existence. This is the central lesson of the premature closure.
+
+**PHASE-13.8** (Frontend Auth + Robust Startup) is concurrently DRAFT
+pending the owner's reboot test (Stage 13.8-7). PHASE-16 stages
+16.1/16.3/16.5 do not block on PHASE-13.8; stages 16.2/16.4/16.6
+require PHASE-13.8 to be fully CLOSED first.
+
+The statement "The project is now genuinely complete and usable" is
+retracted and replaced by: **PHASE-16 is the active phase. Project
+is usable after PHASE-16.1 closes.**
 
 ---
 

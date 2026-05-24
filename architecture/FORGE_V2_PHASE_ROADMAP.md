@@ -910,4 +910,57 @@ This rule is added to `INSTRUCTIONS.md` in Message 3.
 
 ---
 
+---
+
+## Section 6 — PHASE-16: UX Closure Gap (corrective — added 2026-05-24)
+
+> **Authority:** `DECISION-2026-05-24T16-00-phase-16-ux-closure-gap.md`
+> **Status:** ACTIVE — Stage 16.1 next
+> **Type:** Corrective phase. The project-closure artifact
+> (`DECISION-2026-05-23T16-00-project-closure.md`) declared all roadmap phases
+> complete, but the first real owner-use session exposed that Forge is
+> mechanically correct but not usable. This phase closes the gap between the
+> Blueprint Part B-2 Conductor Model promise and the implementation.
+
+### Why a corrective phase
+
+The SU suite proves mechanics; it does not prove outcomes. The central failure:
+Forge has no free-form conversation mode — every message enters the pipeline
+state machine immediately, making looping structurally inevitable. The cure is
+a conversation mode that precedes the pipeline.
+
+### **[Corrective]** PHASE-16 — UX Closure Gap
+
+**Six stages, independently closable, ordered by user impact:**
+
+| Stage | Title | Defects closed | Status |
+|-------|-------|----------------|--------|
+| **16.1** | Conversation Mode | G1 (BLOCKER: loop, no proposal) | NEXT |
+| **16.2** | Intake in the UI | G2 (BLOCKER: no UI path to intake existing project) | PENDING (after 13.8 CLOSED) |
+| **16.3** | Shared Project State | G10 (selected project not carried to Chat) | PENDING |
+| **16.4** | Doctor Fixes | G3 (stale port 4505), G5 (summary wording) | PENDING (after 13.8 CLOSED) |
+| **16.5** | UX Polish | G6 (RTL), G7 (test artifacts in list), G8 (raw enums), G9 (empty state) | PENDING |
+| **16.6** | Provider Contract v2 Completion | G4 (12/13 providers pre-v2) | PENDING |
+
+**Closure gate rule (binding):** Every stage closes against a user *outcome*,
+not a widget's existence. Each stage requires: (1) SU/Playwright scenarios
+PASS, (2) Track A grep clean, (3) owner real-use test with screenshot,
+(4) decision artifact + status.json update + checkpoints under
+`artifacts/decisions/_phase_16_checkpoints/`.
+
+**Sequencing note:** 16.1, 16.3, 16.5 may begin while PHASE-13.8 reboot test
+is pending (they do not touch the startup path). 16.2, 16.4, 16.6 require
+PHASE-13.8 to be fully CLOSED first.
+
+**§ARC:** Ledger stays at 7. Any new §ARC need → STOP, write decision, get
+owner approval before code.
+
+**Track A:** Backend touches (16.2 upload, 16.4 doctor, 16.6 provider migration)
+must hold Track A. 16.6 improves compliance by removing direct `new OpenAI()`
+from `conversationalResponseProvider`.
+
+**Estimated effort:** 20–29 days total across all 6 stages.
+
+---
+
 **END OF PHASE ROADMAP**
