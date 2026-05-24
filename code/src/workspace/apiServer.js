@@ -36,6 +36,22 @@ function isWithin(parentPath, childPath) {
   return relative && !relative.startsWith("..") && !path.isAbsolute(relative) || relative === "";
 }
 
+// Injects <script>window.__FORGE_TOKEN__="TOKEN";</script> into <head>
+// BEFORE the first <script type="module"> tag (guarantees token is set before
+// React executes). Falls back to before </head> if no module script found.
+function _injectForgeToken(html, token) {
+  const tag = `<script>window.__FORGE_TOKEN__="${token}";</script>`;
+  const moduleIdx = html.indexOf('<script type="module"');
+  if (moduleIdx !== -1) {
+    return html.slice(0, moduleIdx) + tag + html.slice(moduleIdx);
+  }
+  const headEndIdx = html.indexOf('</head>');
+  if (headEndIdx !== -1) {
+    return html.slice(0, headEndIdx) + tag + html.slice(headEndIdx);
+  }
+  return html;
+}
+
 function createWorkspaceApiServer(options = {}) {
   const root = path.resolve(options.root || process.cwd());
   const port = Number(options.port || process.env.FORGE_WORKSPACE_API_PORT || 3100);
@@ -1601,8 +1617,11 @@ function createWorkspaceApiServer(options = {}) {
         const reg = getDefaultRegistry();
         const r   = await reg.invoke("fs.read_file", { path: "web/index.html" }, { root });
         if (r.status === "SUCCESS") {
+          const html = _activeToken !== null
+            ? _injectForgeToken(r.output.content, _activeToken)
+            : r.output.content;
           res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-          res.end(r.output.content);
+          res.end(html);
         } else {
           sendJson(res, 404, { error: "Not found" });
         }
@@ -2073,8 +2092,11 @@ function createWorkspaceApiServer(options = {}) {
         const reg = getDefaultRegistry();
         const r   = await reg.invoke("fs.read_file", { path: "web/index.html" }, { root });
         if (r.status === "SUCCESS") {
+          const html = _activeToken !== null
+            ? _injectForgeToken(r.output.content, _activeToken)
+            : r.output.content;
           res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-          res.end(r.output.content);
+          res.end(html);
         } else {
           sendJson(res, 404, { error: "Not found" });
         }

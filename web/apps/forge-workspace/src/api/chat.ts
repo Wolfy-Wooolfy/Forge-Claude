@@ -1,4 +1,5 @@
 import { apiPost, getApiBase } from './base'
+import { getToken } from './auth'
 import type {
   ChatStreamEvent,
   ProjectItem,
@@ -16,9 +17,12 @@ export async function* chatStream(
   req: ChatStreamRequest,
   signal?: AbortSignal
 ): AsyncGenerator<ChatStreamEvent> {
+  const token = getToken()
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+  if (token !== null) headers['Authorization'] = `Bearer ${token}`
   const res = await fetch(`${getApiBase()}/api/ai-os/chat/stream`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify(req),
     signal,
   })

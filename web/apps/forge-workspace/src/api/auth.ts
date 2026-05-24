@@ -1,5 +1,24 @@
 import { apiPost } from './base'
 
+// ─── Session token (injected into <head> by the server on every page load) ───
+
+declare global {
+  interface Window { __FORGE_TOKEN__?: string }
+}
+
+let _token: string | null = null
+
+export function getToken(): string | null {
+  if (_token === null) {
+    _token =
+      typeof window !== 'undefined' &&
+      typeof window.__FORGE_TOKEN__ === 'string'
+        ? window.__FORGE_TOKEN__
+        : null
+  }
+  return _token
+}
+
 // ─── POST /api/auth/register ─────────────────────────────────────────────────
 
 export interface RegisterRequest {

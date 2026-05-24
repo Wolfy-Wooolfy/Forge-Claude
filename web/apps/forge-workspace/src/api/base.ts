@@ -1,4 +1,5 @@
 import { ApiError } from './types'
+import { getToken } from './auth'
 
 export function getApiBase(): string {
   return import.meta.env.VITE_API_BASE ?? ''
@@ -9,10 +10,12 @@ export async function apiFetch<T>(
   options?: RequestInit
 ): Promise<T> {
   const url = `${getApiBase()}${path}`
-  const res = await fetch(url, {
-    headers: { 'Content-Type': 'application/json' },
-    ...options,
-  })
+  const token = getToken()
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(token !== null ? { Authorization: `Bearer ${token}` } : {}),
+  }
+  const res = await fetch(url, { headers, ...options })
 
   const data = (await res.json()) as Record<string, unknown>
 
