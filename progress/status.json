@@ -73,7 +73,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-05-24T12:37:48.933Z",
+    "last_doctor_run": "2026-05-24T15:18:38.279Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
@@ -1082,8 +1082,69 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "NONE-ACTIVE",
-  "last_updated": "2026-05-23T18:30:00.000Z",
+  "current_task": "PHASE-13.8-CLOSURE-DRAFT-PENDING-REBOOT-TEST",
+  "last_updated": "2026-05-24T10:30:00.000Z",
+  "phase_13_8": {
+    "status": "DRAFT-PENDING-REBOOT-TEST",
+    "closed_at": null,
+    "closure_artifact": "artifacts/decisions/DECISION-2026-05-24T10-30-phase-13-8-closure.md",
+    "checkpoints": [
+      "artifacts/decisions/_phase_13_8_checkpoints/stage_13_8_2_mid.md",
+      "artifacts/decisions/_phase_13_8_checkpoints/stage_13_8_3.md",
+      "artifacts/decisions/_phase_13_8_checkpoints/stage_13_8_6.md",
+      "artifacts/decisions/_phase_13_8_checkpoints/stage_13_8_7.md"
+    ],
+    "scenarios_added": [
+      "S217",
+      "S218",
+      "S219"
+    ],
+    "su_baseline_at_close": {
+      "pass": 213,
+      "fail": 1,
+      "skip": 5,
+      "total": 219,
+      "known_env_delta": [
+        "S191 — windows_task_scheduler LogonType S4U (known Windows environment delta)"
+      ],
+      "unexpected_fail": 0,
+      "run_date": "2026-05-24"
+    },
+    "arc_ledger_count": 7,
+    "arc_ledger_count_before": 6,
+    "arc_7_decision": "artifacts/decisions/DECISION-2026-05-24T10-00-arc-7-env-loader-fs-exception.md",
+    "arc_7_file": "code/src/startup/env_loader.js",
+    "s208_updated": "arc_count_equals_six -> arc_count_equals_seven (stale assertion after ARC-7 addition)",
+    "reboot_test": {
+      "status": "PENDING",
+      "checklist": "artifacts/decisions/_phase_13_8_checkpoints/stage_13_8_7.md",
+      "result": null,
+      "screenshot_confirmed": false,
+      "confirmed_at": null
+    },
+    "type": "corrective — frontend auth + robust startup (env_loader + Task Scheduler + EPERM self-heal)",
+    "files_created": [
+      "code/src/startup/env_loader.js",
+      "code/src/testing/scenarios/S217_html_token_injection_in_head.json",
+      "code/src/testing/scenarios/S218_env_key_loads_from_dotenv.json",
+      "code/src/testing/scenarios/S219_env_port_conflict_ambient_wins.json"
+    ],
+    "files_modified": [
+      "code/src/workspace/apiServer.js",
+      "code/src/testing/helpers/api_server_test_helper.js",
+      "web/apps/forge-workspace/src/api/auth.ts",
+      "web/apps/forge-workspace/src/api/base.ts",
+      "web/apps/forge-workspace/src/api/chat.ts",
+      "web/index.html",
+      "INSTALL_FORGE.bat",
+      "start-api.js",
+      "RUN_FORGE.bat",
+      "docs/10_runtime/18_AGENT_ROLES_CONTRACT.md",
+      "code/src/testing/helpers/phase_12_regression_helper.js",
+      "code/src/testing/scenarios/S208_phase12_full_regression.json"
+    ],
+    "cost_actual_usd": 0
+  },
   "phase_13_7": {
     "status": "CLOSED",
     "closed_at": "2026-05-23T18:30:00.000Z",
