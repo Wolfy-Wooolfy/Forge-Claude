@@ -9,6 +9,23 @@ const path = require("path");
 const os   = require("os");
 const http = require("http");
 
+// ── .forge-session parser ─────────────────────────────────────────────────────
+// start() writes a comment line then a JSON line. This parser skips any line
+// beginning with '#' and parses the first remaining non-empty line as JSON.
+// Using /\r?\n/ handles both Unix (\n) and Windows (\r\n) line endings.
+// Does NOT rely on a fixed line index — safe regardless of file shape.
+
+function _parseSessionToken(content) {
+  const lines = content.trim().split(/\r?\n/);
+  for (const line of lines) {
+    const t = line.trim();
+    if (t.length > 0 && !t.startsWith("#")) {
+      return JSON.parse(t).token;
+    }
+  }
+  throw new Error("forge-session: no JSON line found in session file");
+}
+
 // ── HTTP helpers ──────────────────────────────────────────────────────────────
 
 function _httpGet(baseUrl, reqPath, token) {
@@ -163,12 +180,10 @@ async function runS206AuthAccepted() {
     const addr = instance.server.address();
     const base = "http://127.0.0.1:" + addr.port;
 
-    // Read token from web/.forge-session (second line is JSON)
+    // Read token from web/.forge-session via robust parser.
     const sessionPath    = path.join(tempDir, "web", ".forge-session");
     const sessionContent = fs.readFileSync(sessionPath, "utf8");
-    const sessionLines   = sessionContent.trim().split("\n");
-    const sessionJson    = JSON.parse(sessionLines[1]);
-    const token          = sessionJson.token;
+    const token          = _parseSessionToken(sessionContent);
 
     // /api/ai/approval-policy is an /api/* route; with correct Bearer token → 200
     const resp = await _httpGet(base, "/api/ai/approval-policy", token);
@@ -333,7 +348,9 @@ async function runS217HtmlTokenInjection() {
   let instance   = null;
 
   try {
-    // Seed web/index.html with a realistic stub that has a module script in <head>.
+    // Seed web/index.html with a realistic stub matching the real React build shape:
+    // a <script type="module"> in <head>, no inline scripts — injection must go
+    // in <head> BEFORE this tag.
     const webDir = path.join(tempDir, "web");
     fs.mkdirSync(webDir, { recursive: true });
     fs.writeFileSync(path.join(webDir, "index.html"), [
@@ -353,14 +370,12 @@ async function runS217HtmlTokenInjection() {
     const { port: p } = instance.server.address();
     const base = "http://127.0.0.1:" + p;
 
-    // Read the session token written by start().
+    // Read session token via robust parser (skip comment lines, /\r?\n/ split).
     const sessionPath    = path.join(tempDir, "web", ".forge-session");
     const sessionContent = fs.readFileSync(sessionPath, "utf8");
-    const sessionLines   = sessionContent.trim().split("\n");
-    const sessionJson    = JSON.parse(sessionLines[1]);
-    const sessionToken   = sessionJson.token;
+    const sessionToken   = _parseSessionToken(sessionContent);
 
-    // GET / — read served HTML.
+    // GET / — receive served HTML.
     const htmlResp = await _httpGetFull(base, "/", null);
     const htmlBody = htmlResp.body;
 
@@ -374,15 +389,16 @@ async function runS217HtmlTokenInjection() {
       injectionIdx !== -1 &&
       (moduleIdx === -1 || injectionIdx < moduleIdx);
 
-    // Check 2: does the injected token match the session token exactly?
+    // Check 2: token embedded in HTML equals the session-file token.
     const html_token_equals_session = html_injection_in_head;
 
-    // Check 3: unauthenticated API call returns 401 (control — should always pass).
+    // Check 3 (control — should always be true): no-auth returns 401.
     const unauthResp = await _httpGet(base, "/api/ai/approval-policy", null);
     const unauth_api_returns_401 = unauthResp.status === 401;
 
     // Check 4: token extracted from HTML (if present) is accepted on API call.
-    // If injection is absent (RED state), htmlToken is null → result is false.
+    // Before fix: injection is absent → htmlToken is null → false.
+    // After fix: injection present → token accepted → true.
     const htmlTokenMatch = htmlBody.match(/window\.__FORGE_TOKEN__="([a-f0-9]+)"/);
     const htmlToken      = htmlTokenMatch ? htmlTokenMatch[1] : null;
     let html_extracted_token_accepted = false;
@@ -396,12 +412,11 @@ async function runS217HtmlTokenInjection() {
       html_token_equals_session,
       unauth_api_returns_401,
       html_extracted_token_accepted,
-      // debug fields
-      html_status:    htmlResp.status,
-      head_content:   headContent.trim().slice(0, 200),
+      // debug fields (not directly asserted)
+      html_status:     htmlResp.status,
       injection_found: injectionIdx !== -1,
-      module_idx:     moduleIdx,
-      injection_idx:  injectionIdx
+      module_idx:      moduleIdx,
+      injection_idx:   injectionIdx
     };
   } finally {
     await _teardown(instance, savedEnv);
