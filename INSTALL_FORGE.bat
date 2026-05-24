@@ -78,19 +78,18 @@ call pm2 save --force
 if errorlevel 1 echo WARNING: pm2 save failed — auto-resurrect on next boot may not work.
 echo [OK] Forge running via pm2.
 
-:: ── Step 7: Auto-start on boot (Startup folder) ──────────────────
-echo [7/8] Configuring Windows startup...
-(
-    echo @echo off
-    echo call pm2 resurrect
-) > "%ROOT%forge-resurrect.bat"
-copy /Y "%ROOT%forge-resurrect.bat" "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\" >nul
+:: ── Step 7: Auto-start on boot (Task Scheduler) ──────────────────
+echo [7/8] Configuring Windows startup via Task Scheduler...
+:: Remove stale forge-resurrect.bat from Startup folder if present (replaced by Task Scheduler)
+del /Q "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\forge-resurrect.bat" >nul 2>&1
+
+call "%ROOT%scripts\service\windows_task_scheduler_install.bat" install
 if errorlevel 1 (
-    echo WARNING: Could not write to Startup folder — auto-start on boot not configured.
-    echo   Manually copy %ROOT%forge-resurrect.bat to:
-    echo   %APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\
+    echo WARNING: Task Scheduler registration failed.
+    echo   Run manually: scripts\service\windows_task_scheduler_install.bat install
 ) else (
-    echo [OK] forge-resurrect.bat added to Windows Startup.
+    echo [OK] Forge registered as Windows Task Scheduler task ^(ForgeAPI^).
+    echo      Starts automatically at logon. Restarts on crash ^(3x, 30s delay^).
 )
 
 :: ── Step 8: Desktop shortcuts + open browser ─────────────────────

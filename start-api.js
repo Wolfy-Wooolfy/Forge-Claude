@@ -10,6 +10,12 @@
  * مع قيمة افتراضية 3100.
  */
 
+// Load .env BEFORE any module that reads process.env at construction time.
+// Ambient wins: keys already set by pm2/shell are never overridden.
+const path = require("path");
+const { loadDotEnv } = require("./code/src/startup/env_loader");
+loadDotEnv(path.resolve(__dirname));
+
 const { createWorkspaceApiServer } = require("./code/src/workspace/apiServer");
 
 const port = Number(
