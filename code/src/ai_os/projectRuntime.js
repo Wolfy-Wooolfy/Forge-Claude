@@ -124,6 +124,7 @@ function createAiOsRuntime(options = {}) {
       primary_language: "MIXED",
       current_phase: "DISCOVERY",
       active_runtime_state: "DISCUSSION",
+      conversation_mode: "CONVERSATION",
       documentation_state: "EMPTY",
       execution_package_state: "NOT_READY",
       execution_state: "NOT_STARTED",

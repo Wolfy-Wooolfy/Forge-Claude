@@ -310,6 +310,38 @@ function createConversationEngine(options = {}) {
     return { ok: true, note: "Provider-driven discovery enforced — no inline inference" };
   }
 
+  async function handleConversationMode(projectId, message, state, user_language, history) {
+    const provider = new ConversationalResponseProvider();
+    const providerResult = await provider.executeTask({
+      task_id: `conv_mode_${Date.now()}`,
+      context: {
+        operation: "محادثة",
+        result: message,
+        state: "CONVERSATION",
+        user_language: user_language || state.user_language || "ar",
+        project_name: state.project_name || "",
+        conversation_history: Array.isArray(history) ? history : []
+      }
+    });
+
+    if (providerResult.status !== "SUCCESS" || !providerResult.output || !providerResult.output.message) {
+      return { ok: false, mode: "BLOCKED", reason: "CONVERSATION_PROVIDER_FAILED", project_id: projectId };
+    }
+
+    const r = {
+      ok: true,
+      mode: "CONVERSATION_RESPONSE",
+      message: providerResult.output.message,
+      tone: providerResult.output.tone || "friendly",
+      suggest_next: providerResult.output.suggest_next || "",
+      current_state: "CONVERSATION",
+      project_id: projectId
+    };
+
+    await persistTurn(projectId, message, r);
+    return r;
+  }
+
   async function processMessage(body = {}) {
     const projectId = normalizeProjectId(body.project_id || "");
     const message = String(body.message || "").trim();
@@ -421,6 +453,12 @@ function createConversationEngine(options = {}) {
       };
       await persistTurn(projectId, message, rUnclear);
       return rUnclear;
+    }
+
+    // CONVERSATION MODE gate — PHASE-16.1
+    // Projects start in conversation mode; pipeline entered only on explicit owner action.
+    if (state.conversation_mode === "CONVERSATION") {
+      return await handleConversationMode(projectId, message, state, user_language, history);
     }
 
     // Route DISCUSSION / IDEATION to ideation engine for discovery loop
