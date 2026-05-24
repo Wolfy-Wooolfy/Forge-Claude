@@ -319,10 +319,101 @@ async function runS216AuthGateExemptsStaticRoutes() {
   }
 }
 
+// ── S217: GET / serves HTML with window.__FORGE_TOKEN__ injected in <head> ──────
+//
+// RED phase (before Stage 13.8-2 fix): Handler A returns index.html verbatim,
+// with no token injection. All four assertions fail on the injection checks.
+// GREEN phase (after fix): Handler A injects the token script into <head>
+// before the module script tag; token extracted from HTML matches session file
+// and is accepted on a protected API endpoint.
+
+async function runS217HtmlTokenInjection() {
+  const tempDir  = fs.mkdtempSync(path.join(os.tmpdir(), "forge-s217-"));
+  const savedEnv = _saveEnv();
+  let instance   = null;
+
+  try {
+    // Seed web/index.html with a realistic stub that has a module script in <head>.
+    const webDir = path.join(tempDir, "web");
+    fs.mkdirSync(webDir, { recursive: true });
+    fs.writeFileSync(path.join(webDir, "index.html"), [
+      "<!DOCTYPE html>",
+      '<html lang="ar" dir="rtl">',
+      "  <head>",
+      '    <meta charset="UTF-8" />',
+      '    <script type="module" crossorigin src="/assets/index-stub.js"></script>',
+      "  </head>",
+      "  <body>",
+      '    <div id="root"></div>',
+      "  </body>",
+      "</html>"
+    ].join("\n"), "utf8");
+
+    instance = await _bootServer(tempDir, "s217-test-key");
+    const { port: p } = instance.server.address();
+    const base = "http://127.0.0.1:" + p;
+
+    // Read the session token written by start().
+    const sessionPath    = path.join(tempDir, "web", ".forge-session");
+    const sessionContent = fs.readFileSync(sessionPath, "utf8");
+    const sessionLines   = sessionContent.trim().split("\n");
+    const sessionJson    = JSON.parse(sessionLines[1]);
+    const sessionToken   = sessionJson.token;
+
+    // GET / — read served HTML.
+    const htmlResp = await _httpGetFull(base, "/", null);
+    const htmlBody = htmlResp.body;
+
+    // Check 1: does <head> contain the token injection BEFORE the module script?
+    const headMatch    = htmlBody.match(/<head>([\s\S]*?)<\/head>/i);
+    const headContent  = headMatch ? headMatch[1] : "";
+    const moduleIdx    = headContent.indexOf('<script type="module"');
+    const injectionStr = `window.__FORGE_TOKEN__="${sessionToken}"`;
+    const injectionIdx = headContent.indexOf(injectionStr);
+    const html_injection_in_head =
+      injectionIdx !== -1 &&
+      (moduleIdx === -1 || injectionIdx < moduleIdx);
+
+    // Check 2: does the injected token match the session token exactly?
+    const html_token_equals_session = html_injection_in_head;
+
+    // Check 3: unauthenticated API call returns 401 (control — should always pass).
+    const unauthResp = await _httpGet(base, "/api/ai/approval-policy", null);
+    const unauth_api_returns_401 = unauthResp.status === 401;
+
+    // Check 4: token extracted from HTML (if present) is accepted on API call.
+    // If injection is absent (RED state), htmlToken is null → result is false.
+    const htmlTokenMatch = htmlBody.match(/window\.__FORGE_TOKEN__="([a-f0-9]+)"/);
+    const htmlToken      = htmlTokenMatch ? htmlTokenMatch[1] : null;
+    let html_extracted_token_accepted = false;
+    if (htmlToken !== null) {
+      const authResp = await _httpGet(base, "/api/ai/approval-policy", htmlToken);
+      html_extracted_token_accepted = authResp.status === 200;
+    }
+
+    return {
+      html_injection_in_head,
+      html_token_equals_session,
+      unauth_api_returns_401,
+      html_extracted_token_accepted,
+      // debug fields
+      html_status:    htmlResp.status,
+      head_content:   headContent.trim().slice(0, 200),
+      injection_found: injectionIdx !== -1,
+      module_idx:     moduleIdx,
+      injection_idx:  injectionIdx
+    };
+  } finally {
+    await _teardown(instance, savedEnv);
+    try { fs.rmSync(tempDir, { recursive: true, force: true }); } catch (_) {}
+  }
+}
+
 module.exports = {
   runS204BindingCheck,
   runS205UnauthRejected,
   runS206AuthAccepted,
   runS207UidMismatch,
-  runS216AuthGateExemptsStaticRoutes
+  runS216AuthGateExemptsStaticRoutes,
+  runS217HtmlTokenInjection
 };

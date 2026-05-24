@@ -73,7 +73,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-05-23T18:18:59.846Z",
+    "last_doctor_run": "2026-05-24T10:30:04.056Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
@@ -1103,8 +1103,13 @@
       "web/assets/index-C_BaNzCE.css",
       "web/assets/vendor-D0xakLYA.js"
     ],
-    "scenarios_added": ["S216"],
-    "scenarios_modified": ["S205 (endpoint /health → /api/ai/approval-policy)", "S206 (same endpoint change)"],
+    "scenarios_added": [
+      "S216"
+    ],
+    "scenarios_modified": [
+      "S205 (endpoint /health → /api/ai/approval-policy)",
+      "S206 (same endpoint change)"
+    ],
     "su_baseline": {
       "pass": 211,
       "fail": 0,

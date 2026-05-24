@@ -1,0 +1,16 @@
+{
+  "id": "S217",
+  "name": "GET / — HTML contains window.__FORGE_TOKEN__ in <head> before module script",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/api_server_test_helper",
+  "method": "runS217HtmlTokenInjection",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "html_injection_in_head",        "expected": true },
+    { "type": "state_field_equals", "field": "html_token_equals_session",     "expected": true },
+    { "type": "state_field_equals", "field": "unauth_api_returns_401",        "expected": true },
+    { "type": "state_field_equals", "field": "html_extracted_token_accepted", "expected": true }
+  ]
+}
