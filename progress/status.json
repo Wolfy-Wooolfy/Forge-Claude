@@ -73,7 +73,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-05-25T07:55:00.445Z",
+    "last_doctor_run": "2026-05-25T08:55:52.945Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
@@ -1699,5 +1699,10 @@
       }
     },
     "cost_actual_usd": 0
-  }
+  },
+  "self_test_last_result": "219 passed, 1 failed (S191 known Windows env delta), 5 skipped (225 total)",
+  "self_test_scenarios_pass": 219,
+  "self_test_scenarios_fail": 1,
+  "self_test_scenarios_skip": 5,
+  "self_test_run_at": "2026-05-25T08:00:00.000Z"
 }

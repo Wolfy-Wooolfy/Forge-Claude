@@ -1,0 +1,14 @@
+{
+  "id": "S225",
+  "name": "conversation mode — createProject() via API sets conversation_mode: CONVERSATION in project state (PHASE-16.1 regression guard)",
+  "description": "RED (before Fix A): createProject() calls persistProjectState with overrides = { project_name, project_status } only — conversation_mode absent from response → conversation_mode_is_conversation = false → FAIL. GREEN (after Fix A): createProject() passes conversation_mode: 'CONVERSATION' in overrides → response.project.conversation_mode === 'CONVERSATION' → PASS. Tests the REAL createProject() path via in-process HTTP API server, closing the gap left by S220-S224.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/conversation_mode_test_helper",
+  "method": "runS225CreateProjectSetsConversationMode",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "conversation_mode_is_conversation", "expected": true }
+  ]
+}

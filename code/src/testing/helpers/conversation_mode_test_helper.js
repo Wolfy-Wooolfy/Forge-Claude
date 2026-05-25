@@ -1,17 +1,56 @@
 "use strict";
 
-// S220-S224 helpers — PHASE-16.1 Conversation Mode.
+// S220-S225 helpers — PHASE-16.1 Conversation Mode.
 // Tests conversation_mode gate, processMessage routing, startPipeline transition,
-// and proposal-request routing in conversation mode.
+// proposal-request routing, and createProject() path coverage.
 //
 // Track A note (test infrastructure): fs.mkdirSync / fs.writeFileSync / fs.rmSync
 // are used here only for test fixture setup, not in production code.
 
 const fs   = require("fs");
 const path = require("path");
+const http = require("http");
+const os   = require("os");
 
-const ROOT         = process.cwd();
+const ROOT          = process.cwd();
 const PROJECTS_ROOT = path.resolve(ROOT, "artifacts", "projects");
+
+// ── HTTP helpers for S225 (API-server boot pattern) ───────────────────────────
+
+function _parseSessionToken(content) {
+  const lines = content.trim().split(/\r?\n/);
+  for (const line of lines) {
+    const t = line.trim();
+    if (t.length > 0 && !t.startsWith("#")) return JSON.parse(t).token;
+  }
+  throw new Error("forge-session: no JSON line found");
+}
+
+function _httpPost(baseUrl, reqPath, body, token) {
+  return new Promise((resolve, reject) => {
+    const parsed  = new URL(baseUrl);
+    const payload = JSON.stringify(body);
+    const options = {
+      hostname: parsed.hostname,
+      port:     Number(parsed.port),
+      path:     reqPath,
+      method:   "POST",
+      headers: Object.assign(
+        { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(payload) },
+        token ? { Authorization: "Bearer " + token } : {}
+      ),
+      agent: false
+    };
+    const req = http.request(options, (res) => {
+      let data = "";
+      res.on("data", (chunk) => { data += chunk; });
+      res.on("end",  () => { try { resolve(JSON.parse(data)); } catch (_) { resolve({}); } });
+    });
+    req.on("error", reject);
+    req.write(payload);
+    req.end();
+  });
+}
 
 // ── Shared test utilities ──────────────────────────────────────────────────────
 
@@ -257,10 +296,84 @@ async function runS224ProposalRequestInConversationMode() {
   }
 }
 
+// ── S225: createProject() via API sets conversation_mode: "CONVERSATION" ────────
+//
+// RED (before Fix A): createProject() calls persistProjectState with overrides
+//   = { project_name, project_status } only — no conversation_mode.
+//   buildProjectState() gets undefined from both overrides and existing →
+//   conversation_mode absent from response.project → assertion fails.
+// GREEN (after Fix A): createProject() passes conversation_mode: "CONVERSATION"
+//   in overrides → buildProjectState() writes it to file and response →
+//   response.project.conversation_mode === "CONVERSATION" → PASS.
+//
+// Tests the REAL createProject() code path via in-process HTTP API server —
+// not a hand-written project_state.json. Closes the gap left by S220-S224.
+
+async function runS225CreateProjectSetsConversationMode() {
+  const { resetDefaultRegistry } = require("../../runtime/tools/_registry");
+  const { resetDefaultPolicy }   = require("../../runtime/permission/permissionPolicy");
+  const secretProvider           = require("../../runtime/secrets/secret_provider");
+
+  const tempDir  = fs.mkdtempSync(path.join(os.tmpdir(), "forge-s225-"));
+  const savedEnv = {
+    FORGE_SECRET_PROVIDER:    process.env.FORGE_SECRET_PROVIDER,
+    FORGE_SECRET_STORE_PATH:  process.env.FORGE_SECRET_STORE_PATH,
+    FORGE_SECRET_KEY:         process.env.FORGE_SECRET_KEY,
+    FORGE_WORKSPACE_API_PORT: process.env.FORGE_WORKSPACE_API_PORT
+  };
+
+  process.env.FORGE_SECRET_PROVIDER    = "encrypted_file";
+  process.env.FORGE_SECRET_STORE_PATH  = tempDir;
+  process.env.FORGE_SECRET_KEY         = "s225-test-key";
+  process.env.FORGE_WORKSPACE_API_PORT = "0";
+
+  resetDefaultRegistry();
+  resetDefaultPolicy();
+  secretProvider._resetForTest();
+
+  const { createWorkspaceApiServer } = require("../../workspace/apiServer");
+  const instance = createWorkspaceApiServer({ port: 0, root: tempDir });
+
+  try {
+    await instance.start();
+    const addr = instance.server.address();
+    const base = "http://127.0.0.1:" + addr.port;
+
+    const sessionPath    = path.join(tempDir, "web", ".forge-session");
+    const sessionContent = fs.readFileSync(sessionPath, "utf8");
+    const token          = _parseSessionToken(sessionContent);
+
+    const resp = await _httpPost(base, "/api/projects/create", { project_name: "S225 Conv Mode Test" }, token);
+
+    const conversation_mode_is_conversation =
+      resp.ok === true &&
+      resp.project != null &&
+      resp.project.conversation_mode === "CONVERSATION";
+
+    return { conversation_mode_is_conversation };
+  } finally {
+    secretProvider._resetForTest();
+    for (const [k, v] of Object.entries(savedEnv)) {
+      if (v === undefined) delete process.env[k];
+      else process.env[k] = v;
+    }
+    resetDefaultRegistry();
+    resetDefaultPolicy();
+    if (instance && instance.server) {
+      if (typeof instance.server.closeAllConnections === "function") {
+        instance.server.closeAllConnections();
+      }
+      await new Promise((resolve) => instance.server.close(resolve));
+    }
+    try { fs.rmSync(tempDir, { recursive: true, force: true }); } catch (_) {}
+  }
+}
+
 module.exports = {
   runS220DefaultConversationMode,
   runS221ProcessMessageConversationMode,
   runS222StartPipeline,
   runS223PipelineEntryAfterTransition,
-  runS224ProposalRequestInConversationMode
+  runS224ProposalRequestInConversationMode,
+  runS225CreateProjectSetsConversationMode
 };

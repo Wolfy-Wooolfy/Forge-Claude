@@ -875,8 +875,9 @@ function createWorkspaceApiServer(options = {}) {
     await writeActiveProject(projectId);
 
     const state = await persistProjectState(projectId, {
-      project_name: projectName,
-      project_status: "ACTIVE"
+      project_name:      projectName,
+      project_status:    "ACTIVE",
+      conversation_mode: "CONVERSATION"
     });
 
     return {

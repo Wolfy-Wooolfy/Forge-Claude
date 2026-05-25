@@ -40,12 +40,17 @@ export function ChatInput({ disabled, onSend }: ChatInputProps) {
   const [value, setValue] = useState('')
   const [listening, setListening] = useState(false)
   const recognitionRef = useRef<SRInstance | null>(null)
+  const textareaRef    = useRef<HTMLTextAreaElement | null>(null)
   const SR = getSR()
   const hasVoice = SR !== null
 
   useEffect(() => {
     return () => { recognitionRef.current?.abort() }
   }, [])
+
+  useEffect(() => {
+    if (!disabled) textareaRef.current?.focus()
+  }, [disabled])
 
   function toggleVoice() {
     if (!SR) return
@@ -91,6 +96,7 @@ export function ChatInput({ disabled, onSend }: ChatInputProps) {
   return (
     <div className="flex items-end gap-2 border-t border-border pt-4">
       <textarea
+        ref={textareaRef}
         data-testid="chat-input"
         rows={1}
         value={value}
