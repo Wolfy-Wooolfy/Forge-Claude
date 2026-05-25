@@ -1,0 +1,13 @@
+{
+  "id": "S229",
+  "name": "GET /api/projects returns active_project_id matching last activated project (B2 context-init contract — PHASE-16 UNIFIED)",
+  "description": "Validates the backend contract that ProjectProvider.useEffect relies on: after creating and activating a project, GET /api/projects must return active_project_id matching that project's slug — not hardcoded 'default_project'. Without this contract the context init fetch would produce incorrect initial state.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/normalization_test_helper",
+  "method": "runS229ListProjectsReturnsActiveId",
+  "args": [],
+  "assertions": [
+    { "type": "state_field_equals", "field": "active_project_id_correct", "expected": true }
+  ]
+}

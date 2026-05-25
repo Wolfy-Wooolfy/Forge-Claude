@@ -14,7 +14,7 @@ This checkpoint covers the first 3 defects from PHASE-16 UNIFIED §2:
 | Block | Defect | Fix |
 |-------|--------|-----|
 | B1 | `workspaceHelpers.js:753` `normalizeProjectId()` does `trim()` only; inconsistent with `buildProjectId()` | Applied lowercase + slug transform |
-| B2 | `ChatView.tsx` and `ProjectsView.tsx` each maintain independent `projectId` state | Created `ProjectContext`; both views now share single source of truth |
+| B2 | `ProjectProvider` starts with hardcoded `'default_project'`; no backend fetch on mount → wrong project if user opens Chat directly | Added `useEffect` that fetches `GET /api/projects` on mount |
 | B3 | `buildProjectState()` returns `undefined` for legacy projects without `conversation_mode` field | Added `|| "PIPELINE"` fallback |
 
 ---
@@ -45,18 +45,46 @@ This checkpoint covers the first 3 defects from PHASE-16 UNIFIED §2:
 
 ---
 
-## B2 — React Context for shared active project
+## B2 — React Context for shared active project (completed)
+
+### Context + sharing (initial implementation)
 
 **New file:** `web/apps/forge-workspace/src/contexts/ProjectContext.tsx`
 - `ProjectProvider` wraps all routes in `App.tsx`
 - `useProject()` hook returns `{ activeProjectId, setActiveProjectId }`
+- `ChatView.tsx` — replaces `useState('default_project')` with `useProject()` hook; removes dead `<input>` block
+- `ProjectsView.tsx` — calls `setActiveProjectId` in `loadProjects()` and `handleActivate()`
 
-**Modified files:**
-- `App.tsx` — imports `ProjectProvider`, wraps `<div>` shell with it
-- `ChatView.tsx` — replaces `useState('default_project')` with `useProject()` hook; removes dead `<input data-testid="project-id-input">` block (was marked "replaced by project picker in Stage 13.3"); now shows project name as read-only label
-- `ProjectsView.tsx` — adds `useProject()` hook; calls `setActiveProjectId(resolvedId)` in `loadProjects()` and `setActiveProjectId(projectId)` in `handleActivate()`
+### Context init fix (B2 completion — CTO feedback)
 
-**Validation:** `npm run build` → TypeScript compiled clean, 1532 modules, exit 0. No type errors.
+**Problem identified:** `ProjectProvider` started with hardcoded `useState('default_project')`. If the user opened Chat directly (without visiting ProjectsView first), the context stayed at `'default_project'` regardless of the real active project.
+
+**Fix:** `ProjectContext.tsx` — added `useEffect` that fetches `GET /api/projects` on mount:
+
+```diff
++ import { listProjects } from '@/api/projects'
+
+  export function ProjectProvider({ children }: { children: ReactNode }) {
+    const [activeProjectId, setActiveProjectId] = useState('default_project')
+
++   useEffect(() => {
++     listProjects()
++       .then((data) => {
++         const id = data.active_project_id?.trim() || 'default_project'
++         setActiveProjectId(id)
++       })
++       .catch(() => {
++         // backend unreachable on startup — stay at default_project
++       })
++   }, [])
+```
+
+**Fallback:** If the fetch fails (backend not ready, network error), context stays at `'default_project'` — explicit, not silent.
+
+**Scenario evidence (backend contract):**
+- `S229 ✓` — Create + activate "My App" → `GET /api/projects` returns `active_project_id === "my_app"` (not `"default_project"`) — confirms the backend endpoint the context relies on returns correct data
+
+**Validation:** `npm run build` → TypeScript compiled clean, 1532 modules, exit 0 (both before and after useEffect addition).
 
 ---
 
@@ -71,18 +99,17 @@ This checkpoint covers the first 3 defects from PHASE-16 UNIFIED §2:
 +   : (existing.conversation_mode || "PIPELINE"),
 ```
 
-**Why `|| "PIPELINE"`:** Legacy projects written before PHASE-16.1 have no `conversation_mode` field. When `existing.conversation_mode` is `undefined`, the old code propagated `undefined` into the returned state object. New code always guarantees a defined value, defaulting to `"PIPELINE"` (the pre-16.1 behaviour).
+**Why `|| "PIPELINE"`:** Legacy projects written before PHASE-16.1 have no `conversation_mode` field. Old code propagated `undefined`. New code always returns a defined value, defaulting to `"PIPELINE"` (pre-16.1 behaviour).
 
 **Scenario evidence:**
-- `S228 ✓` — Legacy project state written without `conversation_mode` → `POST /api/projects/activate` → `response.project.conversation_mode === "PIPELINE"`
+- `S228 ✓` — Legacy project state without `conversation_mode` → `POST /api/projects/activate` → `response.project.conversation_mode === "PIPELINE"`
 
 ---
 
-## Full test suite results (2026-05-25)
+## Full test suite results (2026-05-25 — after B2 completion)
 
 ```
-221 passed, 2 failed, 5 skipped (228 total)
-duration: 126825ms
+222 passed, 2 failed, 5 skipped (229 total)
 ```
 
 | Scenario | Status | Notes |
@@ -90,10 +117,11 @@ duration: 126825ms
 | S226 | ✓ GREEN | B1 fix — normalizeProjectId slug consistency |
 | S227 | ✓ GREEN | B1+B2 backend contract — API returns slug |
 | S228 | ✓ GREEN | B3 fix — PIPELINE fallback |
-| S17  | ✗ FAIL | **Pre-existing flaky** — `documentationBuildLoop LOOP_EXHAUSTED`. Appeared in baseline run before any production code change. Not caused by this phase. |
+| S229 | ✓ GREEN | B2 context-init contract — GET /api/projects returns correct active_project_id |
+| S17  | ✗ FAIL | **Pre-existing flaky** — `documentationBuildLoop LOOP_EXHAUSTED`. Confirmed by CTO on clean zip before any changes. Registered as debt item (not fixed in this phase). |
 | S191 | ✗ FAIL | **Pre-existing Windows env delta** — always fails in this environment. Known baseline. |
 
-**Baseline before PHASE-16 UNIFIED:** 219 passed, 4 failed (S191, S226, S227, S228). Net improvement: +3 scenarios GREEN, S17 flaky still present.
+**Baseline before PHASE-16 UNIFIED:** 219 passed, 4 failed (S191, S226, S227, S228). Net improvement: +4 scenarios GREEN (S226/S227/S228/S229), total 229 scenarios.
 
 ---
 
