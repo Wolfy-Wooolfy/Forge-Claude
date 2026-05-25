@@ -1,0 +1,139 @@
+[
+  {
+    "entry_type": "IDEATION_INTAKE",
+    "message": "عايز اعرف ايه افضل انواع سيستم ال HR حاليا في العالم",
+    "needs_clarification": true,
+    "clarification_questions": [
+      "ما هي الخصائص أو الوظائف التي تهمك في نظام HR؟"
+    ],
+    "requirement_model": {
+      "goal": "Identify the best HR system currently available globally"
+    },
+    "requirement_domain": "Human Resources (HR) Systems",
+    "requirement_completeness": false,
+    "requirement_reasoning_summary": "المستخدم يريد معرفة أفضل أنواع أنظمة HR في العالم حالياً، لكن لم يتم تحديد المتطلبات التفصيلية مثل الوظائف أو الخصائص المطلوبة في النظام.",
+    "created_at": "2026-05-25T07:56:18.501Z"
+  },
+  {
+    "entry_type": "DISCOVERY_ITERATION_REQUIRED",
+    "open_questions_answered": [
+      "ما هي الخصائص أو الوظائف التي تهمك في نظام HR؟"
+    ],
+    "answers": {
+      "raw_answer": "كل تفاصيل ال HR",
+      "answered_questions": [
+        "ما هي الخصائص أو الوظائف التي تهمك في نظام HR؟"
+      ]
+    },
+    "merged_answers": {
+      "raw_answer": "كل تفاصيل ال HR",
+      "answered_questions": [
+        "ما هي الخصائص أو الوظائف التي تهمك في نظام HR؟"
+      ]
+    },
+    "requirement_domain": "Human Resources Software",
+    "requirement_model": {
+      "goal": "Identify the best HR system currently available globally",
+      "desired_features": "All details of HR"
+    },
+    "completeness": false,
+    "next_open_questions": [
+      "هل تفضل نظام HR سحابي أم نظام يتم تثبيته محليًا؟"
+    ],
+    "requirement_reasoning_summary": "User wants to know the best HR system globally and is interested in all HR details. To refine the requirement, we need to know the preferred deployment type (cloud or on-premises) as it impacts system choice.",
+    "created_at": "2026-05-25T07:56:43.057Z"
+  },
+  {
+    "entry_type": "DISCOVERY_ITERATION_REQUIRED",
+    "open_questions_answered": [
+      "هل تفضل نظام HR سحابي أم نظام يتم تثبيته محليًا؟"
+    ],
+    "answers": {
+      "raw_answer": "محليا",
+      "answered_questions": [
+        "هل تفضل نظام HR سحابي أم نظام يتم تثبيته محليًا؟"
+      ]
+    },
+    "merged_answers": {
+      "raw_answer": "محليا",
+      "answered_questions": [
+        "هل تفضل نظام HR سحابي أم نظام يتم تثبيته محليًا؟"
+      ]
+    },
+    "requirement_domain": "HR Systems",
+    "requirement_model": {
+      "goal": "Identify the best HR system currently available globally",
+      "desired_features": "All details of HR",
+      "deployment_preference": "On-premises"
+    },
+    "completeness": false,
+    "next_open_questions": [
+      "هل تفضل نظام HR موجه لشركات صغيرة أم كبيرة؟"
+    ],
+    "requirement_reasoning_summary": "تم تحديث النموذج ليشمل تفضيل المستخدم لنظام HR يتم تثبيته محليًا بدلاً من السحابي. لا يزال هناك غموض حول حجم الشركات المستهدفة لاختيار النظام الأمثل.",
+    "created_at": "2026-05-25T07:56:54.066Z"
+  },
+  {
+    "entry_type": "DISCOVERY_ITERATION_REQUIRED",
+    "open_questions_answered": [
+      "هل تفضل نظام HR موجه لشركات صغيرة أم كبيرة؟"
+    ],
+    "answers": {
+      "raw_answer": "متوسطة",
+      "answered_questions": [
+        "هل تفضل نظام HR موجه لشركات صغيرة أم كبيرة؟"
+      ]
+    },
+    "merged_answers": {
+      "raw_answer": "متوسطة",
+      "answered_questions": [
+        "هل تفضل نظام HR موجه لشركات صغيرة أم كبيرة؟"
+      ]
+    },
+    "requirement_domain": "Human Resources Management Systems",
+    "requirement_model": {
+      "goal": "Identify the best HR system currently available globally",
+      "desired_features": "All details of HR",
+      "deployment_preference": "On-premises",
+      "company_size_preference": "Medium"
+    },
+    "completeness": false,
+    "next_open_questions": [
+      "هل تفضل نظام HR موجه لصناعة معينة أو قطاع محدد؟"
+    ],
+    "requirement_reasoning_summary": "تم تحديث نموذج المتطلبات ليشمل تفضيل حجم الشركة كمتوسطة بناءً على إجابة المستخدم. لا يزال هناك غموض حول ما إذا كان المستخدم يفضل نظام HR مخصص لصناعة معينة أو قطاع محدد، مما يؤثر على اختيار النظام الأمثل.",
+    "created_at": "2026-05-25T07:57:05.178Z"
+  },
+  {
+    "entry_type": "DISCOVERY_ITERATION_REQUIRED",
+    "open_questions_answered": [
+      "هل تفضل نظام HR موجه لصناعة معينة أو قطاع محدد؟"
+    ],
+    "answers": {
+      "raw_answer": "القطاع التجاري",
+      "answered_questions": [
+        "هل تفضل نظام HR موجه لصناعة معينة أو قطاع محدد؟"
+      ]
+    },
+    "merged_answers": {
+      "raw_answer": "القطاع التجاري",
+      "answered_questions": [
+        "هل تفضل نظام HR موجه لصناعة معينة أو قطاع محدد؟"
+      ]
+    },
+    "requirement_domain": "HR Systems",
+    "requirement_model": {
+      "goal": "Identify the best HR system currently available globally",
+      "desired_features": "All details of HR",
+      "deployment_preference": "On-premises",
+      "company_size_preference": "Medium",
+      "industry_sector": "Commercial"
+    },
+    "completeness": false,
+    "next_open_questions": [
+      "هل تفضل نظام HR موجه للشركات الصغيرة، المتوسطة، أم الكبيرة؟"
+    ],
+    "requirement_reasoning_summary": "تم تحديث نموذج المتطلبات ليشمل تفضيل القطاع التجاري بناءً على إجابة المستخدم. لا تزال هناك حاجة لتحديد حجم الشركة المستهدفة لنظام HR لتقليل الغموض وتنقيح المتطلبات.",
+    "created_at": "2026-05-25T07:57:17.810Z"
+  }
+]

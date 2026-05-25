@@ -1,0 +1,68 @@
+{
+  "project_id": "new_t",
+  "project_name": "New T",
+  "project_type": "REVIEW",
+  "project_mode": "EXTEND_EXISTING",
+  "project_status": "ACTIVE",
+  "primary_language": "AR",
+  "current_phase": "DISCOVERY",
+  "active_runtime_state": "DISCOVERY_REQUIRED",
+  "documentation_state": "EMPTY",
+  "execution_package_state": "NOT_READY",
+  "execution_state": "NOT_STARTED",
+  "verification_state": "NOT_READY",
+  "delivery_state": "NOT_READY",
+  "memory_state": "EMPTY",
+  "accepted_options": [],
+  "rejected_options": [],
+  "open_questions": [
+    "هل تفضل نظام HR موجه للشركات الصغيرة، المتوسطة، أم الكبيرة؟"
+  ],
+  "pending_decisions": [],
+  "review_cycles_count": 0,
+  "artifact_registry": {
+    "project_root": "artifacts/projects/new_t",
+    "project_state": "artifacts/projects/new_t/project_state.json",
+    "decision_packet": "",
+    "execution_package": ""
+  },
+  "active_project_flag": true,
+  "last_updated_at": "2026-05-25T07:57:17.812Z",
+  "user_goal": "عايز اعرف ايه افضل انواع سيستم ال HR حاليا في العالم",
+  "business_goal": "",
+  "technical_goal": "",
+  "workspace_path": "D:\\S\\Halo\\Tech\\Forge-Claude",
+  "source_of_truth": "ZIP_SNAPSHOT",
+  "selected_strategy": "",
+  "clarification_answers": {
+    "raw_answer": "القطاع التجاري",
+    "answered_questions": [
+      "هل تفضل نظام HR موجه لصناعة معينة أو قطاع محدد؟"
+    ]
+  },
+  "requirement_domain": "HR Systems",
+  "domain_locked": false,
+  "domain_history": [],
+  "requirement_completeness": false,
+  "requirement_model": {
+    "goal": "Identify the best HR system currently available globally",
+    "desired_features": "All details of HR",
+    "deployment_preference": "On-premises",
+    "company_size_preference": "Medium",
+    "industry_sector": "Commercial"
+  },
+  "requirement_reasoning_summary": "تم تحديث نموذج المتطلبات ليشمل تفضيل القطاع التجاري بناءً على إجابة المستخدم. لا تزال هناك حاجة لتحديد حجم الشركة المستهدفة لنظام HR لتقليل الغموض وتنقيح المتطلبات.",
+  "provider_error": "",
+  "conversation_history": {
+    "proposal_count": 0,
+    "draft_count": 0
+  },
+  "decision_history": {
+    "has_decision_packet": false
+  },
+  "version_registry": [],
+  "vision": null,
+  "vision_locked": false,
+  "vision_version": null,
+  "vision_history": []
+}
