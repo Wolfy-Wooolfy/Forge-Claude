@@ -751,9 +751,10 @@ function buildFileTypeAwareProposal(requestText, targetFile) {
 }
 
 function normalizeProjectId(projectIdInput) {
-  return typeof projectIdInput === "string" && projectIdInput.trim() !== ""
-    ? projectIdInput.trim()
-    : "default_project";
+  const s = typeof projectIdInput === "string"
+    ? projectIdInput.trim().toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "")
+    : "";
+  return s || "default_project";
 }
 
 function normalizeProjectName(projectNameInput) {

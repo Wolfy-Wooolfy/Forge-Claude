@@ -1,0 +1,13 @@
+{
+  "id": "S228",
+  "name": "legacy project without conversation_mode field → buildProjectState returns PIPELINE (B3 backward compat — PHASE-16 UNIFIED)",
+  "description": "RED (before B3 fix): buildProjectState returns conversation_mode:undefined for old projects (no fallback) → state_field_is_pipeline=false → FAIL. GREEN (after B3 fix): '|| PIPELINE' fallback applied → conversation_mode:'PIPELINE' in response.project → PASS.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/conversation_mode_test_helper",
+  "method": "runS228BackwardCompatPipelineFallback",
+  "args": [],
+  "assertions": [
+    { "type": "state_field_equals", "field": "state_field_is_pipeline", "expected": true }
+  ]
+}

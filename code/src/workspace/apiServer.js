@@ -779,7 +779,7 @@ function createWorkspaceApiServer(options = {}) {
       vision_history: Array.isArray(existing.vision_history) ? existing.vision_history : [],
       conversation_mode: overrides.conversation_mode !== undefined
         ? overrides.conversation_mode
-        : existing.conversation_mode,
+        : (existing.conversation_mode || "PIPELINE"),
       active_project_flag: readActiveProjectId() === projectId,
       last_updated_at: new Date().toISOString()
     };

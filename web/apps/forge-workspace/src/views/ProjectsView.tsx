@@ -7,6 +7,7 @@ import { DeleteConfirmDialog } from '@/components/projects/DeleteConfirmDialog'
 import { ProjectContextPanel } from '@/components/projects/ProjectContextPanel'
 import { ActivityStream } from '@/components/projects/ActivityStream'
 import type { ProjectItem, HistoryItem } from '@/api/types'
+import { useProject } from '@/contexts/ProjectContext'
 
 // ── state shapes ─────────────────────────────────────────────────────────────
 
@@ -26,6 +27,7 @@ interface HistoryState {
 // ── component ─────────────────────────────────────────────────────────────────
 
 export default function ProjectsView() {
+  const { setActiveProjectId } = useProject()
   const [state, setState] = useState<ProjectsState>({
     projects: [],
     activeProjectId: 'default_project',
@@ -71,6 +73,7 @@ export default function ProjectsView() {
           loading: false,
           error: null,
         })
+        setActiveProjectId(resolvedId)
         await loadHistory(resolvedId)
       } catch (e) {
         setState((prev) => ({
@@ -80,7 +83,7 @@ export default function ProjectsView() {
         }))
       }
     },
-    [loadHistory]
+    [loadHistory, setActiveProjectId]
   )
 
   useEffect(() => {
@@ -102,6 +105,7 @@ export default function ProjectsView() {
         activeProjectId: projectId,
         activeProject: project,
       }))
+      setActiveProjectId(projectId)
       await loadHistory(projectId)
     } catch (e) {
       setState((prev) => ({

@@ -369,11 +369,99 @@ async function runS225CreateProjectSetsConversationMode() {
   }
 }
 
+// ── S228: project without conversation_mode → buildProjectState returns "PIPELINE" ──
+//
+// Tests B3 backward compat: old projects (pre-PHASE-16.1) stored without a
+// conversation_mode field must not silently default to CONVERSATION mode.
+// After the B3 fix, buildProjectState falls back to "PIPELINE" explicitly.
+//
+// RED (before B3 fix): buildProjectState returns conversation_mode: undefined
+//   (existing.conversation_mode is undefined, no fallback applied) →
+//   state_field_is_pipeline = false → FAIL.
+// GREEN (after B3 fix): fallback `|| "PIPELINE"` applied →
+//   conversation_mode: "PIPELINE" in response.project → PASS.
+
+async function runS228BackwardCompatPipelineFallback() {
+  const { resetDefaultRegistry } = require("../../runtime/tools/_registry");
+  const { resetDefaultPolicy }   = require("../../runtime/permission/permissionPolicy");
+  const secretProvider           = require("../../runtime/secrets/secret_provider");
+
+  const tempDir  = fs.mkdtempSync(path.join(os.tmpdir(), "forge-s228-"));
+  const savedEnv = {
+    FORGE_SECRET_PROVIDER:    process.env.FORGE_SECRET_PROVIDER,
+    FORGE_SECRET_STORE_PATH:  process.env.FORGE_SECRET_STORE_PATH,
+    FORGE_SECRET_KEY:         process.env.FORGE_SECRET_KEY,
+    FORGE_WORKSPACE_API_PORT: process.env.FORGE_WORKSPACE_API_PORT
+  };
+
+  process.env.FORGE_SECRET_PROVIDER    = "encrypted_file";
+  process.env.FORGE_SECRET_STORE_PATH  = tempDir;
+  process.env.FORGE_SECRET_KEY         = "s228-test-key";
+  process.env.FORGE_WORKSPACE_API_PORT = "0";
+
+  resetDefaultRegistry();
+  resetDefaultPolicy();
+  secretProvider._resetForTest();
+
+  const { createWorkspaceApiServer } = require("../../workspace/apiServer");
+  const instance = createWorkspaceApiServer({ port: 0, root: tempDir });
+
+  try {
+    await instance.start();
+    const addr = instance.server.address();
+    const base = `http://127.0.0.1:${addr.port}`;
+
+    const sessionContent = fs.readFileSync(path.join(tempDir, "web", ".forge-session"), "utf8");
+    const token          = _parseSessionToken(sessionContent);
+
+    // Write a legacy project state WITHOUT conversation_mode (simulates pre-PHASE-16.1)
+    const legacyId   = "s228_legacy_project";
+    const projectDir = path.join(tempDir, "artifacts", "projects", legacyId);
+    fs.mkdirSync(projectDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(projectDir, "project_state.json"),
+      JSON.stringify({
+        project_id:           legacyId,
+        project_name:         "S228 Legacy",
+        active_runtime_state: "DISCUSSION",
+        last_updated_at:      new Date().toISOString()
+      }, null, 2),
+      "utf8"
+    );
+
+    // Activate the legacy project — triggers persistProjectState → buildProjectState
+    const resp = await _httpPost(base, "/api/projects/activate", { project_id: legacyId }, token);
+
+    const state_field_is_pipeline =
+      resp.ok === true &&
+      resp.project != null &&
+      resp.project.conversation_mode === "PIPELINE";
+
+    return { state_field_is_pipeline };
+  } finally {
+    secretProvider._resetForTest();
+    for (const [k, v] of Object.entries(savedEnv)) {
+      if (v === undefined) delete process.env[k];
+      else process.env[k] = v;
+    }
+    resetDefaultRegistry();
+    resetDefaultPolicy();
+    if (instance && instance.server) {
+      if (typeof instance.server.closeAllConnections === "function") {
+        instance.server.closeAllConnections();
+      }
+      await new Promise((resolve) => instance.server.close(resolve));
+    }
+    try { fs.rmSync(tempDir, { recursive: true, force: true }); } catch (_) {}
+  }
+}
+
 module.exports = {
   runS220DefaultConversationMode,
   runS221ProcessMessageConversationMode,
   runS222StartPipeline,
   runS223PipelineEntryAfterTransition,
   runS224ProposalRequestInConversationMode,
-  runS225CreateProjectSetsConversationMode
+  runS225CreateProjectSetsConversationMode,
+  runS228BackwardCompatPipelineFallback
 };

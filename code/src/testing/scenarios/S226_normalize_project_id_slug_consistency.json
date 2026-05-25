@@ -1,0 +1,14 @@
+{
+  "id": "S226",
+  "name": "normalizeProjectId produces same slug as buildProjectId for human-readable names (B1 fix — PHASE-16 UNIFIED)",
+  "description": "RED (before B1 fix): normalizeProjectId('New NT') trims only → 'New NT' ≠ 'new_nt' → slugs_match=false → FAIL. GREEN (after B1 fix): normalizeProjectId applies lowercase+slug → 'new_nt' === buildProjectId output → both assertions true → PASS.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/normalization_test_helper",
+  "method": "runS226NormalizeProjectIdSlugConsistency",
+  "args": [],
+  "assertions": [
+    { "type": "state_field_equals", "field": "slugs_match",        "expected": true },
+    { "type": "state_field_equals", "field": "normalized_is_slug", "expected": true }
+  ]
+}

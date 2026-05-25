@@ -1,0 +1,13 @@
+{
+  "id": "S227",
+  "name": "POST /api/projects/activate with human-readable name returns slug active_project_id (B1+B2 backend contract — PHASE-16 UNIFIED)",
+  "description": "RED (before B1 fix): writeActiveProject('New NT') uses trim-only normalizeProjectId → response active_project_id='New NT' ≠ 'new_nt' → FAIL. GREEN (after B1 fix): normalizeProjectId slugifies → 'new_nt' → active_project_id_is_slug=true → PASS.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/normalization_test_helper",
+  "method": "runS227ActivateProjectNormalizesId",
+  "args": [],
+  "assertions": [
+    { "type": "state_field_equals", "field": "active_project_id_is_slug", "expected": true }
+  ]
+}

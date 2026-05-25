@@ -5,6 +5,7 @@ import { ChatInput } from '@/components/chat/ChatInput'
 import { MessageBubble } from '@/components/chat/MessageBubble'
 import { QuickReplies, normalizeChips } from '@/components/chat/QuickReplies'
 import type { ChatMessage, ChatPhase, ClarificationState, QuickReplyChip } from '@/components/chat/types'
+import { useProject } from '@/contexts/ProjectContext'
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -32,7 +33,7 @@ interface ChatState {
 // ── component ─────────────────────────────────────────────────────────────────
 
 export default function ChatView() {
-  const [projectId, setProjectId] = useState('default_project')
+  const { activeProjectId: projectId } = useProject()
   const [state, setState] = useState<ChatState>({
     messages: [],
     phase: 'discovery',
@@ -253,16 +254,8 @@ export default function ChatView() {
   return (
     <div className="flex flex-col h-full gap-4 p-4" data-testid="chat-view">
 
-      {/* Project ID selector — replaced by project picker in Stage 13.3 */}
       <div className="flex items-center gap-2 text-xs text-gray-400 flex-shrink-0">
-        <span>Project:</span>
-        <input
-          data-testid="project-id-input"
-          aria-label="Project ID"
-          value={projectId}
-          onChange={(e) => setProjectId(e.target.value)}
-          className="border border-input rounded px-2 py-0.5 text-xs bg-background text-foreground w-48"
-        />
+        <span>Project: <strong className="text-gray-200">{projectId}</strong></span>
         <span className="text-xs px-2 py-0.5 rounded-full border border-border">
           {state.phase}
         </span>
