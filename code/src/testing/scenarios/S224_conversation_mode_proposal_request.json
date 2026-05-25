@@ -1,0 +1,16 @@
+{
+  "id": "S224",
+  "name": "conversation mode — proposal request ('اقترح عليا') returns actual proposal, state stays DISCUSSION, pipeline not entered (PHASE-16.1 core outcome guard)",
+  "description": "RED (before D2 gate): 'اقترح عليا' enters pipeline → mode = IDEATION_IN_PROGRESS, state → IDEATION → FAIL. GREEN (after D2 gate): conversation gate fires → monkey-patched provider returns proposal → mode = CONVERSATION_RESPONSE, message includes 'مقترح', state stays DISCUSSION → PASS. This is the scenario that directly tests the G1 fix outcome.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/conversation_mode_test_helper",
+  "method": "runS224ProposalRequestInConversationMode",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "mode_not_ideation",          "expected": true },
+    { "type": "state_field_equals", "field": "state_remains_discussion",   "expected": true },
+    { "type": "state_field_equals", "field": "response_contains_proposal", "expected": true }
+  ]
+}

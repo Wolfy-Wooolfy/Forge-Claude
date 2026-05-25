@@ -4,9 +4,9 @@
   "current_stage": "A",
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
-  "next_phase": "PHASE-16-STAGE-16-1",
-  "next_step": "PHASE-16.1 Conversation Mode — Step-0 state-inheritance summary, then implementation.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-24T16-00-phase-16-ux-closure-gap.md",
+  "next_phase": "PHASE-16-STAGE-16-1-OWNER-REAL-USE-TEST",
+  "next_step": "PHASE-16.1 owner real-use test: open Forge, create project, send 'اقترح عليا', confirm actual proposal received + state stays DISCUSSION. Screenshot → report → stage declared CLOSED.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-24T20-00-phase-16-1-conversation-mode-closure.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -73,15 +73,15 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-05-24T19:08:38.391Z",
+    "last_doctor_run": "2026-05-25T07:19:38.725Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
-    "self_test_last_run": "2026-05-23",
-    "self_test_last_result": "211 passed, 0 failed, 5 skipped (216 total) — PHASE-13.7 CLOSED. S216 GREEN. Auth gate fix + static handlers + relative API base + frontend rebuild.",
-    "self_test_scenarios_pass": 211,
+    "self_test_last_run": "2026-05-24",
+    "self_test_last_result": "218 passed, 1 failed (S191 known env delta), 5 skipped (224 total) — PHASE-16.1 IMPLEMENTATION COMPLETE. S220-S224 GREEN. Conversation mode gate + startPipeline endpoint.",
+    "self_test_scenarios_pass": 218,
     "self_test_scenarios_skip": 5,
-    "self_test_scenarios_fail": 0,
+    "self_test_scenarios_fail": 1,
     "providers_registered_count": 13,
     "tools_registered_count": 78,
     "doctor_checks_count": 34,
@@ -1085,8 +1085,8 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-16-STAGE-16-1-PENDING-PROMPT",
-  "last_updated": "2026-05-24T16:00:00.000Z",
+  "current_task": "PHASE-16-STAGE-16-1-OWNER-REAL-USE-TEST-PENDING",
+  "last_updated": "2026-05-24T20:00:00.000Z",
   "phase_16": {
     "status": "ACTIVE",
     "started_at": "2026-05-24T16:00:00.000Z",
@@ -1112,8 +1112,48 @@
         "defects": [
           "G1"
         ],
-        "status": "NEXT",
-        "depends_on_phase_13_8_closed": false
+        "status": "IMPLEMENTATION_COMPLETE",
+        "depends_on_phase_13_8_closed": false,
+        "implementation_completed_at": "2026-05-24T20:00:00.000Z",
+        "decision_artifact": "artifacts/decisions/DECISION-2026-05-24T20-00-phase-16-1-conversation-mode-closure.md",
+        "checkpoint_mid": "artifacts/decisions/_phase_16_checkpoints/stage_16_1_mid.md",
+        "checkpoint_final": "artifacts/decisions/_phase_16_checkpoints/stage_16_1_final.md",
+        "su_baseline": {
+          "pass": 218,
+          "fail": 1,
+          "fail_known": "S191 — windows_task_scheduler LogonType S4U (env delta)",
+          "skip": 5,
+          "total": 224
+        },
+        "scenarios_added": [
+          "S220",
+          "S221",
+          "S222",
+          "S223",
+          "S224"
+        ],
+        "files_modified": [
+          "code/src/ai_os/projectRuntime.js",
+          "code/src/ai_os/conversationEngine.js",
+          "code/src/workspace/apiServer.js"
+        ],
+        "files_created": [
+          "code/src/testing/helpers/conversation_mode_test_helper.js",
+          "code/src/testing/scenarios/S220_conversation_mode_default_state.json",
+          "code/src/testing/scenarios/S221_conversation_mode_gate_fires.json",
+          "code/src/testing/scenarios/S222_conversation_mode_start_pipeline.json",
+          "code/src/testing/scenarios/S223_conversation_mode_pipeline_entry_after_transition.json",
+          "code/src/testing/scenarios/S224_conversation_mode_proposal_request.json"
+        ],
+        "arc_count_unchanged": true,
+        "arc_count": 7,
+        "track_a_violations": 0,
+        "owner_real_use_test": {
+          "status": "PENDING",
+          "required_action": "Owner opens Forge, creates project, sends 'اقترح عليا', confirms actual proposal received (not question), state stays DISCUSSION, screenshot",
+          "confirmed_at": null,
+          "screenshot_confirmed": false
+        }
       },
       "16_2": {
         "title": "Intake in the UI",

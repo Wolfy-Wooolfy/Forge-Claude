@@ -539,11 +539,49 @@ function createConversationEngine(options = {}) {
     return rProcessed;
   }
 
+  async function startPipeline(body = {}) {
+    const projectId = normalizeProjectId(body.project_id || "");
+    const state = loadState(projectId);
+
+    if (!state) {
+      return { ok: false, mode: "BLOCKED", reason: "PROJECT_NOT_FOUND" };
+    }
+
+    if (state.conversation_mode !== "CONVERSATION") {
+      return { ok: false, mode: "BLOCKED", reason: "NOT_IN_CONVERSATION_MODE" };
+    }
+
+    let userGoal = state.user_goal || "";
+    if (!userGoal) {
+      const history = loadConversationHistory(projectId);
+      const lastUserMsg = history.slice().reverse().find((h) => h.role === "user");
+      if (lastUserMsg) {
+        userGoal = String(lastUserMsg.content || lastUserMsg.message || "").trim();
+      }
+    }
+
+    const updatedState = {
+      ...state,
+      conversation_mode: "PIPELINE",
+      user_goal: userGoal || state.user_goal || "",
+      last_updated_at: nowIso()
+    };
+
+    await saveState(projectId, updatedState);
+
+    return {
+      ok: true,
+      conversation_mode: "PIPELINE",
+      project_id: projectId
+    };
+  }
+
   return {
     processMessage,
     generateCheckpoint,
     confirmTransition,
     getProjectSummary,
+    startPipeline,
     CONFIRMATION_REQUIRED_TRANSITIONS
   };
 }

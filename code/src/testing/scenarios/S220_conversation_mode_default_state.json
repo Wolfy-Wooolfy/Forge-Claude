@@ -1,0 +1,14 @@
+{
+  "id": "S220",
+  "name": "conversation mode — new project state includes conversation_mode: CONVERSATION by default (PHASE-16.1 regression guard)",
+  "description": "RED (before PHASE-16.1 D1): buildDefaultState() returns no conversation_mode field → FAIL. GREEN (after D1): buildDefaultState() includes conversation_mode: CONVERSATION → PASS.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/conversation_mode_test_helper",
+  "method": "runS220DefaultConversationMode",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "conversation_mode_is_conversation", "expected": true }
+  ]
+}

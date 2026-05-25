@@ -777,6 +777,9 @@ function createWorkspaceApiServer(options = {}) {
       vision_locked: typeof existing.vision_locked === "boolean" ? existing.vision_locked : false,
       vision_version: existing.vision_version || null,
       vision_history: Array.isArray(existing.vision_history) ? existing.vision_history : [],
+      conversation_mode: overrides.conversation_mode !== undefined
+        ? overrides.conversation_mode
+        : existing.conversation_mode,
       active_project_flag: readActiveProjectId() === projectId,
       last_updated_at: new Date().toISOString()
     };
@@ -1844,6 +1847,12 @@ function createWorkspaceApiServer(options = {}) {
         }
 
         res.end();
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/ai-os/project/start-pipeline") {
+        const body = await readBody(req);
+        sendJson(res, 200, await conversationEngine.startPipeline(body));
         return;
       }
 

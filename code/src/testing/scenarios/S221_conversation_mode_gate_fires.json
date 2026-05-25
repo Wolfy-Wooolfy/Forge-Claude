@@ -1,0 +1,15 @@
+{
+  "id": "S221",
+  "name": "conversation mode — processMessage on CONVERSATION-mode project: gate fires, state stays DISCUSSION (PHASE-16.1 regression guard)",
+  "description": "RED (before D2 gate): pipeline branch fires → state transitions to IDEATION → FAIL. GREEN (after D2 gate): conversation gate fires → handleConversationMode called → mode ≠ IDEATION_IN_PROGRESS AND active_runtime_state stays DISCUSSION → PASS.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/conversation_mode_test_helper",
+  "method": "runS221ProcessMessageConversationMode",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "mode_not_ideation",        "expected": true },
+    { "type": "state_field_equals", "field": "state_remains_discussion", "expected": true }
+  ]
+}
