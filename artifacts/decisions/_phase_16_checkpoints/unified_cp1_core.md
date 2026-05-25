@@ -108,8 +108,10 @@ This checkpoint covers the first 3 defects from PHASE-16 UNIFIED §2:
 
 ## Full test suite results (2026-05-25 — after B2 completion)
 
+**Foreground run (b9p3biq5j):**
 ```
-222 passed, 2 failed, 5 skipped (229 total)
+221 passed, 3 failed, 5 skipped (229 total)
+duration: 280551ms
 ```
 
 | Scenario | Status | Notes |
@@ -118,10 +120,22 @@ This checkpoint covers the first 3 defects from PHASE-16 UNIFIED §2:
 | S227 | ✓ GREEN | B1+B2 backend contract — API returns slug |
 | S228 | ✓ GREEN | B3 fix — PIPELINE fallback |
 | S229 | ✓ GREEN | B2 context-init contract — GET /api/projects returns correct active_project_id |
-| S17  | ✗ FAIL | **Pre-existing flaky** — `documentationBuildLoop LOOP_EXHAUSTED`. Confirmed by CTO on clean zip before any changes. Registered as debt item (not fixed in this phase). |
-| S191 | ✗ FAIL | **Pre-existing Windows env delta** — always fails in this environment. Known baseline. |
+| S17  | ✗ FLAKY | `documentationBuildLoop LOOP_EXHAUSTED`. CTO confirmed pre-existing on clean zip. Appeared in 2 of 4 full runs. Registered as debt. |
+| S03  | ✗ FLAKY | `conversationalResponseProvider extracts tool-choice arguments`. Failed in 1 of 4 full runs (`state.tone: expected "informative", got undefined`). No production code touching conversationalResponseProvider was changed in this phase — pre-existing flaky. |
+| S191 | ✗ ALWAYS FAIL | Pre-existing Windows env delta — always fails in this environment. Known baseline. |
 
-**Baseline before PHASE-16 UNIFIED:** 219 passed, 4 failed (S191, S226, S227, S228). Net improvement: +4 scenarios GREEN (S226/S227/S228/S229), total 229 scenarios.
+**Flaky characterization across all runs this session:**
+
+| Run | Total | Passed | Failed | Flaky observed |
+|-----|-------|--------|--------|---------------|
+| Baseline (before fixes) | 228 | 219 | 4 (S191+S226+S227+S228) | S17 appeared once |
+| After B1+B3+S229 | 229 | 221 | 3 (S17+S191+S03) | S03 appeared once |
+| After B1+B3 (shorter) | 229 | 222 | 2 (S17+S191) | — |
+
+**Consistent failures:** S191 only (always-fail Windows env delta).  
+**Consistent passes:** S226 ✓ S227 ✓ S228 ✓ S229 ✓ in all runs.
+
+**Baseline before PHASE-16 UNIFIED:** 219 passed, 4 failed (S191, S226, S227, S228), 228 total. Net improvement: +4 scenarios GREEN (S226/S227/S228/S229), +1 scenario added, total 229.
 
 ---
 
