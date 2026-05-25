@@ -1,0 +1,45 @@
+{
+  "id": "S230",
+  "name": "ideationEngine.expandIdea — question_count=3+1 hits cap=4, engine forces readyForOptions=true ignoring LLM signal (B4 deterministic break-out — PHASE-16 UNIFIED)",
+  "description": "RED (before B4 fix): no question_count tracking in engine → LLM returns ready_for_options=false → mode=IDEATION_IN_PROGRESS → FAIL. GREEN (after B4 fix): engine reads question_count=3, increments to 4, cap=4 reached, forces readyForOptions=true regardless of LLM signal → mode=READY_FOR_OPTIONS → PASS.",
+  "type": "direct_engine",
+  "permission": "WORKSPACE_WRITE",
+  "engine": "ideationEngine",
+  "method": "expandIdea",
+  "fixture": {
+    "project_name": "Test B4 Cap",
+    "current_state": "DISCUSSION",
+    "active_runtime_state": "DISCUSSION",
+    "user_goal": "بناء نظام إدارة مهام",
+    "requirement_domain": "productivity",
+    "domain_locked": false,
+    "domain_lock_intent": "FLEXIBLE",
+    "requirement_model": {},
+    "question_count": 3
+  },
+  "mock": {
+    "tool_name": "expand_idea",
+    "args": {
+      "expanded_summary": "نظام إدارة مهام",
+      "missing_components": ["تحديد الجمهور"],
+      "suggested_directions": [],
+      "improvement_proposals": [],
+      "readiness_assessment": { "ready_for_options": false, "blocking_gaps": ["حجم الفريق"] },
+      "follow_up_question": "هل تحتاج دعماً للفريق أم للاستخدام الفردي؟",
+      "suggested_answers": [],
+      "detected_domain": "productivity",
+      "pivot_detected": false,
+      "domain_confidence": 0.9,
+      "name_goal_mismatch": false
+    }
+  },
+  "input": {
+    "refinement_input": "أريد إضافة تقارير أسبوعية"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "PASS" },
+    { "type": "state_field_equals", "field": "ok",             "expected": true },
+    { "type": "state_field_equals", "field": "ready_for_options", "expected": true },
+    { "type": "state_field_equals", "field": "mode",           "expected": "READY_FOR_OPTIONS" }
+  ]
+}
