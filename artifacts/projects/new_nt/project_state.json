@@ -1,6 +1,6 @@
 {
-  "project_id": "stage_11_5_live_nextjs",
-  "project_name": "stage_11_5_live_nextjs",
+  "project_id": "new_nt",
+  "project_name": "New NT",
   "project_type": "REVIEW",
   "project_mode": "EXTEND_EXISTING",
   "project_status": "ACTIVE",
@@ -37,8 +37,8 @@
     "has_decision_packet": false
   },
   "artifact_registry": {
-    "project_root": "artifacts/projects/stage_11_5_live_nextjs",
-    "project_state": "artifacts/projects/stage_11_5_live_nextjs/project_state.json",
+    "project_root": "artifacts/projects/new_nt",
+    "project_state": "artifacts/projects/new_nt/project_state.json",
     "decision_packet": "",
     "execution_package": ""
   },
@@ -50,6 +50,7 @@
   "vision_locked": false,
   "vision_version": null,
   "vision_history": [],
-  "active_project_flag": false,
-  "last_updated_at": "2026-05-25T09:08:40.217Z"
+  "conversation_mode": "CONVERSATION",
+  "active_project_flag": true,
+  "last_updated_at": "2026-05-25T09:08:40.211Z"
 }
