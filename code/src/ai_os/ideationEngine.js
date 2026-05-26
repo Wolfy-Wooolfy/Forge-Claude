@@ -164,14 +164,25 @@ function createIdeationEngine(options = {}) {
       created_at:       nowIso()
     });
 
-    const readyForOptions = expansion.readiness_assessment && expansion.readiness_assessment.ready_for_options === true;
+    // B4: deterministic break-out — force ready after 4 turns without LLM ready signal.
+    // question_count persists in project state across turns; cap = 4.
+    // Re-read state here to capture any domain-pivot write that preceded this block.
+    const llmReady = expansion.readiness_assessment && expansion.readiness_assessment.ready_for_options === true;
+    const currentCount = typeof state.question_count === "number" ? state.question_count : 0;
+    const newCount = currentCount + 1;
+    const stateForCount = readJsonSafe(statePath, {});
+    stateForCount.question_count = newCount;
+    await tryWriteJson(statePath, stateForCount);
+    const forcedReady = !llmReady && newCount >= 4;
+    const readyForOptions = llmReady || forcedReady;
 
     return {
       ok:                true,
       mode:              readyForOptions ? "READY_FOR_OPTIONS" : "IDEATION_IN_PROGRESS",
       expansion,
       ready_for_options:  readyForOptions,
-      follow_up_question: expansion.follow_up_question || "",
+      follow_up_question: forcedReady ? "" : (expansion.follow_up_question || ""),
+      forced_ready:       forcedReady,
       suggested_answers:  Array.isArray(expansion.suggested_answers) ? expansion.suggested_answers : [],
       detected_domain:    expansion.detected_domain || "",
       previous_domain:    currentDomain,

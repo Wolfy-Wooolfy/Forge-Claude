@@ -41,28 +41,23 @@ class OpenAiDocumentationProvider {
       };
     }
 
-    let response;
+    const { getClient } = require("./_contract/openAiAdapter");
+    let completion;
     try {
-      response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${this.apiKey}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: this.model,
-          temperature: 0.3,
-          messages: [
-            {
-              role: "system",
-              content: "Return only clean Markdown documentation. No JSON. No code fence wrapping the entire document."
-            },
-            {
-              role: "user",
-              content: this.buildPrompt(task)
-            }
-          ]
-        })
+      const client = getClient();
+      completion = await client.chat.completions.create({
+        model: this.model,
+        temperature: 0.3,
+        messages: [
+          {
+            role: "system",
+            content: "Return only clean Markdown documentation. No JSON. No code fence wrapping the entire document."
+          },
+          {
+            role: "user",
+            content: this.buildPrompt(task)
+          }
+        ]
       });
     } catch (err) {
       return {
@@ -70,32 +65,19 @@ class OpenAiDocumentationProvider {
         output: null,
         metadata: {
           provider: this.name,
-          reason: "FETCH_ERROR",
+          reason: err.code || "FETCH_ERROR",
           error: err && err.message ? err.message : String(err)
         }
       };
     }
 
-    if (!response.ok) {
-      return {
-        status: "FAILED",
-        output: null,
-        metadata: {
-          provider: this.name,
-          reason: "OPENAI_HTTP_ERROR",
-          status_code: response.status
-        }
-      };
-    }
-
-    const payload = await response.json();
     const content =
-      payload &&
-      payload.choices &&
-      payload.choices[0] &&
-      payload.choices[0].message &&
-      typeof payload.choices[0].message.content === "string"
-        ? payload.choices[0].message.content.trim()
+      completion &&
+      completion.choices &&
+      completion.choices[0] &&
+      completion.choices[0].message &&
+      typeof completion.choices[0].message.content === "string"
+        ? completion.choices[0].message.content.trim()
         : "";
 
     if (!content) {

@@ -199,42 +199,24 @@ class IdeationExpansionProvider {
       }
     };
 
-    let response;
+    const { callChatWithTool } = require("./_contract/openAiAdapter");
+
+    let result;
     try {
-      response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${this.apiKey}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: this.model,
-          temperature: 0.4,
-          tools: [expandIdeaTool],
-          tool_choice: { type: "function", function: { name: "expand_idea" } },
-          messages: [
-            { role: "system", content: "You are the Ideation Expansion Engine for a governed AI Operating System. Detect domain from the current user message — never copy the previous domain blindly." },
-            ...historyMessages,
-            { role: "user", content: this.buildPrompt(task) }
-          ]
-        })
+      result = await callChatWithTool({
+        provider_id:     this.name,
+        system:          "You are the Ideation Expansion Engine for a governed AI Operating System. Detect domain from the current user message — never copy the previous domain blindly.",
+        messages:        [...historyMessages, { role: "user", content: this.buildPrompt(task) }],
+        tool_definition: expandIdeaTool.function,
+        temperature:     0.4,
+        model:           this.model
       });
     } catch (err) {
-      return { status: "FAILED", output: null, metadata: { provider: this.name, reason: "FETCH_ERROR", error: err && err.message ? err.message : String(err) } };
-    }
-
-    if (!response.ok) {
-      return { status: "FAILED", output: null, metadata: { provider: this.name, reason: "OPENAI_HTTP_ERROR", status_code: response.status } };
-    }
-
-    const payload = await response.json();
-    const toolCall = payload.choices && payload.choices[0] && payload.choices[0].message &&
-      Array.isArray(payload.choices[0].message.tool_calls) && payload.choices[0].message.tool_calls[0];
-
-    if (!toolCall || toolCall.type !== "function") {
-      return { status: "FAILED", output: null, metadata: { provider: this.name, reason: "NO_TOOL_CALL" } };
+      return { status: "FAILED", output: null, metadata: { provider: this.name, reason: err.code || "PROVIDER_ERROR", error: err && err.message ? err.message : String(err) } };
     }
 
     try {
-      const parsed = JSON.parse(toolCall.function.arguments);
-      const normalized = this.normalizeOutput(parsed);
+      const normalized = this.normalizeOutput(result.arguments);
       if (!normalized) {
         return { status: "FAILED", output: null, metadata: { provider: this.name, reason: "INVALID_EXPANSION_SCHEMA" } };
       }

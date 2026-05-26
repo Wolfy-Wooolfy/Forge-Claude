@@ -54,56 +54,35 @@ Return valid JSON only:
 
     const { system, userPrompt } = this.buildPrompt(message, pendingAction, userLanguage);
 
-    let response;
+    const { callChatWithTool } = require("./_contract/openAiAdapter");
+
+    let result;
     try {
-      response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${this.apiKey}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: this.model,
-          temperature: 0.1,
-          tools: [{
-            type: "function",
-            function: {
-              name: "classify_intent",
-              description: "Classify the user's intent in response to a pending action.",
-              parameters: {
-                type: "object",
-                properties: {
-                  intent: { type: "string", enum: ["AFFIRM", "REJECT", "MODIFY", "UNCLEAR"] },
-                  confidence: { type: "number", description: "Confidence score between 0.0 and 1.0" },
-                  clarification_question: { type: "string", description: "Question to ask if intent is unclear or confidence is low, otherwise empty string" }
-                },
-                required: ["intent", "confidence", "clarification_question"]
-              }
-            }
-          }],
-          tool_choice: { type: "function", function: { name: "classify_intent" } },
-          messages: [
-            { role: "system", content: system },
-            { role: "user", content: userPrompt }
-          ]
-        })
+      result = await callChatWithTool({
+        provider_id:     "intent_classification",
+        system,
+        messages:        [{ role: "user", content: userPrompt }],
+        tool_definition: {
+          name:        "classify_intent",
+          description: "Classify the user's intent in response to a pending action.",
+          parameters: {
+            type: "object",
+            properties: {
+              intent:                 { type: "string", enum: ["AFFIRM", "REJECT", "MODIFY", "UNCLEAR"] },
+              confidence:             { type: "number", description: "Confidence score between 0.0 and 1.0" },
+              clarification_question: { type: "string", description: "Question to ask if intent is unclear or confidence is low, otherwise empty string" }
+            },
+            required: ["intent", "confidence", "clarification_question"]
+          }
+        },
+        temperature: 0.1,
+        model:       this.model
       });
     } catch (err) {
-      return { status: "FAILED", output: null, metadata: { reason: "FETCH_ERROR", error: err && err.message ? err.message : String(err) } };
+      return { status: "FAILED", output: null, metadata: { reason: err.code || "PROVIDER_ERROR", error: err && err.message ? err.message : String(err) } };
     }
 
-    if (!response.ok) {
-      return { status: "FAILED", output: null, metadata: { reason: "API_HTTP_ERROR", status_code: response.status } };
-    }
-
-    const payload = await response.json();
-    const toolCall = payload.choices && payload.choices[0] && payload.choices[0].message &&
-      Array.isArray(payload.choices[0].message.tool_calls) && payload.choices[0].message.tool_calls[0];
-
-    if (!toolCall || toolCall.type !== "function") {
-      return { status: "FAILED", output: null, metadata: { reason: "NO_TOOL_CALL" } };
-    }
-
-    let args;
-    try { args = JSON.parse(toolCall.function.arguments); }
-    catch { return { status: "FAILED", output: null, metadata: { reason: "INVALID_TOOL_ARGUMENTS" } }; }
+    const args = result.arguments;
 
     const validIntents = ["AFFIRM", "REJECT", "MODIFY", "UNCLEAR"];
     const intent = validIntents.includes(args.intent) ? args.intent : "UNCLEAR";

@@ -179,6 +179,10 @@ async function callChatWithTool({
   };
 }
 
+function _resetClientForTests() {
+  _client = null;
+}
+
 module.exports = {
   getClient,
   getModel,
@@ -187,6 +191,7 @@ module.exports = {
   extractToolCallArguments,
   extractJsonFromText,
   callChatWithTool,
+  _resetClientForTests,
   DEFAULT_TIMEOUT_MS,
   DEFAULT_RETRY_BACKOFF_MS
 };

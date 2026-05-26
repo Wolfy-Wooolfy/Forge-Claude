@@ -1,6 +1,6 @@
 "use strict";
 
-const { OpenAI } = require("openai");
+const { getClient } = require("./_contract/openAiAdapter");
 
 class ConversationalResponseProvider {
   constructor() {
@@ -180,7 +180,7 @@ Then one sentence telling the user what to do next.`;
       .map((h) => ({ role: h.role === "assistant" ? "assistant" : "user", content: String(h.content || h.message || "") }))
       .filter((h) => h.content);
 
-    const client = new OpenAI({ apiKey: this.apiKey });
+    const client = getClient();
     const stream = await client.chat.completions.create({
       model: this.model,
       temperature: 0.6,
@@ -219,7 +219,7 @@ Then one sentence telling the user what to do next.`;
       .map((h) => ({ role: h.role === "assistant" ? "assistant" : "user", content: String(h.content || h.message || "") }))
       .filter((h) => h.content);
 
-    const client = new OpenAI({ apiKey: this.apiKey });
+    const client = getClient();
 
     try {
       const completion = await client.chat.completions.create({

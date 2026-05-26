@@ -22,9 +22,16 @@ function _httpFetch(url, options) {
       res.on("data",  (chunk) => { buf += chunk; });
       res.on("end",   () => {
         const statusCode = res.statusCode;
+        const rawHeaders = res.headers || {};
         resolve({
           ok:   statusCode >= 200 && statusCode < 300,
           status: statusCode,
+          headers: {
+            get:     (name) => rawHeaders[name.toLowerCase()] || null,
+            has:     (name) => Object.prototype.hasOwnProperty.call(rawHeaders, name.toLowerCase()),
+            forEach: (cb)   => Object.keys(rawHeaders).forEach(k => cb(rawHeaders[k], k)),
+            entries: function* () { for (const k of Object.keys(rawHeaders)) yield [k, rawHeaders[k]]; }
+          },
           json: () => Promise.resolve(JSON.parse(buf)),
           text: () => Promise.resolve(buf)
         });
@@ -151,6 +158,15 @@ async function _runDirectProvider(scenario, root) {
 
   let raw;
   try {
+    // Reset the OpenAI client singleton so each direct_provider test gets a
+    // fresh client bound to this test's mock URL (prevents stale PORT from
+    // a prior test's mock server leaking into the next test's API calls).
+    try {
+      const adapterPath = path.join(root, "code", "src", "providers", "_contract", "openAiAdapter");
+      const adapter = require(adapterPath);
+      if (typeof adapter._resetClientForTests === "function") adapter._resetClientForTests();
+    } catch (_e) { /* adapter not yet loaded — no-op */ }
+
     const provDir  = path.join(root, "code", "src", "providers");
     const Cls      = require(path.join(provDir, scenario.provider));
     const provider = new Cls();
@@ -385,6 +401,14 @@ async function _runDirectEngine(scenario, root) {
 
     process.env.OPENAI_API_KEY = "sk-mock-engine-" + scenario.id.toLowerCase() + "-0000";
   }
+
+  // Reset the OpenAI client singleton so each direct_engine test gets a
+  // fresh client (no stale baseURL from a prior direct_provider test).
+  try {
+    const adapterPath = path.join(root, "code", "src", "providers", "_contract", "openAiAdapter");
+    const adapter = require(adapterPath);
+    if (typeof adapter._resetClientForTests === "function") adapter._resetClientForTests();
+  } catch (_e) { /* adapter not yet loaded — no-op */ }
 
   const startTs = new Date().toISOString();
   let raw;
