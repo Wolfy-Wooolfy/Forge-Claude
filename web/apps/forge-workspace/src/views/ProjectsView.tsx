@@ -133,6 +133,14 @@ export default function ProjectsView() {
 
   // ── derived ────────────────────────────────────────────────────────────────
 
+  const SYSTEM_PREFIXES = ['stage_', 'test_', 'diag_', 'live_smoke_', '_']
+
+  function isUserProject(id: string): boolean {
+    return !SYSTEM_PREFIXES.some((pfx) => id.startsWith(pfx))
+  }
+
+  const visibleProjects = state.projects.filter((p) => isUserProject(p.project_id))
+
   const canDelete = state.activeProjectId !== 'default_project'
   const activeName =
     state.activeProject?.project_name ?? state.activeProjectId
@@ -142,7 +150,7 @@ export default function ProjectsView() {
   return (
     <div className="flex h-full">
       {/* ── left panel: project list ─────────────────────────────────── */}
-      <div className="w-64 flex-shrink-0 border-r border-gray-800 flex flex-col">
+      <div className="w-64 flex-shrink-0 border-e border-gray-800 flex flex-col">
         <div className="p-4 border-b border-gray-800 flex items-center justify-between">
           <h1 className="text-sm font-semibold text-gray-100">Projects</h1>
           <Button
@@ -160,10 +168,10 @@ export default function ProjectsView() {
             <div className="text-xs text-gray-500 italic p-2">جارٍ التحميل...</div>
           ) : state.error ? (
             <div className="text-xs text-red-400 p-2">{state.error}</div>
-          ) : state.projects.length === 0 ? (
+          ) : visibleProjects.length === 0 ? (
             <div className="text-xs text-gray-500 italic p-2">لا توجد مشاريع.</div>
           ) : (
-            state.projects.map((project) => {
+            visibleProjects.map((project) => {
               const isActive = project.project_id === state.activeProjectId
               return (
                 <button

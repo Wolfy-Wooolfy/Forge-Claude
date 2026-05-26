@@ -120,6 +120,16 @@ function createWorkspaceApiServer(options = {}) {
     });
   }
 
+  // §ARC-8: fs.write_file tool is text-only; binary upload requires raw Buffer — exempt from L2 tool routing
+  function readBinaryBody(req) {
+    return new Promise((resolve, reject) => {
+      const chunks = [];
+      req.on("data", (chunk) => { chunks.push(chunk); });
+      req.on("end", () => { resolve(Buffer.concat(chunks)); });
+      req.on("error", reject);
+    });
+  }
+
   function loadApprovalPolicy() {
     const fallback = {
       version: "1.1",
@@ -2093,6 +2103,22 @@ function createWorkspaceApiServer(options = {}) {
         } catch (err) {
           sendJson(res, 500, { ok: false, error: err && err.message ? err.message : "KB_LIST_SOURCES_FAILED" });
         }
+        return;
+      }
+
+      // §ARC-8: binary ZIP upload — fs.writeFileSync exempt (text tool cannot handle raw Buffer)
+      if (req.method === "POST" && pathname === "/api/intake/upload") {
+        const projectId  = requestUrl.searchParams.get("project_id") || "unknown";
+        const filename   = req.headers["x-filename"] || "upload.zip";
+        const safename   = filename.replace(/[^a-zA-Z0-9._-]/g, "_");
+        const uploadsDir = path.resolve(root, "artifacts", "uploads");
+        fs.mkdirSync(uploadsDir, { recursive: true });
+        const zipName    = `${Date.now()}_${safename}`;
+        const savedPath  = path.join(uploadsDir, zipName);
+        const fileBuffer = await readBinaryBody(req);
+        fs.writeFileSync(savedPath, fileBuffer);
+        const zipPath    = `artifacts/uploads/${zipName}`;
+        sendJson(res, 200, { ok: true, zip_path: zipPath, project_id: projectId });
         return;
       }
 

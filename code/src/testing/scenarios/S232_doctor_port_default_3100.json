@@ -1,0 +1,16 @@
+{
+  "id": "S232",
+  "name": "apiServerPort and webServerPort default to port 3100 not 4505",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/monitoring_test_helper",
+  "method": "runS232PortDefault3100",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "api_port_detail_has_3100", "expected": true },
+    { "type": "state_field_equals", "field": "api_port_detail_has_4505", "expected": false },
+    { "type": "state_field_equals", "field": "web_port_detail_has_3100", "expected": true },
+    { "type": "state_field_equals", "field": "web_port_detail_has_4505", "expected": false }
+  ]
+}

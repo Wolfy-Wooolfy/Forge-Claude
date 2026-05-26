@@ -1,0 +1,268 @@
+﻿
+── Forge Self-Test Harness ──────────────────────────────────────
+
+  ✓  S01    conversationalResponseProvider returns respond_to_user tool call
+  ✓  S02    intentClassificationProvider classifies user approval as AFFIRM
+  ✓  S03    conversationalResponseProvider extracts all tool-choice arguments correctly
+  ✓  S04    fs.write_file succeeds in WORKSPACE_WRITE permission mode
+  ✓  S05    fs.write_file denied in READ_ONLY permission mode
+  ✓  S06    full conversation turn through conversationEngine
+  ✓  S07    conversation turn falls back gracefully when provider has no API key
+  ✓  S08    fs.write_file denied in PROMPT mode (no interactive session in harness)
+  ✓  S09    DANGER_FULL_ACCESS does not change conversation engine output shape
+  ✓  S100   role.invoke test_designer — happy path returns scenarios and coverage_summary
+  ✓  S101   role.invoke test_designer — missing spec returns FAILED INVALID_INPUT
+  ✓  S102   role.invoke reviewer Phase B — happy path returns APPROVED_WITH_CONCERNS
+  ✓  S103   role.invoke test_designer — agent returns non-JSON returns FAILED INVALID_ROLE_OUTPUT
+  ✓  S104   role.invoke cost_estimator — happy path returns phases and effort totals
+  ✓  S105   role.invoke cost_estimator — missing spec returns FAILED INVALID_INPUT
+  ✓  S106   role.invoke cost_estimator — agent returns non-JSON returns FAILED INVALID_ROLE_OUTPUT
+  ✓  S107   role.invoke environment — happy path returns container_recommendation and env vars
+  ✓  S108   role.invoke environment — missing spec returns FAILED INVALID_INPUT
+  ✓  S109   role.invoke environment — agent returns non-JSON returns FAILED INVALID_ROLE_OUTPUT
+  ✓  S10    doctor runDoctor() returns ok=true with no FAIL checks
+  ✓  S110   role.invoke documentation — happy path returns overview and api_reference
+  ✓  S111   role.invoke documentation — missing spec returns FAILED INVALID_INPUT
+  ✓  S112   role.invoke documentation — agent returns non-JSON returns FAILED INVALID_ROLE_OUTPUT
+  ✓  S113   role.invoke deployment — happy path returns deployment_sequence and health_verification
+  ✓  S114   role.invoke deployment — missing spec returns FAILED INVALID_INPUT
+  ✓  S115   role.invoke deployment — agent returns non-JSON returns FAILED INVALID_ROLE_OUTPUT
+  ✓  S116   role.invoke quality_judge — happy path returns APPROVED verdict with confidence_score
+  ✓  S117   role.invoke quality_judge — missing spec returns FAILED INVALID_INPUT
+  ✓  S118   role.invoke quality_judge — REJECTED verdict when BLOCKER cross-role issue present
+  ✓  S119   doctor builtproject_runtime check passes
+  ✓  S11    multi-turn conversation state preserved across turns via conversationEngine
+  ✓  S120   builtproject.run_scenarios reference project — all 6 scenarios PASS
+  ✓  S121   builtproject.run_scenarios with scenario_ids filter — runs only specified scenario
+  ✓  S122   builtproject.read_report returns last report after run
+  ✓  S123   builtproject.run_scenarios with non-existent project_root returns FAILED
+  ✓  S124   builtproject.run_scenarios — scenario_ids empty list runs all scenarios
+  ✓  S125   builtproject.run_scenarios T-1 — create_todo assertions all PASS
+  ✓  S126   builtproject.run_scenarios T-6 — missing_title_returns_400 PASS
+  ✓  S127   builtproject.run_scenarios writes last_report.json and loopback_signal.json
+  ✓  S128   builtproject.read_report on project with no prior run returns FAILED
+  ✓  S129   kb.ingest_url returns DUPLICATE when src_id already in manifest
+  ✓  S12    W-03 isolation: FORGE_DECISION_OVERRIDE has no effect on permission layer
+  ✓  S130   kb.list_sources returns seeded source from manifest
+  ✓  S131   kb.cite returns FAILED when all supporting chunks are LOW credibility
+  ✓  S132   kb.validate_citations detects uncited factual claim
+  ✓  S133   research.fetch_url returns DUPLICATE when src_id already in manifest
+  ✓  S134   role.invoke research — happy path returns ResearchFindings with valid structure
+  ✓  S135   role.invoke research — missing required question field returns FAILED INVALID_INPUT
+  ✓  S136   role.invoke research — pre-seeded cost_ledger over cap returns FAILED BUDGET_EXCEEDED
+  ✗  S137   kb.retrieve returns empty results for project with no vector data
+node :          FAIL assertion [status_equals]: status: expected 'SUCCESS', got 'FAILED'
+At line:1 char:35
++ cd "d:\S\Halo\Tech\Forge-Claude"; node bin/forge-test.js 2>&1 | Out-F ...
++                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (         FAIL a...', got 'FAILED':String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  ✓  S138   agent.invoke allowed in WORKSPACE_WRITE mode (no PROMPT required)
+         FAIL assertion [state_field_exists]: state.results is missing/null
+         FAIL assertion [state_field_equals]: state.results.length: expected 0, got undefined
+
+  ✓  S139   orchestration state machine: validateTransition + createLoop initial state
+  ✓  S13    TEST mode allows artifacts/ writes for CI scenarios
+  ✓  S140   loop state persists across steps: graph.json written, reloaded, audit log correct
+  ✓  S141   orchestration boot validation: 17 states, ITERATION_CAP, misspelling detection
+  ✓  S142   debate protocol: agree at PROPOSE when BLOCKER locations match
+  ✓  S143   debate protocol: arbitrate after 3 COUNTER rounds of disagreement
+  ✓  S144   debate protocol: DebateVerdict schema validation (positive + negative cases)
+  ✓  S145   iteration cap (count=5 >= CAP=5) triggers escalation without incrementing counter
+  ✓  S146   owner gate 1 auto-approves with FORGE_OWNER_AUTO_APPROVE=1; blocks when no responder
+  ✓  S147   gate 2 REJECT_AND_LOOP increments iteration_count and returns next_state=BUILDER
+  ✓  S148   shouldSkipGate3 returns true when deployment_enabled is not strictly true
+  ✓  S149   orchestration tools registered — all 6 present with correct modes, previews, and input schemas
+  ✓  S14    ideationExpansionProvider returns valid expansion tool-call shape
+  ✓  S150   orchestration.abort transitions loop to ABORTED_BY_OWNER; audit log preserved with schema-pure ABORT row
+  ✓  S151   retrieve() with 50ms timeout fires TimeoutError; withRetry does NOT retry on TimeoutError
+  ✓  S152   Full loop fast-path: FORGE_OWNER_AUTO_APPROVE=1, 14 transitions, reaches COMPLETE
+  ✓  S153   Gate 1 fires in ENV_REPORT, auto-approve via env, proceeds to TEST_DESIGN
+  ✓  S154   Gate 2 REJECT_AND_LOOP increments iteration count; loop returns to BUILDER; second iteration reaches COMPLETE
+  ✓  S155   Reviewer + Security disagree → debate runs → Quality Judge arbitrates → verdict ARBITRATED in debate_verdicts.jsonl
+  ✓  S156   deployment_enabled=false → Gate 3 skipped (VACUOUS_SKIP) → COMPLETE without deploy step
+  ✓  S157   appendAuditRow rejects rows with unexpected fields (contract §12.2)
+  ✓  S158   project.intake_zip directory mode — copies fixture_pycli into project source
+  ✓  S159   project.analyze_source — parses fixture_pycli and returns SourceTreeAnalysis with AST samples
+  ✓  S15    ideationEngine.expandIdea persists ideation_log.json via L2 Tool Runtime
+  ✓  S160   reverse_vision_role — mock provider returns valid InferredVision with all 8 required fields
+  ✓  S161   intake end-to-end mock — intake_zip → analyze_source → reverse_vision_role → vision.md written unlocked
+  ✓  S162   project.analyze_source — Rust-only directory returns UNSUPPORTED_LANGUAGE (§7 language matrix)
+  ✓  S163   project.analyze_source — JavaScript file → detects 'javascript'
+  ✓  S164   project.analyze_source — TypeScript file → detects 'typescript'
+  ✓  S165   project.analyze_source — fixture_nextjs → detects 'typescript' + detected_framework='next'
+  ✓  S166   reverse_vision_role — mock provider + Next.js source tree → domain='web_application'
+  ✓  S167   intake end-to-end mock — fixture_nextjs → vision.md with domain='web_application'
+  ✓  S168   project.analyze_source — single .go file → detects 'go', framework=null
+  ✓  S169   project.analyze_source — fixture_gocli → go detected + go.mod parsed + AST symbols
+  ✓  S16    businessAnalysisEngine.analyzeProject persists business_analysis_log.json via L2 Tool Runtime
+  ✓  S170   reverse_vision_role — mock provider + Go CLI source tree → domain='cli_tool'
+  ✓  S171   intake end-to-end mock — fixture_gocli → vision.md with domain='cli_tool'
+  ✓  S172   intake handler — directory_path trigger starts intake, returns AWAIT_VISION_APPROVAL
+  ✓  S173   intake handler — no attachment + no active project returns NO_ACTIVE_INTAKE
+  ✓  S174   intake sync flow — fixture_gocli intake via mock role → vision.md unlocked + state=AWAIT_VISION_APPROVAL
+  ✓  S175   intake approve — AFFIRM intent → vision_locked=true + state=APPROVED + loop at ARCHITECT_DESIGN
+  ✓  S176   intake edit — MODIFY intent + regex → non_goals updated, state remains AWAIT_VISION_APPROVAL
+  ✓  S177   intake reject — REJECT intent → state=REJECTED + project artifacts deleted
+  ✓  S178   start_loop with owner_intent_source=vision_locked_intake → current_state=ARCHITECT_DESIGN
+  ✓  S179   reverseVisionProvider writes LLM trace files (metadata/requests/responses) per providerTrace
+  ✗  S17    documentationBuildLoop persists loop state + review log + report via L2
+         FAIL assertion [status_equals]: status: expected 'PASS', got 'FAIL'
+
+  ✓  S180   agent_budget_rule: role_id=reverse_vision skips vision-lock check; other role_id gets DENIED
+         FAIL assertion [state_field_equals]: state.ok: expected true, got false
+         FAIL assertion [state_field_equals]: state.mode: expected "DOCUMENTATION_BUILD_COMPLETE", got "LOOP_EXHAUSTED"
+
+  ✓  S181   full mock e2e: directory_path → intake → mock RV role → mock approve → lock vision → loop=ARCHITECT_DESIGN
+  ✓  S182   mock e2e: intake handler × 3 fixtures sequentially → valid InferredVision per fixture
+  ✓  S183   PHASE-11 full regression: grammars + role single path + contract + provider v2
+  ✓  S184   intake_zip entries at cap — 50000 entries → SUCCESS
+  ✓  S185   intake_zip entries over cap — 50001 entries → ZIP_TOO_LARGE
+  ✓  S186   intake_zip env override entries — 60000 cap, 55000 entries → SUCCESS
+  ✓  S187   intake_zip bytes at cap — 50 MB+1, under 500 MB default → SUCCESS
+  ✓  S188   intake_zip bytes over cap — 500 MB+1 → ZIP_TOO_LARGE
+  ✓  S189   intake_zip env override bytes — 100 MB cap, 50 MB+1 → SUCCESS
+  ✓  S18    documentationReviewEngine persists review log + report via L2
+  ✓  S190   service install — windows_nssm_install.bat structure: actions + NSSM check + Node check + idempotency
+  ✗  S191   service install — windows_task_scheduler_install.bat structure: Register-ScheduledTask + restart-on-failure + LogonType S4U
+  ✓  S192   service_lifecycle Doctor check — present in Doctor output, status PASS (not installed yet is not a failure)
+  ✓  S193   secrets — secret_provider.js API contract and provider resolution
+  ✓  S194   secrets — windows_credential_manager.js API contract
+         FAIL assertion [state_field_equals]: state.logon_type_ok: expected true, got false
+
+  ✓  S195   secrets — encrypted_file_provider AES-256-GCM + scrypt round trip
+  ✓  S196   secrets — secrets_in_env_var Doctor check present and status valid
+  ✓  S197   backup — backup.create applies DEFAULT_EXCLUDE correctly
+  ✓  S198   backup — backup.verify detects ZIP corruption
+  ✓  S199   backup — Doctor check warns when backup is stale (> 7 days)
+  ✓  S19    deliveryPackageBuilder persists runbook + package + state via L2
+  ✓  S200   backup — backup.restore round-trip and ENFORCEMENT_DENIED in WORKSPACE_WRITE
+  ✓  S201   logging — log_writer routes info/warn/error and triggers rotation
+  ✓  S202   monitoring — metrics_window_24h initialized with 7 fields + idempotent
+  ✓  S203   doctor — logging_status PASS when logs/ present, WARN when missing
+  ✓  S204   api server — binds to 127.0.0.1 by default (OQ-2 fixed)
+  ✓  S205   api server — unauthenticated request returns 401
+  ✓  S206   api server — Bearer token accepted on protected endpoint
+  ✓  S207   api server — start() throws UID_PIN_MISMATCH on wrong user
+  ✓  S208   PHASE-12 full regression: service, secrets, backup, logging, auth, binding, uid_pin
+  ✓  S209   doctor — all PHASE-12 checks registered and no PHASE-12 check in FAIL status
+  ✓  S20    discussionLoopGate.assertDiscussionComplete persists gate JSON via L2
+  ✓  S210   uid_pin_match: Windows service-account equivalence (5 unit tests for isIdentityMatch)
+  ✓  S211   nssm_helper: multi-encoding Buffer detection (4 unit tests for _decodeNssmBuffer)
+  ✓  S212   openai_api_key Doctor check consults secret_provider before env var
+  ✓  S213   api vision — GET /api/vision with no vision.md returns null
+  ✓  S214   api vision — GET /api/vision with valid vision.md returns frontmatter + body
+  ✓  S215   api kb/sources — GET /api/kb/sources with no sources returns empty array
+  ✓  S216   auth gate exempts static routes when _activeToken is set (PHASE-13.7 regression guard)
+  ✓  S217   GET / — HTML contains window.__FORGE_TOKEN__ in <head> before module script
+  ✓  S218   env_loader — OPENAI_API_KEY loads from .env when no ambient key is set
+  ✓  S219   env_loader — ambient FORGE_API_PORT is not overridden by stale .env value (ambient wins)
+  ✓  S21    languageDetectionCompliance.validateLanguageConsistency persists compliance log via L2
+  ✓  S220   conversation mode — new project state includes conversation_mode: CONVERSATION by default (PHASE-16.1 regression guard)
+  ✓  S221   conversation mode — processMessage on CONVERSATION-mode project: gate fires, state stays DISCUSSION (PHASE-16.1 regression guard)
+  ✓  S222   conversation mode — startPipeline sets conversation_mode: PIPELINE (PHASE-16.1 regression guard)
+  ✓  S223   conversation mode — after startPipeline, processMessage enters pipeline (state → IDEATION) (PHASE-16.1 regression guard)
+  ✓  S224   conversation mode — proposal request ('اقترح عليا') returns actual proposal, state stays DISCUSSION, pipeline not entered (PHASE-16.1 core outcome guard)
+  ✓  S225   conversation mode — createProject() via API sets conversation_mode: CONVERSATION in project state (PHASE-16.1 regression guard)
+  ✓  S226   normalizeProjectId produces same slug as buildProjectId for human-readable names (B1 fix — PHASE-16 UNIFIED)
+  ✓  S227   POST /api/projects/activate with human-readable name returns slug active_project_id (B1+B2 backend contract — PHASE-16 UNIFIED)
+  ✓  S228   legacy project without conversation_mode field → buildProjectState returns PIPELINE (B3 backward compat — PHASE-16 UNIFIED)
+  ✓  S229   GET /api/projects returns active_project_id matching last activated project (B2 context-init contract — PHASE-16 UNIFIED)
+  ✓  S22    projectReviewEngine.reviewProject persists review report via L2
+  ✓  S230   ideationEngine.expandIdea — question_count=3+1 hits cap=4, engine forces readyForOptions=true ignoring LLM signal (B4 deterministic break-out — PHASE-16 UNIFIED)
+  ✓  S231   runDoctor summary is HEALTHY when fail=0 and warn=0
+  ✗  S232   apiServerPort and webServerPort default to port 3100 not 4505
+  ✓  S23    refinementLoopOrchestrator.runIdeationLoop persists ideation log via L2
+  ✓  S24    uxValidator.validateResponse persists ux validation log via L2
+  ✓  S25    /api/ai/decision end-to-end write via L2 Tool Runtime
+  ✓  S26    /api/projects/activate write paths via L2 Tool Runtime
+  ✓  S27    /api/projects/create write path via L2 Tool Runtime
+  ✓  S28    /api/ai/propose write path via L2 Tool Runtime
+  ✓  S29    /api/projects/delete uses fs.delete_dir L2 tool
+  ✓  S30    fs.delete_dir rejects path outside artifacts/projects/ — deny-by-default
+  ✓  S31    fs.write_file denied when vision exists but vision_locked=false
+  ✓  S32    fs.write_file succeeds when vision_locked=true
+  ✓  S33    vision.approve_amendment increments vision_version from 1 to 2
+  ✓  S34    vision.propose_amendment returns PROPOSED without changing vision_version
+  ✓  S35    vision.approve_amendment on already-approved returns AMENDMENT_NOT_PROPOSABLE
+  ✓  S36    shell.run_in_workspace denied when vision_locked=false
+  ✓  S37    shell.run_in_workspace succeeds when vision_locked=true
+  ✓  S38    shell.run_with_prompt denies sudo via HARD_DENY_ARGV0
+  ✓  S39    shell.run_with_prompt env allowlist strips OPENAI_* from subprocess
+  ✓  S40    shell.run_with_prompt denies chmod 777 via HARD_DENY_PATTERNS
+  ✓  S41    shell.run (DANGER_FULL_ACCESS) denies chmod 777 via HARD_DENY_PATTERNS
+  ✓  S42    env.detect_all returns full fingerprint with required shape
+         FAIL assertion [state_field_equals]: state.api_port_detail_has_3100: expected true, got false
+
+         FAIL assertion [state_field_equals]: state.api_port_detail_has_4505: expected false, got true
+         FAIL assertion [state_field_equals]: state.web_port_detail_has_3100: expected true, got false
+         FAIL assertion [state_field_equals]: state.web_port_detail_has_4505: expected false, got true
+
+  ✓  S43    env.detect_one with detector_id:os returns detected:true and platform field
+  ✓  S44    env.detect_all with use_cache:true returns cached fingerprint when valid cache exists
+  ✓  S45    env.refresh_fingerprint runs all detectors and persists artifact to disk
+  ✓  S46    env.probe_binary with valid arg returns probe result with exit_code and stdout
+  ✓  S47    env.probe_binary with disallowed arg returns FAILED/INVALID_PROBE_ARG
+  ✓  S48    pkg.install npm installs package into test workspace (Tier 1)
+  ✓  S49    pkg.remove npm removes package listed in fixture package.json (Tier 1)
+  ✓  S50    pkg.audit npm returns mock result in TEST mode without spawning real audit
+  ✓  S51    pkg.list npm reads package.json dependencies without spawning (READ_ONLY)
+  ✓  S52    pkg.install npm_global (Tier 2) routes to shell.run_with_prompt and is auto-denied in tests
+  ✓  S53    pkg.detect_lock_files finds package-lock.json in test workspace (no binary required)
+  ✓  S54    pkg.install (WORKSPACE_WRITE) is DENIED when permission mode is READ_ONLY
+  ✓  S55    pkg.list pip reads requirements.txt without spawning (cross-adapter READ_ONLY coverage)
+  ✓  S56    pkg.get_adapter returns npm adapter metadata (READ_ONLY)
+  ✓  S57    pkg.install pip installs package into test workspace --target (Tier 1)
+  ○  S58    container.run with safe args succeeds (detached, returns container_id)
+         skip: binary not found: docker
+  ✓  S59    container.run with --privileged is HARD_DENY
+  ✓  S60    container.run with --cap-add NET_ADMIN is HARD_DENY
+  ✓  S61    container.run with bind-mount /etc:/etc is HARD_DENY (workspace boundary violation)
+  ○  S62    container.run with workspace-bound bind-mount succeeds
+         skip: binary not found: docker
+  ✓  S63    container.run with privileged port 80 is DENIED (PROMPT_REQUIRED, not escalated in WORKSPACE_WRITE)
+  ✓  S64    container.exec in PROMPT mode is DENIED (auto-deny prompter, no interactive session)
+  ○  S65    container.stop stops a running container (stops forge-test-s58 started by S58)
+         skip: binary not found: docker
+  ✓  S66    container.logs on non-existent container returns FAILED (CONTAINER_NOT_FOUND or RUNTIME_NOT_AVAILABLE)
+  ○  S67    container.list returns containers list (READ_ONLY, requires docker)
+         skip: binary not found: docker
+  ○  S68    container.compose_config expands workspace-local compose.yml to JSON
+         skip: binary not found: docker
+  ✓  S69    container.build with dockerfile outside workspace is DENIED WORKSPACE_BOUNDARY_VIOLATION
+  ✓  S70    container.build is DENIED when project vision is not locked
+  ✓  S71    agent.list_available returns 5 providers (mock always true)
+  ✓  S72    agent.invoke with mock provider returns deterministic output
+  ✓  S73    agent.invoke with missing project_id returns FAILED (INVALID_INPUT)
+  ✓  S74    agent.estimate_cost returns zero cost for mock provider
+  ✓  S75    agent.invoke writes one JSONL entry to cost ledger
+  ✓  S76    agent.read_ledger returns seeded entry with correct count and cost
+  ✓  S77    agent.read_ledger entry has all required schema fields
+  ✓  S78    agent.invoke at budget 80% allows with BUDGET_80_PCT warn
+  ✓  S79    agent.invoke at budget 95% returns DENIED BUDGET_95_PCT_REQUIRES_APPROVAL (non-mock provider)
+  ✓  S80    agent.invoke at budget 100% returns DENIED BUDGET_EXCEEDED (non-mock provider)
+  ✓  S81    agent.invoke non-mock provider + unlocked vision returns DENIED VISION_NOT_LOCKED
+  ✓  S82    agent.invoke mock provider + unlocked vision returns SUCCESS (mock bypass)
+  ✓  S83    role.invoke architect basic success — valid input returns SUCCESS with design output
+  ✓  S84    role.invoke architect invalid input — missing intent returns FAILED INVALID_INPUT
+  ✓  S85    role.invoke architect invalid LLM output — non-JSON text returns FAILED INVALID_ROLE_OUTPUT
+  ✓  S86    role.invoke spec_writer basic success — valid design returns SUCCESS with spec output
+  ✓  S87    role.invoke spec_writer invalid input — missing design returns FAILED INVALID_INPUT
+  ✓  S88    role.invoke spec_writer role attribution — output contains role_id field
+  ✓  S89    role.invoke reviewer Phase A — clean spec returns SUCCESS with APPROVED verdict
+  ✓  S90    role.invoke reviewer Phase A — sparse spec returns SUCCESS with REJECTED verdict
+  ✓  S91    role.invoke reviewer Phase B — missing code field returns FAILED INVALID_INPUT
+  ✓  S92    role.invoke builder — happy path returns files_written plan
+  ✓  S93    role.invoke builder — missing spec returns FAILED INVALID_INPUT
+  ✓  S94    role.invoke builder — agent returns non-JSON returns FAILED INVALID_ROLE_OUTPUT
+  ✓  S95    role.invoke builder — agent returns JSON failing OUTPUT_SCHEMA returns FAILED INVALID_ROLE_OUTPUT
+  ✓  S96    role.invoke security_auditor — Phase SPEC happy path returns threat_level
+  ✓  S97    role.invoke security_auditor — Phase CODE happy path returns threat_level
+  ✓  S98    role.invoke security_auditor — Phase CODE missing code field returns FAILED INVALID_INPUT
+  ✓  S99    role.invoke security_auditor — agent returns non-JSON returns FAILED INVALID_ROLE_OUTPUT
+
+─────────────────────────────────────────────────────────────────
+FAILURES DETECTED — 223 passed, 4 failed, 5 skipped (232 total)
+duration: 119801ms
+

@@ -6,7 +6,7 @@ module.exports = {
   id:          "api_server_port",
   description: "API server port bindable or already in use (Forge running)",
   fn(ctx) {
-    const port = ctx.api_port || 4505;
+    const port = ctx.api_port || 3100;
     return new Promise((resolve) => {
       const srv = net.createServer();
       let resolved = false;

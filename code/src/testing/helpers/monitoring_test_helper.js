@@ -196,9 +196,49 @@ async function runS209DoctorPhase12ChecksPass() {
   };
 }
 
+// ── S231: runDoctor summary is "HEALTHY" when fail=0 and warn=0 ──────────────
+
+async function runS231DoctorHealthySummary() {
+  const { runDoctor }   = require("../../runtime/doctor/runDoctor");
+  const { listCheckIds } = require("../../runtime/doctor/_registry");
+  const allIds = listCheckIds();
+
+  // Skip every registered check so counts are all zero — summary must be HEALTHY
+  const result = await runDoctor({
+    write_report: false,
+    update_status: false,
+    skip_checks:  allIds
+  });
+
+  return { summary: result && result.summary };
+}
+
+// ── S232: apiServerPort and webServerPort default to 3100, not 4505 ──────────
+
+async function runS232PortDefault3100() {
+  const apiCheck = require("../../runtime/doctor/checks/apiServerPort");
+  const webCheck = require("../../runtime/doctor/checks/webServerPort");
+
+  // Call with empty ctx — no api_port or web_port set
+  const apiResult = await Promise.resolve(apiCheck.fn({}));
+  const webResult = await Promise.resolve(webCheck.fn({}));
+
+  const apiDetail = String((apiResult && apiResult.detail) || "");
+  const webDetail = String((webResult && webResult.detail) || "");
+
+  return {
+    api_port_detail_has_3100: apiDetail.includes("3100"),
+    api_port_detail_has_4505: apiDetail.includes("4505"),
+    web_port_detail_has_3100: webDetail.includes("3100"),
+    web_port_detail_has_4505: webDetail.includes("4505")
+  };
+}
+
 module.exports = {
   runS201LogWriterRotation,
   runS202MetricsWindowInitialized,
   runS203DoctorLoggingStatus,
-  runS209DoctorPhase12ChecksPass
+  runS209DoctorPhase12ChecksPass,
+  runS231DoctorHealthySummary,
+  runS232PortDefault3100
 };

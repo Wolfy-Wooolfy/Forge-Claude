@@ -1,0 +1,13 @@
+{
+  "id": "S231",
+  "name": "runDoctor summary is HEALTHY when fail=0 and warn=0",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/monitoring_test_helper",
+  "method": "runS231DoctorHealthySummary",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "summary", "expected": "HEALTHY" }
+  ]
+}

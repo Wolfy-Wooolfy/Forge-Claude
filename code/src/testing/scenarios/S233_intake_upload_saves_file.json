@@ -1,0 +1,15 @@
+{
+  "id": "S233",
+  "name": "POST /api/intake/upload saves binary file and returns zip_path in artifacts/uploads",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/intake_upload_test_helper",
+  "method": "runS233IntakeUpload",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "http_status",                 "expected": 200 },
+    { "type": "state_field_equals", "field": "ok",                          "expected": true },
+    { "type": "state_field_equals", "field": "zip_path_starts_with_uploads","expected": true }
+  ]
+}

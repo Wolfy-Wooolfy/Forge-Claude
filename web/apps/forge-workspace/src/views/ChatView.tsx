@@ -9,6 +9,13 @@ import { useProject } from '@/contexts/ProjectContext'
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
+const PHASE_LABEL: Record<ChatPhase, string> = {
+  discovery:    'جاهز',
+  streaming:    'يفكر…',
+  ready:        'جاهز',
+  clarification:'يطرح أسئلة',
+}
+
 function makeId(): string {
   return Math.random().toString(36).slice(2)
 }
@@ -257,7 +264,7 @@ export default function ChatView() {
       <div className="flex items-center gap-2 text-xs text-gray-400 flex-shrink-0">
         <span>Project: <strong className="text-gray-200">{projectId}</strong></span>
         <span className="text-xs px-2 py-0.5 rounded-full border border-border">
-          {state.phase}
+          {PHASE_LABEL[state.phase]}
         </span>
       </div>
 
@@ -267,9 +274,12 @@ export default function ChatView() {
         className="flex-1 overflow-y-auto flex flex-col pr-1 min-h-0"
       >
         {state.messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-gray-400 text-sm gap-2">
-            <span className="text-2xl">⚡</span>
-            <span>Send a message to start</span>
+          <div className="flex flex-col items-center justify-center h-full text-gray-500 text-sm gap-3">
+            <span className="text-3xl select-none">✦</span>
+            <p className="text-gray-300 font-medium">مرحباً بك في Forge</p>
+            <p className="text-xs text-center max-w-xs leading-relaxed">
+              اكتب فكرتك أو مشروعك وسيساعدك Forge في تحليله وبناء رؤية واضحة له.
+            </p>
           </div>
         )}
         {state.messages.map((msg) => (

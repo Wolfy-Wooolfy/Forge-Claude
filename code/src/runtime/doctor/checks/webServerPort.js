@@ -6,8 +6,8 @@ module.exports = {
   id:          "web_server_port",
   description: "Web server port bindable or already in use (Forge running)",
   fn(ctx) {
-    const port    = ctx.web_port || ctx.api_port || 4505;
-    const apiPort = ctx.api_port || 4505;
+    const port    = ctx.web_port || ctx.api_port || 3100;
+    const apiPort = ctx.api_port || 3100;
 
     if (port === apiPort) {
       return { status: "PASS", detail: "web served on API port " + port };

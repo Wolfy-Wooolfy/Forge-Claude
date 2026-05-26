@@ -13,8 +13,8 @@ async function runDoctor(options) {
 
   const ctx = {
     root,
-    api_port:    Number(opts.api_port  || process.env.PORT     || 4505),
-    web_port:    Number(opts.web_port  || process.env.WEB_PORT || opts.api_port || 4505),
+    api_port:    Number(opts.api_port  || process.env.PORT     || 3100),
+    web_port:    Number(opts.web_port  || process.env.WEB_PORT || opts.api_port || 3100),
     skip_checks: Array.isArray(opts.skip_checks) ? opts.skip_checks : []
   };
 
@@ -35,7 +35,9 @@ async function runDoctor(options) {
   const report = {
     schema_version: "1.0",
     ok:             counts.fail === 0,
-    summary:        counts.fail + " critical, " + counts.warn + " warning",
+    summary:        counts.fail === 0 && counts.warn === 0
+      ? "HEALTHY"
+      : counts.fail + " critical, " + counts.warn + " warning",
     counts,
     started_at:     startedAt,
     duration_ms:    Date.now() - t0,
