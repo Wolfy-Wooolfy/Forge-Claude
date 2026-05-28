@@ -5,36 +5,19 @@
   "project_mode": "EXTEND_EXISTING",
   "project_status": "ACTIVE",
   "primary_language": "AR",
+  "user_goal": "اقترح عليا مشروع جديد",
+  "business_goal": "",
+  "technical_goal": "",
   "current_phase": "DISCOVERY",
   "active_runtime_state": "DISCOVERY_REQUIRED",
-  "conversation_mode": "CONVERSATION",
-  "documentation_state": "EMPTY",
-  "execution_package_state": "NOT_READY",
-  "execution_state": "NOT_STARTED",
-  "verification_state": "NOT_READY",
-  "delivery_state": "NOT_READY",
-  "memory_state": "EMPTY",
+  "workspace_path": "D:\\S\\Halo\\Tech\\Forge-Claude",
+  "source_of_truth": "ZIP_SNAPSHOT",
+  "selected_strategy": "",
   "accepted_options": [],
   "rejected_options": [],
   "open_questions": [
     "ما هي الميزات الأساسية التي تريدها في نظام HR؟"
   ],
-  "pending_decisions": [],
-  "review_cycles_count": 0,
-  "artifact_registry": {
-    "project_root": "artifacts/projects/clean_test",
-    "project_state": "artifacts/projects/clean_test/project_state.json",
-    "decision_packet": "",
-    "execution_package": ""
-  },
-  "active_project_flag": true,
-  "last_updated_at": "2026-05-28T11:59:21.327Z",
-  "user_goal": "اقترح عليا مشروع جديد",
-  "business_goal": "",
-  "technical_goal": "",
-  "workspace_path": "D:\\S\\Halo\\Tech\\Forge-Claude",
-  "source_of_truth": "ZIP_SNAPSHOT",
-  "selected_strategy": "",
   "clarification_answers": {
     "raw_answer": "اقترح عليا",
     "answered_questions": [
@@ -50,6 +33,11 @@
   },
   "requirement_reasoning_summary": "تم تحديد أن المشروع هو نظام HR بناءً على المدخلات السابقة. المستخدم طلب اقتراح مشروع جديد ولكنه لم يحدد ميزات النظام المطلوبة بعد. لذلك، السؤال المفتوح الحالي هو حول الميزات الأساسية التي يريدها المستخدم في نظام HR لتحديد المتطلبات بشكل أفضل.",
   "provider_error": "",
+  "documentation_state": "EMPTY",
+  "execution_package_state": "NOT_READY",
+  "execution_state": "NOT_STARTED",
+  "verification_state": "NOT_READY",
+  "delivery_state": "NOT_READY",
   "conversation_history": {
     "proposal_count": 0,
     "draft_count": 0
@@ -57,9 +45,21 @@
   "decision_history": {
     "has_decision_packet": false
   },
+  "artifact_registry": {
+    "project_root": "artifacts/projects/clean_test",
+    "project_state": "artifacts/projects/clean_test/project_state.json",
+    "decision_packet": "",
+    "execution_package": ""
+  },
+  "review_cycles_count": 0,
+  "pending_decisions": [],
+  "memory_state": "EMPTY",
   "version_registry": [],
   "vision": null,
   "vision_locked": false,
   "vision_version": null,
-  "vision_history": []
+  "vision_history": [],
+  "conversation_mode": "CONVERSATION",
+  "active_project_flag": false,
+  "last_updated_at": "2026-05-28T12:05:16.320Z"
 }
