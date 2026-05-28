@@ -1,0 +1,17 @@
+[
+  {
+    "entry_type": "IDEATION_INTAKE",
+    "message": "ايه افضل انظمة ال HR في العالم",
+    "needs_clarification": true,
+    "clarification_questions": [
+      "ما هي المعايير التي تهمك في نظام HR؟"
+    ],
+    "requirement_model": {
+      "goal": "Identify the best HR systems in the world"
+    },
+    "requirement_domain": "Human Resources (HR) Systems",
+    "requirement_completeness": false,
+    "requirement_reasoning_summary": "المستخدم يسأل عن أفضل أنظمة HR في العالم، مما يشير إلى اهتمام بنظام إدارة الموارد البشرية. لم يتم تحديد معايير التقييم أو الاستخدام، مما يجعل المتطلبات غير مكتملة.",
+    "created_at": "2026-05-28T11:45:46.368Z"
+  }
+]

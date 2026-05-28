@@ -1,6 +1,6 @@
 {
-  "project_id": "stage_11_1_live_demo",
-  "project_name": "stage_11_1_live_demo",
+  "project_id": "s150_abort_test",
+  "project_name": "s150_abort_test",
   "project_type": "REVIEW",
   "project_mode": "EXTEND_EXISTING",
   "project_status": "ACTIVE",
@@ -37,8 +37,8 @@
     "has_decision_packet": false
   },
   "artifact_registry": {
-    "project_root": "artifacts/projects/stage_11_1_live_demo",
-    "project_state": "artifacts/projects/stage_11_1_live_demo/project_state.json",
+    "project_root": "artifacts/projects/s150_abort_test",
+    "project_state": "artifacts/projects/s150_abort_test/project_state.json",
     "decision_packet": "",
     "execution_package": ""
   },
@@ -52,5 +52,5 @@
   "vision_history": [],
   "conversation_mode": "PIPELINE",
   "active_project_flag": false,
-  "last_updated_at": "2026-05-28T11:47:30.245Z"
+  "last_updated_at": "2026-05-28T11:47:30.258Z"
 }

@@ -50,6 +50,7 @@
   "vision_locked": false,
   "vision_version": null,
   "vision_history": [],
+  "conversation_mode": "PIPELINE",
   "active_project_flag": false,
-  "last_updated_at": "2026-05-25T09:08:40.214Z"
+  "last_updated_at": "2026-05-28T11:47:30.246Z"
 }

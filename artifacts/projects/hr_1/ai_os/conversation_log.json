@@ -1,0 +1,17 @@
+[
+  {
+    "entry_type": "USER_MESSAGE",
+    "message": "ايه افضل انظمة ال HR في العالم",
+    "created_at": "2026-05-28T11:47:48.982Z"
+  },
+  {
+    "entry_type": "CLARIFICATION_ANSWERS",
+    "answers": {
+      "raw_answer": "اقترح عليا",
+      "answered_questions": [
+        "ما هي الوظائف الأساسية التي تريد أن يغطيها نظام ال HR؟"
+      ]
+    },
+    "created_at": "2026-05-28T11:48:51.966Z"
+  }
+]

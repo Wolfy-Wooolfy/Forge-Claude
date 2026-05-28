@@ -1085,8 +1085,8 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-16-UNIFIED-CHECKPOINT-3-AWAITING-CTO-CONFIRMATION",
-  "last_updated": "2026-05-26T09:20:00.000Z",
+  "current_task": "PHASE-16-UNIFIED-AWAITING-OWNER-REAL-USE-TEST",
+  "last_updated": "2026-05-28T00:00:00.000Z",
   "phase_16": {
     "status": "ACTIVE",
     "started_at": "2026-05-24T16:00:00.000Z",
@@ -1709,7 +1709,12 @@
   "self_test_scenarios_skip": 5,
   "self_test_run_at": "2026-05-26T00:00:00.000Z",
   "phase_16_unified": {
-    "status": "CHECKPOINT_3_AWAITING_CTO",
+    "status": "IMPLEMENTATION_COMPLETE_AWAITING_OWNER_REAL_USE_TEST",
+    "checkpoint_3_cto_approved_at": "2026-05-28",
+    "closure_gate": "owner real-use test with screenshots required — decision artifacts stay DRAFT until confirmed",
+    "open_debt": {
+      "S17_documentationBuildLoop": "flaky — must be understood and stabilised before PHASE-16 final closure. Not a current blocker."
+    },
     "checkpoint_1_artifact": "artifacts/decisions/_phase_16_checkpoints/unified_cp1_core.md",
     "checkpoint_2_artifact": "artifacts/decisions/_phase_16_checkpoints/unified_cp2_engine_providers.md",
     "checkpoint_3_artifact": "artifacts/decisions/_phase_16_checkpoints/unified_cp3_ux.md",
