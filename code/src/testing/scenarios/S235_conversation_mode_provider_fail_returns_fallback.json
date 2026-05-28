@@ -1,0 +1,17 @@
+{
+  "id": "S235",
+  "name": "conversation mode — processMessage with FAILED provider → ok:true, mode=CONVERSATION_RESPONSE, provider_failed:true (no silent BLOCKED) (PHASE-16 regression guard)",
+  "description": "RED (before fix): handleConversationMode provider failure returns { ok:false, mode:'BLOCKED' } → ok_true=false, mode_is_conv_response=false → FAIL. GREEN (after fix): provider failure returns user-facing fallback message with ok:true, mode=CONVERSATION_RESPONSE, provider_failed:true → all assertions pass.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/conversation_mode_test_helper",
+  "method": "runS235ConversationModeProviderFailFallback",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "ok_true",               "expected": true },
+    { "type": "state_field_equals", "field": "mode_is_conv_response", "expected": true },
+    { "type": "state_field_equals", "field": "provider_failed_flag",  "expected": true },
+    { "type": "state_field_equals", "field": "message_non_empty",     "expected": true }
+  ]
+}

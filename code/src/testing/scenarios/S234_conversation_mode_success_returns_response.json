@@ -1,0 +1,17 @@
+{
+  "id": "S234",
+  "name": "conversation mode — processMessage with mock SUCCESS provider → ok:true, mode=CONVERSATION_RESPONSE, message non-empty, no provider_failed flag (PHASE-16 regression guard)",
+  "description": "RED (before fix): handleConversationMode with success path returns ok:false or message empty → assertions fail. GREEN (after fix + existing gate): monkey-patched provider returns SUCCESS → mode=CONVERSATION_RESPONSE, ok=true, message non-empty, provider_failed is NOT set → all assertions pass.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/conversation_mode_test_helper",
+  "method": "runS234ConversationModeSuccessReturnsResponse",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "ok_true",               "expected": true },
+    { "type": "state_field_equals", "field": "mode_is_conv_response", "expected": true },
+    { "type": "state_field_equals", "field": "message_non_empty",     "expected": true },
+    { "type": "state_field_equals", "field": "provider_not_failed",   "expected": true }
+  ]
+}

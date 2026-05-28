@@ -325,7 +325,22 @@ function createConversationEngine(options = {}) {
     });
 
     if (providerResult.status !== "SUCCESS" || !providerResult.output || !providerResult.output.message) {
-      return { ok: false, mode: "BLOCKED", reason: "CONVERSATION_PROVIDER_FAILED", project_id: projectId };
+      const failMeta = providerResult.metadata || {};
+      const lang = String(user_language || "ar").toLowerCase();
+      const fallbackMsg = failMeta.reason === "MISSING_API_KEY"
+        ? (lang.startsWith("en") ? "AI provider not configured. Please check OPENAI_API_KEY setting." : "تعذّر توليد رد — تأكّد من إعداد مفتاح API في ملف .env")
+        : (lang.startsWith("en") ? "Could not generate a response. Please try again." : "تعذّر توليد رد، حاول مجدداً.");
+      return {
+        ok: true,
+        mode: "CONVERSATION_RESPONSE",
+        message: fallbackMsg,
+        tone: "informative",
+        suggest_next: "",
+        current_state: "CONVERSATION",
+        provider_failed: true,
+        provider_failure_reason: failMeta.reason || "UNKNOWN",
+        project_id: projectId
+      };
     }
 
     const r = {

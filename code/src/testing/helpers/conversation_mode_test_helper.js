@@ -456,6 +456,98 @@ async function runS228BackwardCompatPipelineFallback() {
   }
 }
 
+// ── S234: processMessage with mock SUCCESS provider → CONVERSATION_RESPONSE, no provider_failed ──
+//
+// RED (before fix): difficult to reach — existing gate works but this guards against regression
+//   where success path could break and return empty message or wrong mode.
+// GREEN: monkey-patched provider returns SUCCESS → ok=true, mode=CONVERSATION_RESPONSE,
+//   message non-empty, provider_failed is NOT set.
+
+async function runS234ConversationModeSuccessReturnsResponse() {
+  const ConversationalResponseProvider = require("../../providers/conversationalResponseProvider");
+  const { createConversationEngine }   = require("../../ai_os/conversationEngine");
+  const PID = "s234_conv_success_test";
+  const { projectDir, aiOsDir } = _ensureProjectDir(PID);
+
+  const originalExecuteTask = ConversationalResponseProvider.prototype.executeTask;
+  ConversationalResponseProvider.prototype.executeTask = async function() {
+    return {
+      status:   "SUCCESS",
+      output:   { message: "مرحباً، يسعدني مساعدتك في بناء مشروعك!", tone: "friendly", suggest_next: "هل تريد مزيداً من التفاصيل؟" },
+      metadata: { model: "mock-s234" }
+    };
+  };
+
+  try {
+    _writeState(projectDir, {
+      project_id:           PID,
+      project_name:         "S234 Test",
+      active_runtime_state: "DISCUSSION",
+      conversation_mode:    "CONVERSATION",
+      last_updated_at:      new Date().toISOString()
+    });
+    fs.writeFileSync(path.join(aiOsDir, "conversation_context.json"), "[]", "utf8");
+
+    const engine = createConversationEngine({ root: ROOT, ideationEngine: MOCK_IDEATION, conversationMemoryManager: STUB_MEMORY });
+    const result = await engine.processMessage({ project_id: PID, message: "مرحبا", user_language: "ar" });
+
+    const ok_true               = result.ok === true;
+    const mode_is_conv_response = result.mode === "CONVERSATION_RESPONSE";
+    const message_non_empty     = typeof result.message === "string" && result.message.length > 0;
+    const provider_not_failed   = result.provider_failed !== true;
+    return { ok_true, mode_is_conv_response, message_non_empty, provider_not_failed };
+  } finally {
+    ConversationalResponseProvider.prototype.executeTask = originalExecuteTask;
+    _cleanup(PID);
+  }
+}
+
+// ── S235: processMessage with FAILED provider → fallback message, no silent BLOCKED ──
+//
+// RED (before fix): handleConversationMode returns { ok:false, mode:"BLOCKED" } on provider failure →
+//   ok_true=false, mode_is_conv_response=false → FAIL.
+// GREEN (after fix): provider failure triggers user-facing fallback → ok:true,
+//   mode=CONVERSATION_RESPONSE, provider_failed:true, message non-empty Arabic fallback → PASS.
+
+async function runS235ConversationModeProviderFailFallback() {
+  const ConversationalResponseProvider = require("../../providers/conversationalResponseProvider");
+  const { createConversationEngine }   = require("../../ai_os/conversationEngine");
+  const PID = "s235_conv_fail_test";
+  const { projectDir, aiOsDir } = _ensureProjectDir(PID);
+
+  const originalExecuteTask = ConversationalResponseProvider.prototype.executeTask;
+  ConversationalResponseProvider.prototype.executeTask = async function() {
+    return {
+      status:   "FAILED",
+      output:   null,
+      metadata: { reason: "MISSING_API_KEY" }
+    };
+  };
+
+  try {
+    _writeState(projectDir, {
+      project_id:           PID,
+      project_name:         "S235 Test",
+      active_runtime_state: "DISCUSSION",
+      conversation_mode:    "CONVERSATION",
+      last_updated_at:      new Date().toISOString()
+    });
+    fs.writeFileSync(path.join(aiOsDir, "conversation_context.json"), "[]", "utf8");
+
+    const engine = createConversationEngine({ root: ROOT, ideationEngine: MOCK_IDEATION, conversationMemoryManager: STUB_MEMORY });
+    const result = await engine.processMessage({ project_id: PID, message: "اقترح عليا", user_language: "ar" });
+
+    const ok_true               = result.ok === true;
+    const mode_is_conv_response = result.mode === "CONVERSATION_RESPONSE";
+    const provider_failed_flag  = result.provider_failed === true;
+    const message_non_empty     = typeof result.message === "string" && result.message.length > 0;
+    return { ok_true, mode_is_conv_response, provider_failed_flag, message_non_empty };
+  } finally {
+    ConversationalResponseProvider.prototype.executeTask = originalExecuteTask;
+    _cleanup(PID);
+  }
+}
+
 module.exports = {
   runS220DefaultConversationMode,
   runS221ProcessMessageConversationMode,
@@ -463,5 +555,7 @@ module.exports = {
   runS223PipelineEntryAfterTransition,
   runS224ProposalRequestInConversationMode,
   runS225CreateProjectSetsConversationMode,
-  runS228BackwardCompatPipelineFallback
+  runS228BackwardCompatPipelineFallback,
+  runS234ConversationModeSuccessReturnsResponse,
+  runS235ConversationModeProviderFailFallback
 };

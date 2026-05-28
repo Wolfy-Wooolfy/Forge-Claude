@@ -239,12 +239,8 @@ export default function ChatView() {
       return
     }
 
-    if (phase === 'ready') {
-      await doStream(text, projectId)
-      return
-    }
-
-    await doDiscovery(text, projectId)
+    // All messages route through processMessage — handles CONVERSATION and PIPELINE modes
+    await doStream(text, projectId)
   }
 
   function handleQuickReply(value: string) {
