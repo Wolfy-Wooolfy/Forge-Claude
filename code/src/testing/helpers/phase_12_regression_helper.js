@@ -96,18 +96,18 @@ async function runS208Phase12FullRegression() {
     uid_pin_format_ok = typeof uidPin.checkOrCreateUidPin === "function";
   } catch (_e) { /* false */ }
 
-  // ── 8. arc_count_equals_seven ─────────────────────────────────────────────
-  // Verify 18_AGENT_ROLES_CONTRACT.md contains §ARC-7 but NOT §ARC-8.
-  // §ARC-7 was added in PHASE-13.8 (env_loader.js bootstrap exception).
-  // This confirms no unauthorized §ARC entry beyond 7 was added.
-  let arc_count_equals_seven = false;
+  // ── 8. arc_count_equals_eight ─────────────────────────────────────────────
+  // Verify 18_AGENT_ROLES_CONTRACT.md contains §ARC-8 but NOT §ARC-9.
+  // §ARC-8 was added in PHASE-13.8 (binary upload exemption, owner-approved 2026-05-26).
+  // Documentation reconciled in PHASE-17 (DECISION-2026-05-28-phase-17-idea-synthesis-gate.md).
+  let arc_count_equals_eight = false;
   try {
     const contractSrc = fs.readFileSync(
       path.join(ROOT, "docs", "10_runtime", "18_AGENT_ROLES_CONTRACT.md"), "utf8"
     );
-    arc_count_equals_seven =
-      contractSrc.includes("§ARC-7") &&
-      !contractSrc.includes("§ARC-8");
+    arc_count_equals_eight =
+      contractSrc.includes("§ARC-8") &&
+      !contractSrc.includes("§ARC-9");
   } catch (_e) { /* false */ }
 
   return {
@@ -118,7 +118,7 @@ async function runS208Phase12FullRegression() {
     auth_middleware_present_ok,
     api_binding_default_ok,
     uid_pin_format_ok,
-    arc_count_equals_seven
+    arc_count_equals_eight
   };
 }
 

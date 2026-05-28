@@ -1,6 +1,6 @@
 # DECISION-2026-05-28 — PHASE-17: Idea Synthesis & Pre-Pipeline Confirmation Gate
 
-> **Status:** APPROVED — owner approved in chat 2026-05-28.
+> **Status:** APPROVED — owner approved in chat 2026-05-28. OQs resolved 2026-05-28 (see §7).
 > **Authored:** 2026-05-28
 > **Phase type:** Track B capability — bridges the conversation layer (PHASE-16) to the orchestration pipeline (PHASE-10, already CLOSED).
 > **Authority chain:** Builds on `DECISION-20260510-vision-shift-multi-agent-conductor.md`. Does NOT amend the Blueprint or any Layer-0 doc.
@@ -77,10 +77,16 @@ state file. No new state model; extends the field PHASE-16 introduced.
 | Method | Responsibility |
 |---|---|
 | `requestIdeaSummary(project_id)` | calls `ideaSynthesisProvider` over full history → writes summary → `conversation_mode = IDEA_REVIEW` → returns summary for display |
-| `confirmIdea(project_id, decision)` | `decision` classified via existing `IntentClassificationProvider` (AFFIRM/REJECT/MODIFY). AFFIRM → locks summary as vision + `conversation_mode = PIPELINE` + pipeline entry. REJECT/MODIFY → back to CONVERSATION |
+| `confirmIdea(project_id, { action })` | `action` is a structured value sent directly by the UI button: `AFFIRM` / `REJECT` / `MODIFY`. **No AI classification** — the button press IS the intent. AFFIRM → locks summary as vision + `conversation_mode = PIPELINE` + pipeline entry. REJECT/MODIFY → back to CONVERSATION |
 
 The "last message = user_goal" behavior is **removed**. user_goal now comes from the
 synthesized + confirmed summary.
+
+> **Correction (2026-05-28):** an earlier draft said `confirmIdea` classifies a free-text
+> reply via `IntentClassificationProvider`. That was wrong: confirm/refine/reject are explicit
+> UI **buttons**, so the intent is already known — running a classifier on a known intent adds
+> an API-key dependency that breaks mock-only for no benefit. `IntentClassificationProvider`
+> stays reserved for free-text replies (its original purpose); it is NOT used here.
 
 ### 2.4 UI (forge-workspace)
 
@@ -146,9 +152,25 @@ artifact, owner approval first.** No §ARC may be written as "approved" unless i
 
 ---
 
-## 7. Open questions for owner (resolve before PROMPT)
+## 7. Open questions for owner (resolved 2026-05-28)
 
-None blocking. Scope + quality bar approved in chat 2026-05-28.
+| # | Question | Resolution |
+|---|---|---|
+| OQ-1 | confirmIdea uses IntentClassificationProvider? | **No.** UI buttons send `{ action: AFFIRM\|REJECT\|MODIFY }` directly. No classifier, no API key, mock-safe. (See §2.3 correction.) |
+| OQ-2 | full conversation history vs last-20? | `loadConversationHistory(id, { full: true })` for synthesis ONLY; other paths keep the 20-message default. |
+| OQ-3 | keep `/start-pipeline` as alias? | **No silent alias.** New endpoints `/request-idea-summary` + `/confirm-idea`. Old `/start-pipeline` disabled — returns directive message, does NOT enter pipeline. |
+
+### §ARC ledger documentation debt (folded into this phase)
+
+The §ARC count is genuinely **8** (ARC-8 binary-upload exemption owner-approved 2026-05-26),
+but two documentation artifacts are out of sync:
+
+- `docs/10_runtime/18_AGENT_ROLES_CONTRACT.md` — canonical ledger still lists only ARC-1..7.
+- `code/src/testing/scenarios/S208_phase12_full_regression.json` — still asserts `arc_count_equals_seven`.
+- `code/src/testing/helpers/phase_12_regression_helper.js` — helper logic checks `!includes("§ARC-8")`.
+
+PHASE-17 reconciles this: add §ARC-8 row to canonical contract, rename field to
+`arc_count_equals_eight`, update S208 assertion. No new §ARC is created — docs match reality.
 
 ---
 

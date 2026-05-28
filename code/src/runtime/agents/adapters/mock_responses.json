@@ -214,5 +214,29 @@
     "tokens_in": 150,
     "tokens_out": 160,
     "finish_reason": "stop"
+  },
+  "mock|mock-is|scenario:S236": {
+    "text": "{\"project_name\":\"تطبيق إدارة المهام\",\"domain\":\"web_application\",\"goal_primary\":\"A web application that helps teams manage and track tasks with real-time updates.\",\"features\":[\"إضافة مهام جديدة\",\"تعيين المهام لأعضاء الفريق\",\"تتبع حالة المهمة (قيد التنفيذ / منجزة)\",\"إشعارات عند تحديث المهمة\"],\"constraints\":[\"يجب أن يدعم اللغة العربية\",\"يعمل على المتصفح فقط (لا تطبيق موبايل)\"],\"non_goals\":[\"لا يوجد تطبيق موبايل مرحلة أولى\"],\"open_questions\":[\"هل يحتاج النظام لتسجيل دخول وصلاحيات مختلفة للمستخدمين؟\",\"هل البيانات تُخزَّن في قاعدة بيانات أم في الذاكرة فقط؟\"]}",
+    "tokens_in": 120,
+    "tokens_out": 140,
+    "finish_reason": "stop"
+  },
+  "mock|mock-is|scenario:S237": {
+    "text": "{\"project_name\":\"تطبيق إدارة المهام\",\"domain\":\"web_application\",\"goal_primary\":\"A web application that helps teams manage and track tasks with real-time updates and role-based access.\",\"features\":[\"إضافة مهام جديدة\",\"تعيين المهام لأعضاء الفريق\",\"تتبع حالة المهمة (قيد التنفيذ / منجزة)\",\"إشعارات عند تحديث المهمة\",\"صلاحيات مختلفة: مدير ومستخدم عادي\"],\"constraints\":[\"يجب أن يدعم اللغة العربية\",\"يعمل على المتصفح فقط (لا تطبيق موبايل)\"],\"non_goals\":[\"لا يوجد تطبيق موبايل مرحلة أولى\"],\"open_questions\":[\"هل البيانات تُخزَّن في قاعدة بيانات أم في الذاكرة فقط؟\"]}",
+    "tokens_in": 140,
+    "tokens_out": 160,
+    "finish_reason": "stop"
+  },
+  "mock|mock-is|scenario:S238": {
+    "text": "{\"project_name\":\"أداة إدارة الميزانية\",\"domain\":\"web_application\",\"goal_primary\":\"A web application that helps individuals track personal income and expenses.\",\"features\":[\"تسجيل المصاريف اليومية\",\"تصنيف المصاريف حسب الفئة\",\"عرض ملخص شهري\"],\"constraints\":[],\"non_goals\":[],\"open_questions\":[\"هل هناك دعم لتعدد العملات؟\",\"هل يحتاج لتصدير التقارير (PDF/Excel)؟\"]}",
+    "tokens_in": 100,
+    "tokens_out": 120,
+    "finish_reason": "stop"
+  },
+  "mock|mock-is|scenario:S239": {
+    "text": "{\"project_name\":\"Edu Platform\",\"domain\":\"web_application\",\"goal_primary\":\"A web application that provides online courses and learning management for students and teachers.\",\"features\":[\"إنشاء دورات تعليمية\",\"متابعة تقدم الطلاب\",\"اختبارات وتقييمات\"],\"constraints\":[\"يدعم اللغة العربية والإنجليزية\"],\"non_goals\":[\"لا بث مباشر في المرحلة الأولى\"],\"open_questions\":[\"هل المنصة مدفوعة أم مجانية؟\",\"هل يوجد شهادات معتمدة؟\"]}",
+    "tokens_in": 110,
+    "tokens_out": 130,
+    "finish_reason": "stop"
   }
 }
