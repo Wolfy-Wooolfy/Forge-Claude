@@ -1,7 +1,7 @@
 # DECISION-20260526 — §ARC-8: Binary Upload Infrastructure Exemption
 
 **Date:** 2026-05-26
-**Owner approval:** CTO verbal — B7a Track A constraint acknowledged
+**Status:** APPROVED — owner (Khaled) approved explicitly in chat, 2026-05-26. Technical rationale: binary ZIP Buffer cannot route through text-only fs.write_file L2 tool.
 **Scope:** `code/src/workspace/apiServer.js` — `POST /api/intake/upload` handler
 
 ## Decision
