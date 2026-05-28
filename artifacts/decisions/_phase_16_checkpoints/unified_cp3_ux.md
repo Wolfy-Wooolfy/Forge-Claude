@@ -1,8 +1,8 @@
-# PHASE-16 UNIFIED — Checkpoint 3: B6 + B7 UX Surface
+# PHASE-16 UNIFIED — Checkpoint 3: B6 + B7 + B8 UX Surface + Conversation Mode Routing
 
-**Date:** 2026-05-26
-**Status:** AWAITING CTO CONFIRMATION
-**Suite at checkpoint:** 225 passed / 3 failed (pre-existing) / 5 skipped / 233 total
+**Date:** 2026-05-26 (updated 2026-05-28 — B8 added, CTO verified)
+**Status:** CTO APPROVED 2026-05-28 — AWAITING OWNER REAL-USE TEST
+**Suite at checkpoint:** 227 passed / 3 failed (pre-existing) / 5 skipped / 235 total
 
 ---
 
@@ -117,11 +117,45 @@ artifacts/decisions/DECISION-20260526-arc8-binary-upload-exemption.md (NEW)
 
 ---
 
+---
+
+## B8 — Conversation Mode Routing Fix (COMPLETE, CTO-verified 2026-05-28)
+
+### Root Causes Fixed
+
+| # | Root Cause | Location | Fix |
+|---|-----------|---------|-----|
+| RC-1 (PRIMARY) | `handleSend()` routed first message to `doDiscovery()` → `POST /api/ai-os/intake` (old pipeline), bypassing `processMessage()` entirely | `web/apps/forge-workspace/src/views/ChatView.tsx` | Removed `doDiscovery` branch — all messages now route via `doStream()` → `processMessage()` |
+| RC-2 (SECONDARY) | `handleConversationMode()` returned `{ ok:false, mode:"BLOCKED" }` silently on provider failure — no user-facing message | `code/src/ai_os/conversationEngine.js:328` | Provider failure now returns `{ ok:true, mode:"CONVERSATION_RESPONSE", message: Arabic fallback, provider_failed:true }` |
+
+### Files Modified (B8)
+
+| File | Change |
+|------|--------|
+| `web/apps/forge-workspace/src/views/ChatView.tsx` | `handleSend()`: removed dead `doDiscovery` branch; all messages via `doStream()` |
+| `code/src/ai_os/conversationEngine.js` | `handleConversationMode()`: provider failure → Arabic fallback message instead of BLOCKED |
+| `code/src/testing/helpers/conversation_mode_test_helper.js` | Added `runS234` + `runS235` helpers |
+| `code/src/testing/scenarios/S234_conversation_mode_success_returns_response.json` | NEW — S234 GREEN |
+| `code/src/testing/scenarios/S235_conversation_mode_provider_fail_returns_fallback.json` | NEW — S235 GREEN |
+
+### Scenario results (B8)
+
+- **S234** ✓ `processMessage SUCCESS provider → ok:true, mode=CONVERSATION_RESPONSE, no provider_failed flag`
+- **S235** ✓ `processMessage FAILED provider → ok:true, mode=CONVERSATION_RESPONSE, provider_failed:true (no silent BLOCKED)`
+
+### Open Debt (not blockers — recorded)
+
+- **S17** `documentationBuildLoop` — flaky, pre-existing
+- **S28** `api_propose` — flaky (passes alone, fails intermittently in full suite, order-dependent state leak), discovered 2026-05-28
+
+---
+
 ## Risks
 
 - **IntakeView** — frontend calls `/api/ai-os/intake` after upload; real-use test will exercise the full intake pipeline. Verify ZIP parsing + vision generation in owner test session.
 - **Projects filter** — `isUserProject` hides `test_*`/`stage_*` projects; confirm `default_project` (no matching prefix) remains visible.
 - **RTL** — `border-e` is logical property; supported in Tailwind v3.3+ and all modern browsers.
+- **B8 frontend** — `doDiscovery` is now dead code. Cleanup deferred per CTO instruction (لاحق).
 
 ---
 
