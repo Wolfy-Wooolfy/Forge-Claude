@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { chatStream, answerClarification, intake, clarifyRequest } from '@/api'
+import { chatStream, answerClarification } from '@/api'
 import { detectLanguage } from '@/lib/detectLanguage'
 import { ChatInput } from '@/components/chat/ChatInput'
 import { MessageBubble } from '@/components/chat/MessageBubble'
@@ -143,52 +143,7 @@ export default function ChatView() {
     }
   }
 
-  // ── discovery + clarification flow ─────────────────────────────────────────
-
-  async function doDiscovery(text: string, pid: string) {
-    setState((prev) => ({ ...prev, phase: 'streaming', pendingReplies: [] }))
-
-    try {
-      await clarifyRequest({ request: text })
-
-      const res = await intake({
-        message: text,
-        project_id: pid,
-        project_name: pid,
-      })
-
-      if (res.mode === 'CLARIFICATION_REQUIRED') {
-        const questions = Array.isArray(res.blocking_questions) ? res.blocking_questions : []
-        const chips = normalizeChips(res.suggested_answers)
-        addMessage(assistantMsg(questions.join('\n')))
-        setState((prev) => ({
-          ...prev,
-          phase: 'clarification',
-          pendingReplies: chips,
-          clarification: { projectId: pid, projectName: pid, originalRequest: text, questions },
-        }))
-        return
-      }
-
-      if (res.ok === false) {
-        addMessage(assistantMsg(res.reason ?? res.error ?? 'AI OS intake blocked.'))
-        setState((prev) => ({ ...prev, phase: 'discovery' }))
-        return
-      }
-
-      if (res.mode === 'IDEATION_READY') {
-        addMessage(assistantMsg(detectLanguage(text) === 'ar' ? 'اكتمل التحليل.' : 'Discovery complete.'))
-        setState((prev) => ({ ...prev, phase: 'ready', clarification: null }))
-        return
-      }
-
-      addMessage(assistantMsg(JSON.stringify(res, null, 2)))
-      setState((prev) => ({ ...prev, phase: 'ready', clarification: null }))
-    } catch (err) {
-      addMessage(assistantMsg(err instanceof Error ? err.message : 'Unknown error'))
-      setState((prev) => ({ ...prev, phase: 'discovery' }))
-    }
-  }
+  // ── clarification flow ─────────────────────────────────────────────────────
 
   async function doClarificationAnswer(text: string, clar: ClarificationState) {
     setState((prev) => ({ ...prev, phase: 'streaming', pendingReplies: [] }))
