@@ -5,36 +5,19 @@
   "project_mode": "EXTEND_EXISTING",
   "project_status": "ACTIVE",
   "primary_language": "AR",
+  "user_goal": "ايه افضل انظمة ال HR في العالم",
+  "business_goal": "",
+  "technical_goal": "",
   "current_phase": "DISCOVERY",
   "active_runtime_state": "DISCOVERY_REQUIRED",
-  "conversation_mode": "CONVERSATION",
-  "documentation_state": "EMPTY",
-  "execution_package_state": "NOT_READY",
-  "execution_state": "NOT_STARTED",
-  "verification_state": "NOT_READY",
-  "delivery_state": "NOT_READY",
-  "memory_state": "EMPTY",
+  "workspace_path": "D:\\S\\Halo\\Tech\\Forge-Claude",
+  "source_of_truth": "ZIP_SNAPSHOT",
+  "selected_strategy": "",
   "accepted_options": [],
   "rejected_options": [],
   "open_questions": [
     "ما هي الوظائف الأساسية التي تريد أن يغطيها نظام ال HR؟"
   ],
-  "pending_decisions": [],
-  "review_cycles_count": 0,
-  "artifact_registry": {
-    "project_root": "artifacts/projects/hr_1",
-    "project_state": "artifacts/projects/hr_1/project_state.json",
-    "decision_packet": "",
-    "execution_package": ""
-  },
-  "active_project_flag": true,
-  "last_updated_at": "2026-05-28T11:48:59.837Z",
-  "user_goal": "ايه افضل انظمة ال HR في العالم",
-  "business_goal": "",
-  "technical_goal": "",
-  "workspace_path": "D:\\S\\Halo\\Tech\\Forge-Claude",
-  "source_of_truth": "ZIP_SNAPSHOT",
-  "selected_strategy": "",
   "clarification_answers": {
     "raw_answer": "اقترح عليا",
     "answered_questions": [
@@ -50,6 +33,11 @@
   },
   "requirement_reasoning_summary": "المستخدم يسأل عن أفضل أنظمة HR في العالم ويريد اقتراحات. لم يتم تحديد الوظائف الأساسية التي يجب أن يغطيها النظام، وهي معلومة حاسمة لتحديد المتطلبات بدقة.",
   "provider_error": "",
+  "documentation_state": "EMPTY",
+  "execution_package_state": "NOT_READY",
+  "execution_state": "NOT_STARTED",
+  "verification_state": "NOT_READY",
+  "delivery_state": "NOT_READY",
   "conversation_history": {
     "proposal_count": 0,
     "draft_count": 0
@@ -57,9 +45,21 @@
   "decision_history": {
     "has_decision_packet": false
   },
+  "artifact_registry": {
+    "project_root": "artifacts/projects/hr_1",
+    "project_state": "artifacts/projects/hr_1/project_state.json",
+    "decision_packet": "",
+    "execution_package": ""
+  },
+  "review_cycles_count": 0,
+  "pending_decisions": [],
+  "memory_state": "EMPTY",
   "version_registry": [],
   "vision": null,
   "vision_locked": false,
   "vision_version": null,
-  "vision_history": []
+  "vision_history": [],
+  "conversation_mode": "CONVERSATION",
+  "active_project_flag": false,
+  "last_updated_at": "2026-05-28T11:57:38.915Z"
 }

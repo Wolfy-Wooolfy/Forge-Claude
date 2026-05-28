@@ -1,28 +1,30 @@
 {
-  "project_id": "stage_11_4_live_demo",
-  "project_name": "stage_11_4_live_demo",
+  "project_id": "conv_test_new",
+  "project_name": "conv_test_new",
   "project_type": "REVIEW",
   "project_mode": "EXTEND_EXISTING",
   "project_status": "ACTIVE",
-  "primary_language": "MIXED",
-  "user_goal": "",
+  "primary_language": "AR",
+  "user_goal": "اقترح عليا فكرة مشروع",
   "business_goal": "",
   "technical_goal": "",
   "current_phase": "DISCOVERY",
-  "active_runtime_state": "DISCUSSION",
+  "active_runtime_state": "DISCOVERY_REQUIRED",
   "workspace_path": "D:\\S\\Halo\\Tech\\Forge-Claude",
   "source_of_truth": "ZIP_SNAPSHOT",
   "selected_strategy": "",
   "accepted_options": [],
   "rejected_options": [],
-  "open_questions": [],
+  "open_questions": [
+    "ما هو المجال الذي تفضل أن يكون فيه المشروع؟"
+  ],
   "clarification_answers": {},
-  "requirement_domain": "",
+  "requirement_domain": "general project ideas",
   "domain_locked": false,
   "domain_history": [],
   "requirement_completeness": false,
   "requirement_model": {},
-  "requirement_reasoning_summary": "",
+  "requirement_reasoning_summary": "المستخدم طلب اقتراح فكرة مشروع بدون تحديد مجال. لتقديم اقتراح مناسب، يجب أولاً تحديد المجال المفضل للمشروع.",
   "provider_error": "",
   "documentation_state": "EMPTY",
   "execution_package_state": "NOT_READY",
@@ -37,8 +39,8 @@
     "has_decision_packet": false
   },
   "artifact_registry": {
-    "project_root": "artifacts/projects/stage_11_4_live_demo",
-    "project_state": "artifacts/projects/stage_11_4_live_demo/project_state.json",
+    "project_root": "artifacts/projects/conv_test_new",
+    "project_state": "artifacts/projects/conv_test_new/project_state.json",
     "decision_packet": "",
     "execution_package": ""
   },
@@ -50,7 +52,7 @@
   "vision_locked": false,
   "vision_version": null,
   "vision_history": [],
-  "conversation_mode": "PIPELINE",
+  "conversation_mode": "CONVERSATION",
   "active_project_flag": false,
-  "last_updated_at": "2026-05-28T11:57:38.923Z"
+  "last_updated_at": "2026-05-28T11:57:38.911Z"
 }

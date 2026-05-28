@@ -1,0 +1,15 @@
+[
+  {
+    "entry_type": "IDEATION_INTAKE",
+    "message": "اقترح عليا فكرة مشروع",
+    "needs_clarification": true,
+    "clarification_questions": [
+      "ما هو المجال الذي تفضل أن يكون فيه المشروع؟"
+    ],
+    "requirement_model": {},
+    "requirement_domain": "general project ideas",
+    "requirement_completeness": false,
+    "requirement_reasoning_summary": "المستخدم طلب اقتراح فكرة مشروع بدون تحديد مجال. لتقديم اقتراح مناسب، يجب أولاً تحديد المجال المفضل للمشروع.",
+    "created_at": "2026-05-28T11:53:37.696Z"
+  }
+]
