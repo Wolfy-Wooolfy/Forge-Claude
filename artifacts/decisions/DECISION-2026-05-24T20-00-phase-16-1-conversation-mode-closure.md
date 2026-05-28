@@ -3,7 +3,7 @@
 > **ID:** DECISION-2026-05-24T20-00-phase-16-1-conversation-mode-closure
 > **Date:** 2026-05-24
 > **Phase:** PHASE-16.1 — Conversation Mode (G1 BLOCKER)
-> **Status:** DRAFT — IMPLEMENTATION COMPLETE, pending owner real-use test
+> **Status:** CLOSED — Owner test passed 2026-05-28. Project new_te: "اقترح عليا مشروع جديد" → conversational reply; "عايز مشروع في مجال التعليم" → contextual education proposals. Multi-turn context preserved. Tag "جاهز" correct throughout.
 > **Owner:** KhElmasry
 
 ---

@@ -1,7 +1,7 @@
 # DECISION-2026-05-24T16-00-phase-16-ux-closure-gap
 
 > **Type:** Phase Activation Decision — Corrective (post-closure)
-> **Status:** OPEN — awaiting owner approval in chat
+> **Status:** CLOSED — PHASE-16 UNIFIED complete. Owner test passed 2026-05-28: B1–B8 all verified, Conversation Mode working in multi-turn real use.
 > **Authored:** 2026-05-24
 > **Authority:** Blueprint Part B-2 (Conductor Model) + Blueprint Part H
 > **Predecessor:** PHASE-13.8 — Frontend Auth + Robust Startup

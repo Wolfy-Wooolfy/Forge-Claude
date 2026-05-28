@@ -1,7 +1,7 @@
 # PHASE-16 UNIFIED — Checkpoint 3: B6 + B7 + B8 UX Surface + Conversation Mode Routing
 
 **Date:** 2026-05-26 (updated 2026-05-28 — B8 added, CTO verified)
-**Status:** CTO APPROVED 2026-05-28 — AWAITING OWNER REAL-USE TEST
+**Status:** CLOSED — owner test passed 2026-05-28. Conversation Mode (B8) verified: new_te project, "اقترح عليا مشروع جديد" → conversational reply, "عايز مشروع في مجال التعليم" → contextual education proposals. Tag "جاهز" correct. No pipeline loop, no silence, context preserved across turns.
 **Suite at checkpoint:** 227 passed / 3 failed (pre-existing) / 5 skipped / 235 total
 
 ---
