@@ -1,0 +1,17 @@
+{
+  "id": "S238",
+  "name": "idea synthesis — reject path: requestIdeaSummary → confirmIdea REJECT → CONVERSATION; no vision.md (PHASE-17)",
+  "description": "RED (before PHASE-17 Step 2): confirmIdea not exported → TypeError → FAIL. GREEN: REJECT returns conversation_mode=CONVERSATION; no vision.md written.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/idea_synthesis_test_helper",
+  "method": "runS238IdeaSynthesisReject",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "request_ok",               "expected": true },
+    { "type": "state_field_equals", "field": "reject_ok",                "expected": true },
+    { "type": "state_field_equals", "field": "after_reject_conversation", "expected": true },
+    { "type": "state_field_equals", "field": "no_vision_written",        "expected": true }
+  ]
+}

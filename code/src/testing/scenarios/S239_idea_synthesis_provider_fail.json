@@ -1,0 +1,18 @@
+{
+  "id": "S239",
+  "name": "idea synthesis — provider-fail: missing mock key → BLOCKED (SYNTHESIS_FAILED), state stays CONVERSATION, no artifacts written (PHASE-17)",
+  "description": "RED (before PHASE-17 Step 2): requestIdeaSummary not exported → TypeError → FAIL. RED (without fail-closed): provider MOCK_NOT_FOUND causes crash → FAIL. GREEN: scenario_id 'S239_no_mock' has no mock entry → provider returns FAILED MOCK_NOT_FOUND → engine returns {ok:false, mode:BLOCKED, reason:SYNTHESIS_FAILED}; conversation_mode stays CONVERSATION; no idea_summary.json or vision.md written.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/idea_synthesis_test_helper",
+  "method": "runS239IdeaSynthesisProviderFail",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "result_blocked",           "expected": true },
+    { "type": "state_field_equals", "field": "reason_synthesis_failed",  "expected": true },
+    { "type": "state_field_equals", "field": "state_still_conversation", "expected": true },
+    { "type": "state_field_equals", "field": "no_idea_summary_written",  "expected": true },
+    { "type": "state_field_equals", "field": "no_vision_written",        "expected": true }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "id": "S237",
+  "name": "idea synthesis — refine path: requestIdeaSummary → confirmIdea MODIFY → CONVERSATION; no vision.md; re-synthesis succeeds (PHASE-17)",
+  "description": "RED (before PHASE-17 Step 2): confirmIdea not exported → TypeError → FAIL. GREEN: MODIFY returns conversation_mode=CONVERSATION (not BLOCKED); no vision.md written; idea_summary.json remains on disk; second requestIdeaSummary call after MODIFY succeeds (mode back to CONVERSATION allows re-synthesis).",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/idea_synthesis_test_helper",
+  "method": "runS237IdeaSynthesisRefine",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "request_ok",               "expected": true },
+    { "type": "state_field_equals", "field": "modify_ok",                "expected": true },
+    { "type": "state_field_equals", "field": "after_modify_conversation", "expected": true },
+    { "type": "state_field_equals", "field": "no_vision_written",        "expected": true },
+    { "type": "state_field_equals", "field": "idea_summary_still_exists", "expected": true },
+    { "type": "state_field_equals", "field": "resynth_ok",               "expected": true }
+  ]
+}
