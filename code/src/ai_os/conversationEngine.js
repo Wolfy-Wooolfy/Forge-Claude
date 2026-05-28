@@ -4,7 +4,8 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 const ConversationalResponseProvider = require("../providers/conversationalResponseProvider");
-const IntentClassificationProvider = require("../providers/intentClassificationProvider");
+const IntentClassificationProvider   = require("../providers/intentClassificationProvider");
+const ideaSynthesisProvider          = require("../providers/ideaSynthesisProvider");
 const { getDefaultRegistry } = require("../runtime/tools/_registry");
 
 const STATE_TRANSITION_THRESHOLDS = {
@@ -67,13 +68,14 @@ function createConversationEngine(options = {}) {
     return path.join(projectsRoot, normalizeProjectId(projectId), "project_state.json");
   }
 
-  function loadConversationHistory(projectId) {
+  function loadConversationHistory(projectId, opts) {
     const histPath = path.join(
       projectsRoot, normalizeProjectId(projectId),
       "ai_os", "conversation_context.json"
     );
     const raw = readJsonSafe(histPath, []);
-    return Array.isArray(raw) ? raw.slice(-20) : [];
+    const arr = Array.isArray(raw) ? raw : [];
+    return (opts && opts.full) ? arr : arr.slice(-20);
   }
 
   function loadState(projectId) {
@@ -591,12 +593,210 @@ function createConversationEngine(options = {}) {
     };
   }
 
+  // ── Idea Synthesis (PHASE-17) ──────────────────────────────────────────────
+  //
+  // requestIdeaSummary: synthesizes the full conversation into a structured
+  // idea summary and sets conversation_mode = "IDEA_REVIEW".
+  //
+  // confirmIdea: accepts a structured action (AFFIRM/REJECT/MODIFY) from the UI.
+  // AFFIRM → locks summary as vision.md, sets conversation_mode = "PIPELINE",
+  //           active_runtime_state = "IDEATION".
+  // REJECT/MODIFY → discards summary, returns to CONVERSATION.
+
+  async function requestIdeaSummary(body = {}) {
+    const projectId = normalizeProjectId(body.project_id || "");
+    const state = loadState(projectId);
+
+    if (!state) {
+      return { ok: false, mode: "BLOCKED", reason: "PROJECT_NOT_FOUND" };
+    }
+
+    if (state.conversation_mode !== "CONVERSATION") {
+      return { ok: false, mode: "BLOCKED", reason: "NOT_IN_CONVERSATION_MODE" };
+    }
+
+    const fullHistory = loadConversationHistory(projectId, { full: true });
+
+    if (fullHistory.length === 0) {
+      return { ok: false, mode: "BLOCKED", reason: "NO_CONVERSATION_HISTORY" };
+    }
+
+    const result = await ideaSynthesisProvider.executeTask({
+      context: {
+        schema_version:        "1.0",
+        project_id:            projectId,
+        conversation_history:  fullHistory,
+        provider:    body.provider    || process.env.FORGE_PROVIDER || "mock",
+        model:       body.model       || process.env.OPENAI_MODEL   || "mock-is",
+        scenario_id: body.scenario_id || ""
+      }
+    });
+
+    if (result.status !== "SUCCESS") {
+      return {
+        ok:     false,
+        mode:   "BLOCKED",
+        reason: "SYNTHESIS_FAILED",
+        detail: result.metadata
+      };
+    }
+
+    const summary = result.output;
+
+    // Write idea_summary.json via L2 registry
+    const summaryRelPath = "artifacts/projects/" + normalizeProjectId(projectId) + "/idea_summary.json";
+    const reg = getDefaultRegistry();
+    const summaryWrite = await reg.invoke("fs.write_file", {
+      path:    summaryRelPath,
+      content: JSON.stringify({ ...summary, synthesized_at: nowIso(), project_id: projectId }, null, 2)
+    }, { root });
+
+    if (summaryWrite.status !== "SUCCESS") {
+      return {
+        ok:     false,
+        mode:   "BLOCKED",
+        reason: "SUMMARY_WRITE_FAILED",
+        detail: summaryWrite.metadata
+      };
+    }
+
+    const updatedState = {
+      ...state,
+      conversation_mode: "IDEA_REVIEW",
+      last_updated_at:   nowIso()
+    };
+    await saveState(projectId, updatedState);
+
+    return {
+      ok:         true,
+      mode:       "IDEA_REVIEW",
+      project_id: projectId,
+      summary
+    };
+  }
+
+  async function confirmIdea(body = {}) {
+    const projectId = normalizeProjectId(body.project_id || "");
+    const action    = String(body.action || "").toUpperCase();
+    const state     = loadState(projectId);
+
+    if (!state) {
+      return { ok: false, mode: "BLOCKED", reason: "PROJECT_NOT_FOUND" };
+    }
+
+    if (state.conversation_mode !== "IDEA_REVIEW") {
+      return { ok: false, mode: "BLOCKED", reason: "NOT_IN_IDEA_REVIEW_MODE" };
+    }
+
+    const validActions = ["AFFIRM", "REJECT", "MODIFY"];
+    if (!validActions.includes(action)) {
+      return {
+        ok:     false,
+        mode:   "BLOCKED",
+        reason: "INVALID_ACTION",
+        detail: "action must be AFFIRM, REJECT, or MODIFY"
+      };
+    }
+
+    if (action === "REJECT" || action === "MODIFY") {
+      const updatedState = {
+        ...state,
+        conversation_mode: "CONVERSATION",
+        last_updated_at:   nowIso()
+      };
+      await saveState(projectId, updatedState);
+      return {
+        ok:         true,
+        mode:       "CONVERSATION",
+        project_id: projectId,
+        action
+      };
+    }
+
+    // AFFIRM — lock summary as vision.md, enter pipeline
+    const summaryPath = path.join(projectsRoot, normalizeProjectId(projectId), "idea_summary.json");
+    const summary     = readJsonSafe(summaryPath, null);
+
+    if (!summary) {
+      return {
+        ok:     false,
+        mode:   "BLOCKED",
+        reason: "NO_IDEA_SUMMARY",
+        detail: "call request-idea-summary before confirm-idea"
+      };
+    }
+
+    const visionContent  = _formatSummaryAsVision(summary, projectId);
+    const visionRelPath  = "artifacts/projects/" + normalizeProjectId(projectId) + "/vision.md";
+    const reg            = getDefaultRegistry();
+    const visionWrite    = await reg.invoke("fs.write_file", {
+      path:    visionRelPath,
+      content: visionContent
+    }, { root });
+
+    if (visionWrite.status !== "SUCCESS") {
+      return {
+        ok:     false,
+        mode:   "BLOCKED",
+        reason: "VISION_WRITE_FAILED",
+        detail: visionWrite.metadata
+      };
+    }
+
+    const updatedState = {
+      ...state,
+      conversation_mode:    "PIPELINE",
+      active_runtime_state: "IDEATION",
+      user_goal:            summary.goal_primary || "",
+      project_name:         summary.project_name || state.project_name || "",
+      last_updated_at:      nowIso()
+    };
+    await saveState(projectId, updatedState);
+
+    return {
+      ok:                   true,
+      mode:                 "PIPELINE",
+      conversation_mode:    "PIPELINE",
+      active_runtime_state: "IDEATION",
+      project_id:           projectId
+    };
+  }
+
+  function _formatSummaryAsVision(summary, projectId) {
+    const lines = [];
+    lines.push("# Vision: " + (summary.project_name || projectId));
+    lines.push("");
+    lines.push("## Goal");
+    lines.push(summary.goal_primary || "");
+    if (summary.features && summary.features.length > 0) {
+      lines.push("");
+      lines.push("## Features");
+      for (const f of summary.features) lines.push("- " + f);
+    }
+    if (summary.constraints && summary.constraints.length > 0) {
+      lines.push("");
+      lines.push("## Constraints");
+      for (const c of summary.constraints) lines.push("- " + c);
+    }
+    if (summary.non_goals && summary.non_goals.length > 0) {
+      lines.push("");
+      lines.push("## Non-Goals");
+      for (const ng of summary.non_goals) lines.push("- " + ng);
+    }
+    lines.push("");
+    lines.push("---");
+    lines.push("*Generated by Forge Idea Synthesis — confirmed by owner.*");
+    return lines.join("\n");
+  }
+
   return {
     processMessage,
     generateCheckpoint,
     confirmTransition,
     getProjectSummary,
     startPipeline,
+    requestIdeaSummary,
+    confirmIdea,
     CONFIRMATION_REQUIRED_TRANSITIONS
   };
 }

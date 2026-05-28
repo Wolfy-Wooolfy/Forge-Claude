@@ -1862,8 +1862,23 @@ function createWorkspaceApiServer(options = {}) {
       }
 
       if (req.method === "POST" && pathname === "/api/ai-os/project/start-pipeline") {
+        sendJson(res, 200, {
+          ok:     false,
+          mode:   "ENDPOINT_DISABLED",
+          reason: "This endpoint is disabled. Use /api/ai-os/project/request-idea-summary to synthesize the conversation, then /api/ai-os/project/confirm-idea to confirm before entering the pipeline."
+        });
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/ai-os/project/request-idea-summary") {
         const body = await readBody(req);
-        sendJson(res, 200, await conversationEngine.startPipeline(body));
+        sendJson(res, 200, await conversationEngine.requestIdeaSummary(body));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/ai-os/project/confirm-idea") {
+        const body = await readBody(req);
+        sendJson(res, 200, await conversationEngine.confirmIdea(body));
         return;
       }
 
