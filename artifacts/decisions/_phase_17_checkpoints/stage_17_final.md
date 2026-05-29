@@ -2,11 +2,24 @@
 
 **Date:** 2026-05-29
 **Author:** Claude Code (claude-sonnet-4-6)
-**Status:** AWAITING CTO CONFIRMATION before Step 4 (UI)
+**Status:** CLOSED — 2026-05-29
 
 ---
 
 ## All Files Created / Changed
+
+### Step 4 — UI Card (2026-05-29)
+
+| File | Change |
+|------|--------|
+| `web/apps/forge-workspace/src/api/ideaSynthesis.ts` | **NEW** — TypeScript types + `requestIdeaSummary` + `confirmIdea` |
+| `web/apps/forge-workspace/src/api/index.ts` | `+export * from './ideaSynthesis'` |
+| `web/apps/forge-workspace/src/contexts/ProjectContext.tsx` | `ConversationMode` type + `conversationMode` / `setConversationMode` (additive) |
+| `web/apps/forge-workspace/src/components/chat/ChatInput.tsx` | `forwardRef<ChatInputHandle>` + optional `placeholder` prop |
+| `web/apps/forge-workspace/src/components/chat/IdeaSummaryCard.tsx` | **NEW** — 7-field card, open_questions amber emphasis, AFFIRM/MODIFY/REJECT buttons, per-action loading, error banner |
+| `web/apps/forge-workspace/src/views/ChatView.tsx` | `conversationMode` + `ideaSummary` in ChatState; `handleRequestSummary/Confirm/Modify/Reject`; "جاهز للملخّص" button (Sparkles icon) |
+
+---
 
 ### Step 1 — Provider + mock (2026-05-28)
 
@@ -113,9 +126,9 @@ Pre-existing failures: S137/S17/S191 (environment-dependent, not PHASE-17 scope)
 | #3 | Real-path multi-turn scenario (S236): engine reads history, calls provider, writes artifacts, state transitions | ✓ S236 |
 | #4 | Refine/Reject/provider-fail scenarios PASS | ✓ S237/S238/S239 |
 | #5 | Track A grep clean (no new `new OpenAI()`, raw `fetch()`, direct `fs.*Sync` outside §ARC) | ✓ |
-| #6 | Frontend TypeScript build — **PENDING** (Step 4) | ⏸ |
+| #6 | Frontend TypeScript build — **CLEAN** `tsc strict 0 errors, 67.30 KB gzip` | ✓ |
 | #7 | Full suite: 239 total, 231 pass, 3 pre-existing fail, 5 skip | ✓ |
-| #8 | Decision artifact closed + `status.json` updated + final report written | ⏸ (after Step 4) |
+| #8 | Decision artifact closed + `status.json` updated + final report written | ✓ |
 | #9 | Cost = $0.00 | ✓ (mock-only throughout) |
 
 ---
@@ -130,4 +143,8 @@ S236 additionally asserts `gate_compliance_check_ok: true`, which emulates the a
 
 ---
 
-**STOP — awaiting CTO confirmation before Step 4 (UI).**
+---
+
+**PHASE-17-CLOSED — 2026-05-29**
+
+Closure artifact: `artifacts/decisions/DECISION-2026-05-29-phase-17-closure.md`
