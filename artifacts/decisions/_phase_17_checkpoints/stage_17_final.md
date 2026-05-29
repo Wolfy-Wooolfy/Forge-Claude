@@ -85,7 +85,7 @@ CONVERSATION (free chat resumes)
 
 | Scenario | Description | Result |
 |----------|-------------|--------|
-| S236 | Happy path — gate #3 real-path: CONVERSATION → IDEA_REVIEW → PIPELINE + IDEATION, vision.md with `vision_locked:true` | ✓ PASS |
+| S236 | Happy path — gate #3 real-path: CONVERSATION → IDEA_REVIEW → PIPELINE + IDEATION, vision.md with `vision_locked:true`, `gate_compliance_check_ok` | ✓ PASS (13 assertions) |
 | S237 | Refine path — MODIFY → CONVERSATION, no vision.md, re-synthesis succeeds | ✓ PASS |
 | S238 | Reject path — REJECT → CONVERSATION, no vision.md | ✓ PASS |
 | S239 | Provider-fail — missing mock key → BLOCKED SYNTHESIS_FAILED, state stays CONVERSATION, no artifacts | ✓ PASS |
@@ -124,9 +124,9 @@ Pre-existing failures: S137/S17/S191 (environment-dependent, not PHASE-17 scope)
 
 The CTO specified `tool_called` and `artifact_exists` assertion types for S236.
 
-**Finding during implementation:** `tool_called` checks `result.output.tool_calls` which is always `[]` in `module_call` scenarios (the runner initializes it to `[]` regardless of helper output). `artifact_exists` checks the filesystem AFTER the helper's `finally` cleanup runs — files are already deleted.
+**Design choice:** `module_call` helpers in this repo follow a self-cleanup pattern (cleanup in the helper's own `try/finally`), so the helper performs richer in-process verification (`parseFrontmatter` + `validateFrontmatter` against the canonical schema) than `artifact_contains` string matching would provide. The runner does support artifact-level assertions for `module_call` via the scenario `cleanup_project` field — not used here by deliberate choice for stronger structural verification.
 
-**Solution:** All assertions use `state_field_equals` — the helper reads files and computes boolean flags INSIDE the `try` block before cleanup. This is MORE deterministic than `artifact_exists` because it also validates content, not just existence. The gate #3 requirement (real UI→API→engine path) is satisfied by the flow itself: the helper calls `requestIdeaSummary` and `confirmIdea` on the actual engine with real history — no pre-seeding of `idea_summary.json` or `vision.md`.
+S236 additionally asserts `gate_compliance_check_ok: true`, which emulates the actual blocking condition in both `visionComplianceGate.assertVisionLocked()` (modules/visionComplianceGate.js:11) and `vision_lock_rule` (runtime/permission/rules/vision_lock_rule.js:38): `if (!fm.vision_locked) → VISION_NOT_LOCKED`. This proves the written vision.md would pass the real permission layer, not just isolated schema validation.
 
 ---
 

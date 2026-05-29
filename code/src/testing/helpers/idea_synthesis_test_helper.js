@@ -68,16 +68,23 @@ function _makeHistory() {
 
 function _checkVision(visionPath) {
   const exists = fs.existsSync(visionPath);
-  if (!exists) return { exists: false, locked_true: false, locked_at_set: false, fm_valid: false };
+  if (!exists) return { exists: false, locked_true: false, locked_at_set: false, fm_valid: false, gate_compliance_ok: false };
   const { parseFrontmatter, validateFrontmatter } = require("../../ai_os/schemas/visionSchema");
   const content  = fs.readFileSync(visionPath, "utf8");
   const fm       = parseFrontmatter(content);
   const errs     = fm ? validateFrontmatter(fm) : ["parseFrontmatter returned null"];
+  // Emulate the actual gates that block the pipeline:
+  // - visionComplianceGate (modules/visionComplianceGate.js line 11):
+  //     if (!vision.frontmatter.vision_locked) return VISION_NOT_LOCKED
+  // - vision_lock_rule (runtime/permission/rules/vision_lock_rule.js line 38):
+  //     if (!frontmatter.vision_locked) return denied VISION_NOT_LOCKED
+  const gate_compliance_ok = fm !== null && fm.vision_locked === true;
   return {
-    exists:      true,
-    locked_true: fm !== null && fm.vision_locked === true,
-    locked_at_set: fm !== null && typeof fm.vision_locked_at === "string" && fm.vision_locked_at.length > 0,
-    fm_valid:    errs.length === 0
+    exists:           true,
+    locked_true:      fm !== null && fm.vision_locked === true,
+    locked_at_set:    fm !== null && typeof fm.vision_locked_at === "string" && fm.vision_locked_at.length > 0,
+    fm_valid:         errs.length === 0,
+    gate_compliance_ok
   };
 }
 
@@ -140,10 +147,11 @@ async function runS236IdeaSynthesisHappyPath() {
       conversation_mode_pipeline,
       active_runtime_state_ideation,
       user_goal_set,
-      vision_written:          v.exists,
-      vision_locked_true:      v.locked_true,
-      vision_locked_at_set:    v.locked_at_set,
-      vision_frontmatter_valid: v.fm_valid
+      vision_written:           v.exists,
+      vision_locked_true:       v.locked_true,
+      vision_locked_at_set:     v.locked_at_set,
+      vision_frontmatter_valid: v.fm_valid,
+      gate_compliance_check_ok: v.gate_compliance_ok
     };
   } finally {
     _cleanup(PID);
