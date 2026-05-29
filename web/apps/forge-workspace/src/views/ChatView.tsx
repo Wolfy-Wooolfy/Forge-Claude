@@ -1,11 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
-import { chatStream, answerClarification } from '@/api'
+import { Sparkles } from 'lucide-react'
+import { chatStream, answerClarification, requestIdeaSummary } from '@/api'
+import type { IdeaSummary } from '@/api'
 import { detectLanguage } from '@/lib/detectLanguage'
-import { ChatInput } from '@/components/chat/ChatInput'
+import { Button } from '@/components/ui/button'
+import { ChatInput, type ChatInputHandle } from '@/components/chat/ChatInput'
+import { IdeaSummaryCard } from '@/components/chat/IdeaSummaryCard'
 import { MessageBubble } from '@/components/chat/MessageBubble'
 import { QuickReplies, normalizeChips } from '@/components/chat/QuickReplies'
 import type { ChatMessage, ChatPhase, ClarificationState, QuickReplyChip } from '@/components/chat/types'
-import { useProject } from '@/contexts/ProjectContext'
+import { useProject, type ConversationMode } from '@/contexts/ProjectContext'
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -35,17 +39,25 @@ interface ChatState {
   phase: ChatPhase
   clarification: ClarificationState | null
   pendingReplies: QuickReplyChip[]
+  conversationMode: ConversationMode
+  ideaSummary: IdeaSummary | null
 }
 
 // ── component ─────────────────────────────────────────────────────────────────
 
 export default function ChatView() {
-  const { activeProjectId: projectId } = useProject()
+  const { activeProjectId: projectId, conversationMode: initialConversationMode } = useProject()
+  const chatInputRef = useRef<ChatInputHandle | null>(null)
+  const [summaryRequesting, setSummaryRequesting] = useState(false)
+  const [chatPlaceholder, setChatPlaceholder] = useState('اكتب رسالتك...')
+
   const [state, setState] = useState<ChatState>({
     messages: [],
     phase: 'discovery',
     clarification: null,
     pendingReplies: [],
+    conversationMode: initialConversationMode,
+    ideaSummary: null,
   })
 
   const abortRef = useRef<AbortController | null>(null)
@@ -182,9 +194,44 @@ export default function ChatView() {
     }
   }
 
+  // ── idea synthesis flow ────────────────────────────────────────────────────
+
+  async function handleRequestSummary() {
+    setSummaryRequesting(true)
+    try {
+      const res = await requestIdeaSummary({ project_id: projectId })
+      if (res.ok && res.summary) {
+        const summary = res.summary
+        setState((prev) => ({ ...prev, conversationMode: 'IDEA_REVIEW', ideaSummary: summary }))
+      } else {
+        addMessage(assistantMsg(res.reason ?? 'تعذّر تحليل الفكرة. حاول مجدداً.'))
+      }
+    } catch (err) {
+      addMessage(assistantMsg(err instanceof Error ? err.message : 'تعذّر تحليل الفكرة.'))
+    } finally {
+      setSummaryRequesting(false)
+    }
+  }
+
+  function handleIdeaConfirm() {
+    addMessage(assistantMsg('تمام، الفكرة اتثبّتت. هـ ابدأ التخطيط دلوقتي.'))
+    setState((prev) => ({ ...prev, conversationMode: 'PIPELINE', ideaSummary: null }))
+  }
+
+  function handleIdeaModify() {
+    setState((prev) => ({ ...prev, conversationMode: 'CONVERSATION', ideaSummary: null }))
+    setChatPlaceholder('ايه اللي عايز تعدّله؟')
+    chatInputRef.current?.focus()
+  }
+
+  function handleIdeaReject() {
+    setState((prev) => ({ ...prev, conversationMode: 'CONVERSATION', ideaSummary: null }))
+  }
+
   // ── send handler ───────────────────────────────────────────────────────────
 
   async function handleSend(text: string) {
+    setChatPlaceholder('اكتب رسالتك...')
     addMessage(userMsg(text))
 
     const { phase, clarification } = state
@@ -224,7 +271,7 @@ export default function ChatView() {
         data-testid="message-list"
         className="flex-1 overflow-y-auto flex flex-col pr-1 min-h-0"
       >
-        {state.messages.length === 0 && (
+        {state.messages.length === 0 && state.conversationMode !== 'IDEA_REVIEW' && (
           <div className="flex flex-col items-center justify-center h-full text-gray-500 text-sm gap-3">
             <span className="text-3xl select-none">✦</span>
             <p className="text-gray-300 font-medium">مرحباً بك في Forge</p>
@@ -243,12 +290,42 @@ export default function ChatView() {
             onDismiss={dismissReplies}
           />
         )}
+        {state.conversationMode === 'IDEA_REVIEW' && state.ideaSummary && (
+          <IdeaSummaryCard
+            summary={state.ideaSummary}
+            projectId={projectId}
+            onConfirm={handleIdeaConfirm}
+            onModify={handleIdeaModify}
+            onReject={handleIdeaReject}
+          />
+        )}
         <div ref={bottomRef} />
       </div>
 
-      {/* Chat input */}
+      {/* Footer */}
       <div className="flex-shrink-0">
-        <ChatInput disabled={isDisabled} onSend={handleSend} />
+        {state.conversationMode === 'CONVERSATION' && state.messages.length >= 3 && (
+          <div className="mb-2 flex justify-end">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => { void handleRequestSummary() }}
+              disabled={summaryRequesting || isDisabled}
+              data-testid="request-summary-btn"
+            >
+              <span className="flex items-center gap-1.5">
+                <Sparkles className="h-3.5 w-3.5" />
+                {summaryRequesting ? '…' : 'جاهز للملخّص'}
+              </span>
+            </Button>
+          </div>
+        )}
+        <ChatInput
+          ref={chatInputRef}
+          disabled={isDisabled}
+          onSend={handleSend}
+          placeholder={chatPlaceholder}
+        />
       </div>
     </div>
   )

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { Mic, MicOff, Send } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -31,18 +31,30 @@ function getSR(): SRConstructor | null {
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
+export interface ChatInputHandle {
+  focus: () => void
+}
+
 interface ChatInputProps {
   disabled: boolean
   onSend: (text: string) => void
+  placeholder?: string
 }
 
-export function ChatInput({ disabled, onSend }: ChatInputProps) {
+export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(function ChatInput(
+  { disabled, onSend, placeholder = 'اكتب رسالتك...' },
+  ref
+) {
   const [value, setValue] = useState('')
   const [listening, setListening] = useState(false)
   const recognitionRef = useRef<SRInstance | null>(null)
   const textareaRef    = useRef<HTMLTextAreaElement | null>(null)
   const SR = getSR()
   const hasVoice = SR !== null
+
+  useImperativeHandle(ref, () => ({
+    focus: () => { textareaRef.current?.focus() },
+  }))
 
   useEffect(() => {
     return () => { recognitionRef.current?.abort() }
@@ -103,7 +115,7 @@ export function ChatInput({ disabled, onSend }: ChatInputProps) {
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={handleKey}
         disabled={disabled}
-        placeholder="اكتب رسالتك..."
+        placeholder={placeholder}
         className={cn(
           'flex-1 resize-none rounded-md border border-input bg-gray-800 px-3 py-2 text-sm',
           'placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-ring',
@@ -138,4 +150,4 @@ export function ChatInput({ disabled, onSend }: ChatInputProps) {
       </Button>
     </div>
   )
-}
+})
