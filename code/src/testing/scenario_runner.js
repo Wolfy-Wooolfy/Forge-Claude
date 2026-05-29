@@ -185,6 +185,14 @@ async function _runDirectProvider(scenario, root) {
 
     globalThis.fetch = origFetch;
     await svc.close();
+
+    // Reset the singleton so subsequent tests (e.g. direct_tool) don't inherit
+    // a client bound to this now-closed mock server's port (ECONNREFUSED).
+    try {
+      const adapterPath = path.join(root, "code", "src", "providers", "_contract", "openAiAdapter");
+      const adapter = require(adapterPath);
+      if (typeof adapter._resetClientForTests === "function") adapter._resetClientForTests();
+    } catch (_e) { /* adapter not yet loaded — no-op */ }
   }
 
   return _normalizeProviderResult(raw);
@@ -342,28 +350,29 @@ async function _runDirectEngine(scenario, root) {
   const projectId   = "test_engine_" + scenario.id.toLowerCase();
   const projectDir  = path.join(root, "artifacts", "projects", projectId);
   const fixturePath = path.join(projectDir, "project_state.json");
-  let fixtureCreated = false;
 
-  if (!fs.existsSync(fixturePath)) {
-    fs.mkdirSync(projectDir, { recursive: true });
-    const fixtureData = scenario.fixture || {};
-    fs.writeFileSync(fixturePath, JSON.stringify(
-      Object.assign(
-        {
-          project_name:         "Engine Test " + scenario.id,
-          current_state:        "DISCUSSION",
-          active_runtime_state: "DISCUSSION",
-          user_goal:            "",
-          _version:             1,
-          created_at:           new Date().toISOString()
-        },
-        fixtureData,
-        { project_id: projectId }
-      ),
-      null, 2
-    ));
-    fixtureCreated = true;
+  // Always start with a clean project directory to prevent stale state
+  // (e.g. a doc_build_loop_state.json left by a prior run) from affecting results.
+  if (fs.existsSync(projectDir)) {
+    fs.rmSync(projectDir, { recursive: true, force: true });
   }
+  fs.mkdirSync(projectDir, { recursive: true });
+  const fixtureData = scenario.fixture || {};
+  fs.writeFileSync(fixturePath, JSON.stringify(
+    Object.assign(
+      {
+        project_name:         "Engine Test " + scenario.id,
+        current_state:        "DISCUSSION",
+        active_runtime_state: "DISCUSSION",
+        user_goal:            "",
+        _version:             1,
+        created_at:           new Date().toISOString()
+      },
+      fixtureData,
+      { project_id: projectId }
+    ),
+    null, 2
+  ));
 
   // Write pre-existing fixture files (e.g. draft.md for docReviewEngine guard)
   if (Array.isArray(scenario.fixture_files) && scenario.fixture_files.length > 0) {
@@ -508,15 +517,13 @@ async function _runDirectEngine(scenario, root) {
   const newAudit = readEntries(root, { since_ts: startTs });
   const result   = _normalizeEngineResult(raw, newAudit);
 
-  if (fixtureCreated) {
-    Object.defineProperty(result, "_cleanup", {
-      value: () => {
-        try { fs.rmSync(projectDir, { recursive: true, force: true }); } catch { /* best-effort */ }
-      },
-      enumerable: false,
-      writable:   false
-    });
-  }
+  Object.defineProperty(result, "_cleanup", {
+    value: () => {
+      try { fs.rmSync(projectDir, { recursive: true, force: true }); } catch { /* best-effort */ }
+    },
+    enumerable: false,
+    writable:   false
+  });
 
   return result;
 }
@@ -665,9 +672,12 @@ async function _runApiserver(scenario, root) {
   const projectId  = scenario.project_id || ("test_apiserver_" + scenario.id.toLowerCase());
   const projectDir = path.join(root, "artifacts", "projects", projectId);
   const fixturePath = path.join(projectDir, "project_state.json");
-  let fixtureCreated = false;
 
-  if (scenario.fixture && !fs.existsSync(fixturePath)) {
+  if (scenario.fixture) {
+    // Always recreate fixture to prevent stale state from a prior crashed run.
+    if (fs.existsSync(projectDir)) {
+      fs.rmSync(projectDir, { recursive: true, force: true });
+    }
     fs.mkdirSync(projectDir, { recursive: true });
     fs.writeFileSync(fixturePath, JSON.stringify(
       Object.assign(
@@ -684,7 +694,6 @@ async function _runApiserver(scenario, root) {
       ),
       null, 2
     ));
-    fixtureCreated = true;
   }
 
   let instance = null;

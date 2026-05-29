@@ -104,9 +104,10 @@ IDEA_REVIEW   →  confirmIdea REJECT  →  CONVERSATION         (no vision.md)
 
 PHASE-17 added no new §ARC exceptions. Reconciliation work performed:
 
-- `§ARC-8` (`ideaSynthesisProvider` / binary upload exemption) existed since `DECISION-20260526-arc8-binary-upload-exemption.md` (PHASE-13.8).
-- This phase reconciled the contract table: `18_AGENT_ROLES_CONTRACT.md` §ARC-8 row added.
-- `S208` regression assertion updated from `arc_count_equals_seven` → `arc_count_equals_eight` to match.
+- `§ARC-8` = **binary upload exemption** — originated in PHASE-13.8, authority: `DECISION-20260526-arc8-binary-upload-exemption.md`. No §ARC association with `ideaSynthesisProvider`.
+- `ideaSynthesisProvider` = new PHASE-17 provider (`code/src/providers/ideaSynthesisProvider.js`). Normal Contract v2 provider — **no §ARC**; it follows all Track A rules.
+- This phase reconciled the contract table: `18_AGENT_ROLES_CONTRACT.md` §ARC-8 row added (the binary upload §ARC-8 row, not a new one for ideaSynthesisProvider).
+- `S208` regression assertion updated from `arc_count_equals_seven` → `arc_count_equals_eight` to match the §ARC-8 that was added in PHASE-13.8.
 
 ---
 

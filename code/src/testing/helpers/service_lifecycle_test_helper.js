@@ -61,7 +61,7 @@ function runS191TaskSchedulerScriptCheck() {
     register_task_ok:    content.includes("Register-ScheduledTask"),
     restart_count_ok:    content.includes("-RestartCount"),
     restart_interval_ok: content.includes("-RestartInterval"),
-    logon_type_ok:       content.includes("-LogonType S4U"),
+    logon_type_ok:       content.includes("$env:USERNAME") && content.includes("-AtLogOn"),
     node_check_ok:       content.includes("where node"),
     idempotent_ok:       content.includes("schtasks /delete")
   };

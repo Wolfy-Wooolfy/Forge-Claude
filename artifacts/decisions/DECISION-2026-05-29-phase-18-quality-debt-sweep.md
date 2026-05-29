@@ -1,6 +1,6 @@
 # DECISION-2026-05-29 — PHASE-18: Quality Debt Sweep
 
-> **Status:** DRAFT — awaiting owner approval in chat. NOT binding until Khaled replies "approved" or equivalent.
+> **Status:** APPROVED — Khaled approved 2026-05-29. Binding.
 > **Authored:** 2026-05-29
 > **Phase type:** Small cleanup phase (Track B-adjacent). Between feature phases by design.
 > **Predecessor:** PHASE-17 CLOSED ✓
@@ -17,7 +17,7 @@ Four flaky/failing scenarios have carried through the last 4-6 closures, labeled
 | S17 | PHASE-9 era | `documentationBuildLoop` returns `LOOP_EXHAUSTED` instead of `DOCUMENTATION_BUILD_COMPLETE` |
 | S28 | PHASE-9 era | Passes when run alone; fails inside the full suite — test isolation bug |
 | S137 | PHASE-9 era | `kb.retrieve` env dependency on empty vector data |
-| S191 | PHASE-13 era | Windows scheduler `LogonType S4U` check fails on non-Windows |
+| S191 | PHASE-13 era | Helper assertion checks `-LogonType S4U` but BAT file deliberately uses `-AtLogOn + $env:USERNAME` (no S4U) — assertion bug, not platform issue |
 
 Plus two cosmetic items from PHASE-17 worth closing now while the context is fresh:
 
@@ -51,9 +51,18 @@ Suite-vs-alone failures indicate shared state between scenarios. Either:
 
 The scenario expects `status: SUCCESS, results.length: 0` on an empty KB. The engine currently returns `FAILED`. Decide which is correct (likely SUCCESS with empty list — "no results found" is not an error) and adjust either the engine or the scenario.
 
-### 2.4 S191 — Windows-only test
+### 2.4 S191 — Helper assertion bug (not platform-specific)
 
-Mark as `requires: ["windows"]` and let it SKIP gracefully on non-Windows. This is the same pattern used for Playwright-dependent scenarios.
+Root cause identified in §0: the helper `runS191TaskSchedulerScriptCheck()` checks `content.includes("-LogonType S4U")` but the BAT file was deliberately designed to use `-AtLogOn` with `$env:USERNAME` instead of S4U (to avoid stored credentials — see BAT line 16 comment). The assertion was written for a design that was intentionally changed.
+
+**Fix:** update the helper assertion only. No SKIP mechanism, no `requires: ["windows"]` — the test reads file content and is platform-agnostic.
+
+```js
+// Before:
+logon_type_ok: content.includes("-LogonType S4U"),
+// After:
+logon_type_ok: content.includes("$env:USERNAME") && content.includes("-AtLogOn"),
+```
 
 ### 2.5 Cosmetic — PHASE-17 artifacts
 
@@ -90,11 +99,11 @@ Grep for orphan references after `doDiscovery` removal. Delete unused helpers in
 | 1 | S17 PASS in the full suite (not just alone) |
 | 2 | S28 PASS in the full suite (not just alone) |
 | 3 | S137 PASS — engine and scenario agreed on empty-KB semantics |
-| 4 | S191 SKIPS gracefully on non-Windows with reason `requires: windows` |
+| 4 | S191 PASS on Windows AND non-Windows (helper assertion fix — no SKIP mechanism needed) |
 | 5 | Track A grep clean — zero new `new OpenAI()`, raw `fetch()`, `fs.*Sync` outside §ARC |
 | 6 | `stage_17_final.md` title updated; `§ARC-8` wording corrected in PHASE-17 closure artifact |
 | 7 | `doDiscovery`-related dead code removed (or explicitly noted as still-needed) |
-| 8 | Full suite on Windows: **234 passed / 0 failed / 5 skipped (239 total)** — S191 moves from FAIL to SKIP, so pass count goes 231 → 234 |
+| 8 | Full suite on Windows: **234 passed / 0 failed / 5 skipped (239 total)** — S17+S137+S191 move from FAIL to PASS, so pass count goes 231 → 234; 5 skips unchanged (docker scenarios) |
 | 9 | Frontend TypeScript strict build still clean |
 | 10 | Decision artifact closed + `status.json` updated + checkpoint written |
 
@@ -118,8 +127,6 @@ None blocking. Scope is mechanical fixes to known issues.
 
 ## 8. Approval
 
-- [ ] Owner replies "approved" in chat.
-- [ ] This artifact committed to `artifacts/decisions/`.
-- [ ] `status.json.next_phase` updated to `PHASE-18-ACTIVE`.
-
-Until all three: DRAFT, no authority.
+- [x] Owner approved in chat 2026-05-29 (with revised §2.4 and Gate #4 for S191).
+- [x] This artifact committed to `artifacts/decisions/`.
+- [ ] `status.json.next_phase` updated to `PHASE-18-ACTIVE` (pending mid-checkpoint).
