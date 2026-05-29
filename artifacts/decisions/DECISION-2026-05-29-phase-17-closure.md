@@ -39,7 +39,7 @@ IDEA_REVIEW   →  confirmIdea REJECT  →  CONVERSATION         (no vision.md)
 | File | Change |
 |------|--------|
 | `code/src/providers/ideaSynthesisProvider.js` | **NEW** — Contract v2 (`defineProvider`), mock + real paths |
-| `docs/10_runtime/18_AGENT_ROLES_CONTRACT.md` | §ARC-8 row added (ideaSynthesisProvider) |
+| `docs/10_runtime/18_AGENT_ROLES_CONTRACT.md` | §ARC-8 row added (binary upload exemption documentation) |
 | `code/src/runtime/agents/adapters/mock_responses.json` | S236–S239 mock entries |
 | `docs/10_runtime/18b_ROLE_PROMPTS.md` | `idea_synthesis_v1` prompt appended |
 | `code/src/testing/helpers/phase_12_regression_helper.js` | `arc_count_equals_seven` → `arc_count_equals_eight` |

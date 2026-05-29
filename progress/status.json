@@ -4,9 +4,9 @@
   "current_stage": "A",
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
-  "next_phase": "PHASE-18-PENDING-DECISION",
-  "next_step": "PHASE-18 requires a separate decision artifact + explicit owner approval before starting. No phase is activated automatically.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-29-phase-17-closure.md",
+  "next_phase": "PHASE-19-PENDING-DECISION",
+  "next_step": "PHASE-19 requires a separate decision artifact + explicit owner approval before starting. No phase is activated automatically.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-2026-05-30-phase-18-closure.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -78,10 +78,10 @@
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
     "self_test_last_run": "2026-05-29",
-    "self_test_last_result": "231 passed, 3 failed (S137/S17/S191 pre-existing), 5 skipped (239 total) — PHASE-17 CLOSED. S236/S237/S238/S239 GREEN. §ARC-8 reconciled (ideaSynthesisProvider). Frontend TypeScript strict build clean.",
-    "self_test_scenarios_pass": 231,
+    "self_test_last_result": "234 passed, 0 failed, 5 skipped (239 total) — PHASE-18 CLOSED. S17/S137/S191 moved FAIL→PASS. True green suite for first time since PHASE-9. Frontend TypeScript strict build clean.",
+    "self_test_scenarios_pass": 234,
     "self_test_scenarios_skip": 5,
-    "self_test_scenarios_fail": 3,
+    "self_test_scenarios_fail": 0,
     "providers_registered_count": 14,
     "tools_registered_count": 78,
     "doctor_checks_count": 34,
@@ -153,12 +153,14 @@
       "PHASE-13.7",
       "PHASE-15",
       "PHASE-16",
-      "PHASE-17"
+      "PHASE-17",
+      "PHASE-18"
     ],
-    "next": "PHASE-18 (pending decision)",
+    "next": "PHASE-19 (pending decision)",
     "remaining": [],
     "phase_16_closed": "2026-05-28",
     "phase_17_closed": "2026-05-29",
+    "phase_18_closed": "2026-05-30",
     "phase_16_corrective": "DECISION-2026-05-24T16-00-phase-16-ux-closure-gap.md — UX Closure Gap; 6 stages; outcome-based closure gate",
     "phase_15_closed": "2026-05-23T14:00:00.000Z",
     "deferred": [
@@ -1087,8 +1089,8 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-17-CLOSED — awaiting owner decision on PHASE-18",
-  "last_updated": "2026-05-29T00:00:00.000Z",
+  "current_task": "PHASE-18-CLOSED — awaiting owner decision on PHASE-19",
+  "last_updated": "2026-05-30T00:00:00.000Z",
   "phase_16": {
     "status": "ACTIVE",
     "started_at": "2026-05-24T16:00:00.000Z",
@@ -1615,8 +1617,9 @@
       }
     }
   },
-  "findings_open": [
-    "FINDING-2026-05-19-s137-live-openai-call"
+  "findings_open": [],
+  "findings_resolved": [
+    "FINDING-2026-05-19-s137-live-openai-call — RESOLVED in PHASE-18: stale OpenAI client leak from _runDirectProvider fixed in scenario_runner.js"
   ],
   "pcst_v1": {
     "status": "CLOSED_WITH_FINDINGS",
@@ -1714,9 +1717,9 @@
     "closure_artifact": "artifacts/decisions/_phase_16_checkpoints/phase_16_closure.md",
     "checkpoint_3_cto_approved_at": "2026-05-28",
     "open_debt_non_blocking": {
-      "S17_documentationBuildLoop": "flaky — investigate separately.",
-      "S28_ai_propose": "flaky (order-dependent state leak) — investigate separately.",
-      "dead_code_intake_helpers": "optional cleanup — /api/ai-os/intake helpers may have unused exports after doDiscovery removal."
+      "S17_documentationBuildLoop": "RESOLVED in PHASE-18 — runner cleanup bug fixed in scenario_runner.js _runDirectEngine.",
+      "S28_ai_propose": "RESOLVED in PHASE-18 — verified already passing; no fix needed.",
+      "dead_code_intake_helpers": "RESOLVED in PHASE-18 — grep confirms zero doDiscovery matches; cleanup already done in PHASE-16."
     },
     "checkpoint_1_artifact": "artifacts/decisions/_phase_16_checkpoints/unified_cp1_core.md",
     "checkpoint_2_artifact": "artifacts/decisions/_phase_16_checkpoints/unified_cp2_engine_providers.md",
@@ -1744,6 +1747,24 @@
     "arc_8_decision": "artifacts/decisions/DECISION-20260526-arc8-binary-upload-exemption.md",
     "kill_bar_remaining_usd": 5,
     "cost_actuals_usd": 0
+  },
+  "phase_18": {
+    "status": "CLOSED",
+    "closed_at": "2026-05-30T00:00:00.000Z",
+    "closure_artifact": "artifacts/decisions/DECISION-2026-05-30-phase-18-closure.md",
+    "decision_artifact": "artifacts/decisions/DECISION-2026-05-29-phase-18-quality-debt-sweep.md",
+    "checkpoint_mid": "artifacts/decisions/_phase_18_checkpoints/stage_18_mid.md",
+    "checkpoint_final": "artifacts/decisions/_phase_18_checkpoints/stage_18_final.md",
+    "type": "quality debt sweep — no new features",
+    "fixed": ["S17", "S137", "S191"],
+    "verified_no_action": ["S28", "doDiscovery"],
+    "cosmetic_fixes": 2,
+    "baseline_pass": 234,
+    "baseline_skip": 5,
+    "baseline_fail": 0,
+    "arc_ledger_count": 8,
+    "su_assertions_added": 0,
+    "cost_actuals_usd": 0.00
   },
   "phase_17": {
     "status": "CLOSED",
