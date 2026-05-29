@@ -119,7 +119,7 @@ async function runS236IdeaSynthesisHappyPath() {
     const engine = _makeEngine();
 
     // ── Step A: requestIdeaSummary ──────────────────────────────────────────────
-    const synthResult      = await engine.requestIdeaSummary({ project_id: PID, scenario_id: "S236" });
+    const synthResult      = await engine.requestIdeaSummary({ project_id: PID, provider: "mock", scenario_id: "S236" });
     const stateAfterSynth  = _readState(projectDir);
     const request_ok                   = synthResult.ok === true;
     const mode_idea_review_after_synth = !!(stateAfterSynth && stateAfterSynth.conversation_mode === "IDEA_REVIEW");
@@ -184,7 +184,7 @@ async function runS237IdeaSynthesisRefine() {
     const engine = _makeEngine();
 
     // ── First synthesis ─────────────────────────────────────────────────────────
-    const synthResult = await engine.requestIdeaSummary({ project_id: PID, scenario_id: "S237" });
+    const synthResult = await engine.requestIdeaSummary({ project_id: PID, provider: "mock", scenario_id: "S237" });
     const request_ok  = synthResult.ok === true;
 
     // ── MODIFY ─────────────────────────────────────────────────────────────────
@@ -196,7 +196,7 @@ async function runS237IdeaSynthesisRefine() {
     const idea_summary_still_exists = fs.existsSync(path.join(projectDir, "idea_summary.json"));
 
     // ── Re-synthesis after MODIFY ──────────────────────────────────────────────
-    const resynth    = await engine.requestIdeaSummary({ project_id: PID, scenario_id: "S237" });
+    const resynth    = await engine.requestIdeaSummary({ project_id: PID, provider: "mock", scenario_id: "S237" });
     const resynth_ok = resynth.ok === true;
 
     return {
@@ -236,7 +236,7 @@ async function runS238IdeaSynthesisReject() {
 
     const engine = _makeEngine();
 
-    const synthResult  = await engine.requestIdeaSummary({ project_id: PID, scenario_id: "S238" });
+    const synthResult  = await engine.requestIdeaSummary({ project_id: PID, provider: "mock", scenario_id: "S238" });
     const request_ok   = synthResult.ok === true;
 
     const rejectResult     = await engine.confirmIdea({ project_id: PID, action: "REJECT" });
@@ -285,7 +285,7 @@ async function runS239IdeaSynthesisProviderFail() {
     const engine = _makeEngine();
 
     // "S239_no_mock" → mock key "mock|mock-is|scenario:S239_no_mock" → MOCK_NOT_FOUND
-    const failResult      = await engine.requestIdeaSummary({ project_id: PID, scenario_id: "S239_no_mock" });
+    const failResult      = await engine.requestIdeaSummary({ project_id: PID, provider: "mock", scenario_id: "S239_no_mock" });
     const stateAfterFail  = _readState(projectDir);
 
     const result_blocked           = failResult.ok === false && failResult.mode === "BLOCKED";

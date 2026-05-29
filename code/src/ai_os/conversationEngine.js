@@ -627,8 +627,8 @@ function createConversationEngine(options = {}) {
         schema_version:        "1.0",
         project_id:            projectId,
         conversation_history:  fullHistory,
-        provider:    body.provider    || process.env.FORGE_PROVIDER || "mock",
-        model:       body.model       || process.env.OPENAI_MODEL   || "mock-is",
+        provider:    body.provider    || "openai",
+        model:       body.model       || process.env.OPENAI_MODEL   || "gpt-4o-mini",
         scenario_id: body.scenario_id || ""
       }
     });

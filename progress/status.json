@@ -73,7 +73,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-05-29T11:44:11.272Z",
+    "last_doctor_run": "2026-05-29T13:02:44.631Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
@@ -1756,15 +1756,22 @@
     "checkpoint_mid": "artifacts/decisions/_phase_18_checkpoints/stage_18_mid.md",
     "checkpoint_final": "artifacts/decisions/_phase_18_checkpoints/stage_18_final.md",
     "type": "quality debt sweep — no new features",
-    "fixed": ["S17", "S137", "S191"],
-    "verified_no_action": ["S28", "doDiscovery"],
+    "fixed": [
+      "S17",
+      "S137",
+      "S191"
+    ],
+    "verified_no_action": [
+      "S28",
+      "doDiscovery"
+    ],
     "cosmetic_fixes": 2,
     "baseline_pass": 234,
     "baseline_skip": 5,
     "baseline_fail": 0,
     "arc_ledger_count": 8,
     "su_assertions_added": 0,
-    "cost_actuals_usd": 0.00
+    "cost_actuals_usd": 0
   },
   "phase_17": {
     "status": "CLOSED",
