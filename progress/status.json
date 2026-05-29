@@ -73,7 +73,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-05-29T09:17:32.759Z",
+    "last_doctor_run": "2026-05-29T11:21:45.928Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
@@ -1750,9 +1750,14 @@
     "closed_at": "2026-05-29T00:00:00.000Z",
     "decision_artifact": "artifacts/decisions/DECISION-2026-05-29-phase-17-closure.md",
     "deliverables_summary": "Idea Synthesis + Pre-Pipeline Confirmation Gate: ideaSynthesisProvider (§ARC-8 reconciled), engine requestIdeaSummary/confirmIdea, 4 backend scenarios (S236-S239), UI IdeaSummaryCard + ChatView integration. TypeScript strict build clean.",
-    "scenarios_added": ["S236", "S237", "S238", "S239"],
+    "scenarios_added": [
+      "S236",
+      "S237",
+      "S238",
+      "S239"
+    ],
     "su_assertions_added": 31,
     "arc_ledger_count": 8,
-    "cost_actuals_usd": 0.00
+    "cost_actuals_usd": 0
   }
 }
