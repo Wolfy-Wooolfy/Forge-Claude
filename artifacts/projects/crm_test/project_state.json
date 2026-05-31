@@ -5,11 +5,11 @@
   "project_mode": "EXTEND_EXISTING",
   "project_status": "ACTIVE",
   "primary_language": "MIXED",
-  "user_goal": "",
+  "user_goal": "اعمل مقترح لسيستم CRM لشركة صغيرة واعرضه عليا",
   "business_goal": "",
   "technical_goal": "",
   "current_phase": "DISCOVERY",
-  "active_runtime_state": "DISCUSSION",
+  "active_runtime_state": "OPTION_DECISION",
   "workspace_path": "D:\\S\\Halo\\Tech\\Forge-Claude",
   "source_of_truth": "ZIP_SNAPSHOT",
   "selected_strategy": "",
@@ -17,7 +17,7 @@
   "rejected_options": [],
   "open_questions": [],
   "clarification_answers": {},
-  "requirement_domain": "",
+  "requirement_domain": "CRM",
   "domain_locked": false,
   "domain_history": [],
   "requirement_completeness": false,
@@ -52,5 +52,7 @@
   "vision_history": [],
   "conversation_mode": "IDEA_REVIEW",
   "active_project_flag": true,
-  "last_updated_at": "2026-05-29T13:06:16.017Z"
+  "last_updated_at": "2026-05-29T13:24:32.493Z",
+  "domain_lock_intent": "SOFT_LOCKED",
+  "question_count": 1
 }
