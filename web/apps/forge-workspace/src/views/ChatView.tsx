@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Sparkles } from 'lucide-react'
-import { chatStream, answerClarification, requestIdeaSummary } from '@/api'
+import { chatStream, answerClarification, requestIdeaSummary, fetchProjectAiOsState } from '@/api'
 import type { IdeaSummary } from '@/api'
 import { detectLanguage } from '@/lib/detectLanguage'
 import { Button } from '@/components/ui/button'
@@ -12,6 +12,13 @@ import type { ChatMessage, ChatPhase, ClarificationState, QuickReplyChip } from 
 import { useProject, type ConversationMode } from '@/contexts/ProjectContext'
 
 // ── helpers ───────────────────────────────────────────────────────────────────
+
+function friendlyErrorMessage(reason: string | undefined): string {
+  if (reason === 'SYNTHESIS_FAILED')   return 'تعذّر تحليل الفكرة من قِبَل المزوّد. حاول مجدداً.'
+  if (reason === 'PROJECT_NOT_FOUND')  return 'المشروع غير موجود. تحقق من اختيار المشروع الصحيح.'
+  if (reason === 'NO_CONVERSATION_HISTORY') return 'لا توجد محادثة بعد. ابدأ بكتابة فكرتك أولاً.'
+  return 'حدث خطأ غير متوقع. حاول مجدداً.'
+}
 
 const PHASE_LABEL: Record<ChatPhase, string> = {
   discovery:    'جاهز',
@@ -46,17 +53,18 @@ interface ChatState {
 // ── component ─────────────────────────────────────────────────────────────────
 
 export default function ChatView() {
-  const { activeProjectId: projectId, conversationMode: initialConversationMode } = useProject()
+  const { activeProjectId: projectId, setConversationMode } = useProject()
   const chatInputRef = useRef<ChatInputHandle | null>(null)
   const [summaryRequesting, setSummaryRequesting] = useState(false)
   const [chatPlaceholder, setChatPlaceholder] = useState('اكتب رسالتك...')
+  const [errorBanner, setErrorBanner] = useState<string | null>(null)
 
   const [state, setState] = useState<ChatState>({
     messages: [],
-    phase: 'discovery',
+    phase: 'ready',
     clarification: null,
     pendingReplies: [],
-    conversationMode: initialConversationMode,
+    conversationMode: 'CONVERSATION',
     ideaSummary: null,
   })
 
@@ -70,6 +78,30 @@ export default function ChatView() {
   useEffect(() => {
     return () => { abortRef.current?.abort() }
   }, [])
+
+  // Hydrate conversationMode + ideaSummary from backend on project switch.
+  // Also resets chat history so stale messages from a prior project don't linger.
+  useEffect(() => {
+    if (!projectId) return
+    fetchProjectAiOsState(projectId)
+      .then((data) => {
+        if (!data.ok) return
+        const mode = (data.project?.conversation_mode as ConversationMode) || 'CONVERSATION'
+        const summary = data.idea_summary ?? null
+        setState({
+          messages: [],
+          phase: 'ready',
+          clarification: null,
+          pendingReplies: [],
+          conversationMode: mode,
+          ideaSummary: summary,
+        })
+        setConversationMode(mode)
+      })
+      .catch(() => {
+        // backend unreachable — keep defaults
+      })
+  }, [projectId])
 
   const isDisabled = state.phase === 'streaming'
 
@@ -196,18 +228,35 @@ export default function ChatView() {
 
   // ── idea synthesis flow ────────────────────────────────────────────────────
 
+  async function refreshStateFromBackend() {
+    try {
+      const data = await fetchProjectAiOsState(projectId)
+      if (!data.ok) return
+      const mode = (data.project?.conversation_mode as ConversationMode) || 'CONVERSATION'
+      const summary = data.idea_summary ?? null
+      setState((prev) => ({ ...prev, conversationMode: mode, ideaSummary: summary }))
+      setConversationMode(mode)
+    } catch {
+      // backend unreachable — leave state unchanged
+    }
+  }
+
   async function handleRequestSummary() {
     setSummaryRequesting(true)
+    setErrorBanner(null)
     try {
       const res = await requestIdeaSummary({ project_id: projectId })
       if (res.ok && res.summary) {
-        const summary = res.summary
-        setState((prev) => ({ ...prev, conversationMode: 'IDEA_REVIEW', ideaSummary: summary }))
+        setState((prev) => ({ ...prev, conversationMode: 'IDEA_REVIEW', ideaSummary: res.summary! }))
+        setConversationMode('IDEA_REVIEW')
+      } else if (res.reason === 'NOT_IN_CONVERSATION_MODE' || res.reason === 'NO_IDEA_SUMMARY') {
+        // State is stale — silently re-hydrate from backend, no chat message
+        await refreshStateFromBackend()
       } else {
-        addMessage(assistantMsg(res.reason ?? 'تعذّر تحليل الفكرة. حاول مجدداً.'))
+        setErrorBanner(friendlyErrorMessage(res.reason))
       }
-    } catch (err) {
-      addMessage(assistantMsg(err instanceof Error ? err.message : 'تعذّر تحليل الفكرة.'))
+    } catch {
+      setErrorBanner('تعذّر الاتصال بالخادم. حاول مجدداً.')
     } finally {
       setSummaryRequesting(false)
     }
@@ -304,6 +353,20 @@ export default function ChatView() {
 
       {/* Footer */}
       <div className="flex-shrink-0">
+        {errorBanner && (
+          <div
+            role="alert"
+            data-testid="error-banner"
+            className="mb-2 px-3 py-2 rounded-md bg-red-900/40 border border-red-700/50 text-sm text-red-300 flex items-center justify-between gap-2"
+          >
+            <span>{errorBanner}</span>
+            <button
+              className="text-red-400 hover:text-red-200 text-xs shrink-0"
+              onClick={() => setErrorBanner(null)}
+              aria-label="إغلاق"
+            >✕</button>
+          </div>
+        )}
         {state.conversationMode === 'CONVERSATION' && state.messages.length >= 3 && (
           <div className="mb-2 flex justify-end">
             <Button

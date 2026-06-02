@@ -1,8 +1,9 @@
 "use strict";
 
-// S220-S225 helpers — PHASE-16.1 Conversation Mode.
-// Tests conversation_mode gate, processMessage routing, startPipeline transition,
+// S220-S225, S228, S234-S235 helpers — PHASE-16.1 Conversation Mode.
+// Tests conversation_mode gate, processMessage routing,
 // proposal-request routing, and createProject() path coverage.
+// S222/S223 (legacy startPipeline) removed in PHASE-19.
 //
 // Track A note (test infrastructure): fs.mkdirSync / fs.writeFileSync / fs.rmSync
 // are used here only for test fixture setup, not in production code.
@@ -163,82 +164,6 @@ async function runS221ProcessMessageConversationMode() {
     const mode_not_ideation        = result.mode !== "IDEATION_IN_PROGRESS";
     const state_remains_discussion = stateAfter.active_runtime_state === "DISCUSSION";
     return { mode_not_ideation, state_remains_discussion };
-  } finally {
-    _cleanup(PID);
-  }
-}
-
-// ── S222: startPipeline sets conversation_mode: "PIPELINE" ──────────────────────
-//
-// RED (before D3): conversationEngine.startPipeline is undefined →
-//   TypeError caught → ok_true = false → FAIL.
-// GREEN (after D3): startPipeline exists → sets conversation_mode = "PIPELINE" →
-//   both assertions true → PASS.
-
-async function runS222StartPipeline() {
-  const { createConversationEngine } = require("../../ai_os/conversationEngine");
-  const PID = "s222_conv_mode_test";
-  const { projectDir, aiOsDir } = _ensureProjectDir(PID);
-  let ok_true = false;
-  let conversation_mode_pipeline = false;
-  try {
-    _writeState(projectDir, {
-      project_id:           PID,
-      project_name:         "S222 Test",
-      active_runtime_state: "DISCUSSION",
-      conversation_mode:    "CONVERSATION",
-      last_updated_at:      new Date().toISOString()
-    });
-    fs.writeFileSync(path.join(aiOsDir, "conversation_context.json"), "[]", "utf8");
-
-    const engine = createConversationEngine({ root: ROOT, conversationMemoryManager: STUB_MEMORY });
-    try {
-      const result = await engine.startPipeline({ project_id: PID });
-      ok_true = result.ok === true;
-      const stateAfter = _readState(projectDir);
-      conversation_mode_pipeline = stateAfter.conversation_mode === "PIPELINE";
-    } catch (_) {
-      // startPipeline absent (RED) — both stay false
-    }
-    return { ok_true, conversation_mode_pipeline };
-  } finally {
-    _cleanup(PID);
-  }
-}
-
-// ── S223: after startPipeline, processMessage enters pipeline (state → IDEATION) ──
-//
-// RED (before D3): startPipeline absent → TypeError → state not changed →
-//   state_entered_pipeline = false → FAIL.
-// GREEN (after D3): startPipeline sets PIPELINE mode → next processMessage bypasses
-//   conversation gate → pipeline branch fires → state transitions to IDEATION →
-//   state_entered_pipeline = true → PASS.
-
-async function runS223PipelineEntryAfterTransition() {
-  const { createConversationEngine } = require("../../ai_os/conversationEngine");
-  const PID = "s223_conv_mode_test";
-  const { projectDir, aiOsDir } = _ensureProjectDir(PID);
-  let state_entered_pipeline = false;
-  try {
-    _writeState(projectDir, {
-      project_id:           PID,
-      project_name:         "S223 Test",
-      active_runtime_state: "DISCUSSION",
-      conversation_mode:    "CONVERSATION",
-      last_updated_at:      new Date().toISOString()
-    });
-    fs.writeFileSync(path.join(aiOsDir, "conversation_context.json"), "[]", "utf8");
-
-    const engine = createConversationEngine({ root: ROOT, ideationEngine: MOCK_IDEATION, conversationMemoryManager: STUB_MEMORY });
-    try {
-      await engine.startPipeline({ project_id: PID });
-      await engine.processMessage({ project_id: PID, message: "عايز أعمل تطبيق", user_language: "ar" });
-      const stateAfter = _readState(projectDir);
-      state_entered_pipeline = stateAfter.active_runtime_state === "IDEATION";
-    } catch (_) {
-      // startPipeline absent (RED) — state_entered_pipeline stays false
-    }
-    return { state_entered_pipeline };
   } finally {
     _cleanup(PID);
   }
@@ -551,8 +476,6 @@ async function runS235ConversationModeProviderFailFallback() {
 module.exports = {
   runS220DefaultConversationMode,
   runS221ProcessMessageConversationMode,
-  runS222StartPipeline,
-  runS223PipelineEntryAfterTransition,
   runS224ProposalRequestInConversationMode,
   runS225CreateProjectSetsConversationMode,
   runS228BackwardCompatPipelineFallback,

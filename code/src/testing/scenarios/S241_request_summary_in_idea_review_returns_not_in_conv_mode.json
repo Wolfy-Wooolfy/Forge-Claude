@@ -1,0 +1,16 @@
+{
+  "id": "S241",
+  "name": "requestIdeaSummary while in IDEA_REVIEW returns NOT_IN_CONVERSATION_MODE (PHASE-19 Bug 2 shape guard)",
+  "description": "Confirms the error shape FE relies on for its silent-refresh branch. If project is already in IDEA_REVIEW, requestIdeaSummary must return { ok: false, mode: BLOCKED, reason: NOT_IN_CONVERSATION_MODE }.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/idea_synthesis_test_helper",
+  "method": "runS241RequestSummaryWhileInIdeaReview",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "ok_false",                "expected": true },
+    { "type": "state_field_equals", "field": "mode_blocked",            "expected": true },
+    { "type": "state_field_equals", "field": "reason_not_in_conv_mode", "expected": true }
+  ]
+}

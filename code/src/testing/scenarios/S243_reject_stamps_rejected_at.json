@@ -1,0 +1,15 @@
+{
+  "id": "S243",
+  "name": "confirmIdea REJECT stamps rejected_at in idea_summary.json (PHASE-19 OQ-3 audit trail)",
+  "description": "RED (before PHASE-19 OQ-3 stamp): confirmIdea REJECT only updates project_state.json; idea_summary.json untouched. GREEN (after stamp): idea_summary.json gains rejected_at ISO timestamp field.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/idea_synthesis_test_helper",
+  "method": "runS243RejectStampsRejectedAt",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "reject_ok",           "expected": true },
+    { "type": "state_field_equals", "field": "rejected_at_stamped", "expected": true }
+  ]
+}

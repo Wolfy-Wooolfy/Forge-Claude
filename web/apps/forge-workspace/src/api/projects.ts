@@ -1,5 +1,6 @@
 import { apiGet, apiPost } from './base'
 import type { ProjectItem } from './types'
+import type { IdeaSummary } from './ideaSynthesis'
 
 // ─── GET /api/projects ───────────────────────────────────────────────────────
 
@@ -43,6 +44,22 @@ export function createProject(
   req: CreateProjectRequest
 ): Promise<CreateProjectResponse> {
   return apiPost<CreateProjectResponse>('/api/projects/create', req)
+}
+
+// ─── GET /api/ai-os/project — project state with conversation_mode + idea_summary ──
+
+export interface ProjectAiOsStateResponse {
+  ok: boolean
+  project: ProjectItem & { conversation_mode?: string }
+  idea_summary: IdeaSummary | null
+}
+
+export function fetchProjectAiOsState(
+  project_id: string
+): Promise<ProjectAiOsStateResponse> {
+  return apiGet<ProjectAiOsStateResponse>(
+    `/api/ai-os/project?project_id=${encodeURIComponent(project_id)}`
+  )
 }
 
 // ─── POST /api/projects/delete ───────────────────────────────────────────────

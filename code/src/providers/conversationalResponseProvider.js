@@ -32,9 +32,14 @@ class ConversationalResponseProvider {
 - اقتراح MVP أو تجربة صغيرة قبل البناء الكامل.
 
 قواعد الأسلوب:
-- لا تذكر حقولاً تقنية كـ JSON أو أسماء الحالات.
+- لا تذكر حقولاً تقنية كـ JSON أو أسماء الحالات الداخلية.
 - لا تقل "تمام" وتكتفي — أضف دائماً رأيك أو سؤالاً أو اقتراحاً.
 - تحدث بلغة بشرية طبيعية، مختصرة، واضحة.
+
+ممنوع تماماً:
+- لا تقل للمستخدم إننا "ننتقل لمرحلة" أو "سننتقل الآن" أو "اكتملت المرحلة".
+- لا تذكر أي مرحلة بناء بالاسم: IDEATION أو OPTION_DECISION أو DECISION_GATE أو EXECUTION أو PIPELINE.
+- أنت في محادثة حرة فقط. الانتقال لأي مرحلة بناء يحصل فقط لما المستخدم يضغط زرار التأكيد الظاهر في الواجهة — مش من خلالك.
 
 أمثلة على ردود نموذجية:
 
@@ -54,7 +59,7 @@ class ConversationalResponseProvider {
 الرد الغلط: "هنحتاج LMS كامل مع..."
 
 المخرج: JSON فقط بهذا الشكل:
-{ "message": "الرسالة هنا", "tone": "friendly|informative|urgent|celebrating", "suggest_next": "ماذا يفعل المستخدم الآن؟" }`;
+{ "message": "الرسالة هنا", "tone": "friendly|informative|urgent|celebrating", "suggest_next": "سؤال أو نقطة للتعمّق في الفكرة — ليس انتقالاً لمرحلة" }`;
 
     const systemEn = `You are an experienced and thoughtful partner helping users build tech projects. Speak as a knowledgeable friend, not a generic assistant.
 
@@ -65,9 +70,14 @@ Explicit permissions:
 - Propose an MVP or small experiment before full build-out.
 
 Style rules:
-- Never mention technical fields like JSON or state names.
+- Never mention technical fields like JSON or internal state names.
 - Never just say "okay" — always add a viewpoint, question, or suggestion.
 - Keep language natural, concise, and direct.
+
+STRICTLY FORBIDDEN:
+- Never tell the user we are "moving to a stage", "transitioning now", or "stage complete".
+- Never name any build stage: IDEATION, OPTION_DECISION, DECISION_GATE, EXECUTION, PIPELINE.
+- You are in free conversation only. Stage transitions happen exclusively when the user clicks the confirmation button in the UI — not through you.
 
 Few-shot examples:
 
@@ -87,7 +97,7 @@ Good: "Before the full platform, consider starting with one course and a small u
 Bad: "We'll need a complete LMS with..."
 
 Output: JSON only in this format:
-{ "message": "message here", "tone": "friendly|informative|urgent|celebrating", "suggest_next": "what should the user do now?" }`;
+{ "message": "message here", "tone": "friendly|informative|urgent|celebrating", "suggest_next": "a question or point to deepen the idea — not a stage transition" }`;
 
     const system = lang === "ar" ? systemAr : systemEn;
 
@@ -138,9 +148,14 @@ ${resultSummary}
 - لا تقل "تمام" وتكتفي — أضف دائماً رأيك أو سؤالاً أو اقتراحاً.
 - تحدث بلغة بشرية طبيعية، مختصرة، واضحة.
 
+ممنوع تماماً:
+- لا تقل للمستخدم إننا "ننتقل لمرحلة" أو "سننتقل الآن" أو "اكتملت المرحلة".
+- لا تذكر أي مرحلة بناء بالاسم: IDEATION أو OPTION_DECISION أو DECISION_GATE أو EXECUTION أو PIPELINE.
+- أنت في محادثة حرة فقط. الانتقال لأي مرحلة بناء يحصل فقط لما المستخدم يضغط زرار التأكيد الظاهر في الواجهة — مش من خلالك.
+
 اكتب ردّك كنص عادي مباشر، بدون JSON.
 بعد الرد، في سطر جديد اكتب بالضبط: ---SUGGEST---
-ثم جملة واحدة تخبر المستخدم ما يفعله بعد ذلك.`;
+ثم سؤال أو نقطة للتعمّق في الفكرة — ليس انتقالاً لمرحلة.`;
 
     const systemEn = `You are an experienced and thoughtful partner helping users build tech projects.
 
@@ -154,9 +169,14 @@ Style rules:
 - Never mention technical fields like JSON or state names.
 - Never just say "okay" — always add a viewpoint, question, or suggestion.
 
+STRICTLY FORBIDDEN:
+- Never tell the user we are "moving to a stage", "transitioning now", or "stage complete".
+- Never name any build stage: IDEATION, OPTION_DECISION, DECISION_GATE, EXECUTION, PIPELINE.
+- You are in free conversation only. Stage transitions happen exclusively when the user clicks the confirmation button in the UI — not through you.
+
 Write your response as plain text, no JSON.
 After the response, on a new line write exactly: ---SUGGEST---
-Then one sentence telling the user what to do next.`;
+Then a question or point to deepen the idea — not a stage transition.`;
 
     const system = lang === "ar" ? systemAr : systemEn;
     const resultSummary = typeof result === "object" ? JSON.stringify(result, null, 2).slice(0, 1200) : String(result || "");

@@ -1,0 +1,17 @@
+{
+  "id": "S242",
+  "name": "conversationalResponseProvider system prompts forbid stage-transition narration (PHASE-19 Bug 4 prompt fix)",
+  "description": "Deterministic prompt-content assertion: buildPrompt and buildStreamPrompt (AR + EN) must contain the explicit prohibition section added in PHASE-19 Step 6. No LLM call is made — checks static prompt text only.",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/idea_synthesis_test_helper",
+  "method": "runS242PromptForbidsStageTransition",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "ar_build_prompt_has_forbidden",  "expected": true },
+    { "type": "state_field_equals", "field": "en_build_prompt_has_forbidden",  "expected": true },
+    { "type": "state_field_equals", "field": "ar_stream_prompt_has_forbidden", "expected": true },
+    { "type": "state_field_equals", "field": "en_stream_prompt_has_forbidden", "expected": true }
+  ]
+}

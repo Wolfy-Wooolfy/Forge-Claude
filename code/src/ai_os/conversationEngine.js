@@ -669,6 +669,20 @@ function createConversationEngine(options = {}) {
         last_updated_at:   nowIso()
       };
       await saveState(projectId, updatedState);
+
+      if (action === "REJECT") {
+        const summaryPath = path.join(projectsRoot, normalizeProjectId(projectId), "idea_summary.json");
+        const existingSummary = readJsonSafe(summaryPath, null);
+        if (existingSummary) {
+          const rejectReg      = getDefaultRegistry();
+          const summaryRelPath = "artifacts/projects/" + normalizeProjectId(projectId) + "/idea_summary.json";
+          await rejectReg.invoke("fs.write_file", {
+            path:    summaryRelPath,
+            content: JSON.stringify({ ...existingSummary, rejected_at: nowIso() }, null, 2)
+          }, { root });
+        }
+      }
+
       return {
         ok:         true,
         mode:       "CONVERSATION",

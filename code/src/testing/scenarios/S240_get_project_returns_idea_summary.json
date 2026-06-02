@@ -1,0 +1,16 @@
+{
+  "id": "S240",
+  "name": "getProject on IDEA_REVIEW project returns idea_summary inline (PHASE-19 Bug 1 backend)",
+  "description": "RED (before PHASE-19 Step 3): getProject returns { ok, project } with no idea_summary field. GREEN (after Step 3): idea_summary.json read and returned inline when conversation_mode === IDEA_REVIEW; CONVERSATION project returns null.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/idea_synthesis_test_helper",
+  "method": "runS240GetProjectReturnsIdeaSummary",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "idea_summary_returned",         "expected": true },
+    { "type": "state_field_equals", "field": "idea_summary_has_project_name", "expected": true },
+    { "type": "state_field_equals", "field": "conversation_returns_null",     "expected": true }
+  ]
+}

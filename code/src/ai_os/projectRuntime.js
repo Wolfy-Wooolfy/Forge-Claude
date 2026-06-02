@@ -1108,10 +1108,15 @@ function createAiOsRuntime(options = {}) {
 
   function getProject(body = {}) {
     const projectId = normalizeProjectId(body.project_id);
-    return {
-      ok: true,
-      project: loadProjectState(projectId, body.project_name)
-    };
+    const project   = loadProjectState(projectId, body.project_name);
+
+    let idea_summary = null;
+    if (project.conversation_mode === "IDEA_REVIEW") {
+      const summaryPath = path.join(projectsRoot, projectId, "idea_summary.json");
+      idea_summary = readJsonSafe(summaryPath, null);
+    }
+
+    return { ok: true, project, idea_summary };
   }
 
   return {

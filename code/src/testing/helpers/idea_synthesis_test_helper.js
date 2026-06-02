@@ -306,11 +306,210 @@ async function runS239IdeaSynthesisProviderFail() {
   }
 }
 
+// ── S240 — getProject on IDEA_REVIEW returns idea_summary inline ───────────────
+//
+// RED (before PHASE-19 Step 3): getProject returns { ok, project } with no idea_summary field
+//   → idea_summary_returned = false → FAIL.
+// GREEN (after Step 3): getProject reads idea_summary.json when conversation_mode === "IDEA_REVIEW"
+//   and returns it inline → idea_summary_returned = true, idea_summary_has_project_name = true.
+// Also asserts: project in CONVERSATION mode returns idea_summary: null.
+
+async function runS240GetProjectReturnsIdeaSummary() {
+  const { createAiOsRuntime } = require("../../ai_os/projectRuntime");
+
+  const PID_REVIEW       = "s240_idea_review";
+  const PID_CONVERSATION = "s240_conversation";
+
+  const reviewDir = path.join(PROJECTS_ROOT, PID_REVIEW);
+  const convDir   = path.join(PROJECTS_ROOT, PID_CONVERSATION);
+
+  try {
+    // Setup IDEA_REVIEW project with idea_summary.json
+    fs.mkdirSync(reviewDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(reviewDir, "project_state.json"),
+      JSON.stringify({
+        project_id:           PID_REVIEW,
+        project_name:         "S240 Review",
+        active_runtime_state: "DISCUSSION",
+        conversation_mode:    "IDEA_REVIEW",
+        last_updated_at:      new Date().toISOString()
+      }, null, 2),
+      "utf8"
+    );
+    fs.writeFileSync(
+      path.join(reviewDir, "idea_summary.json"),
+      JSON.stringify({
+        project_name:  "S240 Review",
+        domain:        "web_application",
+        goal_primary:  "Test idea",
+        features:      ["feature_a"],
+        constraints:   [],
+        non_goals:     [],
+        open_questions: []
+      }, null, 2),
+      "utf8"
+    );
+
+    // Setup CONVERSATION project (no idea_summary.json)
+    fs.mkdirSync(convDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(convDir, "project_state.json"),
+      JSON.stringify({
+        project_id:           PID_CONVERSATION,
+        project_name:         "S240 Conv",
+        active_runtime_state: "DISCUSSION",
+        conversation_mode:    "CONVERSATION",
+        last_updated_at:      new Date().toISOString()
+      }, null, 2),
+      "utf8"
+    );
+
+    const runtime = createAiOsRuntime({ root: ROOT });
+
+    const reviewResult = runtime.getProject({ project_id: PID_REVIEW });
+    const convResult   = runtime.getProject({ project_id: PID_CONVERSATION });
+
+    const idea_summary_returned          = reviewResult.idea_summary !== null && reviewResult.idea_summary !== undefined;
+    const idea_summary_has_project_name  = idea_summary_returned && typeof reviewResult.idea_summary.project_name === "string";
+    const conversation_returns_null      = convResult.idea_summary === null || convResult.idea_summary === undefined;
+
+    return { idea_summary_returned, idea_summary_has_project_name, conversation_returns_null };
+  } finally {
+    try { fs.rmSync(reviewDir, { recursive: true, force: true }); } catch (_) {}
+    try { fs.rmSync(convDir,   { recursive: true, force: true }); } catch (_) {}
+  }
+}
+
+// ── S241 — requestIdeaSummary when already in IDEA_REVIEW returns NOT_IN_CONVERSATION_MODE ──
+//
+// RED (trivial — engine always returned this): confirms the error shape that FE relies on
+//   for its silent-refresh branch (Step 5 fix).
+// GREEN: { ok: false, mode: "BLOCKED", reason: "NOT_IN_CONVERSATION_MODE" }
+
+async function runS241RequestSummaryWhileInIdeaReview() {
+  const PID = "s241_already_in_review";
+  const { projectDir, aiOsDir } = _ensureProjectDir(PID);
+  try {
+    _writeState(projectDir, {
+      project_id:           PID,
+      project_name:         "S241 Test",
+      active_runtime_state: "DISCUSSION",
+      conversation_mode:    "IDEA_REVIEW",
+      last_updated_at:      new Date().toISOString()
+    });
+    fs.writeFileSync(path.join(aiOsDir, "conversation_context.json"), "[]", "utf8");
+
+    const engine  = _makeEngine();
+    const result  = await engine.requestIdeaSummary({ project_id: PID, provider: "mock", scenario_id: "S241" });
+
+    const ok_false                   = result.ok === false;
+    const mode_blocked               = result.mode === "BLOCKED";
+    const reason_not_in_conv_mode    = result.reason === "NOT_IN_CONVERSATION_MODE";
+
+    return { ok_false, mode_blocked, reason_not_in_conv_mode };
+  } finally {
+    _cleanup(PID);
+  }
+}
+
+// ── S243 — confirmIdea REJECT stamps rejected_at in idea_summary.json ──────────
+//
+// RED (before PHASE-19 OQ-3): confirmIdea REJECT only updates project_state.json,
+//   idea_summary.json untouched → rejected_at_stamped = false → FAIL.
+// GREEN (after OQ-3 stamp): idea_summary.json gains rejected_at field after REJECT.
+
+async function runS243RejectStampsRejectedAt() {
+  const PID = "s243_reject_stamp";
+  const { projectDir, aiOsDir } = _ensureProjectDir(PID);
+  try {
+    _writeState(projectDir, {
+      project_id:           PID,
+      project_name:         "S243 Test",
+      active_runtime_state: "DISCUSSION",
+      conversation_mode:    "CONVERSATION",
+      last_updated_at:      new Date().toISOString()
+    });
+    fs.writeFileSync(
+      path.join(aiOsDir, "conversation_context.json"),
+      JSON.stringify(_makeHistory()),
+      "utf8"
+    );
+
+    const engine = _makeEngine();
+
+    await engine.requestIdeaSummary({ project_id: PID, provider: "mock", scenario_id: "S243" });
+    const rejectResult = await engine.confirmIdea({ project_id: PID, action: "REJECT" });
+
+    const reject_ok           = rejectResult.ok === true;
+    const summaryPath         = path.join(PROJECTS_ROOT, PID, "idea_summary.json");
+    const summaryOnDisk       = JSON.parse(fs.readFileSync(summaryPath, "utf8"));
+    const rejected_at_stamped = typeof summaryOnDisk.rejected_at === "string" && summaryOnDisk.rejected_at.length > 0;
+
+    return { reject_ok, rejected_at_stamped };
+  } finally {
+    _cleanup(PID);
+  }
+}
+
+// ── S242 — conversationalResponseProvider system prompts forbid stage-transition narration ──
+//
+// Deterministic prompt-content assertion: both buildPrompt and buildStreamPrompt
+// (AR + EN) must contain the explicit prohibition section added in PHASE-19 Step 6.
+// No LLM call is made — this checks the static prompt text only.
+
+async function runS242PromptForbidsStageTransition() {
+  const ConversationalResponseProvider = require("../../providers/conversationalResponseProvider");
+  const provider = new ConversationalResponseProvider();
+
+  const dummyTask = {
+    context: {
+      operation:    "test",
+      result:       "ok",
+      state:        "CONVERSATION",
+      project_name: "Test",
+      conversation_history: []
+    }
+  };
+
+  const dummyTaskEn = {
+    context: {
+      operation:    "test",
+      result:       "ok",
+      state:        "CONVERSATION",
+      project_name: "Test",
+      user_language: "en",
+      conversation_history: []
+    }
+  };
+
+  const { system: arBuild }   = provider.buildPrompt(dummyTask);
+  const { system: enBuild }   = provider.buildPrompt(dummyTaskEn);
+  const { system: arStream }  = provider.buildStreamPrompt(dummyTask);
+  const { system: enStream }  = provider.buildStreamPrompt(dummyTaskEn);
+
+  const ar_build_prompt_has_forbidden   = arBuild.includes("ممنوع تماماً") && arBuild.includes("PIPELINE");
+  const en_build_prompt_has_forbidden   = enBuild.includes("STRICTLY FORBIDDEN") && enBuild.includes("PIPELINE");
+  const ar_stream_prompt_has_forbidden  = arStream.includes("ممنوع تماماً") && arStream.includes("ليس انتقالاً لمرحلة");
+  const en_stream_prompt_has_forbidden  = enStream.includes("STRICTLY FORBIDDEN") && enStream.includes("not a stage transition");
+
+  return {
+    ar_build_prompt_has_forbidden,
+    en_build_prompt_has_forbidden,
+    ar_stream_prompt_has_forbidden,
+    en_stream_prompt_has_forbidden
+  };
+}
+
 // ── Exports ────────────────────────────────────────────────────────────────────
 
 module.exports = {
   runS236IdeaSynthesisHappyPath,
   runS237IdeaSynthesisRefine,
   runS238IdeaSynthesisReject,
-  runS239IdeaSynthesisProviderFail
+  runS239IdeaSynthesisProviderFail,
+  runS240GetProjectReturnsIdeaSummary,
+  runS241RequestSummaryWhileInIdeaReview,
+  runS242PromptForbidsStageTransition,
+  runS243RejectStampsRejectedAt
 };

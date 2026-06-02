@@ -238,5 +238,11 @@
     "tokens_in": 110,
     "tokens_out": 130,
     "finish_reason": "stop"
+  },
+  "mock|mock-is|scenario:S243": {
+    "text": "{\"project_name\":\"أداة إدارة الميزانية\",\"domain\":\"web_application\",\"goal_primary\":\"A web application that helps individuals track personal income and expenses.\",\"features\":[\"تسجيل المصاريف اليومية\",\"تصنيف المصاريف حسب الفئة\",\"عرض ملخص شهري\"],\"constraints\":[],\"non_goals\":[],\"open_questions\":[\"هل هناك دعم لتعدد العملات؟\",\"هل يحتاج لتصدير التقارير (PDF/Excel)؟\"]}",
+    "tokens_in": 100,
+    "tokens_out": 120,
+    "finish_reason": "stop"
   }
 }
