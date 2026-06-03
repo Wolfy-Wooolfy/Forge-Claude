@@ -1,15 +1,15 @@
 {
-  "project_id": "test_s182_pycli2",
-  "project_name": "test_s182_pycli2",
+  "project_id": "crm_t",
+  "project_name": "CRM System Proposal",
   "project_type": "REVIEW",
   "project_mode": "EXTEND_EXISTING",
   "project_status": "ACTIVE",
   "primary_language": "MIXED",
-  "user_goal": "",
+  "user_goal": "A CRM system proposal for a medium-sized company to manage customer relationships effectively.",
   "business_goal": "",
   "technical_goal": "",
   "current_phase": "DISCOVERY",
-  "active_runtime_state": "DISCUSSION",
+  "active_runtime_state": "IDEATION",
   "workspace_path": "D:\\S\\Halo\\Tech\\Forge-Claude",
   "source_of_truth": "ZIP_SNAPSHOT",
   "selected_strategy": "",
@@ -37,8 +37,8 @@
     "has_decision_packet": false
   },
   "artifact_registry": {
-    "project_root": "artifacts/projects/test_s182_pycli2",
-    "project_state": "artifacts/projects/test_s182_pycli2/project_state.json",
+    "project_root": "artifacts/projects/crm_t",
+    "project_state": "artifacts/projects/crm_t/project_state.json",
     "decision_packet": "",
     "execution_package": ""
   },
@@ -51,6 +51,6 @@
   "vision_version": null,
   "vision_history": [],
   "conversation_mode": "PIPELINE",
-  "active_project_flag": false,
-  "last_updated_at": "2026-06-03T08:28:52.737Z"
+  "active_project_flag": true,
+  "last_updated_at": "2026-06-03T08:32:31.266Z"
 }
