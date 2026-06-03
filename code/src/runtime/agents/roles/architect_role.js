@@ -1,12 +1,14 @@
 "use strict";
 
-const { defineRole, roleOk, roleFailed } = require("../_role_contract");
-const { validate }                        = require("../_json_schema_validator");
-const { loadPrompt }                      = require("../_prompt_loader");
-const { emit: emitActivity }             = require("../_activity_emitter");
-const { getIndicator }                   = require("../_activity_catalog");
+const { defineRole, roleOk, roleFailed }      = require("../_role_contract");
+const { validate }                             = require("../_json_schema_validator");
+const { loadPrompt }                           = require("../_prompt_loader");
+const { emit: emitActivity }                  = require("../_activity_emitter");
+const { getIndicator }                        = require("../_activity_catalog");
+const { createLanguageDetectionCompliance }   = require("../../../ai_os/languageDetectionCompliance");
 
 const SYSTEM_PROMPT = loadPrompt("architect_v1");
+const { detectLanguage: _detectLang } = createLanguageDetectionCompliance();
 
 const INPUT_SCHEMA = {
   type: "object",
@@ -47,6 +49,30 @@ const OUTPUT_SCHEMA = {
   }
 };
 
+function _buildArchitectPrompt(input, ctx) {
+  const project_id  = input.project_id;
+  const scenarioTag = (ctx && ctx.scenario_id)
+    ? "\nSCENARIO_TAG: " + ctx.scenario_id + "\n"
+    : "";
+
+  const lang = _detectLang(input.intent || "");
+  const langInstruction =
+    "\n\nLANGUAGE INSTRUCTION: The owner's intent is in " + lang + ". " +
+    "Write ALL output field VALUES (design_summary, components[].purpose, " +
+    "technology_choices[].rationale, data_flow, integration_points[].notes, " +
+    "identified_risks[].risk, identified_risks[].mitigation) in " + lang + ". " +
+    "Keep technical identifiers (component names, tech names like Node.js, PostgreSQL) as-is.";
+
+  return (
+    "architect|" + project_id + "\n" +
+    scenarioTag +
+    SYSTEM_PROMPT +
+    "\n\nINPUT:\n" + JSON.stringify({ intent: input.intent }) +
+    langInstruction +
+    "\n\nRESPOND WITH VALID JSON ONLY."
+  );
+}
+
 module.exports = defineRole({
   id:               "architect",
   label:            "Architect",
@@ -70,16 +96,7 @@ module.exports = defineRole({
     const invocation_id = (ctx && ctx.invocation_id) || null;
     const root          = (ctx && ctx.root)          || process.cwd();
 
-    const scenarioTag = (ctx && ctx.scenario_id)
-      ? "\nSCENARIO_TAG: " + ctx.scenario_id + "\n"
-      : "";
-
-    const prompt =
-      "architect|" + project_id + "\n" +
-      scenarioTag +
-      SYSTEM_PROMPT +
-      "\n\nINPUT:\n" + JSON.stringify({ intent: input.intent }) +
-      "\n\nRESPOND WITH VALID JSON ONLY.";
+    const prompt = _buildArchitectPrompt(input, ctx);
 
     let agentResult;
     try {
@@ -121,3 +138,6 @@ module.exports = defineRole({
     return roleOk(parsed, { role: this.id, model, provider });
   }
 });
+
+// defineRole returns a frozen object — reassign with test hook appended
+module.exports = Object.assign({}, module.exports, { _buildArchitectPrompt });

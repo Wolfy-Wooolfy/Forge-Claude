@@ -1,0 +1,15 @@
+{
+  "id": "S249",
+  "name": "architect_role._buildArchitectPrompt appends LANGUAGE INSTRUCTION for Arabic and English intent (PHASE-20 Step 5)",
+  "description": "Deterministic: _buildArchitectPrompt returns a prompt containing 'LANGUAGE INSTRUCTION' with 'in ar' when intent is Arabic, and 'in en' when English. No LLM call — checks the static prompt text only.",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/idea_synthesis_test_helper",
+  "method": "runS249ArchitectLanguageInstruction",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "arabic_prompt_has_lang_instruction",  "expected": true },
+    { "type": "state_field_equals", "field": "english_prompt_has_lang_instruction", "expected": true }
+  ]
+}

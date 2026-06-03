@@ -51,7 +51,6 @@
   "vision_version": null,
   "vision_history": [],
   "conversation_mode": "PIPELINE",
-  "active_project_flag": true,
-  "last_updated_at": "2026-06-03T10:45:01.350Z",
-  "loop_id": "a56ddda7-0f29-4c8d-b2e1-df2b2dad4a5b"
+  "active_project_flag": false,
+  "last_updated_at": "2026-06-03T13:38:51.886Z"
 }

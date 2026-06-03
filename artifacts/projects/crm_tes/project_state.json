@@ -1,30 +1,28 @@
 {
-  "project_id": "conv_test_new",
-  "project_name": "conv_test_new",
+  "project_id": "crm_tes",
+  "project_name": "نظام CRM للشركة",
   "project_type": "REVIEW",
   "project_mode": "EXTEND_EXISTING",
   "project_status": "ACTIVE",
-  "primary_language": "AR",
-  "user_goal": "اقترح عليا فكرة مشروع",
+  "primary_language": "MIXED",
+  "user_goal": "نظام CRM يساعد شركة تضم 150 موظفًا في إدارة العملاء والبيانات بكفاءة.",
   "business_goal": "",
   "technical_goal": "",
   "current_phase": "DISCOVERY",
-  "active_runtime_state": "DISCOVERY_REQUIRED",
+  "active_runtime_state": "IDEATION",
   "workspace_path": "D:\\S\\Halo\\Tech\\Forge-Claude",
   "source_of_truth": "ZIP_SNAPSHOT",
   "selected_strategy": "",
   "accepted_options": [],
   "rejected_options": [],
-  "open_questions": [
-    "ما هو المجال الذي تفضل أن يكون فيه المشروع؟"
-  ],
+  "open_questions": [],
   "clarification_answers": {},
-  "requirement_domain": "general project ideas",
+  "requirement_domain": "",
   "domain_locked": false,
   "domain_history": [],
   "requirement_completeness": false,
   "requirement_model": {},
-  "requirement_reasoning_summary": "المستخدم طلب اقتراح فكرة مشروع بدون تحديد مجال. لتقديم اقتراح مناسب، يجب أولاً تحديد المجال المفضل للمشروع.",
+  "requirement_reasoning_summary": "",
   "provider_error": "",
   "documentation_state": "EMPTY",
   "execution_package_state": "NOT_READY",
@@ -39,8 +37,8 @@
     "has_decision_packet": false
   },
   "artifact_registry": {
-    "project_root": "artifacts/projects/conv_test_new",
-    "project_state": "artifacts/projects/conv_test_new/project_state.json",
+    "project_root": "artifacts/projects/crm_tes",
+    "project_state": "artifacts/projects/crm_tes/project_state.json",
     "decision_packet": "",
     "execution_package": ""
   },
@@ -52,7 +50,8 @@
   "vision_locked": false,
   "vision_version": null,
   "vision_history": [],
-  "conversation_mode": "CONVERSATION",
-  "active_project_flag": false,
-  "last_updated_at": "2026-06-03T13:38:51.780Z"
+  "conversation_mode": "PIPELINE",
+  "active_project_flag": true,
+  "last_updated_at": "2026-06-03T13:39:57.790Z",
+  "loop_id": "f8e56a8e-4c5f-4f21-9ccd-59aaa84ea9cc"
 }

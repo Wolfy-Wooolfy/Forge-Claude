@@ -780,6 +780,40 @@ function runS245LanguageInstructionInPrompt() {
   };
 }
 
+// ── S249 — architect_role._buildArchitectPrompt appends LANGUAGE INSTRUCTION ──
+//
+// RED (before PHASE-20 Step 5): _buildArchitectPrompt is not exported or has no
+//   language instruction → arabic_prompt_has_lang_instruction = false → FAIL.
+// GREEN (after Step 5): prompt contains "LANGUAGE INSTRUCTION: ... in ar"
+//   for Arabic intent and "in en" for English intent.
+//
+// Deterministic: calls _buildArchitectPrompt directly, no LLM call needed.
+
+function runS249ArchitectLanguageInstruction() {
+  const { _buildArchitectPrompt } = require("../../runtime/agents/roles/architect_role");
+
+  const arabicIntent  = "أريد بناء نظام CRM لإدارة 150 موظف مع تتبع الأداء والمهام";
+  const englishIntent = "I want to build a CRM system to manage 150 employees with performance and task tracking";
+
+  const arabicPrompt  = _buildArchitectPrompt({ intent: arabicIntent,  project_id: "test_ar" }, {});
+  const englishPrompt = _buildArchitectPrompt({ intent: englishIntent, project_id: "test_en" }, {});
+
+  const arabic_prompt_has_lang_instruction  =
+    typeof arabicPrompt  === "string" &&
+    arabicPrompt.includes("LANGUAGE INSTRUCTION") &&
+    arabicPrompt.includes("in ar");
+
+  const english_prompt_has_lang_instruction =
+    typeof englishPrompt === "string" &&
+    englishPrompt.includes("LANGUAGE INSTRUCTION") &&
+    englishPrompt.includes("in en");
+
+  return {
+    arabic_prompt_has_lang_instruction,
+    english_prompt_has_lang_instruction
+  };
+}
+
 // ── Exports ────────────────────────────────────────────────────────────────────
 
 module.exports = {
@@ -795,5 +829,6 @@ module.exports = {
   runS245LanguageInstructionInPrompt,
   runS246BridgeStartLoop,
   runS247ArchitectHappyPath,
-  runS248ArchitectFailNonFatal
+  runS248ArchitectFailNonFatal,
+  runS249ArchitectLanguageInstruction
 };
