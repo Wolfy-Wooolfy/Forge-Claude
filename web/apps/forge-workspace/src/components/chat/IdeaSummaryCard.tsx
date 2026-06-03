@@ -39,6 +39,12 @@ export function IdeaSummaryCard({ summary, projectId, onConfirm, onModify, onRej
   return (
     <div dir="rtl" className="my-3 rounded-lg border border-amber-600/40 bg-gray-800/60 p-4 text-sm" data-testid="idea-summary-card">
 
+      {/* Review prompt */}
+      <div className="mb-4 border-b border-amber-700/30 pb-3">
+        <p className="font-semibold text-gray-100 text-base">راجع فكرتك قبل ما نبدأ التخطيط</p>
+        <p className="mt-0.5 text-xs text-gray-400">دي الفكرة زي ما فهمتها — أكّدها أو عدّلها</p>
+      </div>
+
       {/* Header */}
       <div className="mb-3 flex items-start justify-between gap-2">
         <div>
@@ -110,7 +116,7 @@ export function IdeaSummaryCard({ summary, projectId, onConfirm, onModify, onRej
           disabled={loading}
           data-testid="idea-confirm"
         >
-          {activeAction === 'AFFIRM' ? '…' : 'تأكيد الفكرة'}
+          {activeAction === 'AFFIRM' ? '…' : '✓ تمام، ابدأ التخطيط'}
         </Button>
         <Button
           variant="outline"

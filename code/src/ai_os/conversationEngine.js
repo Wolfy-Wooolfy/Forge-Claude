@@ -346,10 +346,15 @@ function createConversationEngine(options = {}) {
       };
     }
 
+    const lang = String(user_language || "ar").toLowerCase();
+    const hint = _hasTransitionIntent(message)
+      ? (lang.startsWith("en") ? _TRANSITION_HINT_EN : _TRANSITION_HINT_AR)
+      : "";
+
     const r = {
       ok: true,
       mode: "CONVERSATION_RESPONSE",
-      message: providerResult.output.message,
+      message: providerResult.output.message + hint,
       tone: providerResult.output.tone || "friendly",
       suggest_next: providerResult.output.suggest_next || "",
       current_state: "CONVERSATION",
@@ -810,4 +815,23 @@ function createConversationEngine(options = {}) {
   };
 }
 
-module.exports = { createConversationEngine };
+// ── Transition-hint helpers (owner-authorized exception to §3.3 / §11.4) ──────
+// These are UI-guidance hints only — they do NOT route or classify intent for
+// pipeline entry. The confirmation gate (button press) is still required.
+// CTO-approved in PHASE-19 Gate #10 findings (2026-06-03).
+
+const _TRANSITION_KEYWORDS_AR = [
+  "اعمل مقترح", "اعمل المقترح", "اعرضه", "اعرض المقترح",
+  "خلصنا", "كفاية", "ابدأ", "يلا",
+  "جاهز", "لخّص", "لخص", "الملخص"
+];
+
+const _TRANSITION_HINT_AR = "\n\n💡 لو خلصت استكشاف فكرتك، اضغط '📋 اعرض ملخّص فكرتي' فوق عشان أعرضلك ملخّص كامل تراجعه.";
+const _TRANSITION_HINT_EN = "\n\n💡 If you've finished exploring your idea, click '📋 Show My Idea Summary' above to see a full summary you can review.";
+
+function _hasTransitionIntent(message) {
+  const lower = String(message).trim().toLowerCase();
+  return _TRANSITION_KEYWORDS_AR.some(kw => lower.includes(kw));
+}
+
+module.exports = { createConversationEngine, _hasTransitionIntent, _TRANSITION_HINT_AR };

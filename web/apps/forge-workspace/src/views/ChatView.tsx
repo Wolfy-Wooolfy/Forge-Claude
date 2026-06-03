@@ -370,15 +370,15 @@ export default function ChatView() {
         {state.conversationMode === 'CONVERSATION' && state.messages.length >= 3 && (
           <div className="mb-2 flex justify-end">
             <Button
-              variant="outline"
-              size="sm"
+              variant="default"
+              size="default"
               onClick={() => { void handleRequestSummary() }}
               disabled={summaryRequesting || isDisabled}
               data-testid="request-summary-btn"
             >
               <span className="flex items-center gap-1.5">
-                <Sparkles className="h-3.5 w-3.5" />
-                {summaryRequesting ? '…' : 'جاهز للملخّص'}
+                <Sparkles className="h-4 w-4" />
+                {summaryRequesting ? '…' : '📋 اعرض ملخّص فكرتي'}
               </span>
             </Button>
           </div>

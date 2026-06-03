@@ -501,6 +501,59 @@ async function runS242PromptForbidsStageTransition() {
   };
 }
 
+// ── S244 — hint appended when message contains transition-intent keywords ─────
+//
+// RED (before PHASE-19 FIX 3): _hasTransitionIntent not exported from
+//   conversationEngine → TypeError → FAIL.
+// GREEN (after FIX 3): _hasTransitionIntent correctly identifies trigger phrases
+//   and the hint constant contains the UI button text 'اعرض ملخّص فكرتي'.
+
+function runS244ConversationHintOnTransitionIntent() {
+  const { _hasTransitionIntent } = require("../../ai_os/conversationEngine");
+
+  const HINT_BUTTON_TEXT = "اعرض ملخّص فكرتي";
+
+  // Phrases that MUST trigger the hint
+  const triggerMessages = [
+    "اعمل مقترح",
+    "اعمل مقترح للمشروع",
+    "اعمل المقترح",
+    "اعرضه",
+    "اعرض المقترح",
+    "خلصنا",
+    "كفاية",
+    "ابدأ",
+    "يلا",
+    "جاهز",
+    "لخّص",
+    "لخص الفكرة",
+    "الملخص"
+  ];
+
+  // Normal messages that must NOT trigger the hint
+  const normalMessages = [
+    "ما هو الهدف الرئيسي؟",
+    "أريد إضافة ميزة تعليقات",
+    "شكراً على التوضيح",
+    "ممتاز، ما رأيك في الجدول الزمني؟",
+    "هل نحتاج تسجيل دخول؟"
+  ];
+
+  const all_triggers_detected = triggerMessages.every(m => _hasTransitionIntent(m) === true);
+  const no_false_positives    = normalMessages.every(m => _hasTransitionIntent(m) === false);
+
+  // Verify the hint constant (exported for this check) contains the button text
+  const { _TRANSITION_HINT_AR } = require("../../ai_os/conversationEngine");
+  const hint_contains_button_text = typeof _TRANSITION_HINT_AR === "string" &&
+    _TRANSITION_HINT_AR.includes(HINT_BUTTON_TEXT);
+
+  return {
+    all_triggers_detected,
+    no_false_positives,
+    hint_contains_button_text
+  };
+}
+
 // ── Exports ────────────────────────────────────────────────────────────────────
 
 module.exports = {
@@ -511,5 +564,6 @@ module.exports = {
   runS240GetProjectReturnsIdeaSummary,
   runS241RequestSummaryWhileInIdeaReview,
   runS242PromptForbidsStageTransition,
-  runS243RejectStampsRejectedAt
+  runS243RejectStampsRejectedAt,
+  runS244ConversationHintOnTransitionIntent
 };

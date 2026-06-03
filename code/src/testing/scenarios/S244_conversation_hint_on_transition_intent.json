@@ -1,0 +1,16 @@
+{
+  "id": "S244",
+  "name": "conversationEngine appends transition hint when message contains intent keywords (PHASE-19 FIX 3)",
+  "description": "Deterministic: _hasTransitionIntent() returns true for known phrases ('اعمل مقترح', 'خلصنا', 'جاهز', ...) and false for neutral messages. The hint constant contains the button text 'اعرض ملخّص فكرتي' to guarantee UI/backend sync. No LLM call.",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/idea_synthesis_test_helper",
+  "method": "runS244ConversationHintOnTransitionIntent",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "all_triggers_detected", "expected": true },
+    { "type": "state_field_equals", "field": "no_false_positives",    "expected": true },
+    { "type": "state_field_equals", "field": "hint_contains_button_text", "expected": true }
+  ]
+}
