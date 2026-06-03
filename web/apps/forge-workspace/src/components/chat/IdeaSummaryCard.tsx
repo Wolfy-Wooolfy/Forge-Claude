@@ -1,12 +1,12 @@
 import { useState, type ReactNode } from 'react'
 import { AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { confirmIdea, type IdeaAction, type IdeaSummary } from '@/api/ideaSynthesis'
+import { confirmIdea, type IdeaAction, type IdeaSummary, type ArchitectDesign } from '@/api/ideaSynthesis'
 
 interface IdeaSummaryCardProps {
   summary: IdeaSummary
   projectId: string
-  onConfirm: () => void
+  onConfirm: (design: ArchitectDesign | null) => void
   onModify: () => void
   onReject: () => void
 }
@@ -19,13 +19,17 @@ export function IdeaSummaryCard({ summary, projectId, onConfirm, onModify, onRej
     setActiveAction(action)
     setError(null)
     try {
-      const res = await confirmIdea({ project_id: projectId, action })
+      const res = await confirmIdea({
+        project_id: projectId,
+        action,
+        ...(action === 'AFFIRM' ? { architect_provider: 'anthropic' } : {}),
+      })
       if (!res.ok) {
         setError(res.reason ?? 'حدث خطأ غير متوقع')
         setActiveAction(null)
         return
       }
-      if (action === 'AFFIRM') onConfirm()
+      if (action === 'AFFIRM') onConfirm(res.architect_design ?? null)
       else if (action === 'MODIFY') onModify()
       else onReject()
     } catch (err) {

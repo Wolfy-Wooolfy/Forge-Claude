@@ -10,12 +10,14 @@
 
 const path = require("path");
 
-const { defineProvider, validateAgainstSchema } = require("./_contract/providerContract");
-const { loadPrompt }                             = require("../runtime/agents/_prompt_loader");
+const { defineProvider, validateAgainstSchema }    = require("./_contract/providerContract");
+const { loadPrompt }                               = require("../runtime/agents/_prompt_loader");
+const { createLanguageDetectionCompliance }        = require("../ai_os/languageDetectionCompliance");
 
 const _MOCK_RESPONSES_PATH = path.join(__dirname, "../runtime/agents/adapters/mock_responses.json");
 
-const SYSTEM_PROMPT = loadPrompt("idea_synthesis_v1");
+const SYSTEM_PROMPT    = loadPrompt("idea_synthesis_v1");
+const { detectLanguage: _detectLang } = createLanguageDetectionCompliance();
 
 // ── Input Schema ──────────────────────────────────────────────────────────────
 
@@ -72,6 +74,9 @@ const OUTPUT_TOOL = {
 // ── User prompt builder ───────────────────────────────────────────────────────
 
 function _buildUserPrompt(projectId, history) {
+  const firstUserMsg = (history || []).find(m => m.role === "user");
+  const lang         = firstUserMsg ? _detectLang(firstUserMsg.content || "") : "en";
+
   const lines = [];
   lines.push("PROJECT ID: " + projectId);
   lines.push("CONVERSATION HISTORY (" + history.length + " messages):");
@@ -88,6 +93,11 @@ function _buildUserPrompt(projectId, history) {
     "Analyze the conversation above and call the idea_synthesis function with a " +
     "structured summary of the user's project idea. Pay special attention to " +
     "open_questions — state clearly what Forge is NOT sure about."
+  );
+  lines.push("");
+  lines.push(
+    "LANGUAGE INSTRUCTION: The conversation is in " + lang + ". Write ALL output fields " +
+    "(project_name, goal_primary, features, constraints, non_goals, open_questions) in " + lang + "."
   );
 
   return lines.join("\n");

@@ -758,22 +758,99 @@ function createConversationEngine(options = {}) {
       return { ok: false, mode: "BLOCKED", reason: "VISION_WRITE_VERIFICATION_FAILED", detail: verifyErrs };
     }
 
+    const loopResult = await reg.invoke("orchestration.start_loop", {
+      project_id:          normalizeProjectId(projectId),
+      owner_intent_source: "vision_locked_intake"
+    }, { root });
+
+    const loopId = (loopResult && loopResult.status === "SUCCESS" && loopResult.output)
+      ? loopResult.output.loop_id
+      : null;
+
     const updatedState = {
       ...state,
       conversation_mode:    "PIPELINE",
       active_runtime_state: "IDEATION",
       user_goal:            summary.goal_primary || "",
       project_name:         summary.project_name || state.project_name || "",
+      loop_id:              loopId || undefined,
       last_updated_at:      nowIso()
     };
     await saveState(projectId, updatedState);
+
+    // ── Architect sync (Step 3) — only when caller supplies architect_provider ──
+    // Production: FE passes architect_provider:"anthropic". Tests: pass "mock".
+    // Failure is non-fatal: ok:true is returned regardless.
+    let architectDesign = null;
+    let architectError  = null;
+
+    const architectProvider    = body.architect_provider    || null;
+    const architectModel       = body.architect_model       || undefined;
+    const architectScenarioId  = body.architect_scenario_id || undefined;
+
+    if (loopId && architectProvider) {
+      const intent =
+        (parsedFm.goals && parsedFm.goals.primary ? parsedFm.goals.primary : "") +
+        (summary.features && summary.features.length > 0
+          ? "\n\nFeatures:\n" + summary.features.join("\n")
+          : "");
+
+      let timeoutHandle;
+      const timeoutPromise = new Promise((_, reject) => {
+        timeoutHandle = setTimeout(() => reject(new Error("ARCHITECT_TIMEOUT")), 30000);
+      });
+
+      try {
+        const architectResult = await Promise.race([
+          reg.invoke("role.invoke", {
+            role_id:     "architect",
+            input:       { intent, project_id: normalizeProjectId(projectId) },
+            project_id:  normalizeProjectId(projectId),
+            provider:    architectProvider,
+            model:       architectModel,
+            scenario_id: architectScenarioId
+          }, { root }),
+          timeoutPromise
+        ]);
+        clearTimeout(timeoutHandle);
+
+        if (architectResult && architectResult.status === "SUCCESS") {
+          architectDesign = architectResult.output;
+          const designPath =
+            "artifacts/projects/" + normalizeProjectId(projectId) +
+            "/orchestration/" + loopId + "/architect_design.json";
+          await reg.invoke("fs.write_file", {
+            path:    designPath,
+            content: JSON.stringify(architectDesign, null, 2)
+          }, { root });
+          await reg.invoke("orchestration.advance_state", {
+            project_id:      normalizeProjectId(projectId),
+            loop_id:         loopId,
+            to_state:        "SPEC_WRITER_FORMALIZE",
+            transition_type: "NORMAL",
+            role_invoked:    "architect"
+          }, { root });
+        } else {
+          architectError = (architectResult && architectResult.metadata && architectResult.metadata.detail)
+            || "ARCHITECT_FAILED";
+        }
+      } catch (err) {
+        clearTimeout(timeoutHandle);
+        architectError = err.message;
+      }
+    }
 
     return {
       ok:                   true,
       mode:                 "PIPELINE",
       conversation_mode:    "PIPELINE",
       active_runtime_state: "IDEATION",
-      project_id:           projectId
+      project_id:           projectId,
+      pipeline_started:     !!loopId,
+      loop_id:              loopId || undefined,
+      pipeline_error:       loopId ? undefined : "LOOP_START_FAILED",
+      architect_design:     architectDesign || undefined,
+      architect_error:      architectError  || undefined
     };
   }
 

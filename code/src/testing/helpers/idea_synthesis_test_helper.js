@@ -554,6 +554,232 @@ function runS244ConversationHintOnTransitionIntent() {
   };
 }
 
+// ── S246 — confirmIdea(AFFIRM) starts orchestration loop, saves loop_id ────────
+//
+// RED (before PHASE-20 Step 2): confirmIdea returns ok:true but loop_id absent
+//   from project_state.json, graph.json does not exist → loop_id_in_state = false,
+//   graph_json_exists = false → FAIL.
+// GREEN (after Step 2): start_loop invoked inside confirmIdea, loop_id saved to
+//   runtime state, graph.json written with current_state = ARCHITECT_DESIGN
+//   (owner_intent_source:"vision_locked_intake" shortcut).
+
+async function runS246BridgeStartLoop() {
+  const PID = "s246_bridge_start_loop";
+  const { projectDir, aiOsDir } = _ensureProjectDir(PID);
+  try {
+    _writeState(projectDir, {
+      project_id:           PID,
+      project_name:         "S246 Bridge Test",
+      active_runtime_state: "DISCUSSION",
+      conversation_mode:    "CONVERSATION",
+      last_updated_at:      new Date().toISOString()
+    });
+    fs.writeFileSync(
+      path.join(aiOsDir, "conversation_context.json"),
+      JSON.stringify(_makeHistory()),
+      "utf8"
+    );
+
+    const engine = _makeEngine();
+
+    // Put project into IDEA_REVIEW with a written idea_summary
+    const synthResult = await engine.requestIdeaSummary({ project_id: PID, provider: "mock", scenario_id: "S246" });
+    if (!synthResult.ok) return { confirm_ok: false, loop_id_in_state: false, graph_json_exists: false, graph_state_architect: false };
+
+    // AFFIRM — this should now call start_loop
+    const confirmResult = await engine.confirmIdea({ project_id: PID, action: "AFFIRM" });
+    const confirm_ok    = confirmResult.ok === true;
+
+    // Check loop_id in runtime state
+    const stateAfter       = _readState(projectDir);
+    const loop_id_in_state = !!(stateAfter && typeof stateAfter.loop_id === "string" && stateAfter.loop_id.length > 0);
+
+    // Check graph.json exists at the expected orchestration path
+    const loopId   = stateAfter && stateAfter.loop_id;
+    const graphPath = loopId
+      ? path.join(ROOT, "artifacts", "projects", PID, "orchestration", loopId, "graph.json")
+      : null;
+    const graph_json_exists = !!(graphPath && fs.existsSync(graphPath));
+
+    // Check graph.current_state === "ARCHITECT_DESIGN" (vision_locked_intake shortcut)
+    let graph_state_architect = false;
+    if (graph_json_exists) {
+      try {
+        const graph = JSON.parse(fs.readFileSync(graphPath, "utf8"));
+        graph_state_architect = graph.current_state === "ARCHITECT_DESIGN";
+      } catch (_) {}
+    }
+
+    return { confirm_ok, loop_id_in_state, graph_json_exists, graph_state_architect };
+  } finally {
+    _cleanup(PID);
+  }
+}
+
+// ── S247 — confirmIdea(AFFIRM) + architect sync happy path ────────────────────
+//
+// RED (before PHASE-20 Step 3): architect not invoked, architect_design absent
+//   from response, graph stays at ARCHITECT_DESIGN → FAIL.
+// GREEN (after Step 3): mock architect called, design in response,
+//   architect_design.json persisted, graph.current_state === "SPEC_WRITER_FORMALIZE".
+
+async function runS247ArchitectHappyPath() {
+  const PID = "s247_architect_happy";
+  const { projectDir, aiOsDir } = _ensureProjectDir(PID);
+  try {
+    _writeState(projectDir, {
+      project_id:           PID,
+      project_name:         "S247 Architect Test",
+      active_runtime_state: "DISCUSSION",
+      conversation_mode:    "CONVERSATION",
+      last_updated_at:      new Date().toISOString()
+    });
+    fs.writeFileSync(path.join(aiOsDir, "conversation_context.json"), JSON.stringify(_makeHistory()), "utf8");
+
+    const engine = _makeEngine();
+
+    const synthResult = await engine.requestIdeaSummary({ project_id: PID, provider: "mock", scenario_id: "S247" });
+    if (!synthResult.ok) return { confirm_ok: false, architect_design_in_response: false, architect_json_exists: false, graph_state_spec_writer: false };
+
+    const confirmResult = await engine.confirmIdea({
+      project_id:           PID,
+      action:               "AFFIRM",
+      architect_provider:   "mock",
+      architect_model:      "mock",
+      architect_scenario_id: "S247"
+    });
+
+    const confirm_ok                   = confirmResult.ok === true;
+    const architect_design_in_response = !!(confirmResult.architect_design && typeof confirmResult.architect_design === "object");
+
+    const stateAfter = _readState(projectDir);
+    const loopId     = stateAfter && stateAfter.loop_id;
+
+    const architectJsonPath = loopId
+      ? path.join(ROOT, "artifacts", "projects", PID, "orchestration", loopId, "architect_design.json")
+      : null;
+    const architect_json_exists = !!(architectJsonPath && fs.existsSync(architectJsonPath));
+
+    let graph_state_spec_writer = false;
+    if (loopId) {
+      const graphPath = path.join(ROOT, "artifacts", "projects", PID, "orchestration", loopId, "graph.json");
+      if (fs.existsSync(graphPath)) {
+        try {
+          const graph = JSON.parse(fs.readFileSync(graphPath, "utf8"));
+          graph_state_spec_writer = graph.current_state === "SPEC_WRITER_FORMALIZE";
+        } catch (_) {}
+      }
+    }
+
+    return { confirm_ok, architect_design_in_response, architect_json_exists, graph_state_spec_writer };
+  } finally {
+    _cleanup(PID);
+  }
+}
+
+// ── S248 — confirmIdea(AFFIRM) architect failure is non-fatal ─────────────────
+//
+// RED (before Step 3): architect never invoked, architect_error absent,
+//   pipeline_started absent → FAIL.
+// GREEN (after Step 3): mock architect invoked, mock returns invalid JSON
+//   (no scripted response → "[mock] no scripted response") → FAILED,
+//   confirmIdea still returns ok:true with pipeline_started:true and architect_error
+//   set, graph.current_state stays "ARCHITECT_DESIGN" (no advance).
+
+async function runS248ArchitectFailNonFatal() {
+  const PID = "s248_architect_fail";
+  const { projectDir, aiOsDir } = _ensureProjectDir(PID);
+  try {
+    _writeState(projectDir, {
+      project_id:           PID,
+      project_name:         "S248 Architect Fail Test",
+      active_runtime_state: "DISCUSSION",
+      conversation_mode:    "CONVERSATION",
+      last_updated_at:      new Date().toISOString()
+    });
+    fs.writeFileSync(path.join(aiOsDir, "conversation_context.json"), JSON.stringify(_makeHistory()), "utf8");
+
+    const engine = _makeEngine();
+
+    const synthResult = await engine.requestIdeaSummary({ project_id: PID, provider: "mock", scenario_id: "S248" });
+    if (!synthResult.ok) return { confirm_ok: false, pipeline_started: false, architect_error_present: false, graph_stays_architect: false };
+
+    // architect_scenario_id "S248" has no mock response → mock returns invalid JSON → architect fails
+    const confirmResult = await engine.confirmIdea({
+      project_id:           PID,
+      action:               "AFFIRM",
+      architect_provider:   "mock",
+      architect_model:      "mock",
+      architect_scenario_id: "S248"
+    });
+
+    const confirm_ok            = confirmResult.ok === true;
+    const pipeline_started      = confirmResult.pipeline_started === true;
+    const architect_error_present = typeof confirmResult.architect_error === "string" && confirmResult.architect_error.length > 0;
+
+    const stateAfter = _readState(projectDir);
+    const loopId     = stateAfter && stateAfter.loop_id;
+
+    let graph_stays_architect = false;
+    if (loopId) {
+      const graphPath = path.join(ROOT, "artifacts", "projects", PID, "orchestration", loopId, "graph.json");
+      if (fs.existsSync(graphPath)) {
+        try {
+          const graph = JSON.parse(fs.readFileSync(graphPath, "utf8"));
+          graph_stays_architect = graph.current_state === "ARCHITECT_DESIGN";
+        } catch (_) {}
+      }
+    }
+
+    return { confirm_ok, pipeline_started, architect_error_present, graph_stays_architect };
+  } finally {
+    _cleanup(PID);
+  }
+}
+
+// ── S245 — _buildUserPrompt appends LANGUAGE INSTRUCTION for ar and en ────────
+//
+// RED (before PHASE-20 Step 1): _buildUserPrompt returns prompt with no language
+//   instruction → arabic_prompt_has_lang_instruction = false → FAIL.
+// GREEN (after Step 1): prompt contains "LANGUAGE INSTRUCTION: The conversation is in ar"
+//   for Arabic history and "in en" for English history.
+//
+// Deterministic: calls _buildUserPrompt directly, no LLM call needed.
+
+function runS245LanguageInstructionInPrompt() {
+  const { _buildUserPrompt } = require("../../providers/ideaSynthesisProvider");
+
+  const arabicHistory = [
+    { role: "user",      content: "أريد بناء تطبيق إدارة مهام للفرق." },
+    { role: "assistant", content: "ممتاز! هل تحتاج تسجيل دخول؟" },
+    { role: "user",      content: "نعم، مع صلاحيات مختلفة للمدير والأعضاء." }
+  ];
+
+  const englishHistory = [
+    { role: "user",      content: "I want to build a task management app for teams." },
+    { role: "assistant", content: "Great! Do you need user authentication?" },
+    { role: "user",      content: "Yes, with different permission levels." }
+  ];
+
+  const arabicPrompt  = _buildUserPrompt("test_ar_p20", arabicHistory);
+  const englishPrompt = _buildUserPrompt("test_en_p20", englishHistory);
+
+  const arabic_prompt_has_lang_instruction  =
+    typeof arabicPrompt  === "string" &&
+    arabicPrompt.includes("LANGUAGE INSTRUCTION") &&
+    arabicPrompt.includes("in ar");
+
+  const english_prompt_has_lang_instruction =
+    typeof englishPrompt === "string" &&
+    englishPrompt.includes("LANGUAGE INSTRUCTION") &&
+    englishPrompt.includes("in en");
+
+  return {
+    arabic_prompt_has_lang_instruction,
+    english_prompt_has_lang_instruction
+  };
+}
+
 // ── Exports ────────────────────────────────────────────────────────────────────
 
 module.exports = {
@@ -565,5 +791,9 @@ module.exports = {
   runS241RequestSummaryWhileInIdeaReview,
   runS242PromptForbidsStageTransition,
   runS243RejectStampsRejectedAt,
-  runS244ConversationHintOnTransitionIntent
+  runS244ConversationHintOnTransitionIntent,
+  runS245LanguageInstructionInPrompt,
+  runS246BridgeStartLoop,
+  runS247ArchitectHappyPath,
+  runS248ArchitectFailNonFatal
 };

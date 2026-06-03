@@ -1,0 +1,17 @@
+{
+  "id": "S247",
+  "name": "confirmIdea(AFFIRM) architect sync happy path — design in response, graph at SPEC_WRITER_FORMALIZE (PHASE-20 Step 3)",
+  "description": "RED (before Step 3): architect not invoked, architect_design absent from response, graph stays at ARCHITECT_DESIGN. GREEN: mock architect called, design in response, architect_design.json persisted, graph.current_state === 'SPEC_WRITER_FORMALIZE'.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/idea_synthesis_test_helper",
+  "method": "runS247ArchitectHappyPath",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "confirm_ok",                   "expected": true },
+    { "type": "state_field_equals", "field": "architect_design_in_response", "expected": true },
+    { "type": "state_field_equals", "field": "architect_json_exists",        "expected": true },
+    { "type": "state_field_equals", "field": "graph_state_spec_writer",      "expected": true }
+  ]
+}

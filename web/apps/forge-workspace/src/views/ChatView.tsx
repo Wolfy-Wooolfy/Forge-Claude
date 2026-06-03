@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import { Sparkles } from 'lucide-react'
 import { chatStream, answerClarification, requestIdeaSummary, fetchProjectAiOsState } from '@/api'
 import type { IdeaSummary } from '@/api'
+import type { ArchitectDesign } from '@/api/ideaSynthesis'
 import { detectLanguage } from '@/lib/detectLanguage'
 import { Button } from '@/components/ui/button'
+import { ArchitectDesignCard } from '@/components/chat/ArchitectDesignCard'
 import { ChatInput, type ChatInputHandle } from '@/components/chat/ChatInput'
 import { IdeaSummaryCard } from '@/components/chat/IdeaSummaryCard'
 import { MessageBubble } from '@/components/chat/MessageBubble'
@@ -48,6 +50,7 @@ interface ChatState {
   pendingReplies: QuickReplyChip[]
   conversationMode: ConversationMode
   ideaSummary: IdeaSummary | null
+  architectDesign: ArchitectDesign | null
 }
 
 // ── component ─────────────────────────────────────────────────────────────────
@@ -66,6 +69,7 @@ export default function ChatView() {
     pendingReplies: [],
     conversationMode: 'CONVERSATION',
     ideaSummary: null,
+    architectDesign: null,
   })
 
   const abortRef = useRef<AbortController | null>(null)
@@ -95,6 +99,7 @@ export default function ChatView() {
           pendingReplies: [],
           conversationMode: mode,
           ideaSummary: summary,
+          architectDesign: null,
         })
         setConversationMode(mode)
       })
@@ -262,9 +267,9 @@ export default function ChatView() {
     }
   }
 
-  function handleIdeaConfirm() {
+  function handleIdeaConfirm(design: ArchitectDesign | null) {
     addMessage(assistantMsg('تمام، الفكرة اتثبّتت. هـ ابدأ التخطيط دلوقتي.'))
-    setState((prev) => ({ ...prev, conversationMode: 'PIPELINE', ideaSummary: null }))
+    setState((prev) => ({ ...prev, conversationMode: 'PIPELINE', ideaSummary: null, architectDesign: design }))
   }
 
   function handleIdeaModify() {
@@ -347,6 +352,9 @@ export default function ChatView() {
             onModify={handleIdeaModify}
             onReject={handleIdeaReject}
           />
+        )}
+        {state.architectDesign && (
+          <ArchitectDesignCard design={state.architectDesign} />
         )}
         <div ref={bottomRef} />
       </div>

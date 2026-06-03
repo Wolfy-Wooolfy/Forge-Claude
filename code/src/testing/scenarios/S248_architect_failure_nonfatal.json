@@ -1,0 +1,17 @@
+{
+  "id": "S248",
+  "name": "confirmIdea(AFFIRM) architect failure — non-fatal: ok:true, pipeline_started, architect_error present, graph stays ARCHITECT_DESIGN (PHASE-20 Step 3)",
+  "description": "RED (before Step 3): architect not invoked, architect_error never set, pipeline_started absent. GREEN: mock architect invoked with no scripted response → fails → confirmIdea still ok:true, pipeline_started:true, architect_error set, graph.current_state === 'ARCHITECT_DESIGN' (did not advance).",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/idea_synthesis_test_helper",
+  "method": "runS248ArchitectFailNonFatal",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "confirm_ok",            "expected": true },
+    { "type": "state_field_equals", "field": "pipeline_started",      "expected": true },
+    { "type": "state_field_equals", "field": "architect_error_present","expected": true },
+    { "type": "state_field_equals", "field": "graph_stays_architect",  "expected": true }
+  ]
+}

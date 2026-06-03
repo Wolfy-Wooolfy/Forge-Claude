@@ -244,5 +244,29 @@
     "tokens_in": 100,
     "tokens_out": 120,
     "finish_reason": "stop"
+  },
+  "mock|mock-is|scenario:S246": {
+    "text": "{\"project_name\":\"تطبيق إدارة المهام\",\"domain\":\"web_application\",\"goal_primary\":\"تطبيق ويب يساعد الفرق على إدارة المهام وتتبعها مع تحديثات فورية.\",\"features\":[\"إضافة مهام جديدة\",\"تعيين المهام لأعضاء الفريق\",\"تتبع حالة المهمة\",\"إشعارات عند التحديث\"],\"constraints\":[\"يعمل على المتصفح فقط\"],\"non_goals\":[\"لا تطبيق موبايل في المرحلة الأولى\"],\"open_questions\":[]}",
+    "tokens_in": 120,
+    "tokens_out": 130,
+    "finish_reason": "stop"
+  },
+  "mock|mock-is|scenario:S247": {
+    "text": "{\"project_name\":\"منصة إدارة المشاريع\",\"domain\":\"web_application\",\"goal_primary\":\"منصة ويب لإدارة المشاريع والمهام بين الفرق مع لوحة تحكم تحليلية.\",\"features\":[\"إنشاء مشاريع ومهام\",\"تعيين المهام للأعضاء\",\"تتبع التقدم والمواعيد النهائية\",\"لوحة تحليلات\"],\"constraints\":[\"متصفح فقط في المرحلة الأولى\",\"بدون تطبيق موبايل\"],\"non_goals\":[\"تكامل مع أدوات خارجية في المرحلة الأولى\"],\"open_questions\":[]}",
+    "tokens_in": 125,
+    "tokens_out": 135,
+    "finish_reason": "stop"
+  },
+  "mock|mock-is|scenario:S248": {
+    "text": "{\"project_name\":\"نظام متابعة الطلبات\",\"domain\":\"web_application\",\"goal_primary\":\"نظام ويب لمتابعة طلبات العملاء من الاستلام حتى التسليم.\",\"features\":[\"تسجيل الطلبات\",\"متابعة حالة الطلب\",\"إشعارات للعملاء\"],\"constraints\":[\"يعمل على الإنترنت فقط\"],\"non_goals\":[\"لا دعم لعمليات الدفع في المرحلة الأولى\"],\"open_questions\":[]}",
+    "tokens_in": 118,
+    "tokens_out": 128,
+    "finish_reason": "stop"
+  },
+  "mock|mock|scenario:S247": {
+    "text": "{\"design_summary\":\"منصة ويب لإدارة المشاريع مبنية على Node.js و React مع قاعدة بيانات PostgreSQL. تدعم إدارة المهام والتقارير التحليلية للفرق.\",\"components\":[{\"name\":\"API Server\",\"tech\":\"Node.js/Express\",\"purpose\":\"معالجة طلبات HTTP وتطبيق منطق الأعمال\"},{\"name\":\"Frontend\",\"tech\":\"React\",\"purpose\":\"واجهة المستخدم التفاعلية للوحة التحكم\"},{\"name\":\"Database\",\"tech\":\"PostgreSQL\",\"purpose\":\"تخزين المشاريع والمهام وبيانات المستخدمين\"},{\"name\":\"Auth Module\",\"tech\":\"JWT + bcrypt\",\"purpose\":\"إدارة المصادقة والجلسات\"}],\"data_flow\":\"المستخدم يرسل طلب عبر React → API Server يتحقق من JWT → يستعلم PostgreSQL → يُعيد البيانات للـ Frontend.\",\"technology_choices\":[{\"category\":\"backend\",\"choice\":\"Node.js/Express\",\"rationale\":\"خفيف وسريع، مناسب لتطبيقات CRUD\"},{\"category\":\"frontend\",\"choice\":\"React\",\"rationale\":\"مكتبة UI ناضجة مع نظام بيئي واسع\"},{\"category\":\"database\",\"choice\":\"PostgreSQL\",\"rationale\":\"قاعدة بيانات علائقية موثوقة تدعم المعاملات المعقدة\"}],\"integration_points\":[{\"name\":\"REST API\",\"type\":\"API\",\"notes\":\"نقاط نهاية HTTP بصيغة JSON للمشاريع والمهام والمستخدمين\"}],\"identified_risks\":[{\"risk\":\"ازدحام قاعدة البيانات عند تزامن الكتابة\",\"severity\":\"MEDIUM\",\"mitigation\":\"استخدام connection pooling وفهرسة الجداول بشكل صحيح\"}]}",
+    "tokens_in": 900,
+    "tokens_out": 500,
+    "finish_reason": "stop"
   }
 }

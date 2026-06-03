@@ -40,9 +40,19 @@ export function requestIdeaSummary(
 
 export type IdeaAction = 'AFFIRM' | 'REJECT' | 'MODIFY'
 
+export interface ArchitectDesign {
+  design_summary: string
+  components: Array<{ name: string; tech: string; purpose: string }>
+  data_flow: string
+  technology_choices: Array<{ category: string; choice: string; rationale: string }>
+  integration_points: Array<{ name: string; type: string; notes: string }>
+  identified_risks: Array<{ risk: string; severity: 'LOW' | 'MEDIUM' | 'HIGH'; mitigation: string }>
+}
+
 export interface ConfirmIdeaRequest {
   project_id: string
   action: IdeaAction
+  architect_provider?: string
 }
 
 export interface ConfirmIdeaResponse {
@@ -52,6 +62,10 @@ export interface ConfirmIdeaResponse {
   active_runtime_state?: string
   project_id?: string
   reason?: string
+  pipeline_started?: boolean
+  loop_id?: string
+  architect_design?: ArchitectDesign
+  architect_error?: string
 }
 
 export function confirmIdea(req: ConfirmIdeaRequest): Promise<ConfirmIdeaResponse> {

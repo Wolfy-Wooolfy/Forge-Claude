@@ -1,0 +1,17 @@
+{
+  "id": "S246",
+  "name": "confirmIdea(AFFIRM) starts orchestration loop and saves loop_id in runtime state (PHASE-20 Step 2)",
+  "description": "RED (before PHASE-20 Step 2): confirmIdea returns ok:true but loop_id absent from state, graph.json does not exist. GREEN: after AFFIRM, loop_id present in project_state.json; graph.json exists at orchestration path; graph.current_state === 'ARCHITECT_DESIGN' (vision_locked_intake shortcut).",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/idea_synthesis_test_helper",
+  "method": "runS246BridgeStartLoop",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "confirm_ok",            "expected": true },
+    { "type": "state_field_equals", "field": "loop_id_in_state",      "expected": true },
+    { "type": "state_field_equals", "field": "graph_json_exists",     "expected": true },
+    { "type": "state_field_equals", "field": "graph_state_architect", "expected": true }
+  ]
+}

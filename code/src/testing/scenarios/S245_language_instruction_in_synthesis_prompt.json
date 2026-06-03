@@ -1,0 +1,15 @@
+{
+  "id": "S245",
+  "name": "ideaSynthesisProvider._buildUserPrompt appends LANGUAGE INSTRUCTION for Arabic and English conversations (PHASE-20 Step 1)",
+  "description": "Deterministic: _buildUserPrompt returns a user prompt containing 'LANGUAGE INSTRUCTION: The conversation is in ar' when the first user message is in Arabic, and 'in en' when English. No LLM call — checks the static prompt text only.",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/idea_synthesis_test_helper",
+  "method": "runS245LanguageInstructionInPrompt",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "arabic_prompt_has_lang_instruction",  "expected": true },
+    { "type": "state_field_equals", "field": "english_prompt_has_lang_instruction", "expected": true }
+  ]
+}
