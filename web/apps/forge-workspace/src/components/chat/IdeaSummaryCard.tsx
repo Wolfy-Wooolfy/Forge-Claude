@@ -22,7 +22,7 @@ export function IdeaSummaryCard({ summary, projectId, onConfirm, onModify, onRej
       const res = await confirmIdea({
         project_id: projectId,
         action,
-        ...(action === 'AFFIRM' ? { architect_provider: 'anthropic' } : {}),
+        ...(action === 'AFFIRM' ? { architect_provider: 'openai', architect_model: 'gpt-4o' } : {}),
       })
       if (!res.ok) {
         setError(res.reason ?? 'حدث خطأ غير متوقع')
