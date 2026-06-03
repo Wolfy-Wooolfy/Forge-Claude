@@ -4,9 +4,9 @@
   "current_stage": "A",
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
-  "next_phase": "PHASE-20-PENDING-DECISION",
-  "next_step": "PHASE-20 requires a separate decision artifact + explicit owner approval before starting. Candidates: deployment split (FINDING-1) + synthesis language (FINDING-2). No phase activated automatically.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-03-phase-19-closure.md",
+  "next_phase": "PHASE-21-PENDING-DECISION",
+  "next_step": "PHASE-20 CLOSED. Next: PHASE-21 (deployment_split closure — verify pm2 runs from D:\\S\\Halo\\Tech\\Forge-Claude, not D:\\ForgeAI). Requires separate decision artifact + owner approval before starting.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-03-phase-20-closure.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -78,7 +78,7 @@
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
     "self_test_last_run": "2026-06-03",
-    "self_test_last_result": "242 passed, 0 failed, 5 skipped (247 total) — PHASE-20 Steps 1-5 done. S245-S249 GREEN. Gate #10 PASSED (Arabic CRM — ArchitectDesignCard rendered). Fixes: scenario_id undefined bug + architect language awareness. TS build clean. Gate #10-retry pending (Arabic output).",
+    "self_test_last_result": "242 passed, 0 failed, 5 skipped (247 total) — PHASE-20 CLOSED. Steps 1-5 complete. S245-S249 GREEN. Gate #10 owner-confirmed: Arabic CRM design, bilingual output correct. Known state: architect_provider=openai/gpt-4o (temporary). deployment_split → PHASE-21.",
     "self_test_scenarios_pass": 242,
     "self_test_scenarios_skip": 5,
     "self_test_scenarios_fail": 0,
@@ -155,14 +155,16 @@
       "PHASE-16",
       "PHASE-17",
       "PHASE-18",
-      "PHASE-19"
+      "PHASE-19",
+      "PHASE-20"
     ],
-    "next": "PHASE-20 (pending decision)",
+    "next": "PHASE-21 (pending decision — deployment_split closure)",
     "remaining": [],
     "phase_16_closed": "2026-05-28",
     "phase_17_closed": "2026-05-29",
     "phase_18_closed": "2026-05-30",
     "phase_19_closed": "2026-06-03",
+    "phase_20_closed": "2026-06-03",
     "phase_16_corrective": "DECISION-2026-05-24T16-00-phase-16-ux-closure-gap.md — UX Closure Gap; 6 stages; outcome-based closure gate",
     "phase_15_closed": "2026-05-23T14:00:00.000Z",
     "deferred": [
@@ -170,6 +172,28 @@
       "PHASE-14"
     ],
     "phase_12_amendment": "DECISION-2026-05-18T12-00-roadmap-phase-12-amendment.md — Windows Tier-1, secret keychain, security model explicit, effort 5-7→8-10 days"
+  },
+  "phase_20": {
+    "status": "CLOSED",
+    "closed_at": "2026-06-03",
+    "closure_artifact": "artifacts/decisions/DECISION-2026-06-03-phase-20-closure.md",
+    "plan_artifact": "artifacts/decisions/DECISION-2026-06-03-phase-20-vision-pipeline-bridge.md",
+    "mid_checkpoint": "artifacts/decisions/_phase_20_checkpoints/stage_20_mid.md",
+    "final_checkpoint": "artifacts/decisions/_phase_20_checkpoints/stage_20_final.md",
+    "gate_10_owner_confirmed": true,
+    "gate_10_confirmed_at": "2026-06-03",
+    "gate_10_test": "Arabic CRM idea → AFFIRM → ArchitectDesignCard — bilingual output verified",
+    "baseline": "242/0/5 (247 total)",
+    "scenarios_added": ["S245", "S246", "S247", "S248", "S249"],
+    "arc_ledger_count": 8,
+    "cost_actuals_usd": 0.04,
+    "steps_completed": ["Step1-language-synthesis", "Step2-bridge-confirm", "Step3-architect-sync", "Step4-FE-card", "Step5-architect-language"],
+    "findings_open": ["deployment_split"],
+    "known_state": {
+      "architect_provider": "openai/gpt-4o",
+      "reason": "ANTHROPIC_API_KEY not set in production; owner decision 2026-06-03",
+      "follow_up": "Switch to anthropic/claude-opus-4-7 after project completion + ANTHROPIC_API_KEY set"
+    }
   },
   "phase_12": {
     "status": "CLOSED",
