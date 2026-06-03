@@ -802,14 +802,15 @@ function createConversationEngine(options = {}) {
 
       try {
         const architectResult = await Promise.race([
-          reg.invoke("role.invoke", {
-            role_id:     "architect",
-            input:       { intent, project_id: normalizeProjectId(projectId) },
-            project_id:  normalizeProjectId(projectId),
-            provider:    architectProvider,
-            model:       architectModel,
-            scenario_id: architectScenarioId
-          }, { root }),
+          reg.invoke("role.invoke", Object.assign({
+            role_id:    "architect",
+            input:      { intent, project_id: normalizeProjectId(projectId) },
+            project_id: normalizeProjectId(projectId),
+            provider:   architectProvider
+          },
+          architectModel      ? { model:       architectModel      } : {},
+          architectScenarioId ? { scenario_id: architectScenarioId } : {}
+          ), { root }),
           timeoutPromise
         ]);
         clearTimeout(timeoutHandle);
