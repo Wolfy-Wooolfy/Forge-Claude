@@ -10,9 +10,14 @@
  * مع قيمة افتراضية 3100.
  */
 
+// Guard: verify this directory is a valid Forge root before anything else.
+// Hard-exits if canonical markers are missing; warns if a stale sibling copy exists.
+const path = require("path");
+const { assertForgeRoot } = require("./code/src/startup/forge_root_guard");
+assertForgeRoot(path.resolve(__dirname));
+
 // Load .env BEFORE any module that reads process.env at construction time.
 // Ambient wins: keys already set by pm2/shell are never overridden.
-const path = require("path");
 const { loadDotEnv } = require("./code/src/startup/env_loader");
 loadDotEnv(path.resolve(__dirname));
 

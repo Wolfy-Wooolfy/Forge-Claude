@@ -10,7 +10,7 @@
   "assertions": [
     { "type": "status_equals",      "expected": "SUCCESS" },
     { "type": "state_field_equals", "field": "doctor_ran",                 "expected": true },
-    { "type": "state_field_equals", "field": "check_count",                "expected": 34 },
+    { "type": "state_field_equals", "field": "check_count",                "expected": 35 },
     { "type": "state_field_equals", "field": "phase12_checks_all_present", "expected": true },
     { "type": "state_field_equals", "field": "phase12_fail_count",         "expected": 0 }
   ]

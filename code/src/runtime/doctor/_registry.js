@@ -37,7 +37,8 @@ const checks = [
   require("./checks/alert_webhook"),
   require("./checks/api_binding"),
   require("./checks/api_auth_token"),
-  require("./checks/uid_pin_match")
+  require("./checks/uid_pin_match"),
+  require("./checks/install_path")
 ];
 
 function listChecks()  { return checks.slice(); }

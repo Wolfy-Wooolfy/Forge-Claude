@@ -1,0 +1,15 @@
+{
+  "id": "S253",
+  "name": "Doctor check install_path: WARN when ctx._test_stale_sibling_path fixture exists (PHASE-21)",
+  "description": "Deterministic: install_path check called with ctx.root = real Forge root and ctx._test_stale_sibling_path = a temp fixture dir that exists. Must return status=WARN and detail naming both the running path and the stale path. No LLM call.",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/install_path_test_helper",
+  "method": "runS253DoctorCheckWarnStaleSibling",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "check_status_is_warn",    "expected": true },
+    { "type": "state_field_equals", "field": "detail_names_both_paths", "expected": true }
+  ]
+}

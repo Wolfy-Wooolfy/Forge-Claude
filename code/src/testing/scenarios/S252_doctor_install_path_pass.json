@@ -1,0 +1,15 @@
+{
+  "id": "S252",
+  "name": "Doctor check install_path: PASS on valid Forge root, no stale sibling (PHASE-21)",
+  "description": "Deterministic: install_path check called with ctx.root = real Forge root (has canonical markers), no ctx._test_stale_sibling_path that exists. Must return status=PASS and detail includes the running path. No LLM call.",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/install_path_test_helper",
+  "method": "runS252DoctorCheckPass",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "check_status_is_pass", "expected": true },
+    { "type": "state_field_equals", "field": "detail_has_path",      "expected": true }
+  ]
+}

@@ -4,9 +4,9 @@
   "current_stage": "A",
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
-  "next_phase": "PHASE-21-PENDING-DECISION",
-  "next_step": "PHASE-20 CLOSED. Next: PHASE-21 (deployment_split closure — verify pm2 runs from D:\\S\\Halo\\Tech\\Forge-Claude, not D:\\ForgeAI). Requires separate decision artifact + owner approval before starting.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-03-phase-20-closure.md",
+  "next_phase": "PHASE-21-ACTIVE",
+  "next_step": "PHASE-21 ACTIVE — startup guard + Doctor install_path implemented. Mid-checkpoint written. Awaiting CTO review + pm2 hygiene + Gate #10 owner verification.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-03-phase-21-deployment-path-integrity.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -73,7 +73,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-06-03T14:04:31.574Z",
+    "last_doctor_run": "2026-06-04T09:02:07.836Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
@@ -84,7 +84,7 @@
     "self_test_scenarios_fail": 0,
     "providers_registered_count": 14,
     "tools_registered_count": 78,
-    "doctor_checks_count": 34,
+    "doctor_checks_count": 35,
     "assertion_types_count": 10,
     "active_permission_mode": "WORKSPACE_WRITE",
     "permission_policy_installed": true,
@@ -111,7 +111,7 @@
     "note": "PHASE-9 CLOSED. KB Runtime (L-KB-1→L-KB-5): source_acquisition, chunking_engine, embedding_engine, storage_lance (LanceDB), cost_ledger, budget_guard, retrieval, manifests, citation_engine, citation_validator, budget_guard vision-override, research_role (12th role, KNOWN-gate, deterministic findings, confidence recompute). 6 KB tools (ingest_url, retrieve, cite, list_sources, delete_source, validate_citations). 3 new doctor checks (kb_budget_status, kb_indexed_sources_count, research_role_registered). Stage 9.7 cleanup: 6 FIX items (retrieval cost ledger, rejected_low_credibility, citation_validator Pattern 4, S137, evidence cap, confidence recompute). scenarios: 128→137 (S129–S137). doctor checks: 21→24. SU assertions: ~276→314. API cost: $0.00.",
     "last_doctor_counts": {
       "pass": 29,
-      "warn": 5,
+      "warn": 6,
       "fail": 0
     },
     "metrics_window_24h": {
@@ -184,16 +184,54 @@
     "gate_10_confirmed_at": "2026-06-03",
     "gate_10_test": "Arabic CRM idea → AFFIRM → ArchitectDesignCard — bilingual output verified",
     "baseline": "242/0/5 (247 total)",
-    "scenarios_added": ["S245", "S246", "S247", "S248", "S249"],
+    "scenarios_added": [
+      "S245",
+      "S246",
+      "S247",
+      "S248",
+      "S249"
+    ],
     "arc_ledger_count": 8,
     "cost_actuals_usd": 0.04,
-    "steps_completed": ["Step1-language-synthesis", "Step2-bridge-confirm", "Step3-architect-sync", "Step4-FE-card", "Step5-architect-language"],
-    "findings_open": ["deployment_split"],
+    "steps_completed": [
+      "Step1-language-synthesis",
+      "Step2-bridge-confirm",
+      "Step3-architect-sync",
+      "Step4-FE-card",
+      "Step5-architect-language"
+    ],
+    "findings_open": [],
     "known_state": {
       "architect_provider": "openai/gpt-4o",
       "reason": "ANTHROPIC_API_KEY not set in production; owner decision 2026-06-03",
       "follow_up": "Switch to anthropic/claude-opus-4-7 after project completion + ANTHROPIC_API_KEY set"
     }
+  },
+  "phase_21": {
+    "status": "ACTIVE",
+    "started_at": "2026-06-04",
+    "plan_artifact": "artifacts/decisions/DECISION-2026-06-03-phase-21-deployment-path-integrity.md",
+    "mid_checkpoint": "artifacts/decisions/_phase_21_checkpoints/stage_21_mid.md",
+    "baseline_at_start": "242/0/5 (247 total)",
+    "scenarios_added": ["S250", "S251", "S252", "S253"],
+    "scenario_s209_updated": "check_count 34→35 (Doctor registry grew by 1)",
+    "suite_after_mid": "246/0/5 (251 total)",
+    "arc_ledger_count": 8,
+    "cost_actuals_usd": 0.0,
+    "files_created": [
+      "code/src/startup/forge_root_guard.js",
+      "code/src/runtime/doctor/checks/install_path.js",
+      "code/src/testing/helpers/install_path_test_helper.js"
+    ],
+    "files_modified": [
+      "start-api.js",
+      "code/src/runtime/doctor/_registry.js",
+      "code/src/testing/scenarios/S209_doctor_phase12_checks_pass.json",
+      "progress/status.json"
+    ],
+    "gate_10_pending": true,
+    "pm2_hygiene_pending": true,
+    "stale_copy_d_forgeai_present": true
   },
   "phase_12": {
     "status": "CLOSED",
@@ -1115,7 +1153,7 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-20 MID-CHECKPOINT CONFIRMED — suite 241/0/5 (246 total) clean. Gate #10 pending: Arabic conversation → AFFIRM → architect design renders in Arabic (real Anthropic API). Kill bar $3.00.",
+  "current_task": "PHASE-21 ACTIVE — deployment_split closure. Startup guard (forge_root_guard.js) + Doctor check (install_path) implemented. Scenarios S250-S253 GREEN. Suite 246/0/5. Mid-checkpoint in progress. Gate #10 pending.",
   "last_updated": "2026-06-03T00:00:00.000Z",
   "phase_16": {
     "status": "ACTIVE",

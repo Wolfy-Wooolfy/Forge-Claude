@@ -1,0 +1,15 @@
+{
+  "id": "S251",
+  "name": "startup guard: canonical markers missing in fixture root → process.exit(1) called with clear message (PHASE-21)",
+  "description": "Deterministic: assertForgeRoot() called with a temp dir lacking canonical markers. Guard must call process.exit(1). Test intercepts process.exit via monkey-patch — no real process termination. No LLM call.",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/install_path_test_helper",
+  "method": "runS251GuardMarkersMissing",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "guard_exits",  "expected": true },
+    { "type": "state_field_equals", "field": "exit_code",    "expected": 1 }
+  ]
+}

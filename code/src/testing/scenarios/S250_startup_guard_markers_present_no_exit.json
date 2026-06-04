@@ -1,0 +1,15 @@
+{
+  "id": "S250",
+  "name": "startup guard: canonical markers present in fixture root → guard logs path, does NOT call process.exit (PHASE-21)",
+  "description": "Deterministic: assertForgeRoot() called with a temp dir containing the 3 canonical markers. Guard should log the running path and NOT call process.exit. No LLM call.",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/install_path_test_helper",
+  "method": "runS250GuardMarkersPresent",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "guard_exits",  "expected": false },
+    { "type": "state_field_equals", "field": "path_logged",  "expected": true }
+  ]
+}
