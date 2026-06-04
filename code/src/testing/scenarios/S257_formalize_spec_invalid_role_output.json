@@ -1,0 +1,18 @@
+{
+  "id": "S257",
+  "name": "formalizeSpec invalid role output — mock returns JSON failing OUTPUT_SCHEMA, spec_error set, advanced:false, loop stays SPEC_WRITER_FORMALIZE (PHASE-22 Step 1)",
+  "description": "RED (before Step 1): formalizeSpec not exported → TypeError → FAIL. GREEN: S257 mock returns {\"scope\":\"...\"} missing decisions/acceptance_criteria/files_to_create/files_to_modify/out_of_scope; spec_writer_role rejects with INVALID_ROLE_OUTPUT; formalizeSpec returns ok:true, spec_error set, advanced:false, no spec.json, loop unchanged.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/spec_writer_test_helper",
+  "method": "runS257InvalidRoleOutput",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "ok_true",                "expected": true },
+    { "type": "state_field_equals", "field": "spec_error_set",         "expected": true },
+    { "type": "state_field_equals", "field": "advanced_false",         "expected": true },
+    { "type": "state_field_equals", "field": "graph_still_spec_writer","expected": true },
+    { "type": "state_field_equals", "field": "no_spec_json",           "expected": true }
+  ]
+}

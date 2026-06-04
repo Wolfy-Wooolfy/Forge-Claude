@@ -855,6 +855,125 @@ function createConversationEngine(options = {}) {
     };
   }
 
+  // ── Spec Writer bridge (PHASE-22) ─────────────────────────────────────────────
+  //
+  // formalizeSpec: drives the spec_writer role from SPEC_WRITER_FORMALIZE → REVIEWER_SPEC.
+  // Same pattern as the architect block in confirmIdea: guard → read design from disk →
+  // invoke role → persist spec.json → advance state → ok:true always.
+  //
+  // D1: separate endpoint, confirmIdea unchanged.
+  // D2: spec_provider defaults to "openai" (override role's default "anthropic").
+  // D3: design read from orchestration/${loopId}/architect_design.json.
+  // D4: state guard — only runs at SPEC_WRITER_FORMALIZE.
+  // D5: 30s timeout via Promise.race (mirroring architect block exactly).
+
+  async function formalizeSpec(body = {}) {
+    const projectId = normalizeProjectId(body.project_id || "");
+    const state     = loadState(projectId);
+
+    if (!state) {
+      return { ok: true, loop_id: null, spec_error: "PROJECT_NOT_FOUND", advanced: false };
+    }
+
+    const loopId = body.loop_id || state.loop_id || null;
+    if (!loopId) {
+      return { ok: true, loop_id: null, spec_error: "NO_LOOP_ID", advanced: false };
+    }
+
+    const specProvider   = body.spec_provider    || "openai";
+    const specModel      = body.spec_model       || undefined;
+    const specScenarioId = body.spec_scenario_id || undefined;
+
+    const reg = getDefaultRegistry();
+
+    // D4: state guard
+    const statusResult = await reg.invoke("orchestration.get_status", {
+      project_id: normalizeProjectId(projectId),
+      loop_id:    loopId
+    }, { root });
+
+    if (!statusResult || statusResult.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, spec_error: "GET_STATUS_FAILED", advanced: false };
+    }
+
+    const currentState = statusResult.output.current_state;
+    if (currentState !== "SPEC_WRITER_FORMALIZE") {
+      return { ok: true, loop_id: loopId, current_state: currentState, spec_error: "WRONG_STATE", advanced: false };
+    }
+
+    // D3: read architect design from disk
+    const designRelPath = "artifacts/projects/" + normalizeProjectId(projectId) +
+      "/orchestration/" + loopId + "/architect_design.json";
+    const designRead = await reg.invoke("fs.read_file", { path: designRelPath }, { root });
+
+    if (!designRead || designRead.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, spec_error: "DESIGN_NOT_FOUND", advanced: false };
+    }
+
+    let design;
+    try {
+      design = JSON.parse(designRead.output.content);
+    } catch {
+      return { ok: true, loop_id: loopId, spec_error: "DESIGN_PARSE_FAILED", advanced: false };
+    }
+
+    // Test-only forced timeout hook (never set in production code)
+    if (body._test_force_timeout) {
+      return { ok: true, loop_id: loopId, advanced: false, spec_error: "SPEC_WRITER_TIMEOUT" };
+    }
+
+    // D5: 30s timeout, mirroring architect block
+    let timeoutHandle;
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutHandle = setTimeout(() => reject(new Error("SPEC_WRITER_TIMEOUT")), 30000);
+    });
+
+    try {
+      const specResult = await Promise.race([
+        reg.invoke("role.invoke", Object.assign(
+          {
+            role_id:    "spec_writer",
+            input:      { design, project_id: normalizeProjectId(projectId) },
+            project_id: normalizeProjectId(projectId),
+            provider:   specProvider
+          },
+          specModel      ? { model:       specModel      } : {},
+          specScenarioId ? { scenario_id: specScenarioId } : {}
+        ), { root }),
+        timeoutPromise
+      ]);
+      clearTimeout(timeoutHandle);
+
+      if (specResult && specResult.status === "SUCCESS") {
+        const spec = specResult.output;
+
+        await reg.invoke("fs.write_file", {
+          path:    "artifacts/projects/" + normalizeProjectId(projectId) +
+                   "/orchestration/" + loopId + "/spec.json",
+          content: JSON.stringify(spec, null, 2)
+        }, { root });
+
+        await reg.invoke("orchestration.advance_state", {
+          project_id:      normalizeProjectId(projectId),
+          loop_id:         loopId,
+          to_state:        "REVIEWER_SPEC",
+          transition_type: "NORMAL",
+          role_invoked:    "spec_writer"
+        }, { root });
+
+        return { ok: true, loop_id: loopId, advanced: true, advanced_to: "REVIEWER_SPEC", spec };
+      }
+
+      const specError = (specResult && specResult.metadata && specResult.metadata.detail)
+        || "SPEC_WRITER_FAILED";
+      return { ok: true, loop_id: loopId, advanced: false, spec_error: specError };
+
+    } catch (err) {
+      clearTimeout(timeoutHandle);
+      return { ok: true, loop_id: loopId, advanced: false, spec_error: err.message };
+    }
+  }
+
   function _formatSummaryAsVision(summary, projectId, frontmatter) {
     const lines = [];
     lines.push("# Vision: " + (summary.project_name || projectId));
@@ -889,6 +1008,7 @@ function createConversationEngine(options = {}) {
     getProjectSummary,
     requestIdeaSummary,
     confirmIdea,
+    formalizeSpec,
     CONFIRMATION_REQUIRED_TRANSITIONS
   };
 }

@@ -268,5 +268,17 @@
     "tokens_in": 900,
     "tokens_out": 500,
     "finish_reason": "stop"
+  },
+  "mock|mock|scenario:S254": {
+    "text": "{\"scope\":\"بناء REST API لإدارة المهام باستخدام Node.js وSQLite. تشمل نقاط نهاية CRUD للمهام والمستخدمين. المصادقة عبر JWT. يُنشر كعملية Node.js واحدة.\",\"decisions\":[{\"decision\":\"استخدام Express.js كإطار HTTP\",\"rationale\":\"إعداد بسيط، مناسب لتطبيقات CRUD\"},{\"decision\":\"تخزين البيانات في SQLite عند data/app.db\",\"rationale\":\"لا يتطلب عملية قاعدة بيانات منفصلة\"}],\"acceptance_criteria\":[{\"id\":\"AC-1\",\"description\":\"POST /users يُعيد 201 مع معرف المستخدم على مدخل صالح\"},{\"id\":\"AC-2\",\"description\":\"POST /auth/login يُعيد JWT على بيانات اعتماد صحيحة\"},{\"id\":\"AC-3\",\"description\":\"GET /tasks يتطلب JWT صالح؛ يُعيد 401 بدون رمز\"}],\"files_to_create\":[{\"path\":\"src/app.js\",\"purpose\":\"نقطة دخول Express\"},{\"path\":\"src/routes/tasks.js\",\"purpose\":\"معالجات مسارات المهام\"},{\"path\":\"src/db.js\",\"purpose\":\"اتصال SQLite وتهيئة المخطط\"}],\"files_to_modify\":[],\"out_of_scope\":[\"مزامنة المهام في الوقت الحقيقي\",\"إشعارات البريد الإلكتروني\",\"واجهة مستخدم أمامية\"]}",
+    "tokens_in": 900,
+    "tokens_out": 520,
+    "finish_reason": "stop"
+  },
+  "mock|mock|scenario:S257": {
+    "text": "{\"scope\":\"Incomplete spec missing required fields\"}",
+    "tokens_in": 100,
+    "tokens_out": 10,
+    "finish_reason": "stop"
   }
 }
