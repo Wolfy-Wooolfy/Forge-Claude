@@ -4,8 +4,8 @@
   "current_stage": "A",
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
-  "next_phase": "PHASE-21-ACTIVE",
-  "next_step": "PHASE-21 ACTIVE — startup guard + Doctor install_path implemented. Mid-checkpoint written. Awaiting CTO review + pm2 hygiene + Gate #10 owner verification.",
+  "next_phase": "PHASE-22-PENDING-DECISION",
+  "next_step": "PHASE-22 = wire spec_writer into the orchestration loop (same pattern as PHASE-20 architect). Awaiting CTO decision artifact + PROMPT-STAGE-22.",
   "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-03-phase-21-deployment-path-integrity.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
@@ -156,9 +156,10 @@
       "PHASE-17",
       "PHASE-18",
       "PHASE-19",
-      "PHASE-20"
+      "PHASE-20",
+      "PHASE-21"
     ],
-    "next": "PHASE-21 (pending decision — deployment_split closure)",
+    "next": "PHASE-22 (pending decision)",
     "remaining": [],
     "phase_16_closed": "2026-05-28",
     "phase_17_closed": "2026-05-29",
@@ -208,11 +209,15 @@
     }
   },
   "phase_21": {
-    "status": "ACTIVE",
+    "status": "CLOSED",
     "started_at": "2026-06-04",
+    "closed_at": "2026-06-04",
     "plan_artifact": "artifacts/decisions/DECISION-2026-06-03-phase-21-deployment-path-integrity.md",
+    "closure_artifact": "artifacts/decisions/DECISION-2026-06-04-phase-21-closure.md",
     "mid_checkpoint": "artifacts/decisions/_phase_21_checkpoints/stage_21_mid.md",
+    "final_checkpoint": "artifacts/decisions/_phase_21_checkpoints/stage_21_final.md",
     "baseline_at_start": "242/0/5 (247 total)",
+    "suite_final": "246/0/5 (251 total)",
     "scenarios_added": [
       "S250",
       "S251",
@@ -222,6 +227,8 @@
     "scenario_s209_updated": "check_count 34→35 (Doctor registry grew by 1)",
     "suite_after_mid": "246/0/5 (251 total)",
     "arc_ledger_count": 8,
+    "doctor_checks": 35,
+    "agent_roles": 13,
     "cost_actuals_usd": 0,
     "files_created": [
       "code/src/startup/forge_root_guard.js",
@@ -234,9 +241,12 @@
       "code/src/testing/scenarios/S209_doctor_phase12_checks_pass.json",
       "progress/status.json"
     ],
-    "gate_10_pending": true,
-    "pm2_hygiene_pending": true,
-    "stale_copy_d_forgeai_present": true
+    "findings_open": [],
+    "gate_10": "PASS",
+    "gate_10_pending": false,
+    "pm2_hygiene_pending": false,
+    "stale_copy_d_forgeai_present": true,
+    "known_non_blocking": "install_path reports WARN on owner machine because D:\\ForgeAI still exists. Correct guard behavior. Owner will delete D:\\ForgeAI manually — no code change needed."
   },
   "phase_12": {
     "status": "CLOSED",
@@ -1158,7 +1168,7 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-21 ACTIVE — deployment_split closure. Startup guard (forge_root_guard.js) + Doctor check (install_path) implemented. Scenarios S250-S253 GREEN. Suite 246/0/5. Mid-checkpoint in progress. Gate #10 pending.",
+  "current_task": "PHASE-21 CLOSED — deployment path integrity. Startup guard + Doctor install_path shipped. Suite 246/0/5. Gate #10 PASS. install_path WARN on owner machine until D:\\ForgeAI deleted (correct behavior, no code change).",
   "last_updated": "2026-06-03T00:00:00.000Z",
   "phase_16": {
     "status": "ACTIVE",
