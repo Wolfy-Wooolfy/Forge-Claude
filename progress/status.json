@@ -73,7 +73,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-06-04T09:02:07.836Z",
+    "last_doctor_run": "2026-06-04T12:04:41.841Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
@@ -213,11 +213,16 @@
     "plan_artifact": "artifacts/decisions/DECISION-2026-06-03-phase-21-deployment-path-integrity.md",
     "mid_checkpoint": "artifacts/decisions/_phase_21_checkpoints/stage_21_mid.md",
     "baseline_at_start": "242/0/5 (247 total)",
-    "scenarios_added": ["S250", "S251", "S252", "S253"],
+    "scenarios_added": [
+      "S250",
+      "S251",
+      "S252",
+      "S253"
+    ],
     "scenario_s209_updated": "check_count 34→35 (Doctor registry grew by 1)",
     "suite_after_mid": "246/0/5 (251 total)",
     "arc_ledger_count": 8,
-    "cost_actuals_usd": 0.0,
+    "cost_actuals_usd": 0,
     "files_created": [
       "code/src/startup/forge_root_guard.js",
       "code/src/runtime/doctor/checks/install_path.js",
