@@ -4,8 +4,8 @@
   "current_stage": "A",
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
-  "next_phase": "PHASE-22-PENDING-DECISION",
-  "next_step": "PHASE-22 = wire spec_writer into the orchestration loop (same pattern as PHASE-20 architect). Awaiting CTO decision artifact + PROMPT-STAGE-22.",
+  "next_phase": "PHASE-23-PENDING-DECISION",
+  "next_step": "PHASE-23 = wire REVIEWER_SPEC (reviewer Phase A, role tested S89/S90) by the same pattern. Awaiting CTO decision artifact + PROMPT-STAGE-23.",
   "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-03-phase-21-deployment-path-integrity.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
@@ -73,7 +73,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-06-07T08:51:20.542Z",
+    "last_doctor_run": "2026-06-07T09:10:49.286Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
@@ -157,9 +157,10 @@
       "PHASE-18",
       "PHASE-19",
       "PHASE-20",
-      "PHASE-21"
+      "PHASE-21",
+      "PHASE-22"
     ],
-    "next": "PHASE-22 (pending decision)",
+    "next": "PHASE-23 (pending decision)",
     "remaining": [],
     "phase_16_closed": "2026-05-28",
     "phase_17_closed": "2026-05-29",
@@ -247,6 +248,29 @@
     "pm2_hygiene_pending": false,
     "stale_copy_d_forgeai_present": true,
     "known_non_blocking": "install_path reports WARN on owner machine because D:\\ForgeAI still exists. Correct guard behavior. Owner will delete D:\\ForgeAI manually — no code change needed."
+  },
+  "phase_22": {
+    "status": "CLOSED",
+    "closed_at": "2026-06-07",
+    "plan_artifact": "artifacts/decisions/DECISION-2026-06-04-phase-22-spec-writer-bridge.md",
+    "closure_artifact": "artifacts/decisions/DECISION-2026-06-07-phase-22-closure.md",
+    "mid_checkpoint": "artifacts/decisions/_phase_22_checkpoints/stage_22_mid.md",
+    "final_checkpoint": "artifacts/decisions/_phase_22_checkpoints/stage_22_final.md",
+    "suite_final": "251/0/5 (256 total)",
+    "scenarios_added": ["S254", "S255", "S256", "S257", "S258"],
+    "arc_ledger_count": 8,
+    "doctor_checks": 35,
+    "agent_roles": 13,
+    "l2_tools": 78,
+    "gate_10": "PASS",
+    "d2_amended": true,
+    "d2_amendment_summary": "provider overridden to openai but model was not — role's default_model claude-opus-4-7 reached OpenAI adapter → 404. Fix: backend defaults model to gpt-4o when specProvider=openai and no model supplied.",
+    "findings_open": [],
+    "deferred": [
+      "new-project-button-contrast (FE cosmetic)",
+      "multi-select-project-deletion (separate small phase)",
+      "_test_force_timeout cleanup (optional, fake-timers)"
+    ]
   },
   "phase_12": {
     "status": "CLOSED",
@@ -1168,7 +1192,7 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-21 CLOSED — deployment path integrity. Startup guard + Doctor install_path shipped. Suite 246/0/5. Gate #10 PASS. install_path WARN on owner machine until D:\\ForgeAI deleted (correct behavior, no code change).",
+  "current_task": "PHASE-22 CLOSED — spec_writer wired into the loop (SPEC_WRITER_FORMALIZE → REVIEWER_SPEC). Real gpt-4o spec generation works; spec card renders in Arabic. Gate #10 PASS. Suite 251/0/5.",
   "last_updated": "2026-06-03T00:00:00.000Z",
   "phase_16": {
     "status": "ACTIVE",
