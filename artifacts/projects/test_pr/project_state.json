@@ -1,15 +1,15 @@
 {
-  "project_id": "test_apiserver_s27_1",
-  "project_name": "Test Apiserver S27",
+  "project_id": "test_pr",
+  "project_name": "نظام CRM للعقارات",
   "project_type": "REVIEW",
   "project_mode": "EXTEND_EXISTING",
   "project_status": "ACTIVE",
   "primary_language": "MIXED",
-  "user_goal": "",
+  "user_goal": "نظام ويب لإدارة علاقات العملاء لشركة استثمار عقاري تضم 150 موظفاً.",
   "business_goal": "",
   "technical_goal": "",
   "current_phase": "DISCOVERY",
-  "active_runtime_state": "DISCUSSION",
+  "active_runtime_state": "IDEATION",
   "workspace_path": "D:\\S\\Halo\\Tech\\Forge-Claude",
   "source_of_truth": "ZIP_SNAPSHOT",
   "selected_strategy": "",
@@ -37,8 +37,8 @@
     "has_decision_packet": false
   },
   "artifact_registry": {
-    "project_root": "artifacts/projects/test_apiserver_s27_1",
-    "project_state": "artifacts/projects/test_apiserver_s27_1/project_state.json",
+    "project_root": "artifacts/projects/test_pr",
+    "project_state": "artifacts/projects/test_pr/project_state.json",
     "decision_packet": "",
     "execution_package": ""
   },
@@ -50,7 +50,8 @@
   "vision_locked": false,
   "vision_version": null,
   "vision_history": [],
-  "conversation_mode": "CONVERSATION",
-  "active_project_flag": false,
-  "last_updated_at": "2026-06-07T08:07:25.876Z"
+  "conversation_mode": "PIPELINE",
+  "active_project_flag": true,
+  "last_updated_at": "2026-06-07T08:08:34.233Z",
+  "loop_id": "74b0388e-e94c-4946-84ab-ca21832b6b16"
 }

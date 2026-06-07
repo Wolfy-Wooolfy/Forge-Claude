@@ -1,0 +1,13 @@
+{
+  "project_name": "نظام CRM للعقارات",
+  "domain": "web_application",
+  "goal_primary": "نظام ويب لإدارة علاقات العملاء لشركة استثمار عقاري تضم 150 موظفاً.",
+  "features": [],
+  "constraints": [],
+  "non_goals": [],
+  "open_questions": [
+    "ما هي الميزات المحددة التي يرغب المستخدم في تضمينها في النظام؟"
+  ],
+  "synthesized_at": "2026-06-07T08:08:31.366Z",
+  "project_id": "test_pr"
+}

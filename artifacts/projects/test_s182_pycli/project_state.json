@@ -1,6 +1,6 @@
 {
-  "project_id": "test_apiserver_s27_1",
-  "project_name": "Test Apiserver S27",
+  "project_id": "test_s182_pycli",
+  "project_name": "test_s182_pycli",
   "project_type": "REVIEW",
   "project_mode": "EXTEND_EXISTING",
   "project_status": "ACTIVE",
@@ -37,8 +37,8 @@
     "has_decision_packet": false
   },
   "artifact_registry": {
-    "project_root": "artifacts/projects/test_apiserver_s27_1",
-    "project_state": "artifacts/projects/test_apiserver_s27_1/project_state.json",
+    "project_root": "artifacts/projects/test_s182_pycli",
+    "project_state": "artifacts/projects/test_s182_pycli/project_state.json",
     "decision_packet": "",
     "execution_package": ""
   },
@@ -50,7 +50,7 @@
   "vision_locked": false,
   "vision_version": null,
   "vision_history": [],
-  "conversation_mode": "CONVERSATION",
+  "conversation_mode": "PIPELINE",
   "active_project_flag": false,
-  "last_updated_at": "2026-06-07T08:07:25.876Z"
+  "last_updated_at": "2026-06-07T08:07:25.916Z"
 }
