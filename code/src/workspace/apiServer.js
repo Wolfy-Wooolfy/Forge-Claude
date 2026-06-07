@@ -626,7 +626,7 @@ function createWorkspaceApiServer(options = {}) {
     const ids = fs.readdirSync(projectsRoot, { withFileTypes: true })
       .filter((entry) => entry.isDirectory())
       .map((entry) => entry.name)
-      .filter(Boolean);
+      .filter((name) => Boolean(name) && normalizeProjectId(name) === name);
 
     if (!ids.includes("default_project")) {
       ids.unshift("default_project");
@@ -638,8 +638,6 @@ function createWorkspaceApiServer(options = {}) {
   function buildProjectState(projectIdInput, overrides = {}) {
     const projectId = normalizeProjectId(projectIdInput);
     const projectRoot = getProjectArtifactsRoot(projectId);
-
-    ensureDir(projectRoot);
 
     const existing = readJsonSafe(getProjectStateAbs(projectId), {});
     const proposalRoot = path.join(projectRoot, "ai", "proposals");

@@ -424,11 +424,138 @@ async function runS217HtmlTokenInjection() {
   }
 }
 
+// ── HTTP POST helper (agent:false — no keep-alive, server.close() resolves fast) ────
+
+function _httpPost(baseUrl, reqPath, body) {
+  return new Promise((resolve, reject) => {
+    const parsed  = new URL(baseUrl);
+    const bodyStr = JSON.stringify(body);
+    const options = {
+      hostname: parsed.hostname,
+      port:     Number(parsed.port),
+      path:     reqPath,
+      method:   "POST",
+      headers: {
+        "Content-Type":   "application/json",
+        "Content-Length": Buffer.byteLength(bodyStr)
+      },
+      agent: false
+    };
+    const req = http.request(options, (res) => {
+      let buf = "";
+      res.on("data", (chunk) => { buf += chunk; });
+      res.on("end",  () => resolve({ status: res.statusCode, body: buf }));
+    });
+    req.on("error", reject);
+    req.write(bodyStr);
+    req.end();
+  });
+}
+
+// ── S260: project list canonicalization — twin excluded, no ghost after delete ───────
+//
+// Creates a collision pair in a temp workspace:
+//   canonical:     regr_collide     (normalizeProjectId("regr_collide") === "regr_collide")
+//   non-canonical: _regr_collide    (normalizeProjectId("_regr_collide") === "regr_collide")
+//
+// Asserts:
+//   a. GET /api/projects → canonical listed ONCE, twin NOT listed
+//   b. DELETE canonical → ok:true
+//   c. GET /api/projects again → canonical id absent, canonical dir NOT regenerated on disk
+
+async function runS260Regression() {
+  const tempDir  = fs.mkdtempSync(path.join(os.tmpdir(), "forge-s260-"));
+  const savedEnv = _saveEnv();
+  let instance   = null;
+
+  try {
+    process.env.FORGE_SECRET_PROVIDER    = "encrypted_file";
+    process.env.FORGE_SECRET_STORE_PATH  = tempDir;
+    process.env.FORGE_SECRET_KEY         = "s260-test-key";
+    process.env.FORGE_WORKSPACE_API_PORT = "0";
+
+    const { resetDefaultRegistry } = require("../../runtime/tools/_registry");
+    const { resetDefaultPolicy }   = require("../../runtime/permission/permissionPolicy");
+    const secretProvider            = require("../../runtime/secrets/secret_provider");
+    resetDefaultRegistry();
+    resetDefaultPolicy();
+    secretProvider._resetForTest();
+
+    // ── materialise collision pair ──────────────────────────────────────────
+    const projectsDir = path.join(tempDir, "artifacts", "projects");
+    const canonicalDir = path.join(projectsDir, "regr_collide");
+    const twinDir      = path.join(projectsDir, "_regr_collide");
+
+    fs.mkdirSync(canonicalDir, { recursive: true });
+    fs.writeFileSync(path.join(canonicalDir, "project_state.json"), JSON.stringify({
+      project_id: "regr_collide", project_name: "Regression Collide",
+      active_runtime_state: "DISCUSSION", _version: 1
+    }, null, 2), "utf8");
+
+    fs.mkdirSync(twinDir, { recursive: true });
+    fs.writeFileSync(path.join(twinDir, "project_state.json"), JSON.stringify({
+      project_id: "_regr_collide", project_name: "Regression Collide Twin",
+      active_runtime_state: "DISCUSSION", _version: 1
+    }, null, 2), "utf8");
+
+    // ── boot server (direct listen — no start(), no auth gate) ─────────────
+    const { createWorkspaceApiServer } = require("../../workspace/apiServer");
+    instance = createWorkspaceApiServer({ root: tempDir, port: 0 });
+    await new Promise((resolve) => instance.server.listen(0, resolve));
+    const { port: p } = instance.server.address();
+    const base = "http://127.0.0.1:" + p;
+
+    // ── (a) first GET — canonical once, twin absent ─────────────────────────
+    const r1    = await _httpGet(base, "/api/projects", null);
+    const d1    = JSON.parse(r1.body);
+    const ids1  = (d1.items || []).map((i) => i.project_id);
+    const canonical_listed_once = ids1.filter((id) => id === "regr_collide").length === 1;
+    const twin_not_listed       = !ids1.includes("_regr_collide");
+
+    // ── (b) DELETE canonical ────────────────────────────────────────────────
+    const rd    = await _httpPost(base, "/api/projects/delete", { project_id: "regr_collide" });
+    const dd    = JSON.parse(rd.body);
+    const delete_ok = dd.ok === true && dd.deleted === true;
+
+    // ── (c) second GET — id gone, dir not regenerated ───────────────────────
+    const r2    = await _httpGet(base, "/api/projects", null);
+    const d2    = JSON.parse(r2.body);
+    const ids2  = (d2.items || []).map((i) => i.project_id);
+    const id_absent_after_delete    = !ids2.includes("regr_collide");
+    const canonical_not_regenerated = !fs.existsSync(canonicalDir);
+
+    return {
+      canonical_listed_once,
+      twin_not_listed,
+      delete_ok,
+      canonical_not_regenerated,
+      id_absent_after_delete
+    };
+
+  } finally {
+    if (instance && instance.server) {
+      if (typeof instance.server.closeAllConnections === "function") {
+        instance.server.closeAllConnections();
+      }
+      await new Promise((resolve) => instance.server.close(resolve));
+    }
+    const secretProvider = require("../../runtime/secrets/secret_provider");
+    secretProvider._resetForTest();
+    _restoreEnv(savedEnv);
+    const { resetDefaultRegistry } = require("../../runtime/tools/_registry");
+    const { resetDefaultPolicy }   = require("../../runtime/permission/permissionPolicy");
+    resetDefaultRegistry();
+    resetDefaultPolicy();
+    try { fs.rmSync(tempDir, { recursive: true, force: true }); } catch (_) {}
+  }
+}
+
 module.exports = {
   runS204BindingCheck,
   runS205UnauthRejected,
   runS206AuthAccepted,
   runS207UidMismatch,
   runS216AuthGateExemptsStaticRoutes,
-  runS217HtmlTokenInjection
+  runS217HtmlTokenInjection,
+  runS260Regression
 };

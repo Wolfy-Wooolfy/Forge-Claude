@@ -1,0 +1,15 @@
+{
+  "id": "S260",
+  "name": "project list canonicalization: twin not listed; canonical not regenerated after delete",
+  "type": "module_call",
+  "module": "code/src/testing/helpers/api_server_test_helper",
+  "method": "runS260Regression",
+  "args": [],
+  "assertions": [
+    { "type": "state_field_equals", "field": "canonical_listed_once",    "expected": true },
+    { "type": "state_field_equals", "field": "twin_not_listed",          "expected": true },
+    { "type": "state_field_equals", "field": "delete_ok",                "expected": true },
+    { "type": "state_field_equals", "field": "canonical_not_regenerated","expected": true },
+    { "type": "state_field_equals", "field": "id_absent_after_delete",   "expected": true }
+  ]
+}
