@@ -280,5 +280,11 @@
     "tokens_in": 100,
     "tokens_out": 10,
     "finish_reason": "stop"
+  },
+  "mock|gpt-4o|scenario:S258": {
+    "text": "{\"scope\":\"نظام CRM ويب لإدارة العملاء والمبيعات. يشمل تسجيل العملاء وتتبع الصفقات والتقارير التحليلية.\",\"decisions\":[{\"decision\":\"استخدام Node.js/Express للـ backend\",\"rationale\":\"مناسب لتطبيقات CRUD بحجم المشروع\"},{\"decision\":\"قاعدة بيانات PostgreSQL\",\"rationale\":\"تدعم العلاقات المعقدة بين العملاء والصفقات\"}],\"acceptance_criteria\":[{\"id\":\"AC-1\",\"description\":\"تسجيل الدخول يُعيد JWT صالح على بيانات صحيحة\"},{\"id\":\"AC-2\",\"description\":\"إضافة عميل جديد تُعيد 201 مع معرف العميل\"}],\"files_to_create\":[{\"path\":\"src/app.js\",\"purpose\":\"نقطة دخول Express\"},{\"path\":\"src/routes/clients.js\",\"purpose\":\"معالجات مسارات العملاء\"}],\"files_to_modify\":[],\"out_of_scope\":[\"تطبيق موبايل\",\"دعم متعدد العملات في المرحلة الأولى\"]}",
+    "tokens_in": 920,
+    "tokens_out": 540,
+    "finish_reason": "stop"
   }
 }

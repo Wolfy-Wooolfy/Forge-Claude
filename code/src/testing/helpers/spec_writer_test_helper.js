@@ -323,9 +323,69 @@ async function runS257InvalidRoleOutput() {
   }
 }
 
+// ── S258 — provider/model coherence: openai provider → gpt-4o model ───────────
+//
+// RED (before PHASE-22 fix): specModel defaults to undefined → role uses
+//   default_model "claude-opus-4-7" → mock looks up "mock|claude-opus-4-7|scenario:S258"
+//   → no scripted response → schema fail → advanced:false → FAIL.
+// GREEN (after fix): specProvider="openai" + no specModel → specModel="gpt-4o"
+//   → mock looks up "mock|gpt-4o|scenario:S258" → scripted response → SUCCESS
+//   → advanced_to:"REVIEWER_SPEC" → PASS.
+//
+// Mechanism: mock key = "mock|<model>|scenario:S258".
+// Only the correct key "mock|gpt-4o|scenario:S258" has a scripted response.
+// If the wrong model leaks to the adapter the key misses and the call fails.
+
+async function runS258ModelCoherence() {
+  const PID     = "s258_model_coherence";
+  const LOOP_ID = "s258-loop-fixture";
+  const projectDir = _ensureProjectDir(PID);
+
+  try {
+    _writeState(projectDir, {
+      project_id:           PID,
+      project_name:         "S258 Test",
+      active_runtime_state: "IDEATION",
+      conversation_mode:    "PIPELINE",
+      loop_id:              LOOP_ID,
+      last_updated_at:      new Date().toISOString()
+    });
+
+    await _seedLoopAtState(PID, LOOP_ID, "SPEC_WRITER_FORMALIZE");
+
+    const engine = _makeEngine();
+    // spec_provider:"openai" with NO spec_model — the fix must default model to "gpt-4o"
+    const result = await engine.formalizeSpec({
+      project_id:       PID,
+      loop_id:          LOOP_ID,
+      spec_provider:    "openai",
+      spec_scenario_id: "S258"
+      // spec_model intentionally omitted — this is what the FE sends
+    });
+
+    const advanced_to_reviewer = result.advanced_to === "REVIEWER_SPEC";
+    const no_spec_error        = !result.spec_error;
+
+    const reg = require("../../runtime/tools/_registry").getDefaultRegistry();
+    const specRead = await reg.invoke("fs.read_file", {
+      path: "artifacts/projects/" + PID + "/orchestration/" + LOOP_ID + "/spec.json"
+    }, { root: ROOT });
+    const spec_json_exists = specRead.status === "SUCCESS";
+
+    return {
+      advanced_to_reviewer,
+      no_spec_error,
+      spec_json_exists
+    };
+  } finally {
+    _cleanup(PID);
+  }
+}
+
 module.exports = {
   runS254FormalizeSpecHappyPath,
   runS255TimeoutGuard,
   runS256StateGuard,
-  runS257InvalidRoleOutput
+  runS257InvalidRoleOutput,
+  runS258ModelCoherence
 };

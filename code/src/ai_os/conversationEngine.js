@@ -881,7 +881,7 @@ function createConversationEngine(options = {}) {
     }
 
     const specProvider   = body.spec_provider    || "openai";
-    const specModel      = body.spec_model       || undefined;
+    const specModel      = body.spec_model || (specProvider === "openai" ? "gpt-4o" : undefined);
     const specScenarioId = body.spec_scenario_id || undefined;
 
     const reg = getDefaultRegistry();
