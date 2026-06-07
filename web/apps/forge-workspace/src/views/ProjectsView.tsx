@@ -155,7 +155,6 @@ export default function ProjectsView() {
           <h1 className="text-sm font-semibold text-gray-100">Projects</h1>
           <Button
             size="sm"
-            variant="outline"
             data-testid="new-project-btn"
             onClick={() => setShowCreate(true)}
           >
