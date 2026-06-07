@@ -1,0 +1,16 @@
+{
+  "id": "S261",
+  "name": "reviewSpec APPROVED — loop seeded REVIEWER_SPEC, mock reviewer returns APPROVED (no findings), graph advances to COST_ESTIMATE (PHASE-23 Step 1)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/reviewer_spec_test_helper",
+  "method": "runS261ReviewApproved",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "advanced_to_cost_estimate", "expected": true },
+    { "type": "state_field_equals", "field": "verdict_approved",          "expected": true },
+    { "type": "state_field_equals", "field": "no_blockers",               "expected": true },
+    { "type": "state_field_equals", "field": "graph_state_cost_estimate", "expected": true }
+  ]
+}

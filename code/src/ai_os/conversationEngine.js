@@ -974,6 +974,133 @@ function createConversationEngine(options = {}) {
     }
   }
 
+  // reviewSpec: drives the reviewer role (Phase A) from REVIEWER_SPEC → COST_ESTIMATE or ESCALATED.
+  // D1: separate endpoint, formalizeSpec unchanged.
+  // D2: review_provider defaults to "openai" (override role's default "anthropic"); gpt-4o backend-owned.
+  // D3: reads architect_design.json + spec.json from orchestration/${loopId}/.
+  // D4: state guard — only runs at REVIEWER_SPEC.
+  // D5: 30s timeout via Promise.race (mirroring formalizeSpec exactly).
+  // D6: BLOCKER-based branch — hasBlocker || verdict==="REJECTED" → ESCALATED; else → COST_ESTIMATE.
+
+  async function reviewSpec(body = {}) {
+    const projectId = normalizeProjectId(body.project_id || "");
+    const state     = loadState(projectId);
+
+    if (!state) {
+      return { ok: true, loop_id: null, review_error: "PROJECT_NOT_FOUND", advanced: false };
+    }
+
+    const loopId = body.loop_id || state.loop_id || null;
+    if (!loopId) {
+      return { ok: true, loop_id: null, review_error: "NO_LOOP_ID", advanced: false };
+    }
+
+    const reviewProvider   = body.review_provider    || "openai";
+    const reviewModel      = body.review_model || (reviewProvider === "openai" ? "gpt-4o" : undefined);
+    const reviewScenarioId = body.review_scenario_id || undefined;
+
+    const reg = getDefaultRegistry();
+
+    // D4: state guard
+    const statusResult = await reg.invoke("orchestration.get_status", {
+      project_id: normalizeProjectId(projectId),
+      loop_id:    loopId
+    }, { root });
+
+    if (!statusResult || statusResult.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, review_error: "GET_STATUS_FAILED", advanced: false };
+    }
+
+    const currentState = statusResult.output.current_state;
+    if (currentState !== "REVIEWER_SPEC") {
+      return { ok: true, loop_id: loopId, current_state: currentState, review_error: "WRONG_STATE", advanced: false };
+    }
+
+    // D3: read architect design from disk
+    const designRelPath = "artifacts/projects/" + normalizeProjectId(projectId) +
+      "/orchestration/" + loopId + "/architect_design.json";
+    const designRead = await reg.invoke("fs.read_file", { path: designRelPath }, { root });
+
+    if (!designRead || designRead.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, review_error: "DESIGN_NOT_FOUND", advanced: false };
+    }
+
+    let design;
+    try {
+      design = JSON.parse(designRead.output.content);
+    } catch {
+      return { ok: true, loop_id: loopId, review_error: "DESIGN_PARSE_FAILED", advanced: false };
+    }
+
+    // D3: read formalized spec from disk (written by formalizeSpec / spec_writer)
+    const specRelPath = "artifacts/projects/" + normalizeProjectId(projectId) +
+      "/orchestration/" + loopId + "/spec.json";
+    const specRead = await reg.invoke("fs.read_file", { path: specRelPath }, { root });
+
+    if (!specRead || specRead.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, review_error: "SPEC_NOT_FOUND", advanced: false };
+    }
+
+    let spec;
+    try {
+      spec = JSON.parse(specRead.output.content);
+    } catch {
+      return { ok: true, loop_id: loopId, review_error: "SPEC_PARSE_FAILED", advanced: false };
+    }
+
+    // D5: 30s timeout, mirroring formalizeSpec
+    let timeoutHandle;
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutHandle = setTimeout(() => reject(new Error("REVIEWER_TIMEOUT")), 30000);
+    });
+
+    try {
+      const reviewResult = await Promise.race([
+        reg.invoke("role.invoke", Object.assign(
+          {
+            role_id:    "reviewer",
+            input:      { phase: "A", spec, design, project_id: normalizeProjectId(projectId) },
+            project_id: normalizeProjectId(projectId),
+            provider:   reviewProvider
+          },
+          reviewModel      ? { model:       reviewModel      } : {},
+          reviewScenarioId ? { scenario_id: reviewScenarioId } : {}
+        ), { root }),
+        timeoutPromise
+      ]);
+      clearTimeout(timeoutHandle);
+
+      if (reviewResult && reviewResult.status === "SUCCESS") {
+        const verdict  = reviewResult.output.verdict;
+        const findings = reviewResult.output.findings;
+        const summary  = reviewResult.output.summary;
+
+        // D6: BLOCKER-based branch — guard against inconsistent verdict/findings
+        const hasBlocker = Array.isArray(findings) && findings.some(f => f && f.severity === "BLOCKER");
+        const toState    = (hasBlocker || verdict === "REJECTED") ? "ESCALATED" : "COST_ESTIMATE";
+
+        await reg.invoke("orchestration.advance_state", {
+          project_id:      normalizeProjectId(projectId),
+          loop_id:         loopId,
+          to_state:        toState,
+          transition_type: "NORMAL",
+          role_invoked:    "reviewer"
+        }, { root });
+
+        return { ok: true, loop_id: loopId, advanced: true, advanced_to: toState,
+                 verdict, findings, summary, model_used: reviewModel };
+      }
+
+      const reviewError = (reviewResult && reviewResult.metadata && reviewResult.metadata.detail)
+        || "REVIEWER_FAILED";
+      return { ok: true, loop_id: loopId, advanced: false, review_error: reviewError, model_used: reviewModel };
+
+    } catch (err) {
+      clearTimeout(timeoutHandle);
+      return { ok: true, loop_id: loopId, advanced: false, review_error: err.message };
+    }
+  }
+
   function _formatSummaryAsVision(summary, projectId, frontmatter) {
     const lines = [];
     lines.push("# Vision: " + (summary.project_name || projectId));
@@ -1009,6 +1136,7 @@ function createConversationEngine(options = {}) {
     requestIdeaSummary,
     confirmIdea,
     formalizeSpec,
+    reviewSpec,
     CONFIRMATION_REQUIRED_TRANSITIONS
   };
 }

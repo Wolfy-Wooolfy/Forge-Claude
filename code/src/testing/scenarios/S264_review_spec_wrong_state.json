@@ -1,0 +1,17 @@
+{
+  "id": "S264",
+  "name": "reviewSpec state guard (D4) — loop at SPEC_WRITER_FORMALIZE → review_error WRONG_STATE, no advance (PHASE-23 Step 1)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/reviewer_spec_test_helper",
+  "method": "runS264StateGuard",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "ok_true",               "expected": true },
+    { "type": "state_field_equals", "field": "review_error_wrong",    "expected": true },
+    { "type": "state_field_equals", "field": "advanced_false",        "expected": true },
+    { "type": "state_field_equals", "field": "current_state_echoed",  "expected": true },
+    { "type": "state_field_equals", "field": "graph_still_spec_writer","expected": true }
+  ]
+}

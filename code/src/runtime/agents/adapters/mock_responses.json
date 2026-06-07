@@ -280,5 +280,35 @@
     "tokens_in": 100,
     "tokens_out": 10,
     "finish_reason": "stop"
+  },
+  "mock|mock|scenario:S261": {
+    "text": "{\"verdict\":\"APPROVED\",\"findings\":[],\"summary\":\"المواصفة كاملة وتحقق جميع المتطلبات. لا توجد مشكلات.\"}",
+    "tokens_in": 800,
+    "tokens_out": 100,
+    "finish_reason": "stop"
+  },
+  "mock|mock|scenario:S262": {
+    "text": "{\"verdict\":\"REJECTED\",\"findings\":[{\"severity\":\"BLOCKER\",\"issue\":\"متطلبات الأمان غير محددة\",\"location\":\"قسم المتطلبات\",\"recommendation\":\"أضف متطلبات المصادقة والتفويض\"}],\"summary\":\"تم رفض المواصفة بسبب ثغرات في متطلبات الأمان.\"}",
+    "tokens_in": 800,
+    "tokens_out": 150,
+    "finish_reason": "stop"
+  },
+  "mock|mock|scenario:S263": {
+    "text": "{\"verdict\":\"APPROVED_WITH_CONCERNS\",\"findings\":[{\"severity\":\"WARN\",\"issue\":\"معدل الطلبات غير محدد\",\"location\":\"قسم الأداء\",\"recommendation\":\"أضف حدوداً لمعدل الطلبات\"}],\"summary\":\"المواصفة مقبولة مع تحفظات. يُنصح بمعالجة التحذيرات.\"}",
+    "tokens_in": 800,
+    "tokens_out": 130,
+    "finish_reason": "stop"
+  },
+  "mock|gpt-4o|scenario:S265": {
+    "text": "{\"not_verdict\":\"MISSING_REQUIRED_FIELDS\"}",
+    "tokens_in": 100,
+    "tokens_out": 10,
+    "finish_reason": "stop"
+  },
+  "mock|mock|scenario:S266": {
+    "text": "{\"verdict\":\"APPROVED\",\"findings\":[{\"severity\":\"BLOCKER\",\"issue\":\"ثغرة أمنية حرجة في نقطة النهاية\",\"location\":\"src/routes/auth.js\",\"recommendation\":\"أصلح الثغرة قبل المتابعة\"}],\"summary\":\"تمت الموافقة ولكن يوجد مانع حرج يتطلب المعالجة.\"}",
+    "tokens_in": 800,
+    "tokens_out": 150,
+    "finish_reason": "stop"
   }
 }
