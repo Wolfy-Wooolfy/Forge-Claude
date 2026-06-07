@@ -1,11 +1,11 @@
 {
-  "project_id": "test_pr",
-  "project_name": "نظام CRM للعقارات",
+  "project_id": "t_pr",
+  "project_name": "CRM لشركة استثمار عقاري",
   "project_type": "REVIEW",
   "project_mode": "EXTEND_EXISTING",
   "project_status": "ACTIVE",
   "primary_language": "MIXED",
-  "user_goal": "نظام ويب لإدارة علاقات العملاء لشركة استثمار عقاري تضم 150 موظفاً.",
+  "user_goal": "نظام CRM يساعد شركة استثمار عقاري في إدارة العملاء والمبيعات بكفاءة.",
   "business_goal": "",
   "technical_goal": "",
   "current_phase": "DISCOVERY",
@@ -37,8 +37,8 @@
     "has_decision_packet": false
   },
   "artifact_registry": {
-    "project_root": "artifacts/projects/test_pr",
-    "project_state": "artifacts/projects/test_pr/project_state.json",
+    "project_root": "artifacts/projects/t_pr",
+    "project_state": "artifacts/projects/t_pr/project_state.json",
     "decision_packet": "",
     "execution_package": ""
   },
@@ -51,6 +51,7 @@
   "vision_version": null,
   "vision_history": [],
   "conversation_mode": "PIPELINE",
-  "active_project_flag": false,
-  "last_updated_at": "2026-06-07T08:19:22.665Z"
+  "active_project_flag": true,
+  "last_updated_at": "2026-06-07T08:20:06.946Z",
+  "loop_id": "64da46dd-6895-4df8-b911-2e8a97720275"
 }
