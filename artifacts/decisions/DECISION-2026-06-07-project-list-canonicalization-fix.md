@@ -67,3 +67,22 @@ endpoint, no new dep, no new role/Doctor check.
 ## §6 Cost
 
 $0.00 — no LLM calls. (Gate #10 is pure UI deletion, no model calls.)
+
+---
+
+## §7 CLOSURE — 2026-06-07
+
+**Gate #10 PASSED** (owner-confirmed in browser, 2026-06-07):
+- Project list shows each project exactly once — no duplicate rows (reference_todo_api, pcst_flask_no_readme, pcst_tailwind_nextjs_blog, s150_abort_test each collapsed from 2→1).
+- Select All control works: selects all visible deletable projects; label flips to "إلغاء التحديد" when all selected.
+- Deleted projects stay gone after list reload — no reappearance. Ghost re-creation vector eliminated.
+
+**F1+F2 verified live on the running pm2 server:** project list went from 31 items (4 collision pairs) to 27 items (each canonical project once). Non-canonical dirs (_reference_todo_api, _s150_abort_test, pcst_flask-no-readme, pcst_tailwind-nextjs-blog) remain on disk untouched; excluded from list.
+
+**CTO independent verification (from fresh zip):**
+- Full suite: 253/0/5 (258 total); Track A clean (10 pre = 10 post); §ARC 8 unchanged.
+- Changed files: `code/src/workspace/apiServer.js` (2 lines: F1 + F2), `code/src/testing/helpers/api_server_test_helper.js` (S260 helper), `code/src/testing/scenarios/S260_project_list_canonicalization_regression.json`, `web/apps/forge-workspace/src/views/ProjectsView.tsx` (Select All), rebuilt bundle `index-CWkzWQ1T.js` / `index-CJ1ceJq9.css`.
+- S120–S128 + S152 (builtproject — use _reference_todo_api by path): all PASS; dir confirmed still on disk.
+- S259 + S260: both PASS.
+
+**Status: CLOSED.**

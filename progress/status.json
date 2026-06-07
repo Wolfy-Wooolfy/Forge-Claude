@@ -73,7 +73,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-06-07T11:36:44.012Z",
+    "last_doctor_run": "2026-06-07T12:15:03.949Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
@@ -274,9 +274,24 @@
     "findings_open": [],
     "deferred": [
       "new-project-button-contrast (FE cosmetic)",
-      "multi-select-project-deletion (separate small phase)",
       "_test_force_timeout cleanup (optional, fake-timers)"
     ]
+  },
+  "ux_task_2026_06_07_multiselect": {
+    "status": "CLOSED",
+    "closed_at": "2026-06-07",
+    "description": "Multi-select project deletion + canonicalization fix (F1+F2) + Select All",
+    "decision_artifact": "artifacts/decisions/DECISION-2026-06-07-ux-multiselect-delete.md",
+    "canonicalization_artifact": "artifacts/decisions/DECISION-2026-06-07-project-list-canonicalization-fix.md",
+    "suite_final": "253/0/5 (258 total)",
+    "scenarios_added": [
+      "S259",
+      "S260"
+    ],
+    "arc_ledger_count": 8,
+    "gate_10": "PASS",
+    "gate_10_confirmed_at": "2026-06-07",
+    "next_phase": "PHASE-23-PENDING-DECISION"
   },
   "phase_12": {
     "status": "CLOSED",
