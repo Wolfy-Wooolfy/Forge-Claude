@@ -144,6 +144,14 @@ export default function ProjectsView() {
     setSelected(next)
   }
 
+  function toggleSelectAll() {
+    if (allSelected) {
+      setSelected(new Set())
+    } else {
+      setSelected(new Set(deletableProjects.map((p) => p.project_id)))
+    }
+  }
+
   async function handleBulkDelete() {
     // D3: skip default_project defensively even if it somehow appears in the set
     const ids = Array.from(selected).filter((id) => id !== 'default_project')
@@ -185,6 +193,11 @@ export default function ProjectsView() {
   }
 
   const visibleProjects = state.projects.filter((p) => isUserProject(p.project_id))
+
+  const deletableProjects = visibleProjects.filter((p) => p.project_id !== 'default_project')
+  const allSelected =
+    deletableProjects.length > 0 &&
+    deletableProjects.every((p) => selected.has(p.project_id))
 
   const canDelete = state.activeProjectId !== 'default_project'
   const activeName =
@@ -232,6 +245,21 @@ export default function ProjectsView() {
               aria-label="إغلاق"
             >
               ×
+            </button>
+          </div>
+        )}
+
+        {/* select-all / clear toggle — visible when list has deletable projects */}
+        {deletableProjects.length > 0 && (
+          <div className="px-3 py-1.5 border-b border-gray-800/50 flex items-center">
+            <button
+              onClick={toggleSelectAll}
+              data-testid="select-all-btn"
+              className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+            >
+              {allSelected
+                ? 'إلغاء التحديد'
+                : `تحديد الكل (${deletableProjects.length})`}
             </button>
           </div>
         )}
