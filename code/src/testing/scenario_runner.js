@@ -696,6 +696,17 @@ async function _runApiserver(scenario, root) {
     ));
   }
 
+  // fixture_files: write arbitrary files relative to root before the server starts
+  // (e.g. active_project.json for active-revert scenarios). Test infra only.
+  if (Array.isArray(scenario.fixture_files)) {
+    for (const ff of scenario.fixture_files) {
+      if (!ff || typeof ff.path !== "string" || typeof ff.content !== "string") continue;
+      const abs = path.join(root, ff.path);
+      fs.mkdirSync(path.dirname(abs), { recursive: true });
+      fs.writeFileSync(abs, ff.content, "utf8");
+    }
+  }
+
   let instance = null;
   let actualPort = null;
   const startTs = new Date().toISOString();

@@ -4,6 +4,7 @@ import { getHistory } from '@/api/ai'
 import { Button } from '@/components/ui/button'
 import { CreateProjectDialog } from '@/components/projects/CreateProjectDialog'
 import { DeleteConfirmDialog } from '@/components/projects/DeleteConfirmDialog'
+import { BulkDeleteConfirmDialog } from '@/components/projects/BulkDeleteConfirmDialog'
 import { ProjectContextPanel } from '@/components/projects/ProjectContextPanel'
 import { ActivityStream } from '@/components/projects/ActivityStream'
 import type { ProjectItem, HistoryItem } from '@/api/types'
@@ -41,6 +42,9 @@ export default function ProjectsView() {
   })
   const [showCreate, setShowCreate] = useState(false)
   const [showDelete, setShowDelete] = useState(false)
+  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [showBulkDelete, setShowBulkDelete] = useState(false)
+  const [bulkResult, setBulkResult] = useState<string | null>(null)
 
   // ── data loaders ───────────────────────────────────────────────────────────
 
@@ -131,6 +135,47 @@ export default function ProjectsView() {
     await loadProjects('default_project')
   }
 
+  function toggleSelect(projectId: string) {
+    // default_project is never selectable (D3)
+    if (projectId === 'default_project') return
+    const next = new Set(selected)
+    if (next.has(projectId)) next.delete(projectId)
+    else next.add(projectId)
+    setSelected(next)
+  }
+
+  async function handleBulkDelete() {
+    // D3: skip default_project defensively even if it somehow appears in the set
+    const ids = Array.from(selected).filter((id) => id !== 'default_project')
+    let deletedCount = 0
+    const failures: string[] = []
+    // D1: call existing endpoint once per id, sequentially; D5: single failure does not abort
+    for (const id of ids) {
+      try {
+        const res = await deleteProject({ project_id: id })
+        if (res.ok) {
+          deletedCount++
+        } else {
+          failures.push(res.reason ?? 'فشل')
+        }
+      } catch (e) {
+        failures.push(e instanceof Error ? e.message : 'خطأ')
+      }
+    }
+    setShowBulkDelete(false)
+    setSelected(new Set())
+    // D4: loadProjects() with no preferredId → reads active_project_id from backend
+    // (backend already reverted to default_project if the active project was deleted)
+    await loadProjects()
+    // D5: plain-Arabic result
+    const deletedLabel = deletedCount === 1 ? 'مشروع واحد' : `${deletedCount} مشاريع`
+    let msg = `اتمسح ${deletedLabel}.`
+    if (failures.length > 0) {
+      msg += ` ما اتمسحش ${failures.length} (${failures[0]}).`
+    }
+    setBulkResult(msg)
+  }
+
   // ── derived ────────────────────────────────────────────────────────────────
 
   const SYSTEM_PREFIXES = ['stage_', 'test_', 'diag_', 'live_smoke_', '_']
@@ -162,6 +207,35 @@ export default function ProjectsView() {
           </Button>
         </div>
 
+        {/* bulk-delete action strip — visible only when ≥1 project selected */}
+        {selected.size > 0 && (
+          <div className="px-3 py-2 border-b border-gray-800 flex items-center justify-between bg-gray-950">
+            <span className="text-xs text-gray-400">{selected.size} محدد</span>
+            <Button
+              variant="destructive"
+              size="sm"
+              data-testid="bulk-delete-btn"
+              onClick={() => setShowBulkDelete(true)}
+            >
+              حذف المحدد
+            </Button>
+          </div>
+        )}
+
+        {/* bulk-delete result feedback */}
+        {bulkResult && (
+          <div className="px-3 py-2 border-b border-gray-800 flex items-center justify-between text-xs text-gray-400 bg-gray-950">
+            <span>{bulkResult}</span>
+            <button
+              onClick={() => setBulkResult(null)}
+              className="ms-2 text-gray-600 hover:text-gray-300 leading-none"
+              aria-label="إغلاق"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
         <div className="flex-1 overflow-auto p-2">
           {state.loading ? (
             <div className="text-xs text-gray-500 italic p-2">جارٍ التحميل...</div>
@@ -171,20 +245,35 @@ export default function ProjectsView() {
             <div className="text-xs text-gray-500 italic p-2">لا توجد مشاريع.</div>
           ) : (
             visibleProjects.map((project) => {
-              const isActive = project.project_id === state.activeProjectId
+              const isActive   = project.project_id === state.activeProjectId
+              const isDefault  = project.project_id === 'default_project'
+              const isSelected = selected.has(project.project_id)
               return (
-                <button
-                  key={project.project_id}
-                  data-testid={`project-item-${project.project_id}`}
-                  className={`w-full text-left px-3 py-2 rounded text-sm transition-colors mb-1 ${
-                    isActive
-                      ? 'bg-blue-600 text-white'
-                      : 'text-gray-300 hover:bg-gray-800 hover:text-gray-100'
-                  }`}
-                  onClick={() => void handleActivate(project.project_id)}
-                >
-                  {project.project_name ?? project.project_id}
-                </button>
+                <div key={project.project_id} className="flex items-center gap-1.5 mb-1">
+                  {/* D3: default_project has no checkbox; spacer keeps alignment */}
+                  {isDefault ? (
+                    <div className="w-3.5 h-3.5 flex-shrink-0" />
+                  ) : (
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => toggleSelect(project.project_id)}
+                      data-testid={`select-project-${project.project_id}`}
+                      className="w-3.5 h-3.5 flex-shrink-0 accent-red-500 cursor-pointer"
+                    />
+                  )}
+                  <button
+                    data-testid={`project-item-${project.project_id}`}
+                    className={`flex-1 min-w-0 text-left px-3 py-2 rounded text-sm transition-colors ${
+                      isActive
+                        ? 'bg-blue-600 text-white'
+                        : 'text-gray-300 hover:bg-gray-800 hover:text-gray-100'
+                    }`}
+                    onClick={() => void handleActivate(project.project_id)}
+                  >
+                    {project.project_name ?? project.project_id}
+                  </button>
+                </div>
               )
             })
           )}
@@ -230,6 +319,13 @@ export default function ProjectsView() {
           projectName={activeName}
           onConfirm={() => handleDelete()}
           onCancel={() => setShowDelete(false)}
+        />
+      )}
+      {showBulkDelete && (
+        <BulkDeleteConfirmDialog
+          count={selected.size}
+          onConfirm={() => handleBulkDelete()}
+          onCancel={() => setShowBulkDelete(false)}
         />
       )}
     </div>

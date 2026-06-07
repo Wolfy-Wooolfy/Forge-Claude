@@ -73,7 +73,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-06-07T09:10:49.286Z",
+    "last_doctor_run": "2026-06-07T09:58:56.582Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
@@ -257,7 +257,13 @@
     "mid_checkpoint": "artifacts/decisions/_phase_22_checkpoints/stage_22_mid.md",
     "final_checkpoint": "artifacts/decisions/_phase_22_checkpoints/stage_22_final.md",
     "suite_final": "251/0/5 (256 total)",
-    "scenarios_added": ["S254", "S255", "S256", "S257", "S258"],
+    "scenarios_added": [
+      "S254",
+      "S255",
+      "S256",
+      "S257",
+      "S258"
+    ],
     "arc_ledger_count": 8,
     "doctor_checks": 35,
     "agent_roles": 13,

@@ -1,0 +1,28 @@
+{
+  "id": "S259",
+  "name": "/api/projects/delete auto-reverts active_project.json to default_project",
+  "type": "apiserver",
+  "permission": "WORKSPACE_WRITE",
+  "project_id": "test_apiserver_s259",
+  "fixture": {
+    "active_runtime_state": "DISCUSSION"
+  },
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/active_project.json",
+      "content": "{\"project_id\":\"test_apiserver_s259\",\"updated_at\":\"2026-01-01T00:00:00.000Z\"}"
+    }
+  ],
+  "method": "POST",
+  "endpoint": "/api/projects/delete",
+  "body": {
+    "project_id": "test_apiserver_s259"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "PASS" },
+    { "type": "state_field_equals", "field": "ok",         "expected": true },
+    { "type": "state_field_equals", "field": "deleted",    "expected": true },
+    { "type": "state_field_equals", "field": "project_id", "expected": "test_apiserver_s259" },
+    { "type": "file_json_field",    "path": "artifacts/projects/active_project.json", "field": "project_id", "expected": "default_project" }
+  ]
+}
