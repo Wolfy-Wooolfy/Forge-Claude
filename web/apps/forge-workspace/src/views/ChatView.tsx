@@ -2,12 +2,13 @@ import { useEffect, useRef, useState } from 'react'
 import { Sparkles } from 'lucide-react'
 import { chatStream, answerClarification, requestIdeaSummary, fetchProjectAiOsState } from '@/api'
 import type { IdeaSummary } from '@/api'
-import { formalizeSpec } from '@/api/ideaSynthesis'
-import type { ArchitectDesign, Spec } from '@/api/ideaSynthesis'
+import { formalizeSpec, reviewSpec } from '@/api/ideaSynthesis'
+import type { ArchitectDesign, Spec, ReviewSpecResponse } from '@/api/ideaSynthesis'
 import { detectLanguage } from '@/lib/detectLanguage'
 import { Button } from '@/components/ui/button'
 import { ArchitectDesignCard } from '@/components/chat/ArchitectDesignCard'
 import { SpecCard } from '@/components/chat/SpecCard'
+import { ReviewCard } from '@/components/chat/ReviewCard'
 import { ChatInput, type ChatInputHandle } from '@/components/chat/ChatInput'
 import { IdeaSummaryCard } from '@/components/chat/IdeaSummaryCard'
 import { MessageBubble } from '@/components/chat/MessageBubble'
@@ -55,6 +56,7 @@ interface ChatState {
   architectDesign: ArchitectDesign | null
   loopId: string | null
   spec: Spec | null
+  reviewResult: ReviewSpecResponse | null
 }
 
 // ── component ─────────────────────────────────────────────────────────────────
@@ -65,6 +67,8 @@ export default function ChatView() {
   const [summaryRequesting, setSummaryRequesting] = useState(false)
   const [specRequesting, setSpecRequesting] = useState(false)
   const [specError, setSpecError] = useState<string | null>(null)
+  const [reviewRequesting, setReviewRequesting] = useState(false)
+  const [reviewError, setReviewError] = useState<string | null>(null)
   const [chatPlaceholder, setChatPlaceholder] = useState('اكتب رسالتك...')
   const [errorBanner, setErrorBanner] = useState<string | null>(null)
 
@@ -78,6 +82,7 @@ export default function ChatView() {
     architectDesign: null,
     loopId: null,
     spec: null,
+    reviewResult: null,
   })
 
   const abortRef = useRef<AbortController | null>(null)
@@ -110,10 +115,13 @@ export default function ChatView() {
           architectDesign: null,
           loopId: null,
           spec: null,
+          reviewResult: null,
         })
         setConversationMode(mode)
         setSpecRequesting(false)
         setSpecError(null)
+        setReviewRequesting(false)
+        setReviewError(null)
       })
       .catch(() => {
         // backend unreachable — keep defaults
@@ -281,8 +289,9 @@ export default function ChatView() {
 
   function handleIdeaConfirm(design: ArchitectDesign | null, loopId: string | null) {
     addMessage(assistantMsg('تمام، الفكرة اتثبّتت. هـ ابدأ التخطيط دلوقتي.'))
-    setState((prev) => ({ ...prev, conversationMode: 'PIPELINE', ideaSummary: null, architectDesign: design, loopId, spec: null }))
+    setState((prev) => ({ ...prev, conversationMode: 'PIPELINE', ideaSummary: null, architectDesign: design, loopId, spec: null, reviewResult: null }))
     setSpecError(null)
+    setReviewError(null)
   }
 
   function handleIdeaModify() {
@@ -315,6 +324,29 @@ export default function ChatView() {
       setSpecError('في مشكلة في تجهيز المواصفات — يقدر يعيد المحاولة')
     } finally {
       setSpecRequesting(false)
+    }
+  }
+
+  // ── review spec flow ──────────────────────────────────────────────────────
+
+  async function handleReviewSpec() {
+    setReviewRequesting(true)
+    setReviewError(null)
+    try {
+      const res = await reviewSpec({
+        project_id:      projectId,
+        loop_id:         state.loopId ?? undefined,
+        review_provider: 'openai',
+      })
+      if (res.advanced && res.verdict) {
+        setState((prev) => ({ ...prev, reviewResult: res }))
+      } else {
+        setReviewError('في مشكلة في المراجعة — يقدر يعيد المحاولة')
+      }
+    } catch {
+      setReviewError('في مشكلة في المراجعة — يقدر يعيد المحاولة')
+    } finally {
+      setReviewRequesting(false)
     }
   }
 
@@ -411,6 +443,31 @@ export default function ChatView() {
         )}
         {state.spec && (
           <SpecCard spec={state.spec} />
+        )}
+        {state.spec && !state.reviewResult && (
+          <div className="flex justify-end mt-2">
+            <Button
+              size="sm"
+              onClick={() => { void handleReviewSpec() }}
+              disabled={reviewRequesting || isDisabled}
+              data-testid="review-spec-btn"
+            >
+              {reviewRequesting ? '…' : 'راجع المواصفات'}
+            </Button>
+          </div>
+        )}
+        {reviewError && (
+          <div className="mt-2 px-3 py-2 rounded-md bg-red-900/40 border border-red-700/50 text-sm text-red-300">
+            {reviewError}
+          </div>
+        )}
+        {state.reviewResult?.advanced && state.reviewResult.verdict && (
+          <ReviewCard
+            verdict={state.reviewResult.verdict}
+            summary={state.reviewResult.summary ?? ''}
+            findings={state.reviewResult.findings ?? []}
+            advancedTo={state.reviewResult.advanced_to ?? ''}
+          />
         )}
         <div ref={bottomRef} />
       </div>

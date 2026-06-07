@@ -107,3 +107,38 @@ export interface FormalizeSpecResponse {
 export function formalizeSpec(req: FormalizeSpecRequest): Promise<FormalizeSpecResponse> {
   return apiPost<FormalizeSpecResponse>('/api/ai-os/project/formalize-spec', req)
 }
+
+// ─── POST /api/ai-os/project/review-spec ─────────────────────────────────────
+
+export type ReviewVerdict = 'APPROVED' | 'APPROVED_WITH_CONCERNS' | 'REJECTED'
+export type FindingSeverity = 'BLOCKER' | 'WARN' | 'INFO'
+
+export interface ReviewFinding {
+  severity: FindingSeverity
+  issue: string
+  location: string
+  recommendation: string
+}
+
+export interface ReviewSpecRequest {
+  project_id: string
+  loop_id?: string
+  review_provider?: string
+}
+
+export interface ReviewSpecResponse {
+  ok: boolean
+  loop_id?: string
+  advanced?: boolean
+  advanced_to?: string
+  verdict?: ReviewVerdict
+  findings?: ReviewFinding[]
+  summary?: string
+  model_used?: string
+  review_error?: string
+  current_state?: string
+}
+
+export function reviewSpec(req: ReviewSpecRequest): Promise<ReviewSpecResponse> {
+  return apiPost<ReviewSpecResponse>('/api/ai-os/project/review-spec', req)
+}
