@@ -72,3 +72,27 @@ CTO verifies from a fresh zip (full suite + Track A + the branch scenarios) befo
 
 Scenarios mock-only: $0.00. Gate #10 runs ONE real reviewer call (gpt-4o) ≈ $0.02–0.04, within the
 $3 dev bar. No other real calls. Real key use only at Gate #10, owner-initiated.
+
+---
+
+## §7 CLOSURE — 2026-06-07
+
+**Gate #10 PASSED** (owner-confirmed in browser, 2026-06-07):
+- Full loop ran end-to-end: architect design → SpecCard → "راجع المواصفات" → ReviewCard rendered.
+- Real reviewer (gpt-4o) returned REJECTED with BLOCKER findings → branch advanced
+  `REVIEWER_SPEC → ESCALATED`; ReviewCard correctly showed verdict badge, BLOCKER-first findings
+  with severity badges, and the distinct "⚠ موقف للمراجعة" escalation TransitionBadge.
+- This is correct quality-gate behavior: the reviewer caught real spec gaps and escalated.
+
+**CTO independent verification (from fresh zip):**
+- Full suite: 259/0/5 (264 total). S261–S266 all PASS; S266 confirms the BLOCKER-based branch
+  (APPROVED verdict + BLOCKER finding → ESCALATED, not COST_ESTIMATE).
+- Track A clean: reviewSpec uses only `reg.invoke` (no fs.*Sync / fetch / new OpenAI / child_process
+  outside §ARC). No `_test_force_timeout` hook in reviewSpec.
+- §ARC = 8. Doctor 35, roles 13, L2 tools 78 — all unchanged.
+
+**Real-call cost at Gate #10:**
+- ONE reviewer gpt-4o call ≈ $0.02–0.04, plus architect + spec_writer calls if owner started fresh.
+- Total within the $3 dev bar. All scenario runs are mock-only ($0.00).
+
+**Status: CLOSED.**

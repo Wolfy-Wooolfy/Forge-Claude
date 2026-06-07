@@ -4,9 +4,9 @@
   "current_stage": "A",
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
-  "next_phase": "PHASE-23-PENDING-DECISION",
-  "next_step": "PHASE-23 = wire REVIEWER_SPEC (reviewer Phase A, role tested S89/S90) by the same pattern. Awaiting CTO decision artifact + PROMPT-STAGE-23.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-03-phase-21-deployment-path-integrity.md",
+  "next_phase": "PHASE-24-PENDING-DECISION",
+  "next_step": "PHASE-24 = COST_ESTIMATE bridge (cost_estimator role at COST_ESTIMATE state). Requires fresh decision artifact + owner approval before starting.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-07-phase-23-reviewer-spec-bridge.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -158,9 +158,10 @@
       "PHASE-19",
       "PHASE-20",
       "PHASE-21",
-      "PHASE-22"
+      "PHASE-22",
+      "PHASE-23"
     ],
-    "next": "PHASE-23 (pending decision)",
+    "next": "PHASE-24 (pending decision)",
     "remaining": [],
     "phase_16_closed": "2026-05-28",
     "phase_17_closed": "2026-05-29",
@@ -276,6 +277,24 @@
       "new-project-button-contrast (FE cosmetic)",
       "_test_force_timeout cleanup (optional, fake-timers)"
     ]
+  },
+  "phase_23": {
+    "status": "CLOSED",
+    "closed_at": "2026-06-07",
+    "plan_artifact": "artifacts/decisions/DECISION-2026-06-07-phase-23-reviewer-spec-bridge.md",
+    "final_checkpoint": "artifacts/decisions/_phase_23_checkpoints/stage_23_final.md",
+    "suite_final": "259/0/5 (264 total)",
+    "scenarios_added": ["S261", "S262", "S263", "S264", "S265", "S266"],
+    "arc_ledger_count": 8,
+    "doctor_checks": 35,
+    "agent_roles": 13,
+    "l2_tools": 78,
+    "gate_10": "PASS",
+    "gate_10_confirmed_at": "2026-06-07",
+    "gate_10_result": "Real reviewer gpt-4o returned REJECTED + BLOCKER findings → REVIEWER_SPEC → ESCALATED; ReviewCard rendered correctly",
+    "d6_branch": "BLOCKER-based (hasBlocker || verdict===REJECTED → ESCALATED)",
+    "real_cost_usd_estimate": 0.04,
+    "findings_open": []
   },
   "ux_task_2026_06_07_multiselect": {
     "status": "CLOSED",
