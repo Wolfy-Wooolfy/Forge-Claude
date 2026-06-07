@@ -2,10 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import { Sparkles } from 'lucide-react'
 import { chatStream, answerClarification, requestIdeaSummary, fetchProjectAiOsState } from '@/api'
 import type { IdeaSummary } from '@/api'
-import type { ArchitectDesign } from '@/api/ideaSynthesis'
+import { formalizeSpec } from '@/api/ideaSynthesis'
+import type { ArchitectDesign, Spec } from '@/api/ideaSynthesis'
 import { detectLanguage } from '@/lib/detectLanguage'
 import { Button } from '@/components/ui/button'
 import { ArchitectDesignCard } from '@/components/chat/ArchitectDesignCard'
+import { SpecCard } from '@/components/chat/SpecCard'
 import { ChatInput, type ChatInputHandle } from '@/components/chat/ChatInput'
 import { IdeaSummaryCard } from '@/components/chat/IdeaSummaryCard'
 import { MessageBubble } from '@/components/chat/MessageBubble'
@@ -51,6 +53,8 @@ interface ChatState {
   conversationMode: ConversationMode
   ideaSummary: IdeaSummary | null
   architectDesign: ArchitectDesign | null
+  loopId: string | null
+  spec: Spec | null
 }
 
 // ── component ─────────────────────────────────────────────────────────────────
@@ -59,6 +63,8 @@ export default function ChatView() {
   const { activeProjectId: projectId, setConversationMode } = useProject()
   const chatInputRef = useRef<ChatInputHandle | null>(null)
   const [summaryRequesting, setSummaryRequesting] = useState(false)
+  const [specRequesting, setSpecRequesting] = useState(false)
+  const [specError, setSpecError] = useState<string | null>(null)
   const [chatPlaceholder, setChatPlaceholder] = useState('اكتب رسالتك...')
   const [errorBanner, setErrorBanner] = useState<string | null>(null)
 
@@ -70,6 +76,8 @@ export default function ChatView() {
     conversationMode: 'CONVERSATION',
     ideaSummary: null,
     architectDesign: null,
+    loopId: null,
+    spec: null,
   })
 
   const abortRef = useRef<AbortController | null>(null)
@@ -100,8 +108,12 @@ export default function ChatView() {
           conversationMode: mode,
           ideaSummary: summary,
           architectDesign: null,
+          loopId: null,
+          spec: null,
         })
         setConversationMode(mode)
+        setSpecRequesting(false)
+        setSpecError(null)
       })
       .catch(() => {
         // backend unreachable — keep defaults
@@ -267,9 +279,10 @@ export default function ChatView() {
     }
   }
 
-  function handleIdeaConfirm(design: ArchitectDesign | null) {
+  function handleIdeaConfirm(design: ArchitectDesign | null, loopId: string | null) {
     addMessage(assistantMsg('تمام، الفكرة اتثبّتت. هـ ابدأ التخطيط دلوقتي.'))
-    setState((prev) => ({ ...prev, conversationMode: 'PIPELINE', ideaSummary: null, architectDesign: design }))
+    setState((prev) => ({ ...prev, conversationMode: 'PIPELINE', ideaSummary: null, architectDesign: design, loopId, spec: null }))
+    setSpecError(null)
   }
 
   function handleIdeaModify() {
@@ -280,6 +293,29 @@ export default function ChatView() {
 
   function handleIdeaReject() {
     setState((prev) => ({ ...prev, conversationMode: 'CONVERSATION', ideaSummary: null }))
+  }
+
+  // ── formalize spec flow ────────────────────────────────────────────────────
+
+  async function handleFormalizeSpec() {
+    setSpecRequesting(true)
+    setSpecError(null)
+    try {
+      const res = await formalizeSpec({
+        project_id:    projectId,
+        loop_id:       state.loopId ?? undefined,
+        spec_provider: 'openai',
+      })
+      if (res.spec) {
+        setState((prev) => ({ ...prev, spec: res.spec! }))
+      } else {
+        setSpecError('في مشكلة في تجهيز المواصفات — يقدر يعيد المحاولة')
+      }
+    } catch {
+      setSpecError('في مشكلة في تجهيز المواصفات — يقدر يعيد المحاولة')
+    } finally {
+      setSpecRequesting(false)
+    }
   }
 
   // ── send handler ───────────────────────────────────────────────────────────
@@ -355,6 +391,26 @@ export default function ChatView() {
         )}
         {state.architectDesign && (
           <ArchitectDesignCard design={state.architectDesign} />
+        )}
+        {state.architectDesign && !state.spec && (
+          <div className="flex justify-end mt-2">
+            <Button
+              size="sm"
+              onClick={() => { void handleFormalizeSpec() }}
+              disabled={specRequesting || isDisabled}
+              data-testid="formalize-spec-btn"
+            >
+              {specRequesting ? '…' : 'كمّل للمواصفات'}
+            </Button>
+          </div>
+        )}
+        {specError && (
+          <div className="mt-2 px-3 py-2 rounded-md bg-red-900/40 border border-red-700/50 text-sm text-red-300">
+            {specError}
+          </div>
+        )}
+        {state.spec && (
+          <SpecCard spec={state.spec} />
         )}
         <div ref={bottomRef} />
       </div>

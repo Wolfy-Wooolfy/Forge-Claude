@@ -6,7 +6,7 @@ import { confirmIdea, type IdeaAction, type IdeaSummary, type ArchitectDesign } 
 interface IdeaSummaryCardProps {
   summary: IdeaSummary
   projectId: string
-  onConfirm: (design: ArchitectDesign | null) => void
+  onConfirm: (design: ArchitectDesign | null, loopId: string | null) => void
   onModify: () => void
   onReject: () => void
 }
@@ -29,7 +29,7 @@ export function IdeaSummaryCard({ summary, projectId, onConfirm, onModify, onRej
         setActiveAction(null)
         return
       }
-      if (action === 'AFFIRM') onConfirm(res.architect_design ?? null)
+      if (action === 'AFFIRM') onConfirm(res.architect_design ?? null, res.loop_id ?? null)
       else if (action === 'MODIFY') onModify()
       else onReject()
     } catch (err) {

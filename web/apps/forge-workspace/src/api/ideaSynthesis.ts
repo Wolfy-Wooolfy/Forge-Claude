@@ -71,3 +71,39 @@ export interface ConfirmIdeaResponse {
 export function confirmIdea(req: ConfirmIdeaRequest): Promise<ConfirmIdeaResponse> {
   return apiPost<ConfirmIdeaResponse>('/api/ai-os/project/confirm-idea', req)
 }
+
+// ─── POST /api/ai-os/project/formalize-spec ──────────────────────────────────
+
+export interface SpecDecision { decision: string; rationale: string }
+export interface SpecAcceptanceCriterion { id: string; description: string }
+export interface SpecFileToCreate { path: string; purpose: string }
+export interface SpecFileToModify { path: string; change: string }
+
+export interface Spec {
+  scope: string
+  decisions: SpecDecision[]
+  acceptance_criteria: SpecAcceptanceCriterion[]
+  files_to_create: SpecFileToCreate[]
+  files_to_modify: SpecFileToModify[]
+  out_of_scope: string[]
+}
+
+export interface FormalizeSpecRequest {
+  project_id: string
+  loop_id?: string
+  spec_provider?: string
+}
+
+export interface FormalizeSpecResponse {
+  ok: boolean
+  loop_id?: string
+  advanced?: boolean
+  advanced_to?: string
+  spec?: Spec
+  spec_error?: string
+  current_state?: string
+}
+
+export function formalizeSpec(req: FormalizeSpecRequest): Promise<FormalizeSpecResponse> {
+  return apiPost<FormalizeSpecResponse>('/api/ai-os/project/formalize-spec', req)
+}
