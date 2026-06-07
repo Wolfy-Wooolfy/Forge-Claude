@@ -325,16 +325,15 @@ async function runS257InvalidRoleOutput() {
 
 // ── S258 — provider/model coherence: openai provider → gpt-4o model ───────────
 //
-// RED (before PHASE-22 fix): specModel defaults to undefined → role uses
-//   default_model "claude-opus-4-7" → mock looks up "mock|claude-opus-4-7|scenario:S258"
-//   → no scripted response → schema fail → advanced:false → FAIL.
+// RED (before fix): specModel defaults to undefined → model_used:undefined → FAIL.
 // GREEN (after fix): specProvider="openai" + no specModel → specModel="gpt-4o"
-//   → mock looks up "mock|gpt-4o|scenario:S258" → scripted response → SUCCESS
-//   → advanced_to:"REVIEWER_SPEC" → PASS.
+//   → model_used:"gpt-4o" in the _test_force_timeout early-return → PASS.
 //
-// Mechanism: mock key = "mock|<model>|scenario:S258".
-// Only the correct key "mock|gpt-4o|scenario:S258" has a scripted response.
-// If the wrong model leaks to the adapter the key misses and the call fails.
+// Mechanism: formalizeSpec exposes model_used (the resolved model) on the
+// _test_force_timeout path. _test_force_timeout bails before any real API call
+// ($0.00) but AFTER specModel is computed — so model_used captures the
+// resolution. S258 asserts model_used === "gpt-4o", which only passes if the
+// fix is in place. Without the fix specModel=undefined → model_used:undefined.
 
 async function runS258ModelCoherence() {
   const PID     = "s258_model_coherence";
@@ -354,28 +353,24 @@ async function runS258ModelCoherence() {
     await _seedLoopAtState(PID, LOOP_ID, "SPEC_WRITER_FORMALIZE");
 
     const engine = _makeEngine();
-    // spec_provider:"openai" with NO spec_model — the fix must default model to "gpt-4o"
+    // spec_provider:"openai" with NO spec_model + _test_force_timeout:true.
+    // Bails before real API call but after specModel is resolved.
     const result = await engine.formalizeSpec({
-      project_id:       PID,
-      loop_id:          LOOP_ID,
-      spec_provider:    "openai",
-      spec_scenario_id: "S258"
-      // spec_model intentionally omitted — this is what the FE sends
+      project_id:          PID,
+      loop_id:             LOOP_ID,
+      spec_provider:       "openai",
+      _test_force_timeout: true
+      // spec_model intentionally absent — mirrors what the FE sends
     });
 
-    const advanced_to_reviewer = result.advanced_to === "REVIEWER_SPEC";
-    const no_spec_error        = !result.spec_error;
-
-    const reg = require("../../runtime/tools/_registry").getDefaultRegistry();
-    const specRead = await reg.invoke("fs.read_file", {
-      path: "artifacts/projects/" + PID + "/orchestration/" + LOOP_ID + "/spec.json"
-    }, { root: ROOT });
-    const spec_json_exists = specRead.status === "SUCCESS";
+    const model_used_gpt4o       = result.model_used === "gpt-4o";
+    const spec_error_timeout     = result.spec_error === "SPEC_WRITER_TIMEOUT";
+    const advanced_false         = result.advanced !== true;
 
     return {
-      advanced_to_reviewer,
-      no_spec_error,
-      spec_json_exists
+      model_used_gpt4o,
+      spec_error_timeout,
+      advanced_false
     };
   } finally {
     _cleanup(PID);

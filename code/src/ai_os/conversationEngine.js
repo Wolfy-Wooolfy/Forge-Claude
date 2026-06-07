@@ -919,7 +919,7 @@ function createConversationEngine(options = {}) {
 
     // Test-only forced timeout hook (never set in production code)
     if (body._test_force_timeout) {
-      return { ok: true, loop_id: loopId, advanced: false, spec_error: "SPEC_WRITER_TIMEOUT" };
+      return { ok: true, loop_id: loopId, advanced: false, spec_error: "SPEC_WRITER_TIMEOUT", model_used: specModel };
     }
 
     // D5: 30s timeout, mirroring architect block
@@ -961,12 +961,12 @@ function createConversationEngine(options = {}) {
           role_invoked:    "spec_writer"
         }, { root });
 
-        return { ok: true, loop_id: loopId, advanced: true, advanced_to: "REVIEWER_SPEC", spec };
+        return { ok: true, loop_id: loopId, advanced: true, advanced_to: "REVIEWER_SPEC", spec, model_used: specModel };
       }
 
       const specError = (specResult && specResult.metadata && specResult.metadata.detail)
         || "SPEC_WRITER_FAILED";
-      return { ok: true, loop_id: loopId, advanced: false, spec_error: specError };
+      return { ok: true, loop_id: loopId, advanced: false, spec_error: specError, model_used: specModel };
 
     } catch (err) {
       clearTimeout(timeoutHandle);

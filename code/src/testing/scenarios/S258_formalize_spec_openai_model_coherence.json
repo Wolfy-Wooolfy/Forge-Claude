@@ -1,7 +1,7 @@
 {
   "id": "S258",
-  "name": "formalizeSpec provider/model coherence — spec_provider:openai + no spec_model → model defaults to gpt-4o, NOT claude-opus-4-7 (PHASE-22 fix)",
-  "description": "RED (before fix): specModel undefined → role uses default_model 'claude-opus-4-7' → mock key 'mock|claude-opus-4-7|scenario:S258' → no scripted response → schema fail → advanced:false. GREEN (after fix): specProvider='openai' + no specModel → specModel='gpt-4o' → mock key 'mock|gpt-4o|scenario:S258' → scripted response → SUCCESS → advanced_to:REVIEWER_SPEC. Mock key acts as deterministic model assertion.",
+  "name": "formalizeSpec provider/model coherence — spec_provider:openai + no spec_model → model_used:gpt-4o (NOT claude-opus-4-7). Catches the real-provider 404 gap. (PHASE-22 fix)",
+  "description": "RED (before fix): specModel=undefined → model_used:undefined → FAIL. GREEN (after fix): specProvider='openai' + no specModel → specModel='gpt-4o' → model_used:'gpt-4o'. Mechanism: _test_force_timeout returns early (no API call, $0.00) after specModel is resolved, exposing model_used as response metadata.",
   "type": "module_call",
   "permission": "WORKSPACE_WRITE",
   "module": "code/src/testing/helpers/spec_writer_test_helper",
@@ -9,8 +9,8 @@
   "args": [],
   "assertions": [
     { "type": "status_equals",      "expected": "SUCCESS" },
-    { "type": "state_field_equals", "field": "advanced_to_reviewer", "expected": true },
-    { "type": "state_field_equals", "field": "no_spec_error",        "expected": true },
-    { "type": "state_field_equals", "field": "spec_json_exists",     "expected": true }
+    { "type": "state_field_equals", "field": "model_used_gpt4o",   "expected": true },
+    { "type": "state_field_equals", "field": "spec_error_timeout", "expected": true },
+    { "type": "state_field_equals", "field": "advanced_false",     "expected": true }
   ]
 }
