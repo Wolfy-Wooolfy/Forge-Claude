@@ -1101,6 +1101,178 @@ function createConversationEngine(options = {}) {
     }
   }
 
+  // ── Builder bridge (PHASE-24) ─────────────────────────────────────────────────
+  //
+  // buildProject: drives the builder role from BUILDER → RUN_TESTS.
+  // Wiring: state guard (BUILDER) → read spec.json + architect_design.json →
+  //         role.invoke(builder) → builder.materialize → advance_state(RUN_TESTS).
+  // Any failure → {ok:true, build_error:<code>, advanced:false} (stays BUILDER, no retry).
+  // Smoke: driven by spec.smoke_entry field; false if not specified.
+  //
+  // Stage-split params (build_* / mat_*) allow different mock keys per stage in tests.
+  // Production: omit build_*/mat_* and use provider/model for both stages.
+
+  async function buildProject(body = {}) {
+    const projectId = normalizeProjectId(body.project_id || "");
+    const state     = loadState(projectId);
+
+    if (!state) {
+      return { ok: true, loop_id: null, build_error: "PROJECT_NOT_FOUND", advanced: false };
+    }
+
+    const loopId = body.loop_id || state.loop_id || null;
+    if (!loopId) {
+      return { ok: true, loop_id: null, build_error: "NO_LOOP_ID", advanced: false };
+    }
+
+    const buildProvider  = body.build_provider    || body.provider || "openai";
+    const buildModel     = body.build_model       || body.model    || "gpt-4o";
+    const buildScenId    = body.build_scenario_id || undefined;
+    const matProvider    = body.mat_provider      || body.provider || "openai";
+    const matModel       = body.mat_model         || body.model    || "gpt-4o";
+    const matScenId      = body.mat_scenario_id   || undefined;
+
+    const reg = getDefaultRegistry();
+
+    // State guard: must be at BUILDER
+    const statusResult = await reg.invoke("orchestration.get_status", {
+      project_id: normalizeProjectId(projectId),
+      loop_id:    loopId
+    }, { root });
+
+    if (!statusResult || statusResult.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, build_error: "GET_STATUS_FAILED", advanced: false };
+    }
+
+    const currentState = statusResult.output.current_state;
+    if (currentState !== "BUILDER") {
+      return { ok: true, loop_id: loopId, current_state: currentState, build_error: "WRONG_STATE", advanced: false };
+    }
+
+    // Read spec from disk
+    const specRelPath = "artifacts/projects/" + normalizeProjectId(projectId) +
+      "/orchestration/" + loopId + "/spec.json";
+    const specRead = await reg.invoke("fs.read_file", { path: specRelPath }, { root });
+
+    if (!specRead || specRead.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, build_error: "SPEC_NOT_FOUND", advanced: false };
+    }
+
+    let spec;
+    try {
+      spec = JSON.parse(specRead.output.content);
+    } catch {
+      return { ok: true, loop_id: loopId, build_error: "SPEC_PARSE_FAILED", advanced: false };
+    }
+
+    // Read architect design from disk
+    const designRelPath = "artifacts/projects/" + normalizeProjectId(projectId) +
+      "/orchestration/" + loopId + "/architect_design.json";
+    const designRead = await reg.invoke("fs.read_file", { path: designRelPath }, { root });
+
+    if (!designRead || designRead.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, build_error: "DESIGN_NOT_FOUND", advanced: false };
+    }
+
+    let design;
+    try {
+      design = JSON.parse(designRead.output.content);
+    } catch {
+      return { ok: true, loop_id: loopId, build_error: "DESIGN_PARSE_FAILED", advanced: false };
+    }
+
+    // Test-only forced timeout hook (never set in production code)
+    if (body._test_force_timeout) {
+      return { ok: true, loop_id: loopId, advanced: false, build_error: "BUILDER_TIMEOUT" };
+    }
+
+    // 30s timeout, mirroring formalizeSpec/reviewSpec
+    let timeoutHandle;
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutHandle = setTimeout(() => reject(new Error("BUILDER_TIMEOUT")), 30000);
+    });
+
+    try {
+      const roleResult = await Promise.race([
+        reg.invoke("role.invoke", Object.assign(
+          {
+            role_id:    "builder",
+            input:      { spec, design, project_id: normalizeProjectId(projectId) },
+            project_id: normalizeProjectId(projectId),
+            provider:   buildProvider
+          },
+          buildModel  ? { model:       buildModel  } : {},
+          buildScenId ? { scenario_id: buildScenId } : {}
+        ), { root }),
+        timeoutPromise
+      ]);
+      clearTimeout(timeoutHandle);
+
+      if (!roleResult || roleResult.status !== "SUCCESS") {
+        const buildError = (roleResult && roleResult.metadata && roleResult.metadata.detail)
+          || "BUILDER_ROLE_FAILED";
+        return { ok: true, loop_id: loopId, advanced: false, build_error: buildError };
+      }
+
+      const plan = roleResult.output && roleResult.output.files_written;
+      if (!Array.isArray(plan) || plan.length === 0) {
+        return { ok: true, loop_id: loopId, advanced: false, build_error: "BUILDER_EMPTY_PLAN" };
+      }
+
+      // Smoke: driven by spec.smoke_entry (no smoke if not present)
+      const smokeEntry = (spec && spec.smoke_entry) || null;
+
+      const matResult = await reg.invoke("builder.materialize", Object.assign(
+        {
+          project_id: normalizeProjectId(projectId),
+          plan,
+          spec,
+          design,
+          provider:   matProvider,
+          smoke:      !!smokeEntry
+        },
+        matModel    ? { model:       matModel    } : {},
+        matScenId   ? { scenario_id: matScenId   } : {},
+        smokeEntry  ? { smoke_entry: smokeEntry  } : {}
+      ), { root });
+
+      const matOut = matResult && matResult.output;
+      if (!matResult || matResult.status !== "SUCCESS" || !matOut || matOut.status !== "SUCCESS") {
+        const errCode = (matOut && matOut.error_code) || "MATERIALIZER_FAILED";
+        return {
+          ok:            true,
+          loop_id:       loopId,
+          advanced:      false,
+          build_error:   errCode,
+          files_written: matOut && matOut.files_written
+        };
+      }
+
+      // Advance state to RUN_TESTS
+      await reg.invoke("orchestration.advance_state", {
+        project_id:      normalizeProjectId(projectId),
+        loop_id:         loopId,
+        to_state:        "RUN_TESTS",
+        transition_type: "NORMAL",
+        role_invoked:    "builder"
+      }, { root });
+
+      return {
+        ok:            true,
+        loop_id:       loopId,
+        advanced:      true,
+        advanced_to:   "RUN_TESTS",
+        files_written: matOut.files_written,
+        smoke:         matOut.smoke,
+        summary:       matOut.summary
+      };
+
+    } catch (err) {
+      clearTimeout(timeoutHandle);
+      return { ok: true, loop_id: loopId, advanced: false, build_error: err.message };
+    }
+  }
+
   function _formatSummaryAsVision(summary, projectId, frontmatter) {
     const lines = [];
     lines.push("# Vision: " + (summary.project_name || projectId));
@@ -1137,6 +1309,7 @@ function createConversationEngine(options = {}) {
     confirmIdea,
     formalizeSpec,
     reviewSpec,
+    buildProject,
     CONFIRMATION_REQUIRED_TRANSITIONS
   };
 }

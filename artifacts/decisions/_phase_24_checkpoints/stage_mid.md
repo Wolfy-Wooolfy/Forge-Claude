@@ -96,3 +96,7 @@ Full suite: **268 total (263 pass / 0 fail / 5 skip Windows)** — 0 fail. (Base
 - `agent.invoke` codegen call forwards `budget_usd: 0.50` hardcoded. Gate #10 real provider must confirm this is within the $0.50/call kill bar.
 - `smoke_entry` must be spec-defined (R-A refinement) — the test helper passes `smoke: false` so this path is not exercised in unit tests.
 - `fs.write_file` creates parent dirs (`mkdirSync recursive`) — tested via S267/S272 with real project dir writes + cleanup.
+
+## Backlog (do NOT fix in PHASE-24 — frozen scope)
+
+- **builtproject server scenarios (S120/S121/S124–S127) flake under full-suite load; harden later (configurable wait_for_port / randomized port / clean teardown / stop pm2 during suite).** Pre-existing test-infra fragility: those scenarios start `node server.js` with a 5s `wait_for_port`; under a ~22-min full-suite run (with pm2 Forge on port 3100) they can miss the window. Not caused by PHASE-24 changes. A closure run must be clean 0-fail — re-run if these flake, and document the flake count.

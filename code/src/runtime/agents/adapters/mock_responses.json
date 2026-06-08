@@ -334,5 +334,29 @@
     "tokens_in": 150,
     "tokens_out": 120,
     "finish_reason": "stop"
+  },
+  "mock|mock-bld-s270|scenario:S270": {
+    "text": "{\"files_written\":[{\"path\":\"add.js\",\"action\":\"create\",\"line_count\":1,\"sha256\":\"pending\"},{\"path\":\"run.js\",\"action\":\"create\",\"line_count\":1,\"sha256\":\"pending\"}],\"summary\":\"Two-file add/run spike.\",\"dependencies_added\":[],\"notes\":[]}",
+    "tokens_in": 120,
+    "tokens_out": 80,
+    "finish_reason": "stop"
+  },
+  "mock|mock-mat-s270|scenario:S270": {
+    "text": "{\"files\":[{\"path\":\"add.js\",\"content\":\"function add(a,b){return a+b;}module.exports={add};\"},{\"path\":\"run.js\",\"content\":\"const{add}=require('./add');console.log(add(3,4));\"}]}",
+    "tokens_in": 120,
+    "tokens_out": 80,
+    "finish_reason": "stop"
+  },
+  "mock|mock-bld-s271|scenario:S271": {
+    "text": "{\"files_written\":[{\"path\":\"add.js\",\"action\":\"create\",\"line_count\":1,\"sha256\":\"pending\"},{\"path\":\"main.js\",\"action\":\"create\",\"line_count\":1,\"sha256\":\"pending\"}],\"summary\":\"Add utility; main.js exits non-zero for smoke test.\",\"dependencies_added\":[],\"notes\":[]}",
+    "tokens_in": 120,
+    "tokens_out": 80,
+    "finish_reason": "stop"
+  },
+  "mock|mock-mat-s271|scenario:S271": {
+    "text": "{\"files\":[{\"path\":\"add.js\",\"content\":\"function add(a,b){return a+b;}module.exports={add};\"},{\"path\":\"main.js\",\"content\":\"process.exit(1);\"}]}",
+    "tokens_in": 80,
+    "tokens_out": 40,
+    "finish_reason": "stop"
   }
 }

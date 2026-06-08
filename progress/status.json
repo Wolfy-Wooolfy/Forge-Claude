@@ -73,7 +73,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-06-07T13:50:32.198Z",
+    "last_doctor_run": "2026-06-08T14:48:06.220Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
@@ -284,7 +284,14 @@
     "plan_artifact": "artifacts/decisions/DECISION-2026-06-07-phase-23-reviewer-spec-bridge.md",
     "final_checkpoint": "artifacts/decisions/_phase_23_checkpoints/stage_23_final.md",
     "suite_final": "259/0/5 (264 total)",
-    "scenarios_added": ["S261", "S262", "S263", "S264", "S265", "S266"],
+    "scenarios_added": [
+      "S261",
+      "S262",
+      "S263",
+      "S264",
+      "S265",
+      "S266"
+    ],
     "arc_ledger_count": 8,
     "doctor_checks": 35,
     "agent_roles": 13,

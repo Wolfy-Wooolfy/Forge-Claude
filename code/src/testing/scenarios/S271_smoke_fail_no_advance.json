@@ -1,0 +1,17 @@
+{
+  "id": "S271",
+  "name": "buildProject() smoke fail — materialize SMOKE_FAILED → state stays BUILDER (PHASE-24)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/builder_wiring_test_helper",
+  "method": "runS271SmokeFail",
+  "args": [],
+  "cleanup_project": "s271_smoke_fail",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "ok_true",             "expected": true },
+    { "type": "state_field_equals", "field": "advanced_false",      "expected": true },
+    { "type": "state_field_equals", "field": "build_error_smoke",   "expected": true },
+    { "type": "state_field_equals", "field": "graph_still_builder", "expected": true }
+  ]
+}
