@@ -4,9 +4,9 @@
   "current_stage": "A",
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
-  "next_phase": "PHASE-24-PENDING-DECISION",
-  "next_step": "PHASE-24 = COST_ESTIMATE bridge (cost_estimator role at COST_ESTIMATE state). Requires fresh decision artifact + owner approval before starting.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-07-phase-23-reviewer-spec-bridge.md",
+  "next_phase": "PHASE-25-PENDING-DECISION",
+  "next_step": "PHASE-25 pending decision. PHASE-24 (BUILDER Materializer) CLOSED — Gate #10 PASS. COST_ESTIMATE / ENV_REPORT / TEST_DESIGN bridges deferred.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-08-phase-24-builder-materializer.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -83,7 +83,7 @@
     "self_test_scenarios_skip": 5,
     "self_test_scenarios_fail": 0,
     "providers_registered_count": 14,
-    "tools_registered_count": 78,
+    "tools_registered_count": 79,
     "doctor_checks_count": 35,
     "assertion_types_count": 10,
     "active_permission_mode": "WORKSPACE_WRITE",
@@ -159,15 +159,17 @@
       "PHASE-20",
       "PHASE-21",
       "PHASE-22",
-      "PHASE-23"
+      "PHASE-23",
+      "PHASE-24"
     ],
-    "next": "PHASE-24 (pending decision)",
+    "next": "PHASE-25 (pending decision)",
     "remaining": [],
     "phase_16_closed": "2026-05-28",
     "phase_17_closed": "2026-05-29",
     "phase_18_closed": "2026-05-30",
     "phase_19_closed": "2026-06-03",
     "phase_20_closed": "2026-06-03",
+    "phase_24_closed": "2026-06-08",
     "phase_16_corrective": "DECISION-2026-05-24T16-00-phase-16-ux-closure-gap.md — UX Closure Gap; 6 stages; outcome-based closure gate",
     "phase_15_closed": "2026-05-23T14:00:00.000Z",
     "deferred": [
@@ -302,6 +304,41 @@
     "d6_branch": "BLOCKER-based (hasBlocker || verdict===REJECTED → ESCALATED)",
     "real_cost_usd_estimate": 0.04,
     "findings_open": []
+  },
+  "phase_24": {
+    "status": "CLOSED",
+    "closed_at": "2026-06-08",
+    "title": "BUILDER Materializer (Path A)",
+    "plan_artifact": "artifacts/decisions/DECISION-2026-06-08-phase-24-builder-materializer.md",
+    "final_checkpoint": "artifacts/decisions/_phase_24_checkpoints/stage_final.md",
+    "suite_final": "265/0/5 (270 total)",
+    "scenarios_added": ["S267", "S268", "S269", "S270", "S271", "S272"],
+    "gate_10": "PASS",
+    "gate_10_confirmed_at": "2026-06-08",
+    "gate_10_result": "real gpt-4o built phase24_gate10 (add.js+main.js); node main.js stdout='7'; total_usd ≤ $1",
+    "gate_10_evidence": "artifacts/spikes/gate10_phase24/gate10_result.json",
+    "arc_ledger_count": 8,
+    "l2_tools": 79,
+    "agent_roles": 13,
+    "files_created": [
+      "code/src/runtime/orchestration/materializerEngine.js",
+      "code/src/runtime/tools/materializer_tools.js",
+      "code/src/testing/helpers/materializer_test_helper.js",
+      "code/src/testing/helpers/builder_wiring_test_helper.js",
+      "scripts/spikes/gate10_phase24_builder_materialize.js",
+      "artifacts/decisions/_phase_24_checkpoints/stage_mid.md",
+      "artifacts/decisions/_phase_24_checkpoints/stage_final.md"
+    ],
+    "files_modified": [
+      "code/src/ai_os/conversationEngine.js",
+      "code/src/runtime/agents/adapters/mock_responses.json"
+    ],
+    "amendment_1": "wiring in conversationEngine.js buildProject() (not iteration_controller.js); baseline 264 not 137",
+    "track_a": "CLEAN — all new production files use reg.invoke only; no direct fs.*Sync / new OpenAI()",
+    "deferred": ["COST_ESTIMATE bridge", "ENV_REPORT bridge", "TEST_DESIGN bridge"],
+    "cost_actuals_usd": 0,
+    "findings_open": [],
+    "backlog": "builtproject server scenarios (S120/S121/S124-S127) flake under full-suite load — harden later (configurable wait_for_port / randomized port / clean teardown / stop pm2 during suite). Pre-existing; not PHASE-24."
   },
   "ux_task_2026_06_07_multiselect": {
     "status": "CLOSED",
@@ -1239,8 +1276,8 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-22 CLOSED — spec_writer wired into the loop (SPEC_WRITER_FORMALIZE → REVIEWER_SPEC). Real gpt-4o spec generation works; spec card renders in Arabic. Gate #10 PASS. Suite 251/0/5.",
-  "last_updated": "2026-06-03T00:00:00.000Z",
+  "current_task": "PHASE-24 CLOSED — BUILDER Materializer (Path A) complete. materializerEngine + builder.materialize tool + buildProject() bridge in conversationEngine.js. Real gpt-4o builds runnable files (add.js+main.js, stdout '7'). Gate #10 PASS. Suite 265/0/5 (270 total). §ARC 8. Next: PHASE-25 pending decision.",
+  "last_updated": "2026-06-08T00:00:00.000Z",
   "phase_16": {
     "status": "ACTIVE",
     "started_at": "2026-05-24T16:00:00.000Z",

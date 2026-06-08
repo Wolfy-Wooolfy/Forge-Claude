@@ -963,4 +963,25 @@ from `conversationalResponseProvider`.
 
 ---
 
+---
+
+## Section 7 — Post-roadmap phases (added incrementally; each requires own decision artifact + owner approval)
+
+| Phase | Title | Status | Decision artifact | Suite |
+|---|---|---|---|---|
+| PHASE-19 | UX Reality (Gate #10 Discovery) | CLOSED 2026-06-03 | DECISION-2026-06-03-phase-19-closure.md | 237/0/5 |
+| PHASE-20 | Vision → Pipeline Bridge | CLOSED 2026-06-03 | DECISION-2026-06-03-phase-20-closure.md | 242/0/5 |
+| PHASE-21 | Deployment Path Integrity | CLOSED 2026-06-04 | DECISION-2026-06-04-phase-21-closure.md | 246/0/5 |
+| PHASE-22 | Spec-Writer Bridge (SPEC_WRITER_FORMALIZE → REVIEWER_SPEC) | CLOSED 2026-06-07 | DECISION-2026-06-07-phase-22-closure.md | 251/0/5 |
+| PHASE-23 | Reviewer-Spec Bridge (REVIEWER_SPEC → COST_ESTIMATE / ESCALATED) | CLOSED 2026-06-07 | DECISION-2026-06-07-phase-23-reviewer-spec-bridge.md | 259/0/5 |
+| **PHASE-24** | **BUILDER Materializer (Path A) — redefines PHASE-24 slot from COST_ESTIMATE bridge per AMENDMENT 1** | **CLOSED 2026-06-08** | DECISION-2026-06-08-phase-24-builder-materializer.md | **265/0/5 (270 total)** |
+| PHASE-25 | PENDING DECISION | — | — | — |
+
+**PHASE-24 notes (AMENDMENT 1):**
+- The original PHASE-24 intent was "COST_ESTIMATE bridge." AMENDMENT 1 (2026-06-08) redefined it to "BUILDER Materializer (Path A)."
+- COST_ESTIMATE / ENV_REPORT / TEST_DESIGN bridges are deferred to a future phase.
+- The builder role (PLANNER contract, S92–S95, sha256:"pending" output) is UNCHANGED. `materializerEngine` + `builder.materialize` tool is the new orchestration layer.
+- `buildProject()` wired in `conversationEngine.js` (mirrors formalizeSpec/reviewSpec pattern). BUILDER → RUN_TESTS on materializer SUCCESS.
+- §ARC ledger: 8. L2 tools: 79. Scenarios: 270. All Track A clean.
+
 **END OF PHASE ROADMAP**

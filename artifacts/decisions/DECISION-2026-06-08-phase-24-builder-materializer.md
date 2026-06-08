@@ -54,6 +54,28 @@ This redefines the PHASE-24 slot (was "COST_ESTIMATE bridge") to "BUILDER Materi
 Gate #10 is the closure gate, consistent with the "scenario green / real path broken" guard: green SU scenarios do NOT close the phase; the owner must see real files produced through the actual BUILDER+materializer path with a real provider, and run them.
 
 ---
+## CLOSURE — 2026-06-08 (Gate #10 PASS — owner confirmed)
+
+- **Status:** CLOSED
+- **Closed at:** 2026-06-08
+- **Suite final:** 265 passed, 0 failed, 5 skipped (270 total) — Windows clean run
+- **Gate #10 verdict:** PASS
+  - G1a role.invoke(builder) → SUCCESS, files_written Array (2 files, all sha256:"pending") ✓
+  - G1b planner plan length ≥ 1 ✓
+  - G1c all sha256 === "pending" (planner output) ✓
+  - G2a builder.materialize status → SUCCESS ✓
+  - G2b output.status → SUCCESS ✓
+  - G2c files_written[0].sha256 ≠ "pending" (real sha256, 64 hex chars) ✓
+  - G3 shell exit_code === 0 ✓
+  - G4 stdout.trim() === "7" ✓
+  - G5 total_usd ≤ $1.00 ✓
+- **Evidence:** `artifacts/spikes/gate10_phase24/gate10_result.json`
+- **Owner confirmation:** Khaled — Gate #10 PASS confirmed in chat 2026-06-08
+- **CTO verification:** SU 6/6 (S267–S272) independent run PASS; buildProject +173 lines Track A clean; §ARC 8; 270 scenarios total; builder_role.js identical to c13c564
+- **Closure checkpoint:** `artifacts/decisions/_phase_24_checkpoints/stage_final.md`
+- **Next phase:** PHASE-25-PENDING-DECISION. COST_ESTIMATE / ENV_REPORT / TEST_DESIGN bridges deferred.
+
+---
 ## AMENDMENT 1 — 2026-06-08 (post-Step-0 verification; supersedes the noted clauses)
 
 Two clauses in the original body were inaccurate and are corrected here (the original text is retained above for audit trail):
