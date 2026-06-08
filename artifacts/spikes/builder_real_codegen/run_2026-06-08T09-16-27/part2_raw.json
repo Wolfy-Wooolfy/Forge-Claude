@@ -1,0 +1,20 @@
+{
+  "codegenResult": {
+    "status": "SUCCESS",
+    "output": {
+      "text": "{\n  \"files\": [\n    {\n      \"path\": \"add.js\",\n      \"content\": \"function add(a, b) { return a + b; } module.exports = { add };\"\n    },\n    {\n      \"path\": \"run.js\",\n      \"content\": \"const { add } = require('./add'); console.log(add(2, 3));\"\n    }\n  ]\n}",
+      "tokens_in": 299,
+      "tokens_out": 82,
+      "latency_ms": 5572,
+      "cost_usd": 0.00273,
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "finish_reason": "stop"
+    },
+    "metadata": {
+      "invocation_id": "2b0e76ac-a7ea-4279-9a57-4815d1b78bb8",
+      "cached": false
+    }
+  },
+  "codegenDuration": 5705
+}

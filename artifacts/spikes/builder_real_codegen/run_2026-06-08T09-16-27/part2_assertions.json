@@ -1,0 +1,47 @@
+{
+  "ts": "2026-06-08T09:16:34.950Z",
+  "assertions": [
+    {
+      "id": "A2.1",
+      "label": "parseable JSON { files: [{path,content}] }",
+      "pass": true
+    },
+    {
+      "id": "A2.2",
+      "label": "add.js exists",
+      "pass": true
+    },
+    {
+      "id": "A2.3",
+      "label": "run.js exists",
+      "pass": true
+    },
+    {
+      "id": "A2.4",
+      "label": "shellResult.status === SUCCESS",
+      "pass": true
+    },
+    {
+      "id": "A2.5",
+      "label": "exit_code === 0",
+      "pass": true,
+      "actual": 0
+    },
+    {
+      "id": "A2.6",
+      "label": "stdout.trim() === '5'",
+      "pass": true,
+      "actual": "5"
+    },
+    {
+      "id": "A2.7",
+      "label": "total_cost ≤ $1.00",
+      "pass": true,
+      "actual": 0.01126
+    }
+  ],
+  "pass_count": 7,
+  "total": 7,
+  "all_pass": true,
+  "verdict": "PASS"
+}

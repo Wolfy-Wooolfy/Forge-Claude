@@ -1,0 +1,38 @@
+{
+  "status": "SUCCESS",
+  "output": {
+    "entries": [
+      {
+        "ts": "2026-06-08T09:06:50.188Z",
+        "invocation_id": "f7e3851d-0f89-40ad-ab03-2ce3889e739d",
+        "project_id": "spike_builder",
+        "provider": "openai",
+        "model": "gpt-4o-2024-08-06",
+        "role": "builder",
+        "tokens_in": 970,
+        "tokens_out": 245,
+        "latency_ms": 3289,
+        "cost_usd_estimated": 0.0375,
+        "cost_usd_actual": 0.00853,
+        "outcome": "success"
+      },
+      {
+        "ts": "2026-06-08T09:16:34.145Z",
+        "invocation_id": "2b0e76ac-a7ea-4279-9a57-4815d1b78bb8",
+        "project_id": "spike_builder",
+        "provider": "openai",
+        "model": "gpt-4o-2024-08-06",
+        "role": null,
+        "tokens_in": 299,
+        "tokens_out": 82,
+        "latency_ms": 5572,
+        "cost_usd_estimated": 0.0104,
+        "cost_usd_actual": 0.00273,
+        "outcome": "success"
+      }
+    ],
+    "total_cost": 0.01126,
+    "count": 2
+  },
+  "metadata": {}
+}
