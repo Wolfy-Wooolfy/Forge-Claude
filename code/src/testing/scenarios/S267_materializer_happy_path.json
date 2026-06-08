@@ -1,0 +1,19 @@
+{
+  "id": "S267",
+  "name": "builder.materialize happy path — 2 files → real sha256 (≠ pending), status SUCCESS (PHASE-24)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/materializer_test_helper",
+  "method": "runS267HappyPath",
+  "args": [],
+  "cleanup_project": "s267_mat_test",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "tool_status_success",   "expected": true },
+    { "type": "state_field_equals", "field": "materialize_status_ok", "expected": true },
+    { "type": "state_field_equals", "field": "files_written_count_2", "expected": true },
+    { "type": "state_field_equals", "field": "add_js_sha256_real",    "expected": true },
+    { "type": "state_field_equals", "field": "run_js_sha256_real",    "expected": true },
+    { "type": "state_field_equals", "field": "smoke_not_ran",         "expected": true }
+  ]
+}

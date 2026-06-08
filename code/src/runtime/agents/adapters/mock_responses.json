@@ -310,5 +310,29 @@
     "tokens_in": 800,
     "tokens_out": 150,
     "finish_reason": "stop"
+  },
+  "mock|mock-mat-s267|scenario:S267": {
+    "text": "{\"files\":[{\"path\":\"add.js\",\"content\":\"function add(a,b){return a+b;}module.exports={add};\"},{\"path\":\"run.js\",\"content\":\"const{add}=require('./add');console.log(add(2,3));\"}]}",
+    "tokens_in": 120,
+    "tokens_out": 80,
+    "finish_reason": "stop"
+  },
+  "mock|mock-mat-s268|scenario:S268": {
+    "text": "{\"files\":[{\"path\":\"../evil.js\",\"content\":\"malicious content\"}]}",
+    "tokens_in": 50,
+    "tokens_out": 20,
+    "finish_reason": "stop"
+  },
+  "mock|mock-mat-s269|scenario:S269": {
+    "text": "I cannot generate that. Please provide more context.",
+    "tokens_in": 50,
+    "tokens_out": 15,
+    "finish_reason": "stop"
+  },
+  "mock|mock-mat-s272|scenario:S272": {
+    "text": "{\"files\":[{\"path\":\"math.js\",\"content\":\"function add(a,b){return a+b;}module.exports={add};\"},{\"path\":\"utils.js\",\"content\":\"function multiply(a,b){return a*b;}module.exports={multiply};\"},{\"path\":\"main.js\",\"content\":\"const{add}=require('./math');const{multiply}=require('./utils');console.log(add(2,3)+multiply(2,3));\"}]}",
+    "tokens_in": 150,
+    "tokens_out": 120,
+    "finish_reason": "stop"
   }
 }

@@ -1,0 +1,17 @@
+{
+  "id": "S269",
+  "name": "builder.materialize codegen parse failure → INVALID_CODEGEN, no partial writes (PHASE-24)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/materializer_test_helper",
+  "method": "runS269ParseFailure",
+  "args": [],
+  "cleanup_project": "s269_mat_test",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "tool_status_success",        "expected": true },
+    { "type": "state_field_equals", "field": "materialize_status_failed",  "expected": true },
+    { "type": "state_field_equals", "field": "error_code_invalid_codegen", "expected": true },
+    { "type": "state_field_equals", "field": "nothing_written",            "expected": true }
+  ]
+}

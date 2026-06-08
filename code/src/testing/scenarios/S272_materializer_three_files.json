@@ -1,0 +1,17 @@
+{
+  "id": "S272",
+  "name": "builder.materialize 3-file plan → all 3 written, all sha256 real (PHASE-24)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/materializer_test_helper",
+  "method": "runS272ThreeFiles",
+  "args": [],
+  "cleanup_project": "s272_mat_test",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "tool_status_success",   "expected": true },
+    { "type": "state_field_equals", "field": "materialize_status_ok", "expected": true },
+    { "type": "state_field_equals", "field": "files_written_count_3", "expected": true },
+    { "type": "state_field_equals", "field": "all_sha256_real",       "expected": true }
+  ]
+}

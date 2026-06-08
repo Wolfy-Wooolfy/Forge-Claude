@@ -52,3 +52,13 @@ This redefines the PHASE-24 slot (was "COST_ESTIMATE bridge") to "BUILDER Materi
 
 ## 8. Owner gate
 Gate #10 is the closure gate, consistent with the "scenario green / real path broken" guard: green SU scenarios do NOT close the phase; the owner must see real files produced through the actual BUILDER+materializer path with a real provider, and run them.
+
+---
+## AMENDMENT 1 — 2026-06-08 (post-Step-0 verification; supersedes the noted clauses)
+
+Two clauses in the original body were inaccurate and are corrected here (the original text is retained above for audit trail):
+
+1. **§2 Wiring (SUPERSEDED).** The materializer is NOT wired in `iteration_controller.js`. Verified: `iteration_controller.js` executes no states — it contains only `checkCap`, `triggerEscalation`, `tryAdvanceForLoopBack` (loop-back cap + escalation). State execution uses per-state **bridge functions in `code/src/ai_os/conversationEngine.js`** (`confirmIdea`→ARCHITECT_DESIGN, `formalizeSpec`→SPEC_WRITER_FORMALIZE, `reviewSpec`→REVIEWER_SPEC). The BUILDER state gains a **new `buildProject()` bridge** in `conversationEngine.js`, mirroring `formalizeSpec`/`reviewSpec`: state guard (currentState==="BUILDER") → read `orchestration/<loopId>/spec.json` + `architect_design.json` via `reg.invoke("fs.read_file")` → `reg.invoke("role.invoke",{role_id:"builder",...})` → on SUCCESS `reg.invoke("builder.materialize",{...})` → on materialize SUCCESS `reg.invoke("orchestration.advance_state",{to_state:"RUN_TESTS",transition_type:"NORMAL",role_invoked:"builder"})`; any failure → `{ok:true, build_error:<code>, advanced:false}` (stays BUILDER, no auto-retry). The graph edge `BUILDER→RUN_TESTS` trigger "role.invoke(builder)→SUCCESS" is satisfied because `buildProject` invokes the builder role.
+
+2. **§4 Baseline (SUPERSEDED).** The SU baseline is **264 total (Windows 259 pass / 0 fail / 5 skip; sandbox 251/8/5 — the 8 are the documented env-delta scenarios)**, NOT 137. Closure target with the 6 new scenarios (S267–S272): **270 total (Windows 265/0/5)**, 0 fail. All else in §4 stands.
+---
