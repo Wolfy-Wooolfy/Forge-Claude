@@ -1,0 +1,24 @@
+{
+  "status": "SUCCESS",
+  "output": {
+    "entries": [
+      {
+        "ts": "2026-06-08T09:06:50.188Z",
+        "invocation_id": "f7e3851d-0f89-40ad-ab03-2ce3889e739d",
+        "project_id": "spike_builder",
+        "provider": "openai",
+        "model": "gpt-4o-2024-08-06",
+        "role": "builder",
+        "tokens_in": 970,
+        "tokens_out": 245,
+        "latency_ms": 3289,
+        "cost_usd_estimated": 0.0375,
+        "cost_usd_actual": 0.00853,
+        "outcome": "success"
+      }
+    ],
+    "total_cost": 0.00853,
+    "count": 1
+  },
+  "metadata": {}
+}

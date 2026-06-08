@@ -1,0 +1,74 @@
+{
+  "ts": "2026-06-08T09:06:50.225Z",
+  "spike": "DECISION-2026-06-08-spike-builder-real-codegen",
+  "project_id": "spike_builder",
+  "evidence_dir": "artifacts/spikes/builder_real_codegen/run_2026-06-08T09-06-46",
+  "part1_status": "SUCCESS",
+  "part1_all_pass": true,
+  "part1_duration_ms": 3415,
+  "part1_assertions": [
+    {
+      "id": "A1.1",
+      "label": "status === SUCCESS",
+      "pass": true,
+      "actual": "SUCCESS"
+    },
+    {
+      "id": "A1.2",
+      "label": "files_written is Array(length>=1)",
+      "pass": true,
+      "actual": "length=2"
+    },
+    {
+      "id": "A1.3",
+      "label": "all sha256 === 'pending'",
+      "pass": true,
+      "actual": [
+        {
+          "path": "add.js",
+          "sha256": "pending"
+        },
+        {
+          "path": "run.js",
+          "sha256": "pending"
+        }
+      ]
+    },
+    {
+      "id": "A1.4",
+      "label": "OUTPUT_SCHEMA valid",
+      "pass": true,
+      "schema_errors": []
+    },
+    {
+      "id": "A1.5",
+      "label": "no planned source files on disk",
+      "pass": true,
+      "actual": []
+    }
+  ],
+  "part1_gate_denied": false,
+  "files_written_count": 2,
+  "files_written": [
+    {
+      "path": "add.js",
+      "action": "create",
+      "line_count": 10,
+      "sha256": "pending",
+      "description": "This file contains a single function `add(a, b)` which takes two parameters and returns their sum. It is exported using `module.exports` for use in other files."
+    },
+    {
+      "path": "run.js",
+      "action": "create",
+      "line_count": 12,
+      "sha256": "pending",
+      "description": "This file serves as the entry point of the program. It imports the `add` function from `add.js`, calls `add(2, 3)`, and prints the result to the console, ensuring only the integer result is outputted, as per the acceptance criteria."
+    }
+  ],
+  "builder_summary": "Planned and organized the implementation of a simple Node.js project with two files: add.js for exporting an addition function and run.js for invoking the function and printing the result. The use of CommonJS was chosen for broader Node.js compatibility.",
+  "actual_usd_after_part1": 0.00853,
+  "kill_bar_usd": 3,
+  "approaching_kill_bar": false,
+  "all_gates_passed": true,
+  "next": "Awaiting GO-PART-2 from CTO before Part 2 execution"
+}

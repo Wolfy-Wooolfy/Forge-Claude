@@ -1,0 +1,47 @@
+{
+  "ts": "2026-06-08T09:06:50.212Z",
+  "assertions": [
+    {
+      "id": "A1.1",
+      "label": "status === SUCCESS",
+      "pass": true,
+      "actual": "SUCCESS"
+    },
+    {
+      "id": "A1.2",
+      "label": "files_written is Array(length>=1)",
+      "pass": true,
+      "actual": "length=2"
+    },
+    {
+      "id": "A1.3",
+      "label": "all sha256 === 'pending'",
+      "pass": true,
+      "actual": [
+        {
+          "path": "add.js",
+          "sha256": "pending"
+        },
+        {
+          "path": "run.js",
+          "sha256": "pending"
+        }
+      ]
+    },
+    {
+      "id": "A1.4",
+      "label": "OUTPUT_SCHEMA valid",
+      "pass": true,
+      "schema_errors": []
+    },
+    {
+      "id": "A1.5",
+      "label": "no planned source files on disk",
+      "pass": true,
+      "actual": []
+    }
+  ],
+  "pass_count": 5,
+  "total": 5,
+  "all_pass": true
+}
