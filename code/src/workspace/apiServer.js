@@ -1898,6 +1898,18 @@ function createWorkspaceApiServer(options = {}) {
         return;
       }
 
+      if (req.method === "POST" && pathname === "/api/ai-os/project/report-env") {
+        const body = await readBody(req);
+        sendJson(res, 200, await conversationEngine.reportEnv(body));
+        return;
+      }
+
+      if (req.method === "POST" && pathname === "/api/ai-os/project/respond-gate") {
+        const body = await readBody(req);
+        sendJson(res, 200, await conversationEngine.respondGate(body));
+        return;
+      }
+
       if (req.method === "GET" && pathname === "/api/projects") {
         sendJson(res, 200, await listProjects());
         return;
