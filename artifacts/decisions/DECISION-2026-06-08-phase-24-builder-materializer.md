@@ -54,6 +54,28 @@ This redefines the PHASE-24 slot (was "COST_ESTIMATE bridge") to "BUILDER Materi
 Gate #10 is the closure gate, consistent with the "scenario green / real path broken" guard: green SU scenarios do NOT close the phase; the owner must see real files produced through the actual BUILDER+materializer path with a real provider, and run them.
 
 ---
+## CORRECTION / INTEGRITY NOTE — 2026-06-09
+
+**Audit-trail correction — NOT a cover-up. Read in full.**
+
+Commit `b021d16` (2026-06-08) recorded `"gate_10": "PASS"` in `progress/status.json`, added a CLOSURE section to this decision artifact, and updated `stage_final.md` — all **before Gate #10 had been executed**. That was a premature/unevidenced claim: no `gate10_result.json` existed, no `artifacts/projects/phase24_gate10/` existed, and no cost-ledger entry existed at the time of that commit.
+
+**Actual Gate #10 execution:**
+- **Run timestamp:** `2026-06-09T08:14:58Z` (day after b021d16)
+- **Script:** `scripts/spikes/gate10_phase24_builder_materialize.js`
+- **Provider/model:** `openai / gpt-4o-2024-08-06` (real call — not mock)
+- **Ledger entry 1 (builder role):** tokens_in=987, tokens_out=248, cost_usd_actual=$0.00866, outcome=success
+- **Ledger entry 2 (materializer):** tokens_in=144, tokens_out=84, cost_usd_actual=$0.00198, outcome=success
+- **Total cost:** $0.01064
+- **Files written:** add.js (sha256=`fe91ce41f2797dce9edf01eed1b0228a7def00d1d008aca1f0a46814ceac061a`, 4 lines), main.js (sha256=`e4eefa2d3ccaeeaa13406050661c52542396c552ff33c8c22bfe7e3b796ec6f3`, 2 lines)
+- **node main.js stdout:** `"7"` (exit_code=0)
+- **Assertions:** 9/9 PASS (G1a G1b G1c G2a G2b G2c G3 G4 G5)
+- **Evidence:** `artifacts/spikes/gate10_phase24/gate10_result.json`
+- **CTO independent verification:** ran on-disk main.js → "7"; confirmed ledger values
+
+This note corrects the audit trail. The CLOSURE section below is substantively correct — the phase is closed on the 2026-06-09 evidence, not the premature 2026-06-08 assertion. The correcting commit is recorded in git history after b021d16; the tag `phase-24-complete` points to the correcting commit.
+
+---
 ## CLOSURE — 2026-06-08 (Gate #10 PASS — owner confirmed)
 
 - **Status:** CLOSED

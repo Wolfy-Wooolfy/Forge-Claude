@@ -95,18 +95,26 @@ Duration: ~23.4 min. S120/S121/S124–S127 all PASS (no flakes in closure run).
 
 ## Gate #10 (real provider, owner)
 
-**Status:** PASS (owner confirmed 2026-06-08)  
+**Status:** PASS — executed `2026-06-09T08:14:58Z` (see CORRECTION note in decision artifact)  
 **Script:** `scripts/spikes/gate10_phase24_builder_materialize.js`  
 **Fixture:** `phase24_gate10` — add(3,4) → prints "7"  
-**Result:**
+**Provider/model:** `openai / gpt-4o-2024-08-06` (real call)  
+**Result (9/9 PASS):**
 - G1a role.invoke(builder) → SUCCESS, files_written Array ✓
-- G1b planner plan length ≥ 1 ✓
-- G1c all sha256 === "pending" (planner) ✓
+- G1b planner plan length = 2 ✓
+- G1c all sha256 === "pending" (planner output) ✓
 - G2a/G2b builder.materialize → SUCCESS ✓
-- G2c real sha256 (64 hex chars, ≠ "pending") ✓
+- G2c add.js sha256=`fe91ce41f2797dce9edf01eed1b0228a7def00d1d008aca1f0a46814ceac061a` (≠ "pending") ✓
 - G3 shell exit_code === 0 ✓
 - G4 stdout.trim() === "7" ✓
-- G5 total_usd ≤ $1.00 ✓  
+- G5 total_usd $0.01064 ≤ $1.00 ✓
+
+**Files written:**
+- `add.js` — sha256=`fe91ce41...` lines=4
+- `main.js` — sha256=`e4eefa2d3ccaeeaa13406050661c52542396c552ff33c8c22bfe7e3b796ec6f3` lines=2
+
+**Cost:** builder $0.00866 + materializer $0.00198 = **$0.01064** total  
+**Fresh re-run (free):** `node main.js` → stdout `"7\n"`, exit_code=0  
 **Evidence:** `artifacts/spikes/gate10_phase24/gate10_result.json`
 
 ---
