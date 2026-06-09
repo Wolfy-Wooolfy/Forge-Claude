@@ -1273,6 +1273,131 @@ function createConversationEngine(options = {}) {
     }
   }
 
+  // ── Cost Estimate bridge (PHASE-25) ─────────────────────────────────────────
+  //
+  // estimateCost: drives the cost_estimator role from COST_ESTIMATE → ENV_REPORT.
+  // No owner gate on this edge (conversation_graph.js gate_check:null).
+  // Any failure → {ok:true, estimate_error:<code>, advanced:false} (stays COST_ESTIMATE).
+
+  async function estimateCost(body = {}) {
+    const projectId = normalizeProjectId(body.project_id || "");
+    const state     = loadState(projectId);
+
+    if (!state) {
+      return { ok: true, loop_id: null, estimate_error: "PROJECT_NOT_FOUND", advanced: false };
+    }
+
+    const loopId = body.loop_id || state.loop_id || null;
+    if (!loopId) {
+      return { ok: true, loop_id: null, estimate_error: "NO_LOOP_ID", advanced: false };
+    }
+
+    const estimateProvider   = body.estimate_provider   || "openai";
+    const estimateModel      = body.estimate_model || (estimateProvider === "openai" ? "gpt-4o" : undefined);
+    const estimateScenarioId = body.estimate_scenario_id || undefined;
+
+    const reg = getDefaultRegistry();
+
+    // State guard: must be at COST_ESTIMATE
+    const statusResult = await reg.invoke("orchestration.get_status", {
+      project_id: normalizeProjectId(projectId),
+      loop_id:    loopId
+    }, { root });
+
+    if (!statusResult || statusResult.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, estimate_error: "GET_STATUS_FAILED", advanced: false };
+    }
+
+    const currentState = statusResult.output.current_state;
+    if (currentState !== "COST_ESTIMATE") {
+      return { ok: true, loop_id: loopId, current_state: currentState, estimate_error: "WRONG_STATE", advanced: false };
+    }
+
+    // Read spec from disk (same artifact paths as buildProject/reviewSpec)
+    const specRelPath = "artifacts/projects/" + normalizeProjectId(projectId) +
+      "/orchestration/" + loopId + "/spec.json";
+    const specRead = await reg.invoke("fs.read_file", { path: specRelPath }, { root });
+
+    if (!specRead || specRead.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, estimate_error: "INPUT_NOT_FOUND", advanced: false };
+    }
+
+    let spec;
+    try {
+      spec = JSON.parse(specRead.output.content);
+    } catch {
+      return { ok: true, loop_id: loopId, estimate_error: "INPUT_NOT_FOUND", advanced: false };
+    }
+
+    // Read architect design from disk
+    const designRelPath = "artifacts/projects/" + normalizeProjectId(projectId) +
+      "/orchestration/" + loopId + "/architect_design.json";
+    const designRead = await reg.invoke("fs.read_file", { path: designRelPath }, { root });
+
+    if (!designRead || designRead.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, estimate_error: "INPUT_NOT_FOUND", advanced: false };
+    }
+
+    let design;
+    try {
+      design = JSON.parse(designRead.output.content);
+    } catch {
+      return { ok: true, loop_id: loopId, estimate_error: "INPUT_NOT_FOUND", advanced: false };
+    }
+
+    // 30s timeout, mirroring reviewSpec/buildProject
+    let timeoutHandle;
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutHandle = setTimeout(() => reject(new Error("COST_ESTIMATOR_TIMEOUT")), 30000);
+    });
+
+    try {
+      const estimateResult = await Promise.race([
+        reg.invoke("role.invoke", Object.assign(
+          {
+            role_id:    "cost_estimator",
+            input:      { project_id: normalizeProjectId(projectId), spec, design },
+            project_id: normalizeProjectId(projectId),
+            provider:   estimateProvider
+          },
+          estimateModel      ? { model:       estimateModel      } : {},
+          estimateScenarioId ? { scenario_id: estimateScenarioId } : {}
+        ), { root }),
+        timeoutPromise
+      ]);
+      clearTimeout(timeoutHandle);
+
+      if (estimateResult && estimateResult.status === "SUCCESS") {
+        const estimate = estimateResult.output;
+
+        await reg.invoke("orchestration.advance_state", {
+          project_id:      normalizeProjectId(projectId),
+          loop_id:         loopId,
+          to_state:        "ENV_REPORT",
+          transition_type: "NORMAL",
+          role_invoked:    "cost_estimator"
+        }, { root });
+
+        return {
+          ok:          true,
+          loop_id:     loopId,
+          advanced:    true,
+          advanced_to: "ENV_REPORT",
+          estimate,
+          model_used:  estimateModel
+        };
+      }
+
+      const estimateError = (estimateResult && estimateResult.metadata && estimateResult.metadata.detail)
+        || "ESTIMATE_FAILED";
+      return { ok: true, loop_id: loopId, advanced: false, estimate_error: estimateError, model_used: estimateModel };
+
+    } catch (err) {
+      clearTimeout(timeoutHandle);
+      return { ok: true, loop_id: loopId, advanced: false, estimate_error: err.message };
+    }
+  }
+
   function _formatSummaryAsVision(summary, projectId, frontmatter) {
     const lines = [];
     lines.push("# Vision: " + (summary.project_name || projectId));
@@ -1310,6 +1435,7 @@ function createConversationEngine(options = {}) {
     formalizeSpec,
     reviewSpec,
     buildProject,
+    estimateCost,
     CONFIRMATION_REQUIRED_TRANSITIONS
   };
 }

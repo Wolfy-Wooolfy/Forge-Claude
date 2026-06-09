@@ -1,0 +1,16 @@
+{
+  "id": "S275",
+  "name": "estimateCost input-missing — loop at COST_ESTIMATE, no spec/design on disk, returns INPUT_NOT_FOUND, no advance (PHASE-25 Step 1)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/cost_estimate_test_helper",
+  "method": "runS275InputNotFound",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "ok_true",                    "expected": true },
+    { "type": "state_field_equals", "field": "estimate_error_not_found",   "expected": true },
+    { "type": "state_field_equals", "field": "advanced_false",             "expected": true },
+    { "type": "state_field_equals", "field": "graph_still_cost_estimate",  "expected": true }
+  ]
+}

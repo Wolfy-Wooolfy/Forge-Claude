@@ -1,0 +1,16 @@
+{
+  "id": "S273",
+  "name": "estimateCost happy-path — loop seeded COST_ESTIMATE, mock returns valid estimate, graph advances to ENV_REPORT (PHASE-25 Step 1)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/cost_estimate_test_helper",
+  "method": "runS273EstimateCostHappyPath",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "advanced_to_env_report", "expected": true },
+    { "type": "state_field_equals", "field": "estimate_present",       "expected": true },
+    { "type": "state_field_equals", "field": "has_phases",             "expected": true },
+    { "type": "state_field_equals", "field": "graph_state_env_report", "expected": true }
+  ]
+}
