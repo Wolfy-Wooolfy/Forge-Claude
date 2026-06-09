@@ -1,0 +1,28 @@
+{
+  "matResult": {
+    "status": "SUCCESS",
+    "output": {
+      "status": "SUCCESS",
+      "files_written": [
+        {
+          "path": "add.js",
+          "action": "create",
+          "line_count": 4,
+          "sha256": "fe91ce41f2797dce9edf01eed1b0228a7def00d1d008aca1f0a46814ceac061a"
+        },
+        {
+          "path": "main.js",
+          "action": "create",
+          "line_count": 2,
+          "sha256": "e4eefa2d3ccaeeaa13406050661c52542396c552ff33c8c22bfe7e3b796ec6f3"
+        }
+      ],
+      "smoke": {
+        "ran": false
+      },
+      "summary": "Materialized 2 file(s)."
+    },
+    "metadata": {}
+  },
+  "matDuration": 1487
+}

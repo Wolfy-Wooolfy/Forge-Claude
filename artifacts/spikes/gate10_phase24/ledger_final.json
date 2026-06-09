@@ -1,0 +1,38 @@
+{
+  "status": "SUCCESS",
+  "output": {
+    "entries": [
+      {
+        "ts": "2026-06-09T08:14:58.548Z",
+        "invocation_id": "e71d1541-a314-4eed-b912-7f832479792a",
+        "project_id": "phase24_gate10",
+        "provider": "openai",
+        "model": "gpt-4o-2024-08-06",
+        "role": "builder",
+        "tokens_in": 987,
+        "tokens_out": 248,
+        "latency_ms": 5053,
+        "cost_usd_estimated": 0.0379,
+        "cost_usd_actual": 0.00866,
+        "outcome": "success"
+      },
+      {
+        "ts": "2026-06-09T08:15:00.043Z",
+        "invocation_id": "4316dbe1-6975-4cd7-8c3b-5dd4cc004bee",
+        "project_id": "phase24_gate10",
+        "provider": "openai",
+        "model": "gpt-4o-2024-08-06",
+        "role": "materializer",
+        "tokens_in": 144,
+        "tokens_out": 84,
+        "latency_ms": 1463,
+        "cost_usd_estimated": 0.0049,
+        "cost_usd_actual": 0.00198,
+        "outcome": "success"
+      }
+    ],
+    "total_cost": 0.01064,
+    "count": 2
+  },
+  "metadata": {}
+}

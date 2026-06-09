@@ -1,0 +1,10 @@
+{
+  "status": "SUCCESS",
+  "output": {
+    "stdout": "7\n",
+    "stderr": "",
+    "exit_code": 0,
+    "timed_out": false
+  },
+  "metadata": {}
+}
