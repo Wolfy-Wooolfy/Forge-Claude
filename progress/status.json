@@ -73,7 +73,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-06-09T09:46:20.689Z",
+    "last_doctor_run": "2026-06-09T12:39:38.811Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
@@ -363,7 +363,12 @@
     "mid_checkpoint": "artifacts/decisions/_phase_25_checkpoints/stage_mid.md",
     "final_checkpoint": "artifacts/decisions/_phase_25_checkpoints/stage_final.md",
     "suite_final": "269/0/5 (274 total)",
-    "scenarios_added": ["S273", "S274", "S275", "S276"],
+    "scenarios_added": [
+      "S273",
+      "S274",
+      "S275",
+      "S276"
+    ],
     "gate_10": "PASS",
     "gate_10_run_ts": "2026-06-09T10:25:12Z",
     "gate_10_confirmed_at": "2026-06-09",
@@ -392,7 +397,11 @@
     "track_a": "CLEAN — estimateCost() and endpoint use reg.invoke only; 0 new forbidden patterns; §ARC unchanged",
     "cost_actuals_usd": 0.01398,
     "findings_open": [],
-    "deferred": ["ENV_REPORT bridge (PHASE-26)", "TEST_DESIGN bridge (PHASE-27)", "buildProject endpoint (PHASE-28)"]
+    "deferred": [
+      "ENV_REPORT bridge (PHASE-26)",
+      "TEST_DESIGN bridge (PHASE-27)",
+      "buildProject endpoint (PHASE-28)"
+    ]
   },
   "ux_task_2026_06_07_multiselect": {
     "status": "CLOSED",
