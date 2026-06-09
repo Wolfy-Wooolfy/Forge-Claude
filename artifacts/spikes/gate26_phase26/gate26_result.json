@@ -1,0 +1,82 @@
+{
+  "ts": "2026-06-09T14:05:41.154Z",
+  "verdict": "PASS",
+  "assertions": [
+    {
+      "id": "G1a",
+      "pass": true
+    },
+    {
+      "id": "G1b",
+      "pass": true
+    },
+    {
+      "id": "G1c",
+      "pass": true
+    },
+    {
+      "id": "G1d",
+      "pass": true
+    },
+    {
+      "id": "G1e",
+      "pass": true
+    },
+    {
+      "id": "G1f",
+      "pass": true
+    },
+    {
+      "id": "G2",
+      "pass": true
+    },
+    {
+      "id": "G3",
+      "pass": true
+    },
+    {
+      "id": "G4a",
+      "pass": true
+    },
+    {
+      "id": "G4b",
+      "pass": true
+    },
+    {
+      "id": "G5",
+      "pass": true
+    },
+    {
+      "id": "G6",
+      "pass": true
+    },
+    {
+      "id": "G7",
+      "pass": true
+    }
+  ],
+  "pass_count": 13,
+  "total": 13,
+  "total_usd": 0.01397,
+  "project_id": "phase26_gate10",
+  "loop_id": "gate26-loop-1781013935639",
+  "loop_state_after_report": "ENV_REPORT",
+  "loop_state_after_gate": "TEST_DESIGN",
+  "env_report_summary": "The environment targets a Docker container hosting a Node.js application with Express for HTTP handling and SQLite for storage. Key dependencies include Node.js 18+ and Express 4.x, with moderate complexity. The primary setup risk involves ensuring containerized SQLite database performance meets expectations for larger datasets.",
+  "env_report_target": "container",
+  "env_report_on_disk": true,
+  "ledger_entry": {
+    "ts": "2026-06-09T14:05:41.003Z",
+    "invocation_id": "900838c3-845a-431e-991b-6c60d230b1f9",
+    "project_id": "phase26_gate10",
+    "provider": "openai",
+    "model": "gpt-4o-2024-08-06",
+    "role": "environment",
+    "tokens_in": 1343,
+    "tokens_out": 484,
+    "latency_ms": 4188,
+    "cost_usd_estimated": 0.0495,
+    "cost_usd_actual": 0.01397,
+    "outcome": "success"
+  }
+}

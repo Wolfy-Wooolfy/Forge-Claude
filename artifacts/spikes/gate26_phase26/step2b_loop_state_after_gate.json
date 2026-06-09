@@ -1,0 +1,16 @@
+{
+  "loopState": "TEST_DESIGN",
+  "statusResult": {
+    "status": "SUCCESS",
+    "output": {
+      "loop_id": "gate26-loop-1781013935639",
+      "current_state": "TEST_DESIGN",
+      "iteration_count": 0,
+      "started_at": "2026-06-09T14:05:36.515Z",
+      "last_advanced_at": "2026-06-09T14:05:41.083Z",
+      "nodes_count": 0,
+      "edges_count": 0
+    },
+    "metadata": {}
+  }
+}

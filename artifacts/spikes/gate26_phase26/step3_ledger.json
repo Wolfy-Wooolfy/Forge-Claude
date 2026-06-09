@@ -1,0 +1,24 @@
+{
+  "status": "SUCCESS",
+  "output": {
+    "entries": [
+      {
+        "ts": "2026-06-09T14:05:41.003Z",
+        "invocation_id": "900838c3-845a-431e-991b-6c60d230b1f9",
+        "project_id": "phase26_gate10",
+        "provider": "openai",
+        "model": "gpt-4o-2024-08-06",
+        "role": "environment",
+        "tokens_in": 1343,
+        "tokens_out": 484,
+        "latency_ms": 4188,
+        "cost_usd_estimated": 0.0495,
+        "cost_usd_actual": 0.01397,
+        "outcome": "success"
+      }
+    ],
+    "total_cost": 0.01397,
+    "count": 1
+  },
+  "metadata": {}
+}

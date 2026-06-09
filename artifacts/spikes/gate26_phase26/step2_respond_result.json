@@ -1,0 +1,11 @@
+{
+  "respondResult": {
+    "ok": true,
+    "loop_id": "gate26-loop-1781013935639",
+    "gate_id": 1,
+    "response": "APPROVE",
+    "advanced_to": "TEST_DESIGN",
+    "advanced": true
+  },
+  "respondDuration": 44
+}

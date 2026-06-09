@@ -1,0 +1,16 @@
+{
+  "loopState": "ENV_REPORT",
+  "statusResult": {
+    "status": "SUCCESS",
+    "output": {
+      "loop_id": "gate26-loop-1781013935639",
+      "current_state": "ENV_REPORT",
+      "iteration_count": 0,
+      "started_at": "2026-06-09T14:05:36.515Z",
+      "last_advanced_at": "2026-06-09T14:05:36.709Z",
+      "nodes_count": 0,
+      "edges_count": 0
+    },
+    "metadata": {}
+  }
+}
