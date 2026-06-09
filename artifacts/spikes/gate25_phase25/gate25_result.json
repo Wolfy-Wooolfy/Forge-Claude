@@ -1,0 +1,64 @@
+{
+  "ts": "2026-06-09T10:25:12.517Z",
+  "verdict": "PASS",
+  "assertions": [
+    {
+      "id": "G1a",
+      "pass": true
+    },
+    {
+      "id": "G1b",
+      "pass": true
+    },
+    {
+      "id": "G2a",
+      "pass": true
+    },
+    {
+      "id": "G2b",
+      "pass": true
+    },
+    {
+      "id": "G2c",
+      "pass": true
+    },
+    {
+      "id": "G2d",
+      "pass": true
+    },
+    {
+      "id": "G3",
+      "pass": true
+    },
+    {
+      "id": "G4",
+      "pass": true
+    },
+    {
+      "id": "G5",
+      "pass": true
+    }
+  ],
+  "pass_count": 9,
+  "total": 9,
+  "total_usd": 0.01398,
+  "project_id": "phase25_gate10",
+  "loop_id": "gate25-loop-1781000706032",
+  "loop_state_final": "ENV_REPORT",
+  "estimate_summary": "The effort estimate for implementing the Todo List API is moderate, with the core logic phase as the biggest cost driver due to endpoint and database CRUD operations. The main assumption is the SQLite database will handle the data load efficiently without performance degradation.",
+  "estimate_effort_mid_hours": 42,
+  "ledger_entry": {
+    "ts": "2026-06-09T10:25:12.452Z",
+    "invocation_id": "af2c1f46-fccd-46a9-8531-310309104e1e",
+    "project_id": "phase25_gate10",
+    "provider": "openai",
+    "model": "gpt-4o-2024-08-06",
+    "role": "cost_estimator",
+    "tokens_in": 1166,
+    "tokens_out": 543,
+    "latency_ms": 5965,
+    "cost_usd_estimated": 0.0414,
+    "cost_usd_actual": 0.01398,
+    "outcome": "success"
+  }
+}
