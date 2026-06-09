@@ -1,7 +1,7 @@
 # PHASE-25 Final Checkpoint
 
 **Date:** 2026-06-09
-**Status:** IMPLEMENTATION COMPLETE — Gate #10 PENDING (real owner run required before closure)
+**Status:** CLOSED — Gate #10 PASS (2026-06-09T10:25:12Z)
 **Decision artifact:** `artifacts/decisions/DECISION-2026-06-09-phase-25-cost-estimate-bridge.md`
 
 ---
@@ -104,7 +104,7 @@ All forbidden pattern counts: 0
 
 ---
 
-## Closure Gate status (pre-Gate #10)
+## Closure Gate status — ALL SATISFIED
 
 - [x] ≥4 mock scenarios: S273/S274/S275/S276 — all PASS
 - [x] Full SU suite green: 269/0/5 (274 total) — no new fails
@@ -112,24 +112,35 @@ All forbidden pattern counts: 0
 - [x] §ARC count = 8 (unchanged)
 - [x] stage_mid.md written
 - [x] stage_final.md written (this file)
-- [ ] Decision artifact CLOSED — **PENDING Gate #10**
-- [ ] status.json phase_25 block — **PENDING Gate #10**
-- [ ] Gate #10 evidence on disk — **PENDING owner real run**
+- [x] Decision artifact CLOSED — `DECISION-2026-06-09-phase-25-cost-estimate-bridge.md`
+- [x] status.json phase_25 block — CLOSED, gate_10 PASS
+- [x] Gate #10 evidence on disk — `artifacts/spikes/gate25_phase25/gate25_result.json` PASS
 
 ---
 
-## Gate #10 specification (for STEP B)
+## Gate #10 — PASS
 
-**Script to write:** `scripts/spikes/gate10_phase25_cost_estimate.js`  
-**Pattern:** mirrors `gate10_phase24_builder_materialize.js` (no scenario_id, real gpt-4o)  
-**Provider override:** `provider="openai"`, `model="gpt-4o"` (cost_estimator role default is anthropic/claude-opus-4-7; ctx override required — see CTO note in GO message)  
-**Steps:**
-1. Create + seed canonical project at COST_ESTIMATE with real spec + design artifacts
-2. POST to `/api/ai-os/project/estimate-cost` (or call engine directly with openai/gpt-4o)
-3. Assert: `advanced:true`, `advanced_to:"ENV_REPORT"`, `estimate.summary` present, `cost_usd ≤ $1`
-4. Write `artifacts/spikes/gate10_phase25/gate10_result.json` with all assertion results
+**Run timestamp:** 2026-06-09T10:25:12Z  
+**Script:** `scripts/spikes/gate25_phase25_cost_estimate.js`  
+**Fixture:** `phase25_gate10` — Todo List REST API (Node.js/Express + SQLite)  
+**Provider/model:** `openai / gpt-4o-2024-08-06` (real call)  
+**Evidence:** `artifacts/spikes/gate25_phase25/gate25_result.json`
 
-**NOT CLOSED until:** evidence file exists on disk and reads PASS.
+**Result (9/9 PASS):**
+| ID | Assertion | Result |
+|---|---|---|
+| G1a | `advanced === true` | ✓ |
+| G1b | `advanced_to === "ENV_REPORT"` | ✓ |
+| G2a | `estimate.phases` Array(4) | ✓ |
+| G2b | `total_effort_mid_hours = 42` (> 0) | ✓ |
+| G2c | `estimate.external_costs` Array | ✓ |
+| G2d | `estimate.top_risks` Array(2) | ✓ |
+| G3  | `loop current_state === "ENV_REPORT"` | ✓ |
+| G4  | Ledger: openai/gpt-4o-2024-08-06, cost=$0.01398, role=cost_estimator | ✓ |
+| G5  | `total_usd $0.01398 ≤ $1.00` | ✓ |
+
+**Cost:** $0.01398 (tokens: 1166 in / 543 out, latency: 5965ms)  
+**CTO verification:** 2026-06-09 — evidence on disk, real tokens, loop at ENV_REPORT, 9/9 PASS
 
 ---
 

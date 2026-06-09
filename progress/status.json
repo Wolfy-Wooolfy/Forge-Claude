@@ -4,9 +4,9 @@
   "current_stage": "A",
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
-  "next_phase": "PHASE-25-PENDING-DECISION",
-  "next_step": "PHASE-25 pending decision. PHASE-24 (BUILDER Materializer) CLOSED — Gate #10 PASS. COST_ESTIMATE / ENV_REPORT / TEST_DESIGN bridges deferred.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-08-phase-24-builder-materializer.md",
+  "next_phase": "PHASE-26-PENDING-DECISION",
+  "next_step": "PHASE-25 (COST_ESTIMATE Bridge) CLOSED — Gate #10 PASS. Loop reaches ENV_REPORT. Next: PHASE-26 (ENV_REPORT bridge + Gate 1).",
+  "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-09-phase-25-cost-estimate-bridge.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -160,9 +160,10 @@
       "PHASE-21",
       "PHASE-22",
       "PHASE-23",
-      "PHASE-24"
+      "PHASE-24",
+      "PHASE-25"
     ],
-    "next": "PHASE-25 (pending decision)",
+    "next": "PHASE-26 (pending decision)",
     "remaining": [],
     "phase_16_closed": "2026-05-28",
     "phase_17_closed": "2026-05-29",
@@ -346,13 +347,52 @@
     "amendment_1": "wiring in conversationEngine.js buildProject() (not iteration_controller.js); baseline 264 not 137",
     "track_a": "CLEAN — all new production files use reg.invoke only; no direct fs.*Sync / new OpenAI()",
     "deferred": [
-      "COST_ESTIMATE bridge",
-      "ENV_REPORT bridge",
-      "TEST_DESIGN bridge"
+      "ENV_REPORT bridge (PHASE-26)",
+      "TEST_DESIGN bridge (PHASE-27)",
+      "buildProject endpoint (PHASE-28)"
     ],
     "cost_actuals_usd": 0,
     "findings_open": [],
     "backlog": "builtproject server scenarios (S120/S121/S124-S127) flake under full-suite load — harden later (configurable wait_for_port / randomized port / clean teardown / stop pm2 during suite). Pre-existing; not PHASE-24."
+  },
+  "phase_25": {
+    "status": "CLOSED",
+    "closed_at": "2026-06-09",
+    "title": "COST_ESTIMATE Bridge",
+    "plan_artifact": "artifacts/decisions/DECISION-2026-06-09-phase-25-cost-estimate-bridge.md",
+    "mid_checkpoint": "artifacts/decisions/_phase_25_checkpoints/stage_mid.md",
+    "final_checkpoint": "artifacts/decisions/_phase_25_checkpoints/stage_final.md",
+    "suite_final": "269/0/5 (274 total)",
+    "scenarios_added": ["S273", "S274", "S275", "S276"],
+    "gate_10": "PASS",
+    "gate_10_run_ts": "2026-06-09T10:25:12Z",
+    "gate_10_confirmed_at": "2026-06-09",
+    "gate_10_result": "real openai/gpt-4o-2024-08-06 produced cost estimate for phase25_gate10 (Todo List API); loop advanced COST_ESTIMATE → ENV_REPORT; 9/9 assertions PASS",
+    "gate_10_cost_usd": 0.01398,
+    "gate_10_evidence": "artifacts/spikes/gate25_phase25/gate25_result.json",
+    "arc_ledger_count": 8,
+    "l2_tools": 79,
+    "agent_roles": 13,
+    "files_created": [
+      "code/src/testing/helpers/cost_estimate_test_helper.js",
+      "code/src/testing/scenarios/S273_estimate_cost_happy_path.json",
+      "code/src/testing/scenarios/S274_estimate_cost_wrong_state.json",
+      "code/src/testing/scenarios/S275_estimate_cost_input_not_found.json",
+      "code/src/testing/scenarios/S276_estimate_cost_role_failure.json",
+      "scripts/spikes/gate25_phase25_cost_estimate.js",
+      "artifacts/decisions/_phase_25_checkpoints/stage_mid.md",
+      "artifacts/decisions/_phase_25_checkpoints/stage_final.md"
+    ],
+    "files_modified": [
+      "code/src/ai_os/conversationEngine.js",
+      "code/src/workspace/apiServer.js",
+      "code/src/runtime/agents/adapters/mock_responses.json",
+      "progress/status.json"
+    ],
+    "track_a": "CLEAN — estimateCost() and endpoint use reg.invoke only; 0 new forbidden patterns; §ARC unchanged",
+    "cost_actuals_usd": 0.01398,
+    "findings_open": [],
+    "deferred": ["ENV_REPORT bridge (PHASE-26)", "TEST_DESIGN bridge (PHASE-27)", "buildProject endpoint (PHASE-28)"]
   },
   "ux_task_2026_06_07_multiselect": {
     "status": "CLOSED",
@@ -1290,8 +1330,8 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-24 CLOSED — BUILDER Materializer (Path A) complete. materializerEngine + builder.materialize tool + buildProject() bridge in conversationEngine.js. Real gpt-4o builds runnable files (add.js+main.js, stdout '7'). Gate #10 PASS. Suite 265/0/5 (270 total). §ARC 8. Next: PHASE-25 pending decision.",
-  "last_updated": "2026-06-08T00:00:00.000Z",
+  "current_task": "PHASE-25 CLOSED — COST_ESTIMATE Bridge complete. estimateCost() + /api/ai-os/project/estimate-cost endpoint. COST_ESTIMATE → ENV_REPORT (no owner gate). Real gpt-4o: 42h mid estimate for Todo API. Gate #10 PASS. Suite 269/0/5 (274 total). §ARC 8. Next: PHASE-26 (ENV_REPORT bridge + Gate 1) pending decision.",
+  "last_updated": "2026-06-09T00:00:00.000Z",
   "phase_16": {
     "status": "ACTIVE",
     "started_at": "2026-05-24T16:00:00.000Z",

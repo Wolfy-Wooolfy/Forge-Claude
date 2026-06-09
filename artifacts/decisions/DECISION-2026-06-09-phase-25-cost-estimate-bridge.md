@@ -1,6 +1,6 @@
 # DECISION-2026-06-09 — PHASE-25: COST_ESTIMATE Bridge
 
-**Status:** APPROVED (owner delegated CTO decision authority — see §9)
+**Status:** CLOSED — Gate #10 PASS (2026-06-09T10:25:12Z)
 **Date:** 2026-06-09
 **Relates:** continues the pipeline-bridge sequence after PHASE-23 (reviewer spec) and PHASE-24 (BUILDER Materializer, Path A — closed @ 5bf019e).
 
@@ -51,3 +51,50 @@ Owner (Khaled) delegated PHASE-25 decision authority to the CTO advisor on 2026-
 
 ## 10. Forward path (context, not in scope)
 25 (this) → 26 (ENV_REPORT + Gate 1) → 27 (TEST_DESIGN) → 28 (buildProject endpoint). After 28: owner goes idea → real, running, materialized build end-to-end.
+
+## 11. CLOSURE — Gate #10 PASS
+
+**Gate #10 run:** 2026-06-09T10:25:12Z  
+**Script:** `scripts/spikes/gate25_phase25_cost_estimate.js`  
+**Fixture:** `phase25_gate10` — Todo List REST API (Node.js/Express + SQLite)  
+**Provider/model:** `openai / gpt-4o-2024-08-06` (real call)  
+**Evidence:** `artifacts/spikes/gate25_phase25/gate25_result.json`
+
+**Result (9/9 PASS):**
+- G1a `advanced === true` ✓
+- G1b `advanced_to === "ENV_REPORT"` ✓
+- G2a `estimate.phases` Array(4) ✓
+- G2b `total_effort_mid_hours = 42` (> 0) ✓
+- G2c `estimate.external_costs` Array ✓
+- G2d `estimate.top_risks` Array(2) ✓
+- G3 `loop current_state === "ENV_REPORT"` ✓
+- G4 Ledger: `openai/gpt-4o-2024-08-06`, `cost_usd_actual=$0.01398`, `role=cost_estimator` ✓
+- G5 `total_usd $0.01398 ≤ $1.00` ✓
+
+**Estimate summary (real gpt-4o output):**  
+"The effort estimate for implementing the Todo List API is moderate, with the core logic phase as the biggest cost driver due to endpoint and database CRUD operations. The main assumption is the SQLite database will handle the data load efficiently without performance degradation."  
+Effort: 28–66 hours (mid: 42h). 4 phases. 2 risks.
+
+**Ledger entry:**
+```json
+{
+  "provider": "openai", "model": "gpt-4o-2024-08-06",
+  "role": "cost_estimator",
+  "tokens_in": 1166, "tokens_out": 543,
+  "latency_ms": 5965,
+  "cost_usd_actual": 0.01398,
+  "outcome": "success"
+}
+```
+
+**Note:** Attempt-1 failed with `VISION_NOT_LOCKED` (agent_budget_rule §A) — gate script was missing vision.md write step (same as PHASE-24 pattern). Fixed in same run; no premature closure written. Gate ran BEFORE closure — no correction note required.
+
+**CTO verification:** 2026-06-09 — confirmed gate25_result.json on disk, real latency, real tokens, loop at ENV_REPORT, 9/9 PASS.
+
+**Closure gate (all satisfied):**
+- [x] ≥4 mock scenarios: S273/S274/S275/S276 — all PASS
+- [x] Full SU suite: 269/0/5 (274 total) — no new fails
+- [x] Track A clean — 0 new forbidden patterns
+- [x] §ARC = 8 (unchanged)
+- [x] Decision CLOSED + stage_final written + status.json phase_25 updated
+- [x] Gate #10 PASS — real gpt-4o, on-disk evidence verified by CTO
