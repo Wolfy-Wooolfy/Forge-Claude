@@ -73,7 +73,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-06-08T14:48:06.220Z",
+    "last_doctor_run": "2026-06-09T09:00:02.949Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
@@ -312,7 +312,14 @@
     "plan_artifact": "artifacts/decisions/DECISION-2026-06-08-phase-24-builder-materializer.md",
     "final_checkpoint": "artifacts/decisions/_phase_24_checkpoints/stage_final.md",
     "suite_final": "265/0/5 (270 total)",
-    "scenarios_added": ["S267", "S268", "S269", "S270", "S271", "S272"],
+    "scenarios_added": [
+      "S267",
+      "S268",
+      "S269",
+      "S270",
+      "S271",
+      "S272"
+    ],
     "gate_10": "PASS",
     "gate_10_run_ts": "2026-06-09T08:14:58Z",
     "gate_10_confirmed_at": "2026-06-09",
@@ -338,7 +345,11 @@
     ],
     "amendment_1": "wiring in conversationEngine.js buildProject() (not iteration_controller.js); baseline 264 not 137",
     "track_a": "CLEAN — all new production files use reg.invoke only; no direct fs.*Sync / new OpenAI()",
-    "deferred": ["COST_ESTIMATE bridge", "ENV_REPORT bridge", "TEST_DESIGN bridge"],
+    "deferred": [
+      "COST_ESTIMATE bridge",
+      "ENV_REPORT bridge",
+      "TEST_DESIGN bridge"
+    ],
     "cost_actuals_usd": 0,
     "findings_open": [],
     "backlog": "builtproject server scenarios (S120/S121/S124-S127) flake under full-suite load — harden later (configurable wait_for_port / randomized port / clean teardown / stop pm2 during suite). Pre-existing; not PHASE-24."
