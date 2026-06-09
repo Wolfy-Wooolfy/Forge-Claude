@@ -50,3 +50,61 @@ Owner (Khaled) delegated PHASE-26 decision authority to the CTO advisor on 2026-
 
 ## 10. Forward path (context, not in scope)
 26 (this) → 27 (TEST_DESIGN) → 28 (buildProject endpoint). After 28: owner goes idea → real, running, materialized build end-to-end.
+
+---
+
+## CLOSURE (Gate #10 verified by CTO 2026-06-09)
+
+**Status:** CLOSED
+
+### Gate #10 real run
+
+| Field | Value |
+|---|---|
+| run_ts | 2026-06-09T14:05:41Z |
+| provider | openai |
+| model | gpt-4o-2024-08-06 |
+| role | environment |
+| tokens_in | 1343 |
+| tokens_out | 484 |
+| latency_ms | 4188 (real API — vs respondGate 44ms no-LLM) |
+| cost_usd_actual | $0.01397 |
+| assertions | 13/13 PASS |
+| evidence | artifacts/spikes/gate26_phase26/gate26_result.json |
+
+### Real flow verified
+
+```
+reportEnv(openai/gpt-4o)
+  → role.invoke(environment) → real gpt-4o-2024-08-06
+  → env_report { target_environment:"container", runtime_dependencies:[3], environment_variables:[2] }
+  → env_report.json persisted to disk  ← Refinement 1 confirmed
+  → gate_pending:1, advanced:false
+  → loop current_state: ENV_REPORT  ← G3 confirmed (independent get_status read)
+
+respondGate(gate_id:1, response:"APPROVE")
+  → orchestration.respond → fireGate(1, "APPROVE")
+  → loop advanced: ENV_REPORT → TEST_DESIGN
+  → loop current_state: TEST_DESIGN  ← G5 confirmed (independent get_status read)
+```
+
+### Closure gate checklist
+
+- [x] ≥6 mock scenarios: 7 (S277–S283) — all PASS
+- [x] Full SU suite green: 276/0/5 (281 total) — zero regressions
+- [x] Track A clean: 0 new forbidden patterns in conversationEngine.js + apiServer.js
+- [x] §ARC = 8 (unchanged — 1,3,4,5,6,8,9 — owner confirmed)
+- [x] Decision artifact closed (this section)
+- [x] stage_mid.md + stage_final.md written
+- [x] status.json phase_26 block present
+- [x] Gate #10 PASS verified by CTO — evidence file on disk before closure
+
+### Suite delta
+
+| | Before | After |
+|---|---|---|
+| Scenarios | 274 (PHASE-25 close) | 281 |
+| New | 0 | S277–S283 (7) |
+| Pass | 269 | 276 |
+| Fail | 0 | 0 |
+| Skip | 5 | 5 |

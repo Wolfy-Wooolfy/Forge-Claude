@@ -144,3 +144,42 @@ new OpenAI()     → 0   fetch()         → 0
 
 **Evidence path:** `artifacts/spikes/gate26_phase26/gate26_result.json`  
 **Cost budget:** ~$0.01–0.02; kill bar $3.00
+
+---
+
+## Gate #10 Result (STEP B — CTO verified 2026-06-09)
+
+**Verdict: PASS — 13/13 assertions**
+
+| Field | Value |
+|---|---|
+| run_ts | 2026-06-09T14:05:41Z |
+| provider | openai / gpt-4o-2024-08-06 |
+| role | environment |
+| tokens_in/out | 1343 / 484 |
+| reportEnv latency | 4188ms (real API) |
+| respondGate latency | 44ms (no LLM) |
+| cost_usd_actual | $0.01397 |
+| loop after reportEnv | ENV_REPORT (gate_pending:1) |
+| loop after APPROVE | TEST_DESIGN |
+| env_report.json on disk | YES |
+| evidence | artifacts/spikes/gate26_phase26/gate26_result.json |
+
+**Assertions:**
+```
+G1a gate_pending:1               PASS
+G1b advanced:false               PASS
+G1c target_environment present   PASS  ("container")
+G1d runtime_dependencies Array   PASS  (length=3)
+G1e environment_variables Array  PASS  (length=2)
+G1f summary present              PASS
+G2  env_report.json on disk      PASS
+G3  loop ENV_REPORT after report PASS
+G4a advanced:true after APPROVE  PASS
+G4b advanced_to TEST_DESIGN      PASS
+G5  loop TEST_DESIGN after gate  PASS
+G6  ledger real env entry        PASS  (openai/gpt-4o-2024-08-06 cost=$0.01397)
+G7  total_usd ≤ $1.00            PASS  ($0.01397)
+```
+
+**PHASE-26 CLOSED.**

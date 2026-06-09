@@ -4,9 +4,9 @@
   "current_stage": "A",
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
-  "next_phase": "PHASE-26-PENDING-DECISION",
-  "next_step": "PHASE-25 (COST_ESTIMATE Bridge) CLOSED — Gate #10 PASS. Loop reaches ENV_REPORT. Next: PHASE-26 (ENV_REPORT bridge + Gate 1).",
-  "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-09-phase-25-cost-estimate-bridge.md",
+  "next_phase": "PHASE-27-PENDING-DECISION",
+  "next_step": "PHASE-26 (ENV_REPORT Bridge + Gate 1) CLOSED — Gate #10 PASS. Loop reaches TEST_DESIGN. Next: PHASE-27 (TEST_DESIGN bridge).",
+  "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-09-phase-26-env-report-gate1.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -161,9 +161,10 @@
       "PHASE-22",
       "PHASE-23",
       "PHASE-24",
-      "PHASE-25"
+      "PHASE-25",
+      "PHASE-26"
     ],
-    "next": "PHASE-26 (pending decision)",
+    "next": "PHASE-27 (pending decision)",
     "remaining": [],
     "phase_16_closed": "2026-05-28",
     "phase_17_closed": "2026-05-29",
@@ -398,7 +399,59 @@
     "cost_actuals_usd": 0.01398,
     "findings_open": [],
     "deferred": [
-      "ENV_REPORT bridge (PHASE-26)",
+      "TEST_DESIGN bridge (PHASE-27)",
+      "buildProject endpoint (PHASE-28)"
+    ]
+  },
+  "phase_26": {
+    "status": "CLOSED",
+    "closed_at": "2026-06-09",
+    "title": "ENV_REPORT Bridge + Gate 1",
+    "plan_artifact": "artifacts/decisions/DECISION-2026-06-09-phase-26-env-report-gate1.md",
+    "mid_checkpoint": "artifacts/decisions/_phase_26_checkpoints/stage_mid.md",
+    "final_checkpoint": "artifacts/decisions/_phase_26_checkpoints/stage_final.md",
+    "suite_final": "276/0/5 (281 total)",
+    "scenarios_added": [
+      "S277",
+      "S278",
+      "S279",
+      "S280",
+      "S281",
+      "S282",
+      "S283"
+    ],
+    "gate_10": "PASS",
+    "gate_10_run_ts": "2026-06-09T14:05:41Z",
+    "gate_10_confirmed_at": "2026-06-09",
+    "gate_10_result": "real openai/gpt-4o-2024-08-06 produced env report for phase26_gate10 (Todo List API); gate_pending:1; loop held at ENV_REPORT; Owner APPROVE → TEST_DESIGN; 13/13 assertions PASS",
+    "gate_10_cost_usd": 0.01397,
+    "gate_10_evidence": "artifacts/spikes/gate26_phase26/gate26_result.json",
+    "arc_ledger_count": 8,
+    "l2_tools": 79,
+    "agent_roles": 13,
+    "files_created": [
+      "code/src/testing/helpers/env_report_test_helper.js",
+      "code/src/testing/scenarios/S277_env_report_happy_path.json",
+      "code/src/testing/scenarios/S278_env_report_wrong_state.json",
+      "code/src/testing/scenarios/S279_env_report_input_not_found.json",
+      "code/src/testing/scenarios/S280_env_report_role_failure.json",
+      "code/src/testing/scenarios/S281_respond_gate_approve.json",
+      "code/src/testing/scenarios/S282_respond_gate_reject.json",
+      "code/src/testing/scenarios/S283_respond_gate_invalid.json",
+      "scripts/spikes/gate26_phase26_env_report.js",
+      "artifacts/decisions/_phase_26_checkpoints/stage_mid.md",
+      "artifacts/decisions/_phase_26_checkpoints/stage_final.md"
+    ],
+    "files_modified": [
+      "code/src/ai_os/conversationEngine.js",
+      "code/src/workspace/apiServer.js",
+      "code/src/runtime/agents/adapters/mock_responses.json",
+      "progress/status.json"
+    ],
+    "track_a": "CLEAN — reportEnv() + respondGate() + endpoints use reg.invoke/role.invoke/orchestration.respond only; 0 new forbidden patterns; §ARC unchanged",
+    "cost_actuals_usd": 0.01397,
+    "findings_open": [],
+    "deferred": [
       "TEST_DESIGN bridge (PHASE-27)",
       "buildProject endpoint (PHASE-28)"
     ]
@@ -1339,8 +1392,8 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-25 CLOSED — COST_ESTIMATE Bridge complete. estimateCost() + /api/ai-os/project/estimate-cost endpoint. COST_ESTIMATE → ENV_REPORT (no owner gate). Real gpt-4o: 42h mid estimate for Todo API. Gate #10 PASS. Suite 269/0/5 (274 total). §ARC 8. Next: PHASE-26 (ENV_REPORT bridge + Gate 1) pending decision.",
-  "last_updated": "2026-06-09T00:00:00.000Z",
+  "current_task": "PHASE-26 CLOSED — ENV_REPORT Bridge + Gate 1 complete. reportEnv() + respondGate() + /report-env + /respond-gate endpoints. Real gpt-4o env report (container/Node.js/SQLite) → gate_pending:1 → Owner APPROVE → TEST_DESIGN. Gate #10 PASS 13/13, $0.01397. Suite 276/0/5 (281 total). §ARC 8. Next: PHASE-27 (TEST_DESIGN bridge) pending decision.",
+  "last_updated": "2026-06-09T14:05:41.000Z",
   "phase_16": {
     "status": "ACTIVE",
     "started_at": "2026-05-24T16:00:00.000Z",
