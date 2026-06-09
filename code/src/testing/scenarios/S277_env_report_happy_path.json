@@ -1,0 +1,18 @@
+{
+  "id": "S277",
+  "name": "reportEnv happy-path — loop seeded ENV_REPORT, mock returns valid env report, env_report.json written, gate_pending:1, loop stays ENV_REPORT (PHASE-26 Step 1)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/env_report_test_helper",
+  "method": "runS277EnvReportHappyPath",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "gate_pending_1",          "expected": true },
+    { "type": "state_field_equals", "field": "advanced_false",          "expected": true },
+    { "type": "state_field_equals", "field": "env_report_present",      "expected": true },
+    { "type": "state_field_equals", "field": "has_summary",             "expected": true },
+    { "type": "state_field_equals", "field": "graph_still_env_report",  "expected": true },
+    { "type": "state_field_equals", "field": "env_report_file_written", "expected": true }
+  ]
+}

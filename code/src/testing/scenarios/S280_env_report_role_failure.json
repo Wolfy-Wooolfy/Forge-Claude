@@ -1,0 +1,17 @@
+{
+  "id": "S280",
+  "name": "reportEnv role-failure — mock returns invalid output (fails OUTPUT_SCHEMA), returns ENV_REPORT_FAILED, advanced:false, graph unchanged (PHASE-26 Step 1)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/env_report_test_helper",
+  "method": "runS280RoleFailure",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "ok_true",                 "expected": true },
+    { "type": "state_field_equals", "field": "env_error_set",           "expected": true },
+    { "type": "state_field_equals", "field": "advanced_false",          "expected": true },
+    { "type": "state_field_equals", "field": "model_used_gpt4o",        "expected": true },
+    { "type": "state_field_equals", "field": "graph_still_env_report",  "expected": true }
+  ]
+}

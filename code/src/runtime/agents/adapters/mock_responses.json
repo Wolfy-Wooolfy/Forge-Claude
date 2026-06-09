@@ -370,5 +370,17 @@
     "tokens_in": 100,
     "tokens_out": 10,
     "finish_reason": "stop"
+  },
+  "mock|mock|scenario:S277": {
+    "text": "{\"target_environment\":\"container\",\"runtime_dependencies\":[{\"name\":\"Node.js\",\"version_constraint\":\">=20.0.0\",\"purpose\":\"Application runtime\"},{\"name\":\"SQLite3\",\"version_constraint\":\">=3.40.0\",\"purpose\":\"Embedded database\"}],\"environment_variables\":[{\"name\":\"PORT\",\"purpose\":\"API server port\",\"format\":\"integer\",\"required\":false,\"is_secret\":false,\"example\":\"3000\"},{\"name\":\"DB_PATH\",\"purpose\":\"SQLite database file path\",\"format\":\"filesystem path\",\"required\":false,\"is_secret\":false,\"example\":\"/app/data/tasks.db\"}],\"external_services\":[],\"os_requirements\":{\"os_family\":\"linux\"},\"container_recommendation\":{\"base_image\":\"node:20-alpine\",\"multi_stage\":true,\"notes\":\"Multi-stage build for minimal production image\"},\"filesystem_requirements\":[{\"path\":\"/app/data\",\"access\":\"read-write\",\"notes\":\"SQLite database storage\"}],\"assumption_flags\":[\"SQLite sufficient for single-user deployment\",\"No external services required\"],\"summary\":\"Node.js/Express REST API with SQLite running on a Linux container environment.\"}",
+    "tokens_in": 700,
+    "tokens_out": 350,
+    "finish_reason": "stop"
+  },
+  "mock|gpt-4o|scenario:S280": {
+    "text": "{\"not_target_environment\":\"MISSING_REQUIRED_FIELDS\"}",
+    "tokens_in": 100,
+    "tokens_out": 10,
+    "finish_reason": "stop"
   }
 }

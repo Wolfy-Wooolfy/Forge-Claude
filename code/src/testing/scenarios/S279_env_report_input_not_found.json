@@ -1,0 +1,16 @@
+{
+  "id": "S279",
+  "name": "reportEnv input-missing — loop at ENV_REPORT, no spec/design files, returns INPUT_NOT_FOUND, advanced:false (PHASE-26 Step 1)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/env_report_test_helper",
+  "method": "runS279InputNotFound",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "ok_true",                 "expected": true },
+    { "type": "state_field_equals", "field": "env_error_not_found",     "expected": true },
+    { "type": "state_field_equals", "field": "advanced_false",          "expected": true },
+    { "type": "state_field_equals", "field": "graph_still_env_report",  "expected": true }
+  ]
+}

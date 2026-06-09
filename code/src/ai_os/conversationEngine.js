@@ -1398,6 +1398,197 @@ function createConversationEngine(options = {}) {
     }
   }
 
+  // ── Env Report bridge (PHASE-26) ─────────────────────────────────────────────
+  //
+  // reportEnv: drives the environment role at ENV_REPORT; loop stays at ENV_REPORT (Gate 1 pending).
+  // No advance — owner must call respondGate to fire Gate 1.
+  // On SUCCESS: persists env_report.json; returns {env_report, gate_pending:1, advanced:false}.
+  // On failure: returns {env_error:<code>, advanced:false}.
+
+  async function reportEnv(body = {}) {
+    const projectId = normalizeProjectId(body.project_id || "");
+    const state     = loadState(projectId);
+
+    if (!state) {
+      return { ok: true, loop_id: null, env_error: "PROJECT_NOT_FOUND", advanced: false };
+    }
+
+    const loopId = body.loop_id || state.loop_id || null;
+    if (!loopId) {
+      return { ok: true, loop_id: null, env_error: "NO_LOOP_ID", advanced: false };
+    }
+
+    const envProvider   = body.env_provider    || "openai";
+    const envModel      = body.env_model || (envProvider === "openai" ? "gpt-4o" : undefined);
+    const envScenarioId = body.env_scenario_id || undefined;
+
+    const reg = getDefaultRegistry();
+
+    const statusResult = await reg.invoke("orchestration.get_status", {
+      project_id: normalizeProjectId(projectId),
+      loop_id:    loopId
+    }, { root });
+
+    if (!statusResult || statusResult.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, env_error: "GET_STATUS_FAILED", advanced: false };
+    }
+
+    const currentState = statusResult.output.current_state;
+    if (currentState !== "ENV_REPORT") {
+      return { ok: true, loop_id: loopId, current_state: currentState, env_error: "WRONG_STATE", advanced: false };
+    }
+
+    const specRelPath = "artifacts/projects/" + normalizeProjectId(projectId) +
+      "/orchestration/" + loopId + "/spec.json";
+    const specRead = await reg.invoke("fs.read_file", { path: specRelPath }, { root });
+
+    if (!specRead || specRead.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, env_error: "INPUT_NOT_FOUND", advanced: false };
+    }
+
+    let spec;
+    try {
+      spec = JSON.parse(specRead.output.content);
+    } catch {
+      return { ok: true, loop_id: loopId, env_error: "INPUT_NOT_FOUND", advanced: false };
+    }
+
+    const designRelPath = "artifacts/projects/" + normalizeProjectId(projectId) +
+      "/orchestration/" + loopId + "/architect_design.json";
+    const designRead = await reg.invoke("fs.read_file", { path: designRelPath }, { root });
+
+    if (!designRead || designRead.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, env_error: "INPUT_NOT_FOUND", advanced: false };
+    }
+
+    let design;
+    try {
+      design = JSON.parse(designRead.output.content);
+    } catch {
+      return { ok: true, loop_id: loopId, env_error: "INPUT_NOT_FOUND", advanced: false };
+    }
+
+    let timeoutHandle;
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutHandle = setTimeout(() => reject(new Error("ENV_REPORT_TIMEOUT")), 30000);
+    });
+
+    try {
+      const envResult = await Promise.race([
+        reg.invoke("role.invoke", Object.assign(
+          {
+            role_id:    "environment",
+            input:      { project_id: normalizeProjectId(projectId), spec, design },
+            project_id: normalizeProjectId(projectId),
+            provider:   envProvider
+          },
+          envModel      ? { model:       envModel      } : {},
+          envScenarioId ? { scenario_id: envScenarioId } : {}
+        ), { root }),
+        timeoutPromise
+      ]);
+      clearTimeout(timeoutHandle);
+
+      if (envResult && envResult.status === "SUCCESS") {
+        const env_report = envResult.output;
+
+        await reg.invoke("fs.write_file", {
+          path:    "artifacts/projects/" + normalizeProjectId(projectId) +
+                   "/orchestration/" + loopId + "/env_report.json",
+          content: JSON.stringify(env_report, null, 2)
+        }, { root });
+
+        return {
+          ok:           true,
+          loop_id:      loopId,
+          env_report,
+          gate_pending: 1,
+          advanced:     false,
+          model_used:   envModel
+        };
+      }
+
+      const envError = (envResult && envResult.metadata && envResult.metadata.detail)
+        || "ENV_REPORT_FAILED";
+      return { ok: true, loop_id: loopId, advanced: false, env_error: envError, model_used: envModel };
+
+    } catch (err) {
+      clearTimeout(timeoutHandle);
+      return { ok: true, loop_id: loopId, advanced: false, env_error: err.message };
+    }
+  }
+
+  // ── Respond Gate bridge (PHASE-26) ────────────────────────────────────────────
+  //
+  // respondGate: resolves Gate 1 (ENV_REPORT) via orchestration.respond.
+  // Guards: gate_id must be 1, response ∈ ["APPROVE","REJECT"], current_state === "ENV_REPORT".
+  // APPROVE → TEST_DESIGN; REJECT → ESCALATED.
+  // Invalid gate/response → {gate_error:"INVALID_GATE_RESPONSE", advanced:false}.
+
+  async function respondGate(body = {}) {
+    const projectId = normalizeProjectId(body.project_id || "");
+    const state     = loadState(projectId);
+
+    if (!state) {
+      return { ok: true, loop_id: null, gate_error: "PROJECT_NOT_FOUND", advanced: false };
+    }
+
+    const loopId = body.loop_id || state.loop_id || null;
+    if (!loopId) {
+      return { ok: true, loop_id: null, gate_error: "NO_LOOP_ID", advanced: false };
+    }
+
+    const gate_id  = body.gate_id;
+    const response = body.response;
+
+    if (gate_id !== 1 || !["APPROVE", "REJECT"].includes(response)) {
+      return { ok: true, loop_id: loopId, gate_error: "INVALID_GATE_RESPONSE", advanced: false };
+    }
+
+    const reg = getDefaultRegistry();
+
+    const statusResult = await reg.invoke("orchestration.get_status", {
+      project_id: normalizeProjectId(projectId),
+      loop_id:    loopId
+    }, { root });
+
+    if (!statusResult || statusResult.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, gate_error: "GET_STATUS_FAILED", advanced: false };
+    }
+
+    const currentState = statusResult.output.current_state;
+    if (currentState !== "ENV_REPORT") {
+      return { ok: true, loop_id: loopId, current_state: currentState, gate_error: "WRONG_STATE", advanced: false };
+    }
+
+    try {
+      const respondResult = await reg.invoke("orchestration.respond", {
+        project_id: normalizeProjectId(projectId),
+        loop_id:    loopId,
+        gate_id:    1,
+        response
+      }, { root });
+
+      if (!respondResult || respondResult.status !== "SUCCESS") {
+        const errDetail = (respondResult && respondResult.metadata && respondResult.metadata.detail)
+          || "GATE_RESPOND_FAILED";
+        return { ok: true, loop_id: loopId, gate_error: errDetail, advanced: false };
+      }
+
+      return {
+        ok:          true,
+        loop_id:     loopId,
+        gate_id:     1,
+        response,
+        advanced_to: respondResult.output.next_state,
+        advanced:    true
+      };
+
+    } catch (err) {
+      return { ok: true, loop_id: loopId, gate_error: err.message, advanced: false };
+    }
+  }
+
   function _formatSummaryAsVision(summary, projectId, frontmatter) {
     const lines = [];
     lines.push("# Vision: " + (summary.project_name || projectId));
@@ -1436,6 +1627,8 @@ function createConversationEngine(options = {}) {
     reviewSpec,
     buildProject,
     estimateCost,
+    reportEnv,
+    respondGate,
     CONFIRMATION_REQUIRED_TRANSITIONS
   };
 }
