@@ -1,0 +1,11 @@
+{
+  "h4Result": {
+    "ok": true,
+    "loop_id": "07554bcb-afff-4439-866b-01f843dfbc5e",
+    "advanced": true,
+    "advanced_to": "ENV_REPORT",
+    "estimate": "(present)",
+    "model_used": "gpt-4o"
+  },
+  "h4Duration": 5050
+}

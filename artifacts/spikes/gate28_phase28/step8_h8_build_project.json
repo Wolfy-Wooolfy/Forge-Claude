@@ -1,0 +1,40 @@
+{
+  "h8Result": {
+    "ok": true,
+    "loop_id": "07554bcb-afff-4439-866b-01f843dfbc5e",
+    "advanced": true,
+    "advanced_to": "RUN_TESTS",
+    "files_written": [
+      {
+        "path": "src/database/sqlite.js",
+        "sha256": "637d74b630b178702c8d388fcef532d9a3dfe4cff5255b74895306b253bef792",
+        "line_count": 9
+      },
+      {
+        "path": "src/middleware/inputValidation.js",
+        "sha256": "17f64cfe4b624731b6a33f8e2cac6572f7211fa968b3dc003cbb37805433b906",
+        "line_count": 16
+      },
+      {
+        "path": "src/middleware/errorHandling.js",
+        "sha256": "889b6ebaa869162053694fb087113c277a7b0febcc4dc1759da17648051b344d",
+        "line_count": 7
+      },
+      {
+        "path": "src/routes/todoRoutes.js",
+        "sha256": "19983c08345b16e501e213459483c59a9d8331915ce1173ae0460a1dbf78e10d",
+        "line_count": 59
+      },
+      {
+        "path": "src/app.js",
+        "sha256": "676e79803aef90078cfb442bd6ef773b27f44379cd353ebb0aa30fdf6daa682d",
+        "line_count": 14
+      }
+    ],
+    "smoke": {
+      "ran": false
+    },
+    "summary": "Materialized 5 file(s)."
+  },
+  "h8Duration": 12170
+}

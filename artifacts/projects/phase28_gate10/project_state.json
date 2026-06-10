@@ -1,0 +1,9 @@
+{
+  "project_id": "phase28_gate10",
+  "project_name": "todo_rest_api",
+  "active_runtime_state": "IDEATION",
+  "conversation_mode": "PIPELINE",
+  "last_updated_at": "2026-06-10T09:56:03.838Z",
+  "user_goal": "Todo List REST API — Node.js/Express + SQLite, CRUD /todos, input validation, error handling",
+  "loop_id": "07554bcb-afff-4439-866b-01f843dfbc5e"
+}

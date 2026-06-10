@@ -1,0 +1,18 @@
+{
+  "h7Result": {
+    "ok": true,
+    "loop_id": "07554bcb-afff-4439-866b-01f843dfbc5e",
+    "advanced": true,
+    "advanced_to": "BUILDER",
+    "test_plan": {
+      "scenarios_count": 6,
+      "coverage_summary": {
+        "acs_total": 6,
+        "acs_covered": 6,
+        "gaps": []
+      }
+    },
+    "model_used": "gpt-4o"
+  },
+  "h7Duration": 20051
+}

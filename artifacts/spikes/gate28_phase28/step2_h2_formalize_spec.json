@@ -1,0 +1,11 @@
+{
+  "h2Result": {
+    "ok": true,
+    "loop_id": "07554bcb-afff-4439-866b-01f843dfbc5e",
+    "advanced": true,
+    "advanced_to": "REVIEWER_SPEC",
+    "spec": "(present)",
+    "model_used": "gpt-4o"
+  },
+  "h2Duration": 6408
+}

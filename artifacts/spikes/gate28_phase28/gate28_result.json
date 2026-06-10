@@ -1,0 +1,227 @@
+{
+  "verdict": "FAIL",
+  "phase": "SMOKE",
+  "assertions": [
+    {
+      "id": "H1a",
+      "label": "confirmIdea ok:true",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "H1b",
+      "label": "confirmIdea mode:PIPELINE",
+      "pass": true,
+      "detail": "PIPELINE"
+    },
+    {
+      "id": "H1c",
+      "label": "loop_id present",
+      "pass": true,
+      "detail": "07554bcb-afff-4439-866b-01f843dfbc5e"
+    },
+    {
+      "id": "H1d",
+      "label": "state after H1 = SPEC_WRITER_FORMALIZE",
+      "pass": true,
+      "actual": "SPEC_WRITER_FORMALIZE",
+      "expected": "SPEC_WRITER_FORMALIZE"
+    },
+    {
+      "id": "H1e",
+      "label": "architect_design.json on disk",
+      "pass": true,
+      "detail": "exists"
+    },
+    {
+      "id": "H2a",
+      "label": "formalizeSpec advanced:true",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "H2b",
+      "label": "advanced_to = REVIEWER_SPEC",
+      "pass": true,
+      "actual": "REVIEWER_SPEC",
+      "expected": "REVIEWER_SPEC"
+    },
+    {
+      "id": "H2c",
+      "label": "spec.json on disk",
+      "pass": true,
+      "detail": "exists"
+    },
+    {
+      "id": "H2d",
+      "label": "state after H2 = REVIEWER_SPEC",
+      "pass": true,
+      "actual": "REVIEWER_SPEC",
+      "expected": "REVIEWER_SPEC"
+    },
+    {
+      "id": "H3a",
+      "label": "reviewSpec advanced:true",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "H3b",
+      "label": "advanced_to = COST_ESTIMATE",
+      "pass": true,
+      "actual": "COST_ESTIMATE",
+      "expected": "COST_ESTIMATE"
+    },
+    {
+      "id": "H3c",
+      "label": "state after H3 = COST_ESTIMATE",
+      "pass": true,
+      "actual": "COST_ESTIMATE",
+      "expected": "COST_ESTIMATE"
+    },
+    {
+      "id": "H4a",
+      "label": "estimateCost advanced:true",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "H4b",
+      "label": "advanced_to = ENV_REPORT",
+      "pass": true,
+      "actual": "ENV_REPORT",
+      "expected": "ENV_REPORT"
+    },
+    {
+      "id": "H4c",
+      "label": "estimate present",
+      "pass": true,
+      "detail": "present"
+    },
+    {
+      "id": "H4d",
+      "label": "state after H4 = ENV_REPORT",
+      "pass": true,
+      "actual": "ENV_REPORT",
+      "expected": "ENV_REPORT"
+    },
+    {
+      "id": "H5a",
+      "label": "reportEnv advanced:false (gate block)",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "H5b",
+      "label": "gate_pending === 1",
+      "pass": true,
+      "detail": 1
+    },
+    {
+      "id": "H5c",
+      "label": "env_report.json on disk",
+      "pass": true,
+      "detail": "exists"
+    },
+    {
+      "id": "H5d",
+      "label": "state after H5 = ENV_REPORT (gate pending)",
+      "pass": true,
+      "actual": "ENV_REPORT",
+      "expected": "ENV_REPORT"
+    },
+    {
+      "id": "H6a",
+      "label": "respondGate advanced:true",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "H6b",
+      "label": "advanced_to = TEST_DESIGN",
+      "pass": true,
+      "actual": "TEST_DESIGN",
+      "expected": "TEST_DESIGN"
+    },
+    {
+      "id": "H6c",
+      "label": "state after H6 = TEST_DESIGN",
+      "pass": true,
+      "actual": "TEST_DESIGN",
+      "expected": "TEST_DESIGN"
+    },
+    {
+      "id": "H7a",
+      "label": "designTests advanced:true",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "H7b",
+      "label": "advanced_to = BUILDER",
+      "pass": true,
+      "actual": "BUILDER",
+      "expected": "BUILDER"
+    },
+    {
+      "id": "H7c",
+      "label": "test_plan.json on disk",
+      "pass": true,
+      "detail": "exists"
+    },
+    {
+      "id": "H7d",
+      "label": "state after H7 = BUILDER",
+      "pass": true,
+      "actual": "BUILDER",
+      "expected": "BUILDER"
+    },
+    {
+      "id": "H8a",
+      "label": "buildProject advanced:true",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "H8b",
+      "label": "advanced_to = RUN_TESTS",
+      "pass": true,
+      "actual": "RUN_TESTS",
+      "expected": "RUN_TESTS"
+    },
+    {
+      "id": "H8c",
+      "label": "files_written count > 0",
+      "pass": true,
+      "detail": "5 files"
+    },
+    {
+      "id": "H8d",
+      "label": "all files_written sha256 ≠ pending",
+      "pass": true,
+      "detail": "all 5 files have real sha256"
+    },
+    {
+      "id": "H8e",
+      "label": "state after H8 = RUN_TESTS",
+      "pass": true,
+      "actual": "RUN_TESTS",
+      "expected": "RUN_TESTS"
+    },
+    {
+      "id": "H8f",
+      "label": "entry file ran (shell.run_in_workspace)",
+      "pass": true,
+      "detail": "ran"
+    },
+    {
+      "id": "H8g",
+      "label": "entry file exit_code === 0",
+      "pass": false,
+      "detail": "exit_code=1 stdout=\"\""
+    }
+  ],
+  "run_stdout": "",
+  "run_exit": 1,
+  "reason": "entry file did not exit 0: exit_code=1"
+}
