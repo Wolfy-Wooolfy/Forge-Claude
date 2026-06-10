@@ -4,9 +4,9 @@
   "current_stage": "A",
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
-  "next_phase": "PHASE-27-PENDING-DECISION",
-  "next_step": "PHASE-26 (ENV_REPORT Bridge + Gate 1) CLOSED — Gate #10 PASS. Loop reaches TEST_DESIGN. Next: PHASE-27 (TEST_DESIGN bridge).",
-  "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-09-phase-26-env-report-gate1.md",
+  "next_phase": "PHASE-28-PENDING-DECISION",
+  "next_step": "PHASE-27 (TEST_DESIGN bridge) CLOSED — Gate #10 PASS. Loop reaches BUILDER. Next: PHASE-28 (buildProject endpoint).",
+  "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-09-phase-27-test-design-bridge.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -162,9 +162,10 @@
       "PHASE-23",
       "PHASE-24",
       "PHASE-25",
-      "PHASE-26"
+      "PHASE-26",
+      "PHASE-27"
     ],
-    "next": "PHASE-27 (pending decision)",
+    "next": "PHASE-28 (pending decision)",
     "remaining": [],
     "phase_16_closed": "2026-05-28",
     "phase_17_closed": "2026-05-29",
@@ -349,7 +350,6 @@
     "track_a": "CLEAN — all new production files use reg.invoke only; no direct fs.*Sync / new OpenAI()",
     "deferred": [
       "ENV_REPORT bridge (PHASE-26)",
-      "TEST_DESIGN bridge (PHASE-27)",
       "buildProject endpoint (PHASE-28)"
     ],
     "cost_actuals_usd": 0,
@@ -399,7 +399,6 @@
     "cost_actuals_usd": 0.01398,
     "findings_open": [],
     "deferred": [
-      "TEST_DESIGN bridge (PHASE-27)",
       "buildProject endpoint (PHASE-28)"
     ]
   },
@@ -452,7 +451,52 @@
     "cost_actuals_usd": 0.01397,
     "findings_open": [],
     "deferred": [
-      "TEST_DESIGN bridge (PHASE-27)",
+      "buildProject endpoint (PHASE-28)"
+    ]
+  },
+  "phase_27": {
+    "status": "CLOSED",
+    "closed_at": "2026-06-10",
+    "title": "TEST_DESIGN Bridge",
+    "plan_artifact": "artifacts/decisions/DECISION-2026-06-09-phase-27-test-design-bridge.md",
+    "mid_checkpoint": "artifacts/decisions/_phase_27_checkpoints/stage_mid.md",
+    "final_checkpoint": "artifacts/decisions/_phase_27_checkpoints/stage_final.md",
+    "suite_final": "280/0/5 (285 total)",
+    "scenarios_added": [
+      "S284",
+      "S285",
+      "S286",
+      "S287"
+    ],
+    "gate_10": "PASS",
+    "gate_10_run_ts": "2026-06-10T08:58:36Z",
+    "gate_10_confirmed_at": "2026-06-10",
+    "gate_10_result": "real openai/gpt-4o-2024-08-06 produced test plan for phase27_gate10; loop advanced TEST_DESIGN → BUILDER; test_plan.json persisted (3 scenarios, coverage 3/3); 9/9 assertions PASS",
+    "gate_10_cost_usd": 0.02042,
+    "gate_10_evidence": "artifacts/spikes/gate27_phase27/gate27_result.json",
+    "arc_ledger_count": 8,
+    "l2_tools": 79,
+    "agent_roles": 13,
+    "files_created": [
+      "code/src/testing/helpers/design_tests_test_helper.js",
+      "code/src/testing/scenarios/S284_design_tests_happy_path.json",
+      "code/src/testing/scenarios/S285_design_tests_wrong_state.json",
+      "code/src/testing/scenarios/S286_design_tests_input_not_found.json",
+      "code/src/testing/scenarios/S287_design_tests_role_failure.json",
+      "scripts/spikes/gate27_phase27_design_tests.js",
+      "artifacts/decisions/_phase_27_checkpoints/stage_mid.md",
+      "artifacts/decisions/_phase_27_checkpoints/stage_final.md"
+    ],
+    "files_modified": [
+      "code/src/ai_os/conversationEngine.js",
+      "code/src/workspace/apiServer.js",
+      "code/src/runtime/agents/adapters/mock_responses.json",
+      "progress/status.json"
+    ],
+    "track_a": "CLEAN — designTests() and endpoint use reg.invoke/role.invoke only; 0 new forbidden patterns; §ARC unchanged",
+    "cost_actuals_usd": 0.02042,
+    "findings_open": [],
+    "deferred": [
       "buildProject endpoint (PHASE-28)"
     ]
   },
@@ -1392,8 +1436,8 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-26 CLOSED — ENV_REPORT Bridge + Gate 1 complete. reportEnv() + respondGate() + /report-env + /respond-gate endpoints. Real gpt-4o env report (container/Node.js/SQLite) → gate_pending:1 → Owner APPROVE → TEST_DESIGN. Gate #10 PASS 13/13, $0.01397. Suite 276/0/5 (281 total). §ARC 8. Next: PHASE-27 (TEST_DESIGN bridge) pending decision.",
-  "last_updated": "2026-06-09T14:05:41.000Z",
+  "current_task": "PHASE-27 CLOSED — TEST_DESIGN bridge complete. designTests() + /design-tests endpoint. Real gpt-4o test plan (3 scenarios, coverage 3/3) → TEST_DESIGN → BUILDER. test_plan.json persisted. Gate #10 PASS 9/9, $0.02042. Suite 280/0/5 (285 total). §ARC 8. Next: PHASE-28 (buildProject endpoint) pending decision.",
+  "last_updated": "2026-06-10T08:58:36.000Z",
   "phase_16": {
     "status": "ACTIVE",
     "started_at": "2026-05-24T16:00:00.000Z",

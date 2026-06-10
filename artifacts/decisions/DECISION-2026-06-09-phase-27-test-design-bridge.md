@@ -45,3 +45,47 @@ Owner (Khaled) delegated PHASE-27 decision authority to the CTO advisor on 2026-
 
 ## 10. Forward path (context, not in scope)
 27 (this) → 28 (buildProject endpoint — wire the existing PHASE-24 buildProject). After 28: owner goes idea → real, running, materialized build end-to-end.
+
+## 11. CLOSURE (Gate #10 PASS — 2026-06-10)
+
+**Status:** CLOSED
+**Closed at:** 2026-06-10T08:58:36Z
+
+### Gate #10 Result — PASS (9/9 assertions)
+
+| Field | Value |
+|---|---|
+| run_ts | 2026-06-10T08:58:36Z |
+| provider | openai / gpt-4o-2024-08-06 |
+| role | test_designer |
+| tokens_in / tokens_out | 1491 / 864 |
+| latency_ms | 10651ms (real API) |
+| cost_usd_actual | $0.02042 |
+| loop after designTests | BUILDER |
+| test_plan.json on disk | YES (3 scenarios, coverage 3/3, gaps=[]) |
+| evidence | artifacts/spikes/gate27_phase27/gate27_result.json |
+
+### Assertions
+
+```
+G1a advanced===true               PASS
+G1b advanced_to==="BUILDER"       PASS
+G2a scenarios is Array (length=3) PASS
+G2b scenarios[0] all 9 fields     PASS
+G2c coverage_summary valid        PASS  (acs_total=3, acs_covered=3, gaps=[])
+G3  test_plan.json on disk        PASS
+G4  loop=BUILDER (independent)    PASS
+G5  ledger real test_designer     PASS  (openai/gpt-4o-2024-08-06, cost=$0.02042)
+G6  total_usd ≤ $1.00             PASS  ($0.02042)
+```
+
+### Closure checklist
+- [x] ≥4 mock scenarios (4): S284–S287 — all PASS
+- [x] Full SU suite green: 280/0/5 (285 total) — no new fails
+- [x] Track A CLEAN — 0 new forbidden patterns; §ARC=8
+- [x] stage_mid.md + stage_final.md written
+- [x] Gate #10 PASS — evidence file EXISTS on disk, reads PASS
+- [x] status.json phase_27 block written
+- [x] CTO verified Gate #10 before closure
+
+**PHASE-27 CLOSED.**

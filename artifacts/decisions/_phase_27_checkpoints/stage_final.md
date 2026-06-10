@@ -1,7 +1,7 @@
 # PHASE-27 Final Checkpoint
 
 **Date:** 2026-06-10
-**Status:** STEP A COMPLETE — endpoint wired, full suite PASS; Gate #10 pending
+**Status:** FULLY CLOSED — STEP A + Gate #10 PASS
 
 ---
 
@@ -105,7 +105,37 @@ Pre-existing §ARC exceptions elsewhere in file — unchanged.
 
 ---
 
-## Closure Gate status (STEP A)
+## Gate #10 — PASS (9/9 assertions) — 2026-06-10T08:58:36Z
+
+**Script:** `scripts/spikes/gate27_phase27_design_tests.js`
+**Evidence:** `artifacts/spikes/gate27_phase27/gate27_result.json`
+
+| Field | Value |
+|---|---|
+| run_ts | 2026-06-10T08:58:36Z |
+| provider | openai / gpt-4o-2024-08-06 |
+| role | test_designer |
+| tokens_in / tokens_out | 1491 / 864 |
+| latency_ms | 10651ms (real API) |
+| cost_usd_actual | $0.02042 |
+| loop after designTests | BUILDER |
+| test_plan.json on disk | YES (3 scenarios, coverage 3/3, gaps=[]) |
+
+```
+G1a advanced===true               PASS
+G1b advanced_to==="BUILDER"       PASS
+G2a scenarios is Array (length=3) PASS
+G2b scenarios[0] all 9 fields     PASS
+G2c coverage_summary valid        PASS  (acs_total=3, acs_covered=3, gaps=[])
+G3  test_plan.json on disk        PASS
+G4  loop=BUILDER (independent)    PASS
+G5  ledger real test_designer     PASS  (openai/gpt-4o-2024-08-06, cost=$0.02042)
+G6  total_usd ≤ $1.00             PASS  ($0.02042)
+```
+
+---
+
+## Closure Gate status (FULLY CLOSED)
 
 - [x] ≥4 mock scenarios (4): S284–S287 — all PASS
 - [x] Full SU suite green: 280/0/5 (285 total) — no new fails
@@ -113,28 +143,8 @@ Pre-existing §ARC exceptions elsewhere in file — unchanged.
 - [x] §ARC count = 8 (unchanged)
 - [x] stage_mid.md written
 - [x] stage_final.md written (this file)
-- [ ] Decision artifact CLOSED — pending Gate #10
-- [ ] status.json phase_27 block — pending Gate #10
-- [ ] Gate #10 (real owner run) — PENDING
+- [x] Decision artifact CLOSED — §11 CLOSURE appended
+- [x] status.json phase_27 block written
+- [x] Gate #10 PASS — evidence on disk, CTO verified before closure
 
----
-
-## Gate #10 plan (STEP B — pending CTO verification of this checkpoint)
-
-**Script:** `scripts/spikes/gate27_phase27_design_tests.js`
-**Project:** `phase27_gate10` (no leading underscore)
-**Provider/model:** `openai / gpt-4o` (real call — no scenario_id)
-**Flow:**
-1. loadDotEnv first (PHASE-25 lesson)
-2. Write LOCKED vision.md (PHASE-25 lesson — locks vision before any loop)
-3. Write project_state.json with loop_id
-4. Seed loop at TEST_DESIGN: start_loop → SPEC_WRITER_FORMALIZE → REVIEWER_SPEC → COST_ESTIMATE → ENV_REPORT → Gate 1 APPROVE → TEST_DESIGN
-5. Write spec.json + architect_design.json (real fixtures)
-6. POST /api/ai-os/project/design-tests → real gpt-4o test plan → advanced:true, advanced_to:"BUILDER"
-7. Verify test_plan.json written + parseable on disk
-8. Verify loop current_state === BUILDER (independent get_status read)
-9. Verify ledger entry (role=test_designer, openai/gpt-4o-*, cost>0)
-10. Assertions: G1 advanced:true + advanced_to:"BUILDER"; G2 test_plan valid (scenarios[], coverage_summary); G3 test_plan.json on disk; G4 loop=BUILDER; G5 ledger real entry; G6 total_usd ≤ $1.00
-
-**Evidence path:** `artifacts/spikes/gate27_phase27/gate27_result.json`
-**Cost budget:** ~$0.01–0.02; kill bar $3.00
+**PHASE-27 CLOSED.**
