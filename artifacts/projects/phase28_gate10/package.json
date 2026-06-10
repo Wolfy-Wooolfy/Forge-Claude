@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "dependencies": {
     "express-validator": "*",
-    "express": "*"
+    "express": "*",
+    "sqlite3": "latest"
   }
 }

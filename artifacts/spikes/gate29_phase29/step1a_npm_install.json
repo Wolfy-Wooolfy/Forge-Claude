@@ -1,0 +1,5 @@
+{
+  "note": "npm install ran as part of runTests dep scan; result embedded in step1_run_tests_result.json",
+  "test_error": null,
+  "deps_stderr": null
+}

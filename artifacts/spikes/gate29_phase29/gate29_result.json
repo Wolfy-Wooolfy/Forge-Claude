@@ -1,0 +1,27 @@
+{
+  "verdict": "PASS",
+  "branch_taken": "FAIL_TO_BUILDER",
+  "report_summary": {
+    "total": 6,
+    "pass": 1,
+    "fail": 5,
+    "error": 0
+  },
+  "npm_install_exit": 0,
+  "bridged_count": 6,
+  "pre_state": "RUN_TESTS",
+  "post_state": "BUILDER",
+  "iteration_count_pre": 0,
+  "iteration_count_post": 1,
+  "loop_back_row": {
+    "ts": "2026-06-10T14:49:21.210Z",
+    "loop_id": "98eae33f-105c-4dbc-8f96-71efbb4827b7",
+    "from_state": "RUN_TESTS",
+    "to_state": "BUILDER",
+    "transition_type": "LOOP_BACK",
+    "role_invoked": null,
+    "mock": false,
+    "cost_usd": 0,
+    "owner_gate_id": 2
+  }
+}

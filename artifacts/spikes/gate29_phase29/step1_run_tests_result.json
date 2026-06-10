@@ -1,0 +1,17 @@
+{
+  "duration_ms": 45476,
+  "result": {
+    "ok": true,
+    "loop_id": "98eae33f-105c-4dbc-8f96-71efbb4827b7",
+    "advanced": true,
+    "advanced_to": "BUILDER",
+    "loop_back": true,
+    "report_summary": {
+      "overall_status": "FAIL",
+      "total": 6,
+      "pass": 1,
+      "fail": 5,
+      "error": 0
+    }
+  }
+}

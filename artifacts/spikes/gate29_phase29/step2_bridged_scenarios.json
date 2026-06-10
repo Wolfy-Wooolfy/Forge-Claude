@@ -1,0 +1,38 @@
+{
+  "count": 6,
+  "expected": 6,
+  "scenarios": [
+    {
+      "file": "T-1_create_todo_returns_201.json",
+      "valid": true,
+      "missing_fields": []
+    },
+    {
+      "file": "T-2_retrieve_todos_returns_array.json",
+      "valid": true,
+      "missing_fields": []
+    },
+    {
+      "file": "T-3_update_todo_with_valid_payload.json",
+      "valid": true,
+      "missing_fields": []
+    },
+    {
+      "file": "T-4_delete_todo_returns_204.json",
+      "valid": true,
+      "missing_fields": []
+    },
+    {
+      "file": "T-5_create_todo_with_invalid_data.json",
+      "valid": true,
+      "missing_fields": []
+    },
+    {
+      "file": "T-6_retrieve_nonexistent_todo_returns_404.json",
+      "valid": true,
+      "missing_fields": []
+    }
+  ],
+  "all_valid": true,
+  "dir": "D:\\S\\Halo\\Tech\\Forge-Claude\\artifacts\\projects\\phase28_gate10\\forge_tests\\scenarios"
+}

@@ -1,0 +1,114 @@
+{
+  "total": 6,
+  "pass": 1,
+  "fail": 5,
+  "error": 0,
+  "overall_status": "FAIL",
+  "ran_at": "2026-06-10T14:49:21.138Z",
+  "scenarios": [
+    {
+      "id": "T-1",
+      "name": "create_todo_returns_201",
+      "status": "FAIL",
+      "duration_ms": 2081,
+      "assertions": [
+        {
+          "type": "http_status_equals",
+          "pass": false,
+          "reason": "Expected HTTP 201, got 404"
+        },
+        {
+          "type": "response_body_contains_key",
+          "pass": false,
+          "reason": "Response body is not a JSON object"
+        },
+        {
+          "type": "response_body_field_equals",
+          "pass": false,
+          "reason": "Response body is not a JSON object"
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "T-2",
+      "name": "retrieve_todos_returns_array",
+      "status": "FAIL",
+      "duration_ms": 2566,
+      "assertions": [
+        {
+          "type": "http_status_equals",
+          "pass": false,
+          "reason": "Expected HTTP 200, got 404"
+        },
+        {
+          "type": "response_body_is_array",
+          "pass": false,
+          "reason": "Expected response body to be an array, got string"
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "T-3",
+      "name": "update_todo_with_valid_payload",
+      "status": "FAIL",
+      "duration_ms": 2870,
+      "assertions": [
+        {
+          "type": "http_status_equals",
+          "pass": false,
+          "reason": "Expected HTTP 200, got 404"
+        },
+        {
+          "type": "response_body_field_equals",
+          "pass": false,
+          "reason": "Response body is not a JSON object"
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "T-4",
+      "name": "delete_todo_returns_204",
+      "status": "FAIL",
+      "duration_ms": 1780,
+      "assertions": [
+        {
+          "type": "http_status_equals",
+          "pass": false,
+          "reason": "Expected HTTP 204, got 404"
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "T-5",
+      "name": "create_todo_with_invalid_data",
+      "status": "FAIL",
+      "duration_ms": 3314,
+      "assertions": [
+        {
+          "type": "http_status_equals",
+          "pass": false,
+          "reason": "Expected HTTP 400, got 404"
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "T-6",
+      "name": "retrieve_nonexistent_todo_returns_404",
+      "status": "PASS",
+      "duration_ms": 3333,
+      "assertions": [
+        {
+          "type": "http_status_equals",
+          "pass": true,
+          "reason": null
+        }
+      ],
+      "error": null
+    }
+  ]
+}

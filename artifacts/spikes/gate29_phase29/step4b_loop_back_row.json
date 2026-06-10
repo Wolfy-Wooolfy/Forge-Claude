@@ -1,0 +1,11 @@
+{
+  "ts": "2026-06-10T14:49:21.210Z",
+  "loop_id": "98eae33f-105c-4dbc-8f96-71efbb4827b7",
+  "from_state": "RUN_TESTS",
+  "to_state": "BUILDER",
+  "transition_type": "LOOP_BACK",
+  "role_invoked": null,
+  "mock": false,
+  "cost_usd": 0,
+  "owner_gate_id": 2
+}
