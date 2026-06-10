@@ -2,7 +2,7 @@
 
 **Date:** 2026-06-10  
 **Phase:** PHASE-29 (RUN_TESTS Bridge)  
-**Status:** STEP A complete — Gate #10 pending
+**Status:** FULLY CLOSED — Gate #10 PASS (2026-06-10T14:49:21Z)
 
 ---
 
@@ -92,4 +92,44 @@ Real `/run-tests` call on `phase28_gate10` project, loop_id `98eae33f-105c-4dbc-
 - Either PASS→REVIEWER_CODE_AND_SECURITY or FAIL→BUILDER with LOOP_BACK row (from_state=RUN_TESTS)
 - Evidence in `artifacts/spikes/gate29_phase29/gate29_result.json`
 
-**WAITING FOR CTO VERIFY → STEP B**
+---
+
+## STEP B — Gate #10 PASS (2026-06-10T14:49:21Z)
+
+**Branch taken:** FAIL_TO_BUILDER (per RULING-3 — report FAIL → loop-back, Gate PASS)
+
+### Report table
+
+| ID  | Name                                   | Status |
+|-----|----------------------------------------|--------|
+| T-1 | create_todo_returns_201                | FAIL (route /api/todos vs /todos) |
+| T-2 | retrieve_todos_returns_array           | FAIL (route /api/todos vs /todos) |
+| T-3 | update_todo_with_valid_payload         | FAIL (route + fixture inert) |
+| T-4 | delete_todo_returns_204                | FAIL (route + fixture inert) |
+| T-5 | create_todo_with_invalid_data          | FAIL (route /api/todos vs /todos) |
+| T-6 | retrieve_nonexistent_todo_returns_404  | **PASS** (Express default 404) |
+
+`total:6 / pass:1 / fail:5 / error:0 / overall_status:FAIL`
+
+### First real LOOP_BACK row
+```json
+{
+  "from_state": "RUN_TESTS", "to_state": "BUILDER",
+  "transition_type": "LOOP_BACK", "mock": false,
+  "ts": "2026-06-10T14:49:21.210Z", "iteration_count": 0→1
+}
+```
+**RULING-2 proven on real data.**
+
+### Root cause (honest)
+The BRIDGE behaved correctly. Build defects caught:
+- **(a) Plan↔build entry mismatch:** test_plan hardcodes `node src/server.js`; final build entry is `src/index.js` (mounts routes at `/api`). Stale `src/server.js` was booted → 404s. (Finding #5)
+- **(b) Inert fixtures:** T-3/T-4 use `fixture:"existing_todo"` but runner ignores fixture → no db seeding. (Finding #4)
+
+Loop-back to BUILDER is the correct designed response. PHASE-29 proves the bridge catches real build defects.
+
+---
+
+## Ops Note: Full-suite runner on Windows
+
+Running `node bin/forge-test.js` directly via piped wrappers (PowerShell `2>&1`, Bash pipe) causes STATUS_STACK_BUFFER_OVERRUN / OOM kills at ~290 scenarios. **Workaround:** use `Start-Process` with `-RedirectStandardOutput` / `-RedirectStandardError` to a temp file, then read the file. This avoids the pipe-buffer interaction that triggers the crash. Document for future sessions.

@@ -47,3 +47,92 @@ Owner delegation of 2026-06-09 stands ("انت CTO المشروع قرر بنف�
 
 ## 10. Forward path (context)
 29 (this) → 30 REVIEWER_CODE_AND_SECURITY (debate) → 31 DOCUMENTATION → 32 QUALITY_JUDGE + Gate 2 (incl. REJECT_AND_LOOP) → 33 DEPLOYMENT_OR_END + Gate 3 → LIVE_DELIVERABLE → COMPLETE. Parallel decisions pending: provider switch to Anthropic; UI wiring of bridges; §ARC reconciliation; flake hardening.
+
+---
+
+## 11. CLOSURE (PHASE-29 CLOSED)
+
+**Status:** CLOSED  
+**Gate #10 run ts:** 2026-06-10T14:49:21Z  
+**Verdict:** PASS — branch FAIL_TO_BUILDER (per RULING-3)
+
+### §7 Refinement (RULING-3 verbatim)
+> Gate PASS = deps actually installed (real npm, exit 0) + plan bridged to forge_tests/scenarios + builtproject.run_scenarios executed against the real built server + last_report.json on disk + the bridge behaved correctly per the report: if report PASS → loop at REVIEWER_CODE_AND_SECURITY; if report FAIL → loop at BUILDER with a LOOP_BACK audit row (from_state RUN_TESTS) and iteration_count incremented. EITHER branch satisfies the gate when behavior matches the report. Likely reality: T-3/T-4 rely on fixture (inert in the runner) → expect a FAIL report → loop-back branch — that is a bonus real-path exercise of the fail path, not a gate failure. Record "harness fixture support" as Finding #4 (deferred). sqlite3: real npm install per v1 policy; if DEPS_INSTALL_FAILED on the real machine, surface it and STOP (decision point).
+
+### Gate #10 execution summary
+- **npm_install_exit:** 0 (express + express-validator + sqlite3 ALL installed with real native build — v1 policy validated, sqlite3 native build succeeded on owner Windows 10)
+- **bridged_count:** 6/6 scenarios bridged, all required-fields valid
+- **last_report (verbatim):** `{ "total": 6, "pass": 1, "fail": 5, "error": 0, "overall_status": "FAIL" }`
+- **per-scenario table:**
+
+| ID  | Name                             | Status | Root cause |
+|-----|----------------------------------|--------|------------|
+| T-1 | create_todo_returns_201          | FAIL   | Route at /api/todos; test hits /todos → 404 |
+| T-2 | retrieve_todos_returns_array     | FAIL   | Route at /api/todos; test hits /todos → 404 |
+| T-3 | update_todo_with_valid_payload   | FAIL   | Route at /api/todos/1; test hits /todos/1 → 404; also fixture `existing_todo` inert |
+| T-4 | delete_todo_returns_204          | FAIL   | Route at /api/todos/1; test hits /todos/1 → 404; also fixture `existing_todo` inert |
+| T-5 | create_todo_with_invalid_data    | FAIL   | Route at /api/todos; test hits /todos → 404 (expected 400) |
+| T-6 | retrieve_nonexistent_todo_returns_404 | **PASS** | /todos/999 not defined → Express default 404; assertion satisfied |
+
+- **branch taken:** FAIL_TO_BUILDER
+
+### First real LOOP_BACK row (verbatim)
+```json
+{
+  "ts": "2026-06-10T14:49:21.210Z",
+  "loop_id": "98eae33f-105c-4dbc-8f96-71efbb4827b7",
+  "from_state": "RUN_TESTS",
+  "to_state": "BUILDER",
+  "transition_type": "LOOP_BACK",
+  "role_invoked": null,
+  "mock": false,
+  "cost_usd": 0,
+  "owner_gate_id": 2
+}
+```
+**`from_state: "RUN_TESTS"` — RULING-2 proven on real production data.**  
+**iteration_count: 0 → 1**
+
+### Root-cause analysis of the FAIL report
+
+**(a) Plan ↔ build entry mismatch:**  
+The test_plan was generated against an earlier build attempt (`node src/server.js`). The final PHASE-28 build's entry is `src/index.js` which mounts routes under `/api`. The harness boots `src/server.js` (the stale attempt-2 artefact), which is still present in the workspace and uses the `/api` prefix. The test scenarios target `/todos` (no prefix) → all route lookups return Express default 404. This is a BUILD/plan coherence defect, not a bridge defect.
+
+**(b) Inert fixtures (Finding #4):**  
+T-3 and T-4 use `fixture: "existing_todo"`. The `builtproject.run_scenarios` runner ignores `fixture` fields (no database seeding). Even with correct routes, T-3/T-4 would fail because no pre-existing todo with id=1 exists. This is a harness capability gap, not a bridge defect.
+
+**(c) Stale prior-attempt files:**  
+`src/server.js` (attempt-2 file) coexists with `src/index.js` (final entry). The plan hardcoded `node src/server.js` rather than deriving the entry from the actual build output. Multiple attempt files in the workspace without cleanup between attempts cause coherence drift.
+
+**The BRIDGE behaved correctly.** It correctly: read test_plan.json; installed deps (npm exit 0, sqlite3 native); bridged 6/6 scenarios; ran builtproject.run_scenarios; received FAIL report; invoked orchestration.loop_back; emitted LOOP_BACK audit row (from_state=RUN_TESTS, mock=false); incremented iteration_count. This is exactly what RUN_TESTS is designed to do — catch build defects and loop-back to BUILDER for correction.
+
+### Findings
+
+**Finding #4 (deferred):** Harness fixture support — `builtproject.run_scenarios` runner ignores `fixture` field. No database seeding for `existing_todo` scenarios. Deferred to PHASE-30+ / iterative-loop work.
+
+**Finding #5 (deferred):** Plan ↔ build entry coherence + workspace hygiene between build attempts. The test plan should derive its server entry from the actual build output (e.g., from `package.json.main` or a canonical `src/index.js` convention). Stale files from earlier build attempts should be cleaned on rebuild (or isolated to attempt subdirectories). Deferred to PHASE-30+ / iterative-loop work.
+
+**Observation (cosmetic, deferred):** The LOOP_BACK audit row hardcodes `owner_gate_id: 2` even for RUN_TESTS-origin loop-backs (Gate 2 = Quality Judge gate). The value is informational and non-blocking. Deferred.
+
+**PHASE-28 Findings #1 + #2 — RESOLVED by this phase:**
+- Finding #1: "materializer emits no package.json" → **RESOLVED in PHASE-29** (dep scan + package.json merge in runTests engine path)
+- Finding #2: "no dependency-install step in pipeline between BUILDER→RUN_TESTS" → **RESOLVED in PHASE-29** (shell.run_in_workspace npm install in runTests; sqlite3 native install validated, exit 0)
+
+### Evidence
+- `artifacts/spikes/gate29_phase29/gate29_result.json` — verdict PASS
+- `artifacts/spikes/gate29_phase29/step0_pre_state.json` — current_state=RUN_TESTS, iteration_count=0
+- `artifacts/spikes/gate29_phase29/step1_run_tests_result.json` — runTests return shape
+- `artifacts/spikes/gate29_phase29/step1a_npm_install.json` — npm install exit 0
+- `artifacts/spikes/gate29_phase29/step2_bridged_scenarios.json` — 6/6 bridged, loader-valid
+- `artifacts/spikes/gate29_phase29/step3_last_report.json` — last_report verbatim (1/5/0)
+- `artifacts/spikes/gate29_phase29/step4_post_state.json` — post_state=BUILDER, iteration_count=1
+- `artifacts/spikes/gate29_phase29/step4b_loop_back_row.json` — LOOP_BACK row verbatim
+
+### Closure checklist
+- [x] `node bin/forge-test.js` → 285/0/5 (290 total), all PASS
+- [x] Decision CLOSED, §11 appended
+- [x] Checkpoints: stage_mid.md + stage_final.md (with Gate #10 section)
+- [x] `progress/status.json` phase_29 block: CLOSED
+- [x] `progress/status.json` top-level: next_phase = PHASE-30-PENDING-DECISION
+- [x] `progress/status.json` phase_28.findings_open: #1 and #2 annotated RESOLVED
+- [x] Git commit + tag phase-29-complete

@@ -4,9 +4,9 @@
   "current_stage": "A",
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
-  "next_phase": "PHASE-29-PENDING-DECISION",
-  "next_step": "PHASE-28 (buildProject endpoint) CLOSED — Gate #10 PASS 44/44. Full chain idea→build→run; 5 files; server ran; $0.40938. Loop reaches RUN_TESTS. Next: PHASE-29 (RUN_TESTS onward) — pending decision.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-10-phase-28-build-endpoint.md",
+  "next_phase": "PHASE-30-PENDING-DECISION",
+  "next_step": "PHASE-29 CLOSED — RUN_TESTS bridge live; first real loop-back exercised (build defects caught: entry/prefix mismatch + fixtures). Loop phase28_gate10 at BUILDER iter 1. Next: PHASE-30 — pending decision.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-10-phase-29-run-tests-bridge.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -77,13 +77,13 @@
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
-    "self_test_last_run": "2026-06-03",
-    "self_test_last_result": "242 passed, 0 failed, 5 skipped (247 total) — PHASE-20 CLOSED. Steps 1-5 complete. S245-S249 GREEN. Gate #10 owner-confirmed: Arabic CRM design, bilingual output correct. Known state: architect_provider=openai/gpt-4o (temporary). deployment_split → PHASE-21.",
-    "self_test_scenarios_pass": 242,
+    "self_test_last_run": "2026-06-10",
+    "self_test_last_result": "285 passed, 0 failed, 5 skipped (290 total) — PHASE-29 CLOSED. S288-S292 GREEN. Gate #10 PASS: FAIL_TO_BUILDER branch; LOOP_BACK row from_state=RUN_TESTS (RULING-2 proven); sqlite3 native install OK (v1 policy); Findings #4-#5 deferred. L2=80 (orchestration.loop_back).",
+    "self_test_scenarios_pass": 285,
     "self_test_scenarios_skip": 5,
     "self_test_scenarios_fail": 0,
     "providers_registered_count": 14,
-    "tools_registered_count": 79,
+    "tools_registered_count": 80,
     "doctor_checks_count": 35,
     "assertion_types_count": 10,
     "active_permission_mode": "WORKSPACE_WRITE",
@@ -164,9 +164,10 @@
       "PHASE-25",
       "PHASE-26",
       "PHASE-27",
-      "PHASE-28"
+      "PHASE-28",
+      "PHASE-29"
     ],
-    "next": "PHASE-29 (pending decision)",
+    "next": "PHASE-30 (pending decision)",
     "remaining": [],
     "phase_16_closed": "2026-05-28",
     "phase_17_closed": "2026-05-29",
@@ -175,6 +176,7 @@
     "phase_20_closed": "2026-06-03",
     "phase_24_closed": "2026-06-08",
     "phase_28_closed": "2026-06-10",
+    "phase_29_closed": "2026-06-10",
     "phase_16_corrective": "DECISION-2026-05-24T16-00-phase-16-ux-closure-gap.md — UX Closure Gap; 6 stages; outcome-based closure gate",
     "phase_15_closed": "2026-05-23T14:00:00.000Z",
     "deferred": [
@@ -546,11 +548,70 @@
     "track_a": "CLEAN — endpoint is a 4-line mirror block; 0 new forbidden patterns; engine frozen (buildProject() hash-proven identical to origin@f0cbd51); §ARC unchanged",
     "cost_actuals_usd": 0.40938,
     "findings_open": [
-      "materializer emits no package.json — deferred to RUN_TESTS phase",
-      "no dependency-install step in pipeline between BUILDER→RUN_TESTS — deferred to RUN_TESTS phase",
+      "materializer emits no package.json — RESOLVED in PHASE-29 (dep scan + package.json merge in runTests engine path)",
+      "no dependency-install step in pipeline between BUILDER→RUN_TESTS — RESOLVED in PHASE-29 (shell.run_in_workspace npm install in runTests; sqlite3 native install validated, exit 0)",
       "native deps (sqlite3) need env tooling or approved dep list — deferred to RUN_TESTS/Environment phases"
     ],
     "deferred": []
+  },
+  "phase_29": {
+    "status": "CLOSED",
+    "closed_at": "2026-06-10",
+    "title": "RUN_TESTS Bridge + Dependency Install",
+    "plan_artifact": "artifacts/decisions/DECISION-2026-06-10-phase-29-run-tests-bridge.md",
+    "mid_checkpoint": "artifacts/decisions/_phase_29_checkpoints/stage_mid.md",
+    "final_checkpoint": "artifacts/decisions/_phase_29_checkpoints/stage_final.md",
+    "suite_final": "285/0/5 (290 total)",
+    "scenarios_added": ["S288", "S289", "S290", "S291", "S292"],
+    "gate_10": "PASS",
+    "gate_10_branch": "FAIL_TO_BUILDER",
+    "gate_10_run_ts": "2026-06-10T14:49:21Z",
+    "gate_10_cost_usd": 0,
+    "gate_10_evidence": "artifacts/spikes/gate29_phase29/gate29_result.json",
+    "gate_10_result": "FAIL branch per RULING-3: report 1/5/0 (T-6 PASS; T-1–T-5 FAIL: route /api/todos vs /todos + inert fixtures). LOOP_BACK row from_state=RUN_TESTS, iter 0→1. Bridge behaved correctly; failures belong to build/plan coherence. sqlite3 native install exit 0 — v1 policy validated.",
+    "l2_tools": 80,
+    "agent_roles": 13,
+    "arc_ledger_count": 8,
+    "engine_edits": [
+      "iteration_controller.js — one-line authorized fix (RULING-2): LOOP_BACK from_state now graph.current_state"
+    ],
+    "files_created": [
+      "code/src/testing/helpers/run_tests_test_helper.js",
+      "code/src/testing/scenarios/S288_run_tests_happy_path.json",
+      "code/src/testing/scenarios/S289_run_tests_wrong_state.json",
+      "code/src/testing/scenarios/S290_run_tests_input_not_found.json",
+      "code/src/testing/scenarios/S291_run_tests_fail_report_loop_back.json",
+      "code/src/testing/scenarios/S292_run_tests_deps_install_failed.json",
+      "scripts/spikes/gate29_phase29_run_tests.js",
+      "artifacts/decisions/_phase_29_checkpoints/stage_mid.md",
+      "artifacts/decisions/_phase_29_checkpoints/stage_final.md",
+      "artifacts/spikes/gate29_phase29/gate29_result.json",
+      "artifacts/spikes/gate29_phase29/step0_pre_state.json",
+      "artifacts/spikes/gate29_phase29/step1_run_tests_result.json",
+      "artifacts/spikes/gate29_phase29/step1a_npm_install.json",
+      "artifacts/spikes/gate29_phase29/step2_bridged_scenarios.json",
+      "artifacts/spikes/gate29_phase29/step3_last_report.json",
+      "artifacts/spikes/gate29_phase29/step4_post_state.json",
+      "artifacts/spikes/gate29_phase29/step4b_loop_back_row.json"
+    ],
+    "files_modified": [
+      "code/src/ai_os/conversationEngine.js",
+      "code/src/runtime/tools/orchestration_tools.js",
+      "code/src/runtime/orchestration/iteration_controller.js",
+      "code/src/workspace/apiServer.js",
+      "progress/status.json"
+    ],
+    "track_a": "CLEAN — runTests() + endpoint + orchestration.loop_back use reg.invoke only; 0 new forbidden patterns; §ARC=8",
+    "findings_open": [
+      "Finding #4: harness fixture support — builtproject.run_scenarios ignores fixture field; no db seeding. Deferred to PHASE-30+ / iterative-loop work.",
+      "Finding #5: plan↔build entry coherence + workspace hygiene. Plan should derive entry from build output; stale files should be cleaned on rebuild. Deferred to PHASE-30+.",
+      "Observation: LOOP_BACK audit row hardcodes owner_gate_id:2 even for RUN_TESTS-origin loop-backs. Cosmetic, deferred."
+    ],
+    "resolves": [
+      "PHASE-28 Finding #1: materializer emits no package.json",
+      "PHASE-28 Finding #2: no dependency-install step in pipeline"
+    ],
+    "cost_actuals_usd": 0
   },
   "ux_task_2026_06_07_multiselect": {
     "status": "CLOSED",
@@ -1488,8 +1549,8 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-28 CLOSED — buildProject endpoint complete. POST /api/ai-os/project/build-project wired; engine frozen (hash-proven). FULL CHAIN real gpt-4o: idea → spec → review → cost → env + Gate1 APPROVE → tests → build → 5 files (sha256 real) → npm install → server ran 'Server is running on port 3000' exit 0. Gate #10 PASS 44/44, $0.40938 (3 attempts). Suite 280/0/5 (285 total). §ARC 8. Findings deferred to RUN_TESTS/env phases. Next: PHASE-29 pending decision.",
-  "last_updated": "2026-06-10T10:32:37.000Z",
+  "current_task": "PHASE-29 CLOSED — RUN_TESTS bridge + dep install live. POST /api/ai-os/project/run-tests wired; dep scan → package.json → real npm install (sqlite3 native OK). FIRST REAL LOOP_BACK: plan 6/6 bridged → builtproject.run_scenarios → report 1/5/0 → BUILDER, from_state=RUN_TESTS, iter 0→1. Build defects caught: plan↔build entry mismatch (/api stale server) + inert fixtures (Findings #4–#5). L2=80, §ARC=8, suite 285/0/5 (290). Next: PHASE-30 pending decision.",
+  "last_updated": "2026-06-10T14:49:21.000Z",
   "phase_16": {
     "status": "ACTIVE",
     "started_at": "2026-05-24T16:00:00.000Z",
