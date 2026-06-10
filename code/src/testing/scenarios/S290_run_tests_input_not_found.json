@@ -1,0 +1,16 @@
+{
+  "id": "S290",
+  "name": "runTests input-missing — RUN_TESTS but no test_plan.json → INPUT_NOT_FOUND, no advance (PHASE-29)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/run_tests_test_helper",
+  "method": "runS290InputNotFound",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "ok_true",              "expected": true },
+    { "type": "state_field_equals", "field": "test_error_not_found", "expected": true },
+    { "type": "state_field_equals", "field": "advanced_false",       "expected": true },
+    { "type": "state_field_equals", "field": "graph_still_run_tests","expected": true }
+  ]
+}

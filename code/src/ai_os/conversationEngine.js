@@ -1273,6 +1273,257 @@ function createConversationEngine(options = {}) {
     }
   }
 
+  // ── Run Tests bridge (PHASE-29) ─────────────────────────────────────────────
+  //
+  // runTests: installs deps + bridges test_plan.json → forge_tests/scenarios/
+  //           + runs builtproject.run_scenarios.
+  // PASS report → advance RUN_TESTS → REVIEWER_CODE_AND_SECURITY.
+  // FAIL report → loop-back to BUILDER via orchestration.loop_back (cap-aware).
+  // No LLM call — purely deterministic.
+
+  async function runTests(body = {}) {
+    const projectId = normalizeProjectId(body.project_id || "");
+    const state     = loadState(projectId);
+
+    if (!state) {
+      return { ok: true, loop_id: null, test_error: "PROJECT_NOT_FOUND", advanced: false };
+    }
+
+    const loopId = body.loop_id || state.loop_id || null;
+    if (!loopId) {
+      return { ok: true, loop_id: null, test_error: "NO_LOOP_ID", advanced: false };
+    }
+
+    const reg = getDefaultRegistry();
+    const pid = normalizeProjectId(projectId);
+
+    // State guard: must be at RUN_TESTS
+    const statusResult = await reg.invoke("orchestration.get_status", {
+      project_id: pid,
+      loop_id:    loopId
+    }, { root });
+
+    if (!statusResult || statusResult.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, test_error: "GET_STATUS_FAILED", advanced: false };
+    }
+
+    const currentState = statusResult.output.current_state;
+    if (currentState !== "RUN_TESTS") {
+      return { ok: true, loop_id: loopId, current_state: currentState,
+               test_error: "WRONG_STATE", advanced: false };
+    }
+
+    // Read test_plan.json
+    const planRelPath = "artifacts/projects/" + pid + "/orchestration/" + loopId + "/test_plan.json";
+    const planRead = await reg.invoke("fs.read_file", { path: planRelPath }, { root });
+
+    if (!planRead || planRead.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, test_error: "INPUT_NOT_FOUND", advanced: false };
+    }
+
+    let testPlan;
+    try {
+      testPlan = JSON.parse(planRead.output.content);
+    } catch {
+      return { ok: true, loop_id: loopId, test_error: "PLAN_PARSE_FAILED", advanced: false };
+    }
+
+    const scenarios = testPlan.scenarios;
+    if (!Array.isArray(scenarios) || scenarios.length === 0) {
+      return { ok: true, loop_id: loopId, test_error: "PLAN_EMPTY", advanced: false };
+    }
+
+    // Test-only forced timeout hook (never set in production code)
+    if (body._test_force_timeout) {
+      return { ok: true, loop_id: loopId, advanced: false, test_error: "RUN_TESTS_TIMEOUT" };
+    }
+
+    const projectRelDir = "artifacts/projects/" + pid;
+    const projectRoot   = path.resolve(root, projectRelDir);
+
+    // ── Sub-step 1: Dep install ────────────────────────────────────────────────
+
+    if (!body._test_skip_npm_install) {
+      // Force-fail hook (test only — never set in production code)
+      if (body._test_force_npm_install_fail) {
+        return { ok: true, loop_id: loopId, advanced: false,
+                 test_error: "DEPS_INSTALL_FAILED", deps_install_stderr: "Forced failure in test" };
+      }
+
+      const NODE_BUILTINS = new Set([
+        "assert","buffer","child_process","cluster","console","crypto","dgram",
+        "dns","domain","events","fs","http","http2","https","inspector","module",
+        "net","os","path","perf_hooks","process","punycode","querystring","readline",
+        "repl","stream","string_decoder","timers","tls","trace_events","tty","url",
+        "util","v8","vm","wasi","worker_threads","zlib"
+      ]);
+      const SKIP_DIRS = new Set(["node_modules", "forge_tests", ".git"]);
+      const depSet    = new Set();
+      const scanPaths = [];
+
+      const topResult = await reg.invoke("fs.list_dir", { path: projectRelDir }, { root });
+      if (topResult && topResult.status === "SUCCESS") {
+        for (const entry of (topResult.output.entries || [])) {
+          if (entry.type === "file" && entry.name.endsWith(".js")) {
+            scanPaths.push(projectRelDir + "/" + entry.name);
+          } else if (entry.type === "dir" && !SKIP_DIRS.has(entry.name)) {
+            const subGlob = await reg.invoke("fs.glob", {
+              pattern: "**/*.js",
+              cwd:     projectRelDir + "/" + entry.name
+            }, { root });
+            if (subGlob && subGlob.status === "SUCCESS") {
+              for (const f of (subGlob.output.matches || [])) scanPaths.push(f);
+            }
+          }
+        }
+      }
+
+      for (const filePath of scanPaths) {
+        const fileRead = await reg.invoke("fs.read_file", { path: filePath }, { root });
+        if (fileRead && fileRead.status === "SUCCESS") {
+          const content = fileRead.output.content || "";
+          const reqRe   = /require\(['"]([^'"]+)['"]\)/g;
+          let m;
+          while ((m = reqRe.exec(content)) !== null) {
+            const mod = m[1];
+            if (!mod.startsWith(".")) {
+              const pkg = mod.startsWith("@")
+                ? mod.split("/").slice(0, 2).join("/")
+                : mod.split("/")[0];
+              if (!NODE_BUILTINS.has(pkg)) depSet.add(pkg);
+            }
+          }
+        }
+      }
+
+      if (depSet.size > 0) {
+        const pkgRelPath = projectRelDir + "/package.json";
+        let pkg = { name: pid, version: "1.0.0" };
+        const pkgRead = await reg.invoke("fs.read_file", { path: pkgRelPath }, { root });
+        if (pkgRead && pkgRead.status === "SUCCESS") {
+          try { pkg = JSON.parse(pkgRead.output.content); } catch { /* keep default */ }
+        }
+        if (!pkg.name)    pkg.name    = pid;
+        if (!pkg.version) pkg.version = "1.0.0";
+        if (!pkg.dependencies) pkg.dependencies = {};
+        for (const d of depSet) {
+          if (!pkg.dependencies[d]) pkg.dependencies[d] = "latest";
+        }
+
+        await reg.invoke("fs.write_file", {
+          path:    pkgRelPath,
+          content: JSON.stringify(pkg, null, 2)
+        }, { root });
+
+        const npmCmd = process.platform === "win32" ? "npm.cmd" : "npm";
+        const installResult = await reg.invoke("shell.run_in_workspace", {
+          project_id: pid,
+          argv:       [npmCmd, "install", "--no-audit", "--no-fund"],
+          timeout_ms: 180000
+        }, { root });
+
+        if (!installResult || installResult.status !== "SUCCESS" ||
+            (installResult.output && installResult.output.exit_code !== 0)) {
+          const stderr = (installResult && installResult.output && installResult.output.stderr) || "";
+          return { ok: true, loop_id: loopId, advanced: false,
+                   test_error: "DEPS_INSTALL_FAILED", deps_install_stderr: stderr };
+        }
+      }
+    }
+
+    // ── Sub-step 2: Bridge test_plan → forge_tests/scenarios ──────────────────
+
+    for (const scenario of scenarios) {
+      const scenRelPath = projectRelDir + "/forge_tests/scenarios/" +
+                          scenario.id + "_" + scenario.name + ".json";
+      await reg.invoke("fs.write_file", {
+        path:    scenRelPath,
+        content: JSON.stringify(scenario, null, 2)
+      }, { root });
+    }
+
+    // ── Sub-step 3: Run scenarios ──────────────────────────────────────────────
+
+    let runOutput;
+
+    if (body._test_force_run_scenarios_result) {
+      runOutput = body._test_force_run_scenarios_result;
+    } else {
+      const toolResult = await reg.invoke("builtproject.run_scenarios", {
+        project_root: projectRoot
+      }, { root });
+
+      if (!toolResult || toolResult.status !== "SUCCESS") {
+        const reason = (toolResult && toolResult.metadata && toolResult.metadata.reason)
+          || "RUN_SCENARIOS_FAILED";
+        return { ok: true, loop_id: loopId, advanced: false, test_error: reason };
+      }
+      runOutput = toolResult.output;
+    }
+
+    const reportSummary = {
+      overall_status: runOutput.overall_status,
+      total:          runOutput.total,
+      pass:           runOutput.pass,
+      fail:           runOutput.fail,
+      error:          runOutput.error
+    };
+
+    // ── Sub-step 4: Advance or loop-back ──────────────────────────────────────
+
+    if (runOutput.overall_status === "PASS") {
+      await reg.invoke("orchestration.advance_state", {
+        project_id:      pid,
+        loop_id:         loopId,
+        to_state:        "REVIEWER_CODE_AND_SECURITY",
+        transition_type: "NORMAL",
+        role_invoked:    "builtproject"
+      }, { root });
+
+      return {
+        ok:             true,
+        loop_id:        loopId,
+        advanced:       true,
+        advanced_to:    "REVIEWER_CODE_AND_SECURITY",
+        report_summary: reportSummary
+      };
+    }
+
+    // FAIL → loop-back (cap-aware via orchestration.loop_back)
+    const lbResult = await reg.invoke("orchestration.loop_back", {
+      project_id: pid,
+      loop_id:    loopId
+    }, { root });
+
+    if (!lbResult || lbResult.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, advanced: false,
+               test_error: "LOOP_BACK_FAILED", report_summary: reportSummary };
+    }
+
+    const lbOut = lbResult.output;
+
+    if (lbOut.escalated) {
+      return {
+        ok:              true,
+        loop_id:         loopId,
+        advanced:        true,
+        advanced_to:     "ESCALATED",
+        escalated:       true,
+        escalation_path: lbOut.escalation_path,
+        report_summary:  reportSummary
+      };
+    }
+
+    return {
+      ok:             true,
+      loop_id:        loopId,
+      advanced:       true,
+      advanced_to:    "BUILDER",
+      loop_back:      true,
+      report_summary: reportSummary
+    };
+  }
+
   // ── Cost Estimate bridge (PHASE-25) ─────────────────────────────────────────
   //
   // estimateCost: drives the cost_estimator role from COST_ESTIMATE → ENV_REPORT.
@@ -1758,6 +2009,7 @@ function createConversationEngine(options = {}) {
     formalizeSpec,
     reviewSpec,
     buildProject,
+    runTests,
     estimateCost,
     designTests,
     reportEnv,

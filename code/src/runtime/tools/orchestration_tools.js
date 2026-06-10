@@ -421,8 +421,58 @@ const read_log = defineTool({
   }
 });
 
+// ── 7. orchestration.loop_back ───────────────────────────────────────────────
+
+const loop_back = defineTool({
+  name:          "orchestration.loop_back",
+  description:   "Cap-aware loop-back to BUILDER. Increments iteration_count and appends a LOOP_BACK audit row; escalates to ESCALATED if iteration cap exceeded. Internal — called by the engine on test-run failure.",
+  required_mode: "WORKSPACE_WRITE",
+
+  input_schema: {
+    type: "object",
+    properties: {
+      project_id: { type: "string", description: "Project ID" },
+      loop_id:    { type: "string", description: "Loop ID" }
+    },
+    required: ["project_id", "loop_id"]
+  },
+
+  output_schema: {
+    type: "object",
+    properties: {
+      advanced:        { type: "boolean" },
+      escalated:       { type: "boolean" },
+      escalation_path: { type: "string" }
+    },
+    required: ["advanced", "escalated"]
+  },
+
+  preview(input) {
+    return Promise.resolve({
+      status:   "PREVIEWED",
+      output:   {
+        loop_id:            input.loop_id,
+        would_loop_back_to: "BUILDER"
+      },
+      metadata: {}
+    });
+  },
+
+  async execute(input, ctx) {
+    try {
+      const { tryAdvanceForLoopBack } = require("../orchestration/iteration_controller");
+      const result = await tryAdvanceForLoopBack(input.project_id, input.loop_id, ctx || {});
+      const output = { advanced: result.advanced, escalated: result.escalated };
+      if (result.escalation_path) output.escalation_path = result.escalation_path;
+      return ok(output);
+    } catch (err) {
+      return failed("LOOP_BACK_FAILED", err.message);
+    }
+  }
+});
+
 // ── Export ────────────────────────────────────────────────────────────────────
 
 module.exports = {
-  tools: [start_loop, advance_state, respond, abort, get_status, read_log]
+  tools: [start_loop, advance_state, respond, abort, get_status, read_log, loop_back]
 };

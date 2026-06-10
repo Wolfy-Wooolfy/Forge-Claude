@@ -1,0 +1,17 @@
+{
+  "id": "S288",
+  "name": "runTests happy-path — RUN_TESTS, PASS report injected, scenarios bridged, graph → REVIEWER_CODE_AND_SECURITY (PHASE-29)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/run_tests_test_helper",
+  "method": "runS288HappyPath",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "advanced_true",        "expected": true },
+    { "type": "state_field_equals", "field": "advanced_to_reviewer", "expected": true },
+    { "type": "state_field_equals", "field": "scenarios_bridged",    "expected": true },
+    { "type": "state_field_equals", "field": "report_status_pass",   "expected": true },
+    { "type": "state_field_equals", "field": "graph_state_reviewer", "expected": true }
+  ]
+}

@@ -136,7 +136,7 @@ async function tryAdvanceForLoopBack(project_id, loop_id, ctx) {
   await appendAuditRow(project_id, loop_id, {
     ts:              new Date().toISOString(),
     loop_id,
-    from_state:      "QUALITY_JUDGE",
+    from_state:      graph.current_state,
     to_state:        "BUILDER",
     transition_type: "LOOP_BACK",
     role_invoked:    null,
