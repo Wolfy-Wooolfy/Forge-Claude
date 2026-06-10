@@ -1,0 +1,15 @@
+{
+  "state": "RUN_TESTS",
+  "hop_states": {
+    "h1": "SPEC_WRITER_FORMALIZE",
+    "h2": "REVIEWER_SPEC",
+    "h3": "COST_ESTIMATE",
+    "h4": "ENV_REPORT",
+    "h5": "ENV_REPORT",
+    "h6": "TEST_DESIGN",
+    "h7": "BUILDER",
+    "h8": "RUN_TESTS",
+    "final": "RUN_TESTS"
+  },
+  "total_usd": 0.40938
+}

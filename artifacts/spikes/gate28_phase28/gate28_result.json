@@ -1,6 +1,9 @@
 {
-  "verdict": "FAIL",
-  "phase": "SMOKE",
+  "verdict": "PASS",
+  "run_ts": "2026-06-10T10:32:37.773Z",
+  "pass_count": 44,
+  "fail_count": 0,
+  "total_assertions": 44,
   "assertions": [
     {
       "id": "H1a",
@@ -18,7 +21,7 @@
       "id": "H1c",
       "label": "loop_id present",
       "pass": true,
-      "detail": "07554bcb-afff-4439-866b-01f843dfbc5e"
+      "detail": "477e11ed-7ca3-46dc-9d32-c714ec6c4ef9"
     },
     {
       "id": "H1d",
@@ -197,7 +200,7 @@
     },
     {
       "id": "H8d",
-      "label": "all files_written sha256 ≠ pending",
+      "label": "all sha256 ≠ pending",
       "pass": true,
       "detail": "all 5 files have real sha256"
     },
@@ -217,11 +220,153 @@
     {
       "id": "H8g",
       "label": "entry file exit_code === 0",
-      "pass": false,
-      "detail": "exit_code=1 stdout=\"\""
+      "pass": true,
+      "detail": "exit_code=0 stdout=\"Server is running on port 3000\\n\""
+    },
+    {
+      "id": "L_architect",
+      "label": "ledger has real openai/gpt-4o entry for architect",
+      "pass": true,
+      "detail": "cost=$0.01217"
+    },
+    {
+      "id": "L_spec_writer",
+      "label": "ledger has real openai/gpt-4o entry for spec_writer",
+      "pass": true,
+      "detail": "cost=$0.01417"
+    },
+    {
+      "id": "L_reviewer",
+      "label": "ledger has real openai/gpt-4o entry for reviewer",
+      "pass": true,
+      "detail": "cost=$0.01281"
+    },
+    {
+      "id": "L_cost_estimator",
+      "label": "ledger has real openai/gpt-4o entry for cost_estimator",
+      "pass": true,
+      "detail": "cost=$0.01715"
+    },
+    {
+      "id": "L_environment",
+      "label": "ledger has real openai/gpt-4o entry for environment",
+      "pass": true,
+      "detail": "cost=$0.0151"
+    },
+    {
+      "id": "L_test_designer",
+      "label": "ledger has real openai/gpt-4o entry for test_designer",
+      "pass": true,
+      "detail": "cost=$0.03084"
+    },
+    {
+      "id": "L_builder",
+      "label": "ledger has real openai/gpt-4o entry for builder",
+      "pass": true,
+      "detail": "cost=$0.01608"
+    },
+    {
+      "id": "L_materializer",
+      "label": "ledger has real openai/gpt-4o entry for materializer",
+      "pass": true,
+      "detail": "cost=$0.0143"
+    },
+    {
+      "id": "L_cost",
+      "label": "total_usd ≤ $1.00",
+      "pass": true,
+      "detail": "$0.40938"
+    },
+    {
+      "id": "FINAL_state",
+      "label": "final loop state = RUN_TESTS",
+      "pass": true,
+      "actual": "RUN_TESTS",
+      "expected": "RUN_TESTS"
     }
   ],
-  "run_stdout": "",
-  "run_exit": 1,
-  "reason": "entry file did not exit 0: exit_code=1"
+  "project_id": "phase28_gate10",
+  "loop_id": "477e11ed-7ca3-46dc-9d32-c714ec6c4ef9",
+  "hop_states": {
+    "h1": "SPEC_WRITER_FORMALIZE",
+    "h2": "REVIEWER_SPEC",
+    "h3": "COST_ESTIMATE",
+    "h4": "ENV_REPORT",
+    "h5": "ENV_REPORT",
+    "h6": "TEST_DESIGN",
+    "h7": "BUILDER",
+    "h8": "RUN_TESTS",
+    "final": "RUN_TESTS"
+  },
+  "final_state": "RUN_TESTS",
+  "total_usd": 0.40938,
+  "npm_install_exit": 0,
+  "files_written_count": 5,
+  "files_written": [
+    {
+      "path": "src/db/database.js",
+      "sha256": "5ec58760ccbe96a0775faa8594ed9b7cff27fcec703dea98539514b563cd77d8",
+      "line_count": 8
+    },
+    {
+      "path": "src/middleware/validateInput.js",
+      "sha256": "631411cab5bb79f9505d880c337eb27b8ad8ec6f598c5276aa9e5d4007fdebd2",
+      "line_count": 14
+    },
+    {
+      "path": "src/middleware/errorHandler.js",
+      "sha256": "4b4bf11f299cb7147a3a373db8b08ec230d6fcca5349e7443295fe89e4eb74b9",
+      "line_count": 6
+    },
+    {
+      "path": "src/routes/todos.js",
+      "sha256": "d2f74baac00952470651f7d89a696e92cee4819afcfb5a5990fb36aabe3d8e33",
+      "line_count": 50
+    },
+    {
+      "path": "src/index.js",
+      "sha256": "111425865b1b88124e42ebd95d79c301bf13a2d20cb52ad58f785cff5e887131",
+      "line_count": 13
+    }
+  ],
+  "run_stdout": "Server is running on port 3000\n",
+  "run_exit_code": 0,
+  "ledger_summary": {
+    "total_usd": 0.40938,
+    "entries_count": 24,
+    "by_role": {
+      "architect": {
+        "model": "gpt-4o-2024-08-06",
+        "cost": 0.01217
+      },
+      "spec_writer": {
+        "model": "gpt-4o-2024-08-06",
+        "cost": 0.01417
+      },
+      "reviewer": {
+        "model": "gpt-4o-2024-08-06",
+        "cost": 0.01281
+      },
+      "cost_estimator": {
+        "model": "gpt-4o-2024-08-06",
+        "cost": 0.01715
+      },
+      "environment": {
+        "model": "gpt-4o-2024-08-06",
+        "cost": 0.0151
+      },
+      "test_designer": {
+        "model": "gpt-4o-2024-08-06",
+        "cost": 0.03084
+      },
+      "builder": {
+        "model": "gpt-4o-2024-08-06",
+        "cost": 0.01608
+      },
+      "materializer": {
+        "model": "gpt-4o-2024-08-06",
+        "cost": 0.0143
+      }
+    }
+  }
 }

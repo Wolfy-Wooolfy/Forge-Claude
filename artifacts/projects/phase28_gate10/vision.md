@@ -4,13 +4,13 @@ project_name: todo_rest_api
 domain: web_api
 vision_version: 1
 vision_locked: true
-vision_locked_at: 2026-06-10T09:56:03.675Z
+vision_locked_at: 2026-06-10T10:31:26.463Z
 locked_by_role: owner
 amendments_history: []
 goals:
   primary: Todo List REST API — Node.js/Express + SQLite, CRUD /todos, input validation, error handling
   secondary: []
-constraints: ["Node.js + Express 4.x","SQLite via better-sqlite3 (no external DB server)"]
+constraints: ["Node.js + Express 4.x","SQLite (no external DB server)"]
 non_goals: ["Authentication","User accounts","Real-time sync","Pagination"]
 ---
 # Vision: todo_rest_api
@@ -28,7 +28,7 @@ Todo List REST API — Node.js/Express + SQLite, CRUD /todos, input validation, 
 
 ## Constraints
 - Node.js + Express 4.x
-- SQLite via better-sqlite3 (no external DB server)
+- SQLite (no external DB server)
 
 ## Non-Goals
 - Authentication

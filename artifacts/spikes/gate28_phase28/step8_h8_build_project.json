@@ -1,34 +1,34 @@
 {
   "h8Result": {
     "ok": true,
-    "loop_id": "07554bcb-afff-4439-866b-01f843dfbc5e",
+    "loop_id": "477e11ed-7ca3-46dc-9d32-c714ec6c4ef9",
     "advanced": true,
     "advanced_to": "RUN_TESTS",
     "files_written": [
       {
-        "path": "src/database/sqlite.js",
-        "sha256": "637d74b630b178702c8d388fcef532d9a3dfe4cff5255b74895306b253bef792",
-        "line_count": 9
+        "path": "src/db/database.js",
+        "sha256": "5ec58760ccbe96a0775faa8594ed9b7cff27fcec703dea98539514b563cd77d8",
+        "line_count": 8
       },
       {
-        "path": "src/middleware/inputValidation.js",
-        "sha256": "17f64cfe4b624731b6a33f8e2cac6572f7211fa968b3dc003cbb37805433b906",
-        "line_count": 16
-      },
-      {
-        "path": "src/middleware/errorHandling.js",
-        "sha256": "889b6ebaa869162053694fb087113c277a7b0febcc4dc1759da17648051b344d",
-        "line_count": 7
-      },
-      {
-        "path": "src/routes/todoRoutes.js",
-        "sha256": "19983c08345b16e501e213459483c59a9d8331915ce1173ae0460a1dbf78e10d",
-        "line_count": 59
-      },
-      {
-        "path": "src/app.js",
-        "sha256": "676e79803aef90078cfb442bd6ef773b27f44379cd353ebb0aa30fdf6daa682d",
+        "path": "src/middleware/validateInput.js",
+        "sha256": "631411cab5bb79f9505d880c337eb27b8ad8ec6f598c5276aa9e5d4007fdebd2",
         "line_count": 14
+      },
+      {
+        "path": "src/middleware/errorHandler.js",
+        "sha256": "4b4bf11f299cb7147a3a373db8b08ec230d6fcca5349e7443295fe89e4eb74b9",
+        "line_count": 6
+      },
+      {
+        "path": "src/routes/todos.js",
+        "sha256": "d2f74baac00952470651f7d89a696e92cee4819afcfb5a5990fb36aabe3d8e33",
+        "line_count": 50
+      },
+      {
+        "path": "src/index.js",
+        "sha256": "111425865b1b88124e42ebd95d79c301bf13a2d20cb52ad58f785cff5e887131",
+        "line_count": 13
       }
     ],
     "smoke": {
@@ -36,5 +36,5 @@
     },
     "summary": "Materialized 5 file(s)."
   },
-  "h8Duration": 12170
+  "h8Duration": 16231
 }

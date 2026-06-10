@@ -1,0 +1,8 @@
+{
+  "name": "todo-rest-api",
+  "version": "1.0.0",
+  "dependencies": {
+    "express-validator": "*",
+    "express": "*"
+  }
+}

@@ -1,11 +1,11 @@
 {
   "h6Result": {
     "ok": true,
-    "loop_id": "07554bcb-afff-4439-866b-01f843dfbc5e",
+    "loop_id": "477e11ed-7ca3-46dc-9d32-c714ec6c4ef9",
     "gate_id": 1,
     "response": "APPROVE",
     "advanced_to": "TEST_DESIGN",
     "advanced": true
   },
-  "h6Duration": 51
+  "h6Duration": 35
 }

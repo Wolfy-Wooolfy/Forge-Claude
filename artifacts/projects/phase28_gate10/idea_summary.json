@@ -12,7 +12,7 @@
   ],
   "constraints": [
     "Node.js + Express 4.x",
-    "SQLite via better-sqlite3 (no external DB server)"
+    "SQLite (no external DB server)"
   ],
   "non_goals": [
     "Authentication",

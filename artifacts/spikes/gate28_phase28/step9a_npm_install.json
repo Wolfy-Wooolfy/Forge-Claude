@@ -1,0 +1,5 @@
+{
+  "exit_code": 0,
+  "stdout": "\nadded 3 packages, removed 1 package, and audited 72 packages in 8s\n\n15 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+  "stderr": ""
+}

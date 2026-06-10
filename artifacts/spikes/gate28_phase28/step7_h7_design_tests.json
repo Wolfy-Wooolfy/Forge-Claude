@@ -1,18 +1,21 @@
 {
   "h7Result": {
     "ok": true,
-    "loop_id": "07554bcb-afff-4439-866b-01f843dfbc5e",
+    "loop_id": "477e11ed-7ca3-46dc-9d32-c714ec6c4ef9",
     "advanced": true,
     "advanced_to": "BUILDER",
     "test_plan": {
-      "scenarios_count": 6,
+      "scenarios_count": 5,
       "coverage_summary": {
-        "acs_total": 6,
-        "acs_covered": 6,
-        "gaps": []
+        "acs_total": 5,
+        "acs_covered": 3,
+        "gaps": [
+          "AC-4",
+          "AC-5"
+        ]
       }
     },
     "model_used": "gpt-4o"
   },
-  "h7Duration": 20051
+  "h7Duration": 12555
 }
