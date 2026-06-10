@@ -1398,6 +1398,138 @@ function createConversationEngine(options = {}) {
     }
   }
 
+  // ── Test Design bridge (PHASE-27) ────────────────────────────────────────────
+  //
+  // designTests: drives the test_designer role from TEST_DESIGN → BUILDER.
+  // No owner gate on this edge (conversation_graph.js gate_check:null).
+  // On SUCCESS: persists test_plan.json; advances to BUILDER; returns the test plan.
+  // Any failure → {ok:true, test_error:<code>, advanced:false} (stays TEST_DESIGN).
+
+  async function designTests(body = {}) {
+    const projectId = normalizeProjectId(body.project_id || "");
+    const state     = loadState(projectId);
+
+    if (!state) {
+      return { ok: true, loop_id: null, test_error: "PROJECT_NOT_FOUND", advanced: false };
+    }
+
+    const loopId = body.loop_id || state.loop_id || null;
+    if (!loopId) {
+      return { ok: true, loop_id: null, test_error: "NO_LOOP_ID", advanced: false };
+    }
+
+    const testProvider   = body.test_provider   || "openai";
+    const testModel      = body.test_model || (testProvider === "openai" ? "gpt-4o" : undefined);
+    const testScenarioId = body.test_scenario_id || undefined;
+
+    const reg = getDefaultRegistry();
+
+    // State guard: must be at TEST_DESIGN
+    const statusResult = await reg.invoke("orchestration.get_status", {
+      project_id: normalizeProjectId(projectId),
+      loop_id:    loopId
+    }, { root });
+
+    if (!statusResult || statusResult.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, test_error: "GET_STATUS_FAILED", advanced: false };
+    }
+
+    const currentState = statusResult.output.current_state;
+    if (currentState !== "TEST_DESIGN") {
+      return { ok: true, loop_id: loopId, current_state: currentState, test_error: "WRONG_STATE", advanced: false };
+    }
+
+    // Read spec from disk (same artifact paths as buildProject/estimateCost/reportEnv)
+    const specRelPath = "artifacts/projects/" + normalizeProjectId(projectId) +
+      "/orchestration/" + loopId + "/spec.json";
+    const specRead = await reg.invoke("fs.read_file", { path: specRelPath }, { root });
+
+    if (!specRead || specRead.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, test_error: "INPUT_NOT_FOUND", advanced: false };
+    }
+
+    let spec;
+    try {
+      spec = JSON.parse(specRead.output.content);
+    } catch {
+      return { ok: true, loop_id: loopId, test_error: "INPUT_NOT_FOUND", advanced: false };
+    }
+
+    // Read architect design from disk
+    const designRelPath = "artifacts/projects/" + normalizeProjectId(projectId) +
+      "/orchestration/" + loopId + "/architect_design.json";
+    const designRead = await reg.invoke("fs.read_file", { path: designRelPath }, { root });
+
+    if (!designRead || designRead.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, test_error: "INPUT_NOT_FOUND", advanced: false };
+    }
+
+    let design;
+    try {
+      design = JSON.parse(designRead.output.content);
+    } catch {
+      return { ok: true, loop_id: loopId, test_error: "INPUT_NOT_FOUND", advanced: false };
+    }
+
+    // 30s timeout, mirroring estimateCost/reportEnv
+    let timeoutHandle;
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutHandle = setTimeout(() => reject(new Error("TEST_DESIGNER_TIMEOUT")), 30000);
+    });
+
+    try {
+      const testResult = await Promise.race([
+        reg.invoke("role.invoke", Object.assign(
+          {
+            role_id:    "test_designer",
+            input:      { project_id: normalizeProjectId(projectId), spec, design },
+            project_id: normalizeProjectId(projectId),
+            provider:   testProvider
+          },
+          testModel      ? { model:       testModel      } : {},
+          testScenarioId ? { scenario_id: testScenarioId } : {}
+        ), { root }),
+        timeoutPromise
+      ]);
+      clearTimeout(timeoutHandle);
+
+      if (testResult && testResult.status === "SUCCESS") {
+        const test_plan = testResult.output;
+
+        await reg.invoke("fs.write_file", {
+          path:    "artifacts/projects/" + normalizeProjectId(projectId) +
+                   "/orchestration/" + loopId + "/test_plan.json",
+          content: JSON.stringify(test_plan, null, 2)
+        }, { root });
+
+        await reg.invoke("orchestration.advance_state", {
+          project_id:      normalizeProjectId(projectId),
+          loop_id:         loopId,
+          to_state:        "BUILDER",
+          transition_type: "NORMAL",
+          role_invoked:    "test_designer"
+        }, { root });
+
+        return {
+          ok:          true,
+          loop_id:     loopId,
+          advanced:    true,
+          advanced_to: "BUILDER",
+          test_plan,
+          model_used:  testModel
+        };
+      }
+
+      const testError = (testResult && testResult.metadata && testResult.metadata.detail)
+        || "TEST_DESIGN_FAILED";
+      return { ok: true, loop_id: loopId, advanced: false, test_error: testError, model_used: testModel };
+
+    } catch (err) {
+      clearTimeout(timeoutHandle);
+      return { ok: true, loop_id: loopId, advanced: false, test_error: err.message };
+    }
+  }
+
   // ── Env Report bridge (PHASE-26) ─────────────────────────────────────────────
   //
   // reportEnv: drives the environment role at ENV_REPORT; loop stays at ENV_REPORT (Gate 1 pending).
@@ -1627,6 +1759,7 @@ function createConversationEngine(options = {}) {
     reviewSpec,
     buildProject,
     estimateCost,
+    designTests,
     reportEnv,
     respondGate,
     CONFIRMATION_REQUIRED_TRANSITIONS

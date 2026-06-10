@@ -382,5 +382,17 @@
     "tokens_in": 100,
     "tokens_out": 10,
     "finish_reason": "stop"
+  },
+  "mock|mock|scenario:S284": {
+    "text": "{\"scenarios\":[{\"id\":\"TC-001\",\"name\":\"POST /tasks يُعيد 201 على مدخل صالح\",\"description\":\"التحقق من أن POST /tasks يقبل البيانات الصحيحة ويُعيد 201 Created\",\"category\":\"happy_path\",\"setup\":{\"fixtures\":[\"empty database\"]},\"execution\":{\"method\":\"POST\",\"path\":\"/tasks\",\"body\":{\"title\":\"مهمة تجريبية\"}},\"assertions\":[{\"type\":\"status_code\",\"expected\":201}],\"teardown\":{\"cleanup\":[\"delete test task\"]},\"metadata\":{\"ac_ref\":\"AC-1\",\"priority\":\"HIGH\"}},{\"id\":\"TC-002\",\"name\":\"GET /tasks يُعيد قائمة المهام\",\"description\":\"التحقق من أن GET /tasks يُعيد مصفوفة المهام\",\"category\":\"happy_path\",\"setup\":{\"fixtures\":[\"seed one task\"]},\"execution\":{\"method\":\"GET\",\"path\":\"/tasks\"},\"assertions\":[{\"type\":\"status_code\",\"expected\":200},{\"type\":\"body_is_array\",\"expected\":true}],\"teardown\":{\"cleanup\":[]},\"metadata\":{\"ac_ref\":\"AC-1\",\"priority\":\"MEDIUM\"}}],\"coverage_summary\":{\"acs_total\":1,\"acs_covered\":1,\"gaps\":[]}}",
+    "tokens_in": 900,
+    "tokens_out": 400,
+    "finish_reason": "stop"
+  },
+  "mock|gpt-4o|scenario:S287": {
+    "text": "{\"not_scenarios\":\"MISSING_REQUIRED_FIELDS\"}",
+    "tokens_in": 100,
+    "tokens_out": 10,
+    "finish_reason": "stop"
   }
 }

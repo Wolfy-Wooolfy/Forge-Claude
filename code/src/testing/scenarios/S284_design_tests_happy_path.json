@@ -1,0 +1,18 @@
+{
+  "id": "S284",
+  "name": "designTests happy-path — loop seeded TEST_DESIGN, mock returns valid test plan, graph advances to BUILDER (PHASE-27 Step 1)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/design_tests_test_helper",
+  "method": "runS284DesignTestsHappyPath",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "advanced_to_builder",   "expected": true },
+    { "type": "state_field_equals", "field": "test_plan_present",     "expected": true },
+    { "type": "state_field_equals", "field": "has_coverage_summary",  "expected": true },
+    { "type": "state_field_equals", "field": "advanced_true",         "expected": true },
+    { "type": "state_field_equals", "field": "graph_state_builder",   "expected": true },
+    { "type": "state_field_equals", "field": "test_plan_file_written","expected": true }
+  ]
+}
