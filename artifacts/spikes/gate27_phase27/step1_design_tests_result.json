@@ -1,0 +1,18 @@
+{
+  "testResult": {
+    "ok": true,
+    "loop_id": "gate27-loop-1781081904214",
+    "advanced": true,
+    "advanced_to": "BUILDER",
+    "test_plan": {
+      "scenarios_count": 3,
+      "coverage_summary": {
+        "acs_total": 3,
+        "acs_covered": 3,
+        "gaps": []
+      }
+    },
+    "model_used": "gpt-4o"
+  },
+  "testDuration": 11080
+}

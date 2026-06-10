@@ -1,0 +1,69 @@
+{
+  "ts": "2026-06-10T08:58:36.308Z",
+  "verdict": "PASS",
+  "assertions": [
+    {
+      "id": "G1a",
+      "pass": true
+    },
+    {
+      "id": "G1b",
+      "pass": true
+    },
+    {
+      "id": "G2a",
+      "pass": true
+    },
+    {
+      "id": "G2b",
+      "pass": true
+    },
+    {
+      "id": "G2c",
+      "pass": true
+    },
+    {
+      "id": "G3",
+      "pass": true
+    },
+    {
+      "id": "G4",
+      "pass": true
+    },
+    {
+      "id": "G5",
+      "pass": true
+    },
+    {
+      "id": "G6",
+      "pass": true
+    }
+  ],
+  "pass_count": 9,
+  "total": 9,
+  "total_usd": 0.02042,
+  "project_id": "phase27_gate10",
+  "loop_id": "gate27-loop-1781081904214",
+  "loop_state_after_design": "BUILDER",
+  "test_plan_on_disk": true,
+  "test_plan_scenarios_count": 3,
+  "coverage_summary": {
+    "acs_total": 3,
+    "acs_covered": 3,
+    "gaps": []
+  },
+  "ledger_entry": {
+    "ts": "2026-06-10T08:58:36.238Z",
+    "invocation_id": "1d0a7dbb-433e-49fe-b6fe-388b7e44dde2",
+    "project_id": "phase27_gate10",
+    "provider": "openai",
+    "model": "gpt-4o-2024-08-06",
+    "role": "test_designer",
+    "tokens_in": 1491,
+    "tokens_out": 864,
+    "latency_ms": 10651,
+    "cost_usd_estimated": 0.0521,
+    "cost_usd_actual": 0.02042,
+    "outcome": "success"
+  }
+}
