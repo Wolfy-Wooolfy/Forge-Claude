@@ -4,9 +4,9 @@
   "current_stage": "A",
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
-  "next_phase": "PHASE-30-PENDING-DECISION",
-  "next_step": "PHASE-29 CLOSED — RUN_TESTS bridge live; first real loop-back exercised (build defects caught: entry/prefix mismatch + fixtures). Loop phase28_gate10 at BUILDER iter 1. Next: PHASE-30 — pending decision.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-10-phase-29-run-tests-bridge.md",
+  "next_phase": "PHASE-31-PENDING-DECISION",
+  "next_step": "PHASE-31-PENDING-DECISION — await CTO decision: REVIEWER_CODE_AND_SECURITY bridge (loop phase28_gate10 genuinely parked there, iter 1, with a real latent defect to catch) vs Fixture Engine (Finding #4).",
+  "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-10-phase-30-test-loop-convergence.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -77,9 +77,9 @@
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
-    "self_test_last_run": "2026-06-10",
-    "self_test_last_result": "285 passed, 0 failed, 5 skipped (290 total) — PHASE-29 CLOSED. S288-S292 GREEN. Gate #10 PASS: FAIL_TO_BUILDER branch; LOOP_BACK row from_state=RUN_TESTS (RULING-2 proven); sqlite3 native install OK (v1 policy); Findings #4-#5 deferred. L2=80 (orchestration.loop_back).",
-    "self_test_scenarios_pass": 285,
+    "self_test_last_run": "2026-06-11",
+    "self_test_last_result": "289 passed, 0 failed, 5 skipped (294 total) — PHASE-30 CLOSED. S293-S296 GREEN. Gate #10 PASS: PASS_TO_REVIEWER branch; build_manifest.json (RULING-4) + manifest-restricted entry derivation; 6/6 real report; loop at REVIEWER_CODE_AND_SECURITY iter-1. Finding #4 (fixtures) OPEN. L2=80.",
+    "self_test_scenarios_pass": 289,
     "self_test_scenarios_skip": 5,
     "self_test_scenarios_fail": 0,
     "providers_registered_count": 14,
@@ -165,9 +165,10 @@
       "PHASE-26",
       "PHASE-27",
       "PHASE-28",
-      "PHASE-29"
+      "PHASE-29",
+      "PHASE-30"
     ],
-    "next": "PHASE-30 (pending decision)",
+    "next": "PHASE-31 (pending decision)",
     "remaining": [],
     "phase_16_closed": "2026-05-28",
     "phase_17_closed": "2026-05-29",
@@ -177,6 +178,7 @@
     "phase_24_closed": "2026-06-08",
     "phase_28_closed": "2026-06-10",
     "phase_29_closed": "2026-06-10",
+    "phase_30_closed": "2026-06-11",
     "phase_16_corrective": "DECISION-2026-05-24T16-00-phase-16-ux-closure-gap.md — UX Closure Gap; 6 stages; outcome-based closure gate",
     "phase_15_closed": "2026-05-23T14:00:00.000Z",
     "deferred": [
@@ -618,6 +620,57 @@
       "PHASE-28 Finding #2: no dependency-install step in pipeline"
     ],
     "cost_actuals_usd": 0
+  },
+  "phase_30": {
+    "status": "CLOSED",
+    "closed_at": "2026-06-11",
+    "title": "Test-Loop Convergence (Finding #5)",
+    "plan_artifact": "artifacts/decisions/DECISION-2026-06-10-phase-30-test-loop-convergence.md",
+    "mid_checkpoint": "artifacts/decisions/_phase_30_checkpoints/stage_mid.md",
+    "final_checkpoint": "artifacts/decisions/_phase_30_checkpoints/stage_final.md",
+    "suite_final": "289/0/5 (294 total)",
+    "scenarios_added": ["S293", "S294", "S295", "S296"],
+    "gate_10": "PASS",
+    "gate_10_branch": "PASS_TO_REVIEWER",
+    "gate_10_run_ts": "2026-06-11T12:02:31Z",
+    "gate_10_cost_usd": 0.03095,
+    "gate_10_evidence": "artifacts/spikes/gate30_phase30/gate30_result.json",
+    "gate_10_result": "Real gpt-4o rebuild (6 files) → build_manifest.json persisted (RULING-4, sha256 CTO-verified vs disk) → entry derived src/server.js (manifest-restricted) → 6 commands rewritten → real npm + real harness → report 6/6 PASS → loop advanced RUN_TESTS→REVIEWER_CODE_AND_SECURITY iter-1 (no increment on PASS). Role-reversal proof: stale src/index.js (priority #1) excluded by manifest. T-3 passed via controller echo (no persistence proof).",
+    "l2_tools": 80,
+    "agent_roles": 13,
+    "arc_ledger_count": 8,
+    "doctor_checks": 35,
+    "engine_edits": [
+      "conversationEngine.js buildProject() — RULING-4: orchestration/<loopId>/build_manifest.json write (full files_written objects), fail-closed MANIFEST_WRITE_FAILED"
+    ],
+    "files_created": [
+      "code/src/testing/scenarios/S293_entry_derivation_happy.json",
+      "code/src/testing/scenarios/S294_stale_entry_inert.json",
+      "code/src/testing/scenarios/S295_entry_unresolved_fail_closed.json",
+      "code/src/testing/scenarios/S296_manifest_absent_legacy.json",
+      "scripts/spikes/gate30_phase30_convergence.js",
+      "artifacts/decisions/_phase_30_checkpoints/stage_mid.md",
+      "artifacts/decisions/_phase_30_checkpoints/stage_final.md",
+      "artifacts/spikes/gate30_phase30/ (15 evidence files incl. rewritten_scenarios/ x6)"
+    ],
+    "files_modified": [
+      "code/src/ai_os/conversationEngine.js",
+      "code/src/testing/helpers/run_tests_test_helper.js",
+      "progress/status.json"
+    ],
+    "track_a": "CLEAN — manifest write + entry derivation + rewrite via reg.invoke only; 0 new forbidden patterns; §ARC=8; L2=80 (no new tools)",
+    "incidentals": [
+      "§X.1 _test_skip_npm_exec test hook — CTO ACCEPTED (gates only npm exec; keeps scan/merge/write)",
+      "corrupt-manifest semantics — CTO APPROVED: present-but-unparseable → ENTRY_UNRESOLVED fail-closed (never silent legacy fallback)"
+    ],
+    "findings_open": [
+      "Finding #4: harness fixture support — still OPEN/deferred. T-3 passed via update echo, not persistence.",
+      "Latent built-app defect (REVIEWER-stage material): update/delete missing this.changes handling — success shapes returned for non-existent ids."
+    ],
+    "resolves": [
+      "PHASE-29 Finding #5: plan↔build entry coherence + workspace hygiene (manifest-driven inertness)"
+    ],
+    "cost_actuals_usd": 0.03095
   },
   "ux_task_2026_06_07_multiselect": {
     "status": "CLOSED",
@@ -1555,8 +1608,8 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-29 CLOSED — RUN_TESTS bridge + dep install live. POST /api/ai-os/project/run-tests wired; dep scan → package.json → real npm install (sqlite3 native OK). FIRST REAL LOOP_BACK: plan 6/6 bridged → builtproject.run_scenarios → report 1/5/0 → BUILDER, from_state=RUN_TESTS, iter 0→1. Build defects caught: plan↔build entry mismatch (/api stale server) + inert fixtures (Findings #4–#5). L2=80, §ARC=8, suite 285/0/5 (290). Next: PHASE-30 pending decision.",
-  "last_updated": "2026-06-10T14:49:21.000Z",
+  "current_task": "PHASE-30 CLOSED — Test-loop convergence (Finding #5): build_manifest.json authoritative build record (RULING-4, fail-closed); runTests entry derivation manifest-restricted + dep-scan scoping + command rewrite (ENTRY_UNRESOLVED fail-closed). Gate #10 REAL: one gpt-4o rebuild $0.03095 → manifest on disk → 6/6 PASS → loop advanced to REVIEWER_CODE_AND_SECURITY iter-1 (PASS_TO_REVIEWER). Role-reversal proof: stale src/index.js (priority #1) excluded by manifest. T-3 passed via response echo (no persistence proof) — Finding #4 fixtures OPEN. S293–S296 added. L2=80, §ARC=8, suite 289/0/5 (294). Next: PHASE-31 pending decision (REVIEWER bridge vs Fixture Engine).",
+  "last_updated": "2026-06-11T13:10:44.891Z",
   "phase_16": {
     "status": "ACTIVE",
     "started_at": "2026-05-24T16:00:00.000Z",
