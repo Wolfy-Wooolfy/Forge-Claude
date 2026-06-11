@@ -73,7 +73,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-06-11T11:38:27.496Z",
+    "last_doctor_run": "2026-06-11T13:46:41.322Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
@@ -629,7 +629,12 @@
     "mid_checkpoint": "artifacts/decisions/_phase_30_checkpoints/stage_mid.md",
     "final_checkpoint": "artifacts/decisions/_phase_30_checkpoints/stage_final.md",
     "suite_final": "289/0/5 (294 total)",
-    "scenarios_added": ["S293", "S294", "S295", "S296"],
+    "scenarios_added": [
+      "S293",
+      "S294",
+      "S295",
+      "S296"
+    ],
     "gate_10": "PASS",
     "gate_10_branch": "PASS_TO_REVIEWER",
     "gate_10_run_ts": "2026-06-11T12:02:31Z",
