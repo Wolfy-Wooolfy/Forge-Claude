@@ -1,0 +1,29 @@
+{
+  "count": 6,
+  "commands": [
+    {
+      "file": "T-1_create_todo_returns_201.json",
+      "command": "node src/server.js"
+    },
+    {
+      "file": "T-2_retrieve_todos_returns_array.json",
+      "command": "node src/server.js"
+    },
+    {
+      "file": "T-3_update_todo_with_valid_payload.json",
+      "command": "node src/server.js"
+    },
+    {
+      "file": "T-4_delete_todo_returns_204.json",
+      "command": "node src/server.js"
+    },
+    {
+      "file": "T-5_create_todo_with_invalid_data.json",
+      "command": "node src/server.js"
+    },
+    {
+      "file": "T-6_retrieve_nonexistent_todo_returns_404.json",
+      "command": "node src/server.js"
+    }
+  ]
+}

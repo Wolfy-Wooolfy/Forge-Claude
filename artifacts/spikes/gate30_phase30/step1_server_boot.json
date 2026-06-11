@@ -1,0 +1,6 @@
+{
+  "port": 64174,
+  "token_length": 64,
+  "session_file_backed_up": true,
+  "note": "in-process apiServer with PHASE-30 code; production 3100 untouched"
+}

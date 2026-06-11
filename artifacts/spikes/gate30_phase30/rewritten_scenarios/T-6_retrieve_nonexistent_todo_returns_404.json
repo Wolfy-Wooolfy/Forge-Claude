@@ -1,0 +1,44 @@
+{
+  "id": "T-6",
+  "name": "retrieve_nonexistent_todo_returns_404",
+  "description": "GET /todos/:id for a non-existing todo returns 404",
+  "category": "http",
+  "fixture": "fresh_db",
+  "setup": {
+    "actions": [
+      {
+        "type": "start_server",
+        "command": "node src/server.js",
+        "wait_for_port": 3000,
+        "timeout_ms": 5000
+      }
+    ]
+  },
+  "execution": {
+    "type": "http_request",
+    "method": "GET",
+    "url": "http://localhost:3000/todos/999",
+    "headers": {
+      "Accept": "application/json"
+    }
+  },
+  "assertions": [
+    {
+      "type": "http_status_equals",
+      "expected": 404
+    }
+  ],
+  "teardown": {
+    "actions": [
+      {
+        "type": "stop_server"
+      }
+    ]
+  },
+  "metadata": {
+    "covers_ac": [
+      "AC-5"
+    ],
+    "estimated_duration_ms": 500
+  }
+}

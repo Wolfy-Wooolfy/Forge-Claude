@@ -1,0 +1,58 @@
+{
+  "request_body": {
+    "project_id": "phase28_gate10",
+    "loop_id": "98eae33f-105c-4dbc-8f96-71efbb4827b7",
+    "provider": "openai",
+    "model": "gpt-4o"
+  },
+  "http_status": 200,
+  "latency_ms": 17510,
+  "response": {
+    "ok": true,
+    "loop_id": "98eae33f-105c-4dbc-8f96-71efbb4827b7",
+    "advanced": true,
+    "advanced_to": "RUN_TESTS",
+    "files_written": [
+      {
+        "path": "src/models/todo.js",
+        "action": "create",
+        "line_count": 8,
+        "sha256": "66bb73c979e1a0d2b83d8e1c4977522663334b210788ac530a545331c89d6bf6"
+      },
+      {
+        "path": "src/controllers/todoController.js",
+        "action": "create",
+        "line_count": 41,
+        "sha256": "f0c4eda6dfca2ca1dc2887380c1487820496da5734a0119e90ed284725be4272"
+      },
+      {
+        "path": "src/middleware/validation.js",
+        "action": "create",
+        "line_count": 12,
+        "sha256": "6e1b46104d49bb6efa1b786491655b8877b9856a4820e7a947c8b6cb036905ac"
+      },
+      {
+        "path": "src/middleware/errorHandler.js",
+        "action": "create",
+        "line_count": 4,
+        "sha256": "b80ce06bbc7e44426e10daa4a1bab1345e4ad26d439f858a24e0ef4cb7be777c"
+      },
+      {
+        "path": "src/routes/todoRoutes.js",
+        "action": "create",
+        "line_count": 11,
+        "sha256": "5467479e52f134ed133d38b32555ebb66196e4d1a0f8d4a5918a1550e70f1647"
+      },
+      {
+        "path": "src/server.js",
+        "action": "create",
+        "line_count": 13,
+        "sha256": "323091fb0add4e9840606ad7ca1c4f12970acaeb4ceed4aee37c9cb006fd7024"
+      }
+    ],
+    "smoke": {
+      "ran": false
+    },
+    "summary": "Materialized 6 file(s)."
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "request_body": {
+    "project_id": "phase28_gate10",
+    "loop_id": "98eae33f-105c-4dbc-8f96-71efbb4827b7"
+  },
+  "http_status": 200,
+  "latency_ms": 21258,
+  "response": {
+    "ok": true,
+    "loop_id": "98eae33f-105c-4dbc-8f96-71efbb4827b7",
+    "advanced": true,
+    "advanced_to": "REVIEWER_CODE_AND_SECURITY",
+    "report_summary": {
+      "overall_status": "PASS",
+      "total": 6,
+      "pass": 6,
+      "fail": 0,
+      "error": 0
+    }
+  }
+}

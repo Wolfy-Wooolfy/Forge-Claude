@@ -1,0 +1,57 @@
+{
+  "id": "T-1",
+  "name": "create_todo_returns_201",
+  "description": "POST /todos with valid payload returns 201 and created todo",
+  "category": "http",
+  "fixture": "fresh_db",
+  "setup": {
+    "actions": [
+      {
+        "type": "start_server",
+        "command": "node src/server.js",
+        "wait_for_port": 3000,
+        "timeout_ms": 5000
+      }
+    ]
+  },
+  "execution": {
+    "type": "http_request",
+    "method": "POST",
+    "url": "http://localhost:3000/todos",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "title": "Buy groceries",
+      "completed": false
+    }
+  },
+  "assertions": [
+    {
+      "type": "http_status_equals",
+      "expected": 201
+    },
+    {
+      "type": "response_body_contains_key",
+      "key": "id"
+    },
+    {
+      "type": "response_body_field_equals",
+      "field": "title",
+      "expected": "Buy groceries"
+    }
+  ],
+  "teardown": {
+    "actions": [
+      {
+        "type": "stop_server"
+      }
+    ]
+  },
+  "metadata": {
+    "covers_ac": [
+      "AC-1"
+    ],
+    "estimated_duration_ms": 500
+  }
+}

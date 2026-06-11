@@ -1,0 +1,73 @@
+{
+  "verdict": "PASS",
+  "branch_taken": "PASS_TO_REVIEWER",
+  "ruling_5": {
+    "criterion_i_commands_match_manifest_entry": true,
+    "criterion_i_expected_command": "node src/server.js",
+    "criterion_i_commands": [
+      {
+        "file": "T-1_create_todo_returns_201.json",
+        "command": "node src/server.js"
+      },
+      {
+        "file": "T-2_retrieve_todos_returns_array.json",
+        "command": "node src/server.js"
+      },
+      {
+        "file": "T-3_update_todo_with_valid_payload.json",
+        "command": "node src/server.js"
+      },
+      {
+        "file": "T-4_delete_todo_returns_204.json",
+        "command": "node src/server.js"
+      },
+      {
+        "file": "T-5_create_todo_with_invalid_data.json",
+        "command": "node src/server.js"
+      },
+      {
+        "file": "T-6_retrieve_nonexistent_todo_returns_404.json",
+        "command": "node src/server.js"
+      }
+    ],
+    "criterion_ii_final_app_booted": true,
+    "criterion_ii_global_404_signature": false,
+    "criterion_ii_passed_ids": [
+      "T-1",
+      "T-2",
+      "T-3",
+      "T-4",
+      "T-5",
+      "T-6"
+    ],
+    "criterion_iii_remaining_failures": []
+  },
+  "report_summary": {
+    "overall_status": "PASS",
+    "total": 6,
+    "pass": 6,
+    "fail": 0,
+    "error": 0
+  },
+  "manifest_files": [
+    "src/models/todo.js",
+    "src/controllers/todoController.js",
+    "src/middleware/validation.js",
+    "src/middleware/errorHandler.js",
+    "src/routes/todoRoutes.js",
+    "src/server.js"
+  ],
+  "derived_entry": "src/server.js",
+  "pre_state": "BUILDER iter-1",
+  "post_state": "REVIEWER_CODE_AND_SECURITY iter-1",
+  "loop_back_row": null,
+  "latency_ms": {
+    "build_project": 17510,
+    "run_tests": 21258
+  },
+  "cost": {
+    "ledger_before_usd": 0,
+    "ledger_after_usd": 0.03095,
+    "delta_usd": 0.03095
+  }
+}

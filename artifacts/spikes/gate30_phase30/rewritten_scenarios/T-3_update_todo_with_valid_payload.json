@@ -1,0 +1,53 @@
+{
+  "id": "T-3",
+  "name": "update_todo_with_valid_payload",
+  "description": "PUT /todos/:id updates todo with valid payload and returns 200",
+  "category": "http",
+  "fixture": "existing_todo",
+  "setup": {
+    "actions": [
+      {
+        "type": "start_server",
+        "command": "node src/server.js",
+        "wait_for_port": 3000,
+        "timeout_ms": 5000
+      }
+    ]
+  },
+  "execution": {
+    "type": "http_request",
+    "method": "PUT",
+    "url": "http://localhost:3000/todos/1",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "title": "Buy groceries",
+      "completed": true
+    }
+  },
+  "assertions": [
+    {
+      "type": "http_status_equals",
+      "expected": 200
+    },
+    {
+      "type": "response_body_field_equals",
+      "field": "completed",
+      "expected": true
+    }
+  ],
+  "teardown": {
+    "actions": [
+      {
+        "type": "stop_server"
+      }
+    ]
+  },
+  "metadata": {
+    "covers_ac": [
+      "AC-3"
+    ],
+    "estimated_duration_ms": 500
+  }
+}
