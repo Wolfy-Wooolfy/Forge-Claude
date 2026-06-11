@@ -1248,6 +1248,25 @@ function createConversationEngine(options = {}) {
         };
       }
 
+      // Persist the authoritative build record (PHASE-30 RULING-4) — fail-closed:
+      // a build whose authoritative record cannot be persisted is not a completed build.
+      let manifestWrite = null;
+      try {
+        manifestWrite = await reg.invoke("fs.write_file", {
+          path: "artifacts/projects/" + normalizeProjectId(projectId) +
+                "/orchestration/" + loopId + "/build_manifest.json",
+          content: JSON.stringify({
+            built_at: new Date().toISOString(),
+            files:    matOut.files_written
+          }, null, 2)
+        }, { root });
+      } catch {
+        manifestWrite = null;
+      }
+      if (!manifestWrite || manifestWrite.status !== "SUCCESS") {
+        return { ok: false, error: "build_error", detail: "MANIFEST_WRITE_FAILED" };
+      }
+
       // Advance state to RUN_TESTS
       await reg.invoke("orchestration.advance_state", {
         project_id:      normalizeProjectId(projectId),
@@ -1341,6 +1360,52 @@ function createConversationEngine(options = {}) {
     const projectRelDir = "artifacts/projects/" + pid;
     const projectRoot   = path.resolve(root, projectRelDir);
 
+    // ── Sub-step 0 (PHASE-30): derive authoritative entry from build_manifest ─
+    // Manifest is written by buildProject (RULING-4). Present → entry MUST derive
+    // from manifest files only (stale workspace files stay inert); absent → legacy
+    // behavior byte-identical (pre-PHASE-30 loops and mock scenarios).
+    const manifestRelPath = "artifacts/projects/" + pid + "/orchestration/" + loopId +
+                            "/build_manifest.json";
+    const manifestRead    = await reg.invoke("fs.read_file", { path: manifestRelPath }, { root });
+    const manifestPresent = !!(manifestRead && manifestRead.status === "SUCCESS");
+
+    let manifestPaths = [];
+    let derivedEntry  = null;
+
+    if (manifestPresent) {
+      let manifest = null;
+      try { manifest = JSON.parse(manifestRead.output.content); } catch { manifest = null; }
+
+      manifestPaths = (manifest && Array.isArray(manifest.files))
+        ? manifest.files.map(function (f) { return f && f.path; })
+            .filter(function (p) { return typeof p === "string" && p.length > 0; })
+        : [];
+
+      const ENTRY_PRIORITY = ["src/index.js", "src/server.js", "src/app.js",
+                              "index.js", "server.js", "app.js"];
+      derivedEntry = ENTRY_PRIORITY.find(function (p) { return manifestPaths.indexOf(p) !== -1; }) || null;
+
+      if (!derivedEntry) {
+        const listeners = [];
+        for (const mp of manifestPaths) {
+          if (!mp.endsWith(".js")) continue;
+          const entryRead = await reg.invoke("fs.read_file",
+            { path: projectRelDir + "/" + mp }, { root });
+          if (entryRead && entryRead.status === "SUCCESS" &&
+              (entryRead.output.content || "").includes(".listen(")) {
+            listeners.push(mp);
+          }
+        }
+        if (listeners.length === 1) derivedEntry = listeners[0];
+      }
+
+      if (!derivedEntry) {
+        // Fail-closed: manifest present but no derivable entry — no state
+        // transition, nothing written.
+        return { ok: false, error: "test_error", detail: "ENTRY_UNRESOLVED" };
+      }
+    }
+
     // ── Sub-step 1: Dep install ────────────────────────────────────────────────
 
     if (!body._test_skip_npm_install) {
@@ -1361,18 +1426,26 @@ function createConversationEngine(options = {}) {
       const depSet    = new Set();
       const scanPaths = [];
 
-      const topResult = await reg.invoke("fs.list_dir", { path: projectRelDir }, { root });
-      if (topResult && topResult.status === "SUCCESS") {
-        for (const entry of (topResult.output.entries || [])) {
-          if (entry.type === "file" && entry.name.endsWith(".js")) {
-            scanPaths.push(projectRelDir + "/" + entry.name);
-          } else if (entry.type === "dir" && !SKIP_DIRS.has(entry.name)) {
-            const subGlob = await reg.invoke("fs.glob", {
-              pattern: "**/*.js",
-              cwd:     projectRelDir + "/" + entry.name
-            }, { root });
-            if (subGlob && subGlob.status === "SUCCESS") {
-              for (const f of (subGlob.output.matches || [])) scanPaths.push(f);
+      if (manifestPresent) {
+        // PHASE-30: manifest present → scan ONLY the current build's files
+        // (stale prior-attempt files must not inject dependencies).
+        for (const mp of manifestPaths) {
+          if (mp.endsWith(".js")) scanPaths.push(projectRelDir + "/" + mp);
+        }
+      } else {
+        const topResult = await reg.invoke("fs.list_dir", { path: projectRelDir }, { root });
+        if (topResult && topResult.status === "SUCCESS") {
+          for (const entry of (topResult.output.entries || [])) {
+            if (entry.type === "file" && entry.name.endsWith(".js")) {
+              scanPaths.push(projectRelDir + "/" + entry.name);
+            } else if (entry.type === "dir" && !SKIP_DIRS.has(entry.name)) {
+              const subGlob = await reg.invoke("fs.glob", {
+                pattern: "**/*.js",
+                cwd:     projectRelDir + "/" + entry.name
+              }, { root });
+              if (subGlob && subGlob.status === "SUCCESS") {
+                for (const f of (subGlob.output.matches || [])) scanPaths.push(f);
+              }
             }
           }
         }
@@ -1415,18 +1488,22 @@ function createConversationEngine(options = {}) {
           content: JSON.stringify(pkg, null, 2)
         }, { root });
 
-        const npmCmd = process.platform === "win32" ? "npm.cmd" : "npm";
-        const installResult = await reg.invoke("shell.run_in_workspace", {
-          project_id: pid,
-          argv:       [npmCmd, "install", "--no-audit", "--no-fund"],
-          timeout_ms: 180000
-        }, { root });
+        // Test-only hook: skip the npm exec but keep scan/merge/write (never set
+        // in production code — lets scenarios assert dep-scan scoping offline).
+        if (!body._test_skip_npm_exec) {
+          const npmCmd = process.platform === "win32" ? "npm.cmd" : "npm";
+          const installResult = await reg.invoke("shell.run_in_workspace", {
+            project_id: pid,
+            argv:       [npmCmd, "install", "--no-audit", "--no-fund"],
+            timeout_ms: 180000
+          }, { root });
 
-        if (!installResult || installResult.status !== "SUCCESS" ||
-            (installResult.output && installResult.output.exit_code !== 0)) {
-          const stderr = (installResult && installResult.output && installResult.output.stderr) || "";
-          return { ok: true, loop_id: loopId, advanced: false,
-                   test_error: "DEPS_INSTALL_FAILED", deps_install_stderr: stderr };
+          if (!installResult || installResult.status !== "SUCCESS" ||
+              (installResult.output && installResult.output.exit_code !== 0)) {
+            const stderr = (installResult && installResult.output && installResult.output.stderr) || "";
+            return { ok: true, loop_id: loopId, advanced: false,
+                     test_error: "DEPS_INSTALL_FAILED", deps_install_stderr: stderr };
+          }
         }
       }
     }
@@ -1434,6 +1511,15 @@ function createConversationEngine(options = {}) {
     // ── Sub-step 2: Bridge test_plan → forge_tests/scenarios ──────────────────
 
     for (const scenario of scenarios) {
+      // PHASE-30: rewrite the plan's server entry to the manifest-derived entry
+      // of the CURRENT build (plan↔build entry coherence — Finding #5).
+      if (derivedEntry && scenario.setup && Array.isArray(scenario.setup.actions)) {
+        for (const action of scenario.setup.actions) {
+          if (action && action.type === "start_server") {
+            action.command = "node " + derivedEntry;
+          }
+        }
+      }
       const scenRelPath = projectRelDir + "/forge_tests/scenarios/" +
                           scenario.id + "_" + scenario.name + ".json";
       await reg.invoke("fs.write_file", {

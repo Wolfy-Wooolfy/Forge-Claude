@@ -357,10 +357,257 @@ async function runS292DepsInstallFailed() {
   }
 }
 
+// ── PHASE-30 fixtures (S293–S296 — entry derivation + manifest inertness) ─────
+
+function _writeWorkspaceFile(projectId, relPath, content) {
+  const full = path.join(PROJECTS_ROOT, projectId, ...relPath.split("/"));
+  fs.mkdirSync(path.dirname(full), { recursive: true });
+  fs.writeFileSync(full, content, "utf8");
+}
+
+function _writeManifest(projectId, loopId, filePaths) {
+  const orchDir = path.join(PROJECTS_ROOT, projectId, "orchestration", loopId);
+  fs.mkdirSync(orchDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(orchDir, "build_manifest.json"),
+    JSON.stringify({
+      built_at: new Date().toISOString(),
+      files: filePaths.map(p => ({ path: p, sha256: "test-fixture", line_count: 1 }))
+    }, null, 2),
+    "utf8"
+  );
+}
+
+function _readBridgedCommands(projectId) {
+  const scenDir = path.join(PROJECTS_ROOT, projectId, "forge_tests", "scenarios");
+  if (!fs.existsSync(scenDir)) return [];
+  const commands = [];
+  for (const f of fs.readdirSync(scenDir)) {
+    const scen = JSON.parse(fs.readFileSync(path.join(scenDir, f), "utf8"));
+    for (const action of (scen.setup && scen.setup.actions) || []) {
+      if (action.type === "start_server") commands.push(action.command);
+    }
+  }
+  return commands;
+}
+
+function _readMergedPkg(projectId) {
+  const p = path.join(PROJECTS_ROOT, projectId, "package.json");
+  if (!fs.existsSync(p)) return null;
+  try { return JSON.parse(fs.readFileSync(p, "utf8")); } catch { return null; }
+}
+
+// ── S293 — entry derivation happy: manifest entry wins, stale files dep-invisible ─
+
+async function runS293EntryDerivationHappy() {
+  const PID     = "s293_entry_happy";
+  const LOOP_ID = "s293-loop-fixture";
+  const projectDir = _ensureProjectDir(PID);
+
+  try {
+    _writeState(projectDir, {
+      project_id: PID, project_name: "S293 Test",
+      active_runtime_state: "IDEATION", conversation_mode: "PIPELINE",
+      loop_id: LOOP_ID, last_updated_at: new Date().toISOString()
+    });
+
+    await _seedLoopAtRunTests(PID, LOOP_ID, { writeTestPlan: true });
+
+    // Current-build files (listed in the manifest):
+    _writeWorkspaceFile(PID, "src/index.js",
+      "const express = require('express');\nconst app = express();\napp.listen(3000);\n");
+    _writeWorkspaceFile(PID, "src/routes/todos.js",
+      "const express = require('express');\nmodule.exports = {};\n");
+    // Stale prior-attempt file (on disk, NOT in the manifest):
+    _writeWorkspaceFile(PID, "src/server.js",
+      "const leftPad = require('left-pad');\nrequire('http').createServer().listen(3000);\n");
+    _writeManifest(PID, LOOP_ID, ["src/index.js", "src/routes/todos.js"]);
+
+    const engine = _makeEngine();
+    const result = await engine.runTests({
+      project_id:                       PID,
+      loop_id:                          LOOP_ID,
+      _test_skip_npm_exec:              true,
+      _test_force_run_scenarios_result: { overall_status: "PASS", total: 2, pass: 2, fail: 0, error: 0 }
+    });
+
+    const advanced_to_reviewer = result.advanced === true &&
+      result.advanced_to === "REVIEWER_CODE_AND_SECURITY";
+
+    const commands = _readBridgedCommands(PID);
+    const commands_rewritten_to_manifest_entry =
+      commands.length === 2 && commands.every(c => c === "node src/index.js");
+
+    const pkg  = _readMergedPkg(PID);
+    const deps = (pkg && pkg.dependencies) || {};
+    const manifest_dep_present = !!deps["express"];
+    const stale_dep_absent     = !("left-pad" in deps);
+
+    return {
+      advanced_to_reviewer, commands_rewritten_to_manifest_entry,
+      manifest_dep_present, stale_dep_absent
+    };
+  } finally {
+    _cleanup(PID);
+  }
+}
+
+// ── S294 — stale entry inert: stale src/server.js on disk is never selected ───
+
+async function runS294StaleEntryInert() {
+  const PID     = "s294_stale_inert";
+  const LOOP_ID = "s294-loop-fixture";
+  const projectDir = _ensureProjectDir(PID);
+
+  try {
+    _writeState(projectDir, {
+      project_id: PID, project_name: "S294 Test",
+      active_runtime_state: "IDEATION", conversation_mode: "PIPELINE",
+      loop_id: LOOP_ID, last_updated_at: new Date().toISOString()
+    });
+
+    await _seedLoopAtRunTests(PID, LOOP_ID, { writeTestPlan: true });
+
+    // Current build: src/app.js only (in manifest).
+    _writeWorkspaceFile(PID, "src/app.js",
+      "const express = require('express');\nconst app = express();\napp.listen(3000);\n");
+    // Stale entry candidate on disk, NOT in manifest (would win priority if eligible):
+    _writeWorkspaceFile(PID, "src/server.js",
+      "const leftPad = require('left-pad');\nrequire('http').createServer().listen(3000);\n");
+    _writeManifest(PID, LOOP_ID, ["src/app.js"]);
+
+    const engine = _makeEngine();
+    const result = await engine.runTests({
+      project_id:                       PID,
+      loop_id:                          LOOP_ID,
+      _test_skip_npm_exec:              true,
+      _test_force_run_scenarios_result: { overall_status: "PASS", total: 2, pass: 2, fail: 0, error: 0 }
+    });
+
+    const advanced_true = result.advanced === true;
+
+    const commands = _readBridgedCommands(PID);
+    const commands_rewritten_to_app =
+      commands.length === 2 && commands.every(c => c === "node src/app.js");
+    const stale_entry_never_selected = commands.every(c => c !== "node src/server.js");
+
+    const pkg  = _readMergedPkg(PID);
+    const deps = (pkg && pkg.dependencies) || {};
+    const stale_dep_absent = !("left-pad" in deps);
+
+    return {
+      advanced_true, commands_rewritten_to_app,
+      stale_entry_never_selected, stale_dep_absent
+    };
+  } finally {
+    _cleanup(PID);
+  }
+}
+
+// ── S295 — entry unresolved → fail-closed, no transition, nothing written ─────
+
+async function runS295EntryUnresolvedFailClosed() {
+  const PID     = "s295_entry_unresolved";
+  const LOOP_ID = "s295-loop-fixture";
+  const projectDir = _ensureProjectDir(PID);
+
+  try {
+    _writeState(projectDir, {
+      project_id: PID, project_name: "S295 Test",
+      active_runtime_state: "IDEATION", conversation_mode: "PIPELINE",
+      loop_id: LOOP_ID, last_updated_at: new Date().toISOString()
+    });
+
+    await _seedLoopAtRunTests(PID, LOOP_ID, { writeTestPlan: true });
+
+    // Manifest exists, but no priority name and no .listen( anywhere → unresolvable.
+    _writeWorkspaceFile(PID, "src/helpers/math.js", "module.exports = x => x + 1;\n");
+    _writeManifest(PID, LOOP_ID, ["src/helpers/math.js"]);
+
+    const engine = _makeEngine();
+    const result = await engine.runTests({ project_id: PID, loop_id: LOOP_ID });
+
+    const ok_false                = result.ok === false;
+    const error_field_test_error  = result.error === "test_error";
+    const detail_entry_unresolved = result.detail === "ENTRY_UNRESOLVED";
+
+    const reg = require("../../runtime/tools/_registry").getDefaultRegistry();
+    const statusResult = await reg.invoke("orchestration.get_status", {
+      project_id: PID, loop_id: LOOP_ID
+    }, { root: ROOT });
+    const graph_still_run_tests = statusResult.status === "SUCCESS" &&
+      statusResult.output.current_state === "RUN_TESTS";
+
+    const scenDir = path.join(PROJECTS_ROOT, PID, "forge_tests", "scenarios");
+    const no_scenarios_written =
+      !fs.existsSync(scenDir) || fs.readdirSync(scenDir).length === 0;
+
+    return {
+      ok_false, error_field_test_error, detail_entry_unresolved,
+      graph_still_run_tests, no_scenarios_written
+    };
+  } finally {
+    _cleanup(PID);
+  }
+}
+
+// ── S296 — manifest absent → legacy path byte-identical (commands untouched) ──
+
+async function runS296ManifestAbsentLegacy() {
+  const PID     = "s296_legacy_path";
+  const LOOP_ID = "s296-loop-fixture";
+  const projectDir = _ensureProjectDir(PID);
+
+  try {
+    _writeState(projectDir, {
+      project_id: PID, project_name: "S296 Test",
+      active_runtime_state: "IDEATION", conversation_mode: "PIPELINE",
+      loop_id: LOOP_ID, last_updated_at: new Date().toISOString()
+    });
+
+    await _seedLoopAtRunTests(PID, LOOP_ID, { writeTestPlan: true });
+    // NO build_manifest.json written — pre-PHASE-30 loop shape.
+
+    const engine = _makeEngine();
+    const result = await engine.runTests({
+      project_id:                       PID,
+      loop_id:                          LOOP_ID,
+      _test_skip_npm_install:           true,
+      _test_force_run_scenarios_result: { overall_status: "PASS", total: 2, pass: 2, fail: 0, error: 0 }
+    });
+
+    const advanced_to_reviewer = result.advanced === true &&
+      result.advanced_to === "REVIEWER_CODE_AND_SECURITY";
+
+    const scenDir = path.join(PROJECTS_ROOT, PID, "forge_tests", "scenarios");
+    const scenarios_bridged = fs.existsSync(scenDir) && fs.readdirSync(scenDir).length === 2;
+
+    // Legacy: plan's original command preserved verbatim (fixture uses "node server.js").
+    const commands = _readBridgedCommands(PID);
+    const commands_unchanged =
+      commands.length === 2 && commands.every(c => c === "node server.js");
+
+    const reg = require("../../runtime/tools/_registry").getDefaultRegistry();
+    const statusResult = await reg.invoke("orchestration.get_status", {
+      project_id: PID, loop_id: LOOP_ID
+    }, { root: ROOT });
+    const graph_state_reviewer = statusResult.status === "SUCCESS" &&
+      statusResult.output.current_state === "REVIEWER_CODE_AND_SECURITY";
+
+    return { advanced_to_reviewer, scenarios_bridged, commands_unchanged, graph_state_reviewer };
+  } finally {
+    _cleanup(PID);
+  }
+}
+
 module.exports = {
   runS288HappyPath,
   runS289WrongState,
   runS290InputNotFound,
   runS291FailReportLoopBack,
-  runS292DepsInstallFailed
+  runS292DepsInstallFailed,
+  runS293EntryDerivationHappy,
+  runS294StaleEntryInert,
+  runS295EntryUnresolvedFailClosed,
+  runS296ManifestAbsentLegacy
 };

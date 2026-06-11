@@ -1,0 +1,16 @@
+{
+  "id": "S296",
+  "name": "runTests manifest absent — legacy behavior byte-identical: commands untouched, S288-style flow passes (PHASE-30)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/run_tests_test_helper",
+  "method": "runS296ManifestAbsentLegacy",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "advanced_to_reviewer", "expected": true },
+    { "type": "state_field_equals", "field": "scenarios_bridged",    "expected": true },
+    { "type": "state_field_equals", "field": "commands_unchanged",   "expected": true },
+    { "type": "state_field_equals", "field": "graph_state_reviewer", "expected": true }
+  ]
+}

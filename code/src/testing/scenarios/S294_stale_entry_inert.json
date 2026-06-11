@@ -1,0 +1,16 @@
+{
+  "id": "S294",
+  "name": "runTests stale entry inert — on-disk src/server.js outside manifest never selected; its deps invisible (PHASE-30)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/run_tests_test_helper",
+  "method": "runS294StaleEntryInert",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "advanced_true",              "expected": true },
+    { "type": "state_field_equals", "field": "commands_rewritten_to_app",  "expected": true },
+    { "type": "state_field_equals", "field": "stale_entry_never_selected", "expected": true },
+    { "type": "state_field_equals", "field": "stale_dep_absent",           "expected": true }
+  ]
+}
