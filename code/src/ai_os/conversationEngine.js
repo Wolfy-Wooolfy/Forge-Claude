@@ -1610,6 +1610,286 @@ function createConversationEngine(options = {}) {
     };
   }
 
+  // ── Reviewer Code & Security bridge (PHASE-31) ──────────────────────────────
+  //
+  // reviewProject: manifest-scoped dual-role review at REVIEWER_CODE_AND_SECURITY.
+  // Input authority = build_manifest.json (REQUIRED — no scan-all fallback). Reads
+  // spec.json + architect_design.json + each manifest file's on-disk content, then
+  // invokes reviewer (phase B) AND security_auditor (phase CODE) over the assembled
+  // code object. Persists merged review_report.json BEFORE any transition.
+  //
+  // Derived verdict (RULING-6 — computed here from the two native schemas; NOT a
+  // new field on either role):
+  //   reviewer_approve = verdict !== "REJECTED"   AND no finding severity==="BLOCKER"
+  //   security_approve = threat_level NOT IN {CRITICAL,HIGH} AND no finding severity==="BLOCKER"
+  //   APPROVE iff (reviewer_approve AND security_approve) → advance_state DOCUMENTATION
+  //   REQUEST_CHANGES otherwise → orchestration.loop_back BUILDER (cap-aware)
+  //
+  // Fail-closed (no transition; a valid REJECTED/high-threat is NOT a failure — it is
+  // the REQUEST_CHANGES branch working):
+  //   manifest absent/unparseable/empty → { ok:false, error:"review_error", detail:"MANIFEST_REQUIRED" }
+  //   spec/design/manifest-file unread  → review_error:"REVIEW_INPUT_NOT_FOUND", advanced:false
+  //   role.invoke non-schema failure    → review_error:"ROLE_INVOKE_FAILED",     advanced:false
+  //   role output fails OUTPUT_SCHEMA    → review_error:"REVIEW_PARSE_FAILED",     advanced:false
+  //   review_report write failure       → { ok:false, error:"review_error", detail:"REVIEW_WRITE_FAILED" }
+  //
+  // Stage-split params (reviewer_* / security_*) let tests disambiguate the two role
+  // mocks (mock-rev-* vs mock-sec-*). Production: omit them, pass provider/model.
+
+  async function reviewProject(body = {}) {
+    const projectId = normalizeProjectId(body.project_id || "");
+    const state     = loadState(projectId);
+
+    if (!state) {
+      return { ok: true, loop_id: null, review_error: "PROJECT_NOT_FOUND", advanced: false };
+    }
+
+    const loopId = body.loop_id || state.loop_id || null;
+    if (!loopId) {
+      return { ok: true, loop_id: null, review_error: "NO_LOOP_ID", advanced: false };
+    }
+
+    const revProvider = body.reviewer_provider     || body.provider || "openai";
+    const revModel    = body.reviewer_model        || body.model    || (revProvider === "openai" ? "gpt-4o" : undefined);
+    const revScenId   = body.reviewer_scenario_id  || body.review_scenario_id || undefined;
+    const secProvider = body.security_provider     || body.provider || "openai";
+    const secModel    = body.security_model        || body.model    || (secProvider === "openai" ? "gpt-4o" : undefined);
+    const secScenId   = body.security_scenario_id  || body.review_scenario_id || undefined;
+
+    const reg = getDefaultRegistry();
+    const pid = normalizeProjectId(projectId);
+
+    // State guard: must be at REVIEWER_CODE_AND_SECURITY
+    const statusResult = await reg.invoke("orchestration.get_status", {
+      project_id: pid, loop_id: loopId
+    }, { root });
+
+    if (!statusResult || statusResult.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, review_error: "GET_STATUS_FAILED", advanced: false };
+    }
+
+    const currentState = statusResult.output.current_state;
+    if (currentState !== "REVIEWER_CODE_AND_SECURITY") {
+      return { ok: true, loop_id: loopId, current_state: currentState,
+               review_error: "WRONG_STATE", advanced: false };
+    }
+
+    const orchRelDir    = "artifacts/projects/" + pid + "/orchestration/" + loopId;
+    const projectRelDir = "artifacts/projects/" + pid;
+
+    // ── Input authority: build_manifest.json is REQUIRED (RULING-7) ────────────
+    const manifestRead = await reg.invoke("fs.read_file",
+      { path: orchRelDir + "/build_manifest.json" }, { root });
+
+    if (!manifestRead || manifestRead.status !== "SUCCESS") {
+      return { ok: false, error: "review_error", detail: "MANIFEST_REQUIRED" };
+    }
+
+    let manifest;
+    try {
+      manifest = JSON.parse(manifestRead.output.content);
+    } catch {
+      return { ok: false, error: "review_error", detail: "MANIFEST_REQUIRED" };
+    }
+
+    const manifestPaths = (manifest && Array.isArray(manifest.files))
+      ? manifest.files.map(function (f) { return f && f.path; })
+          .filter(function (p) { return typeof p === "string" && p.length > 0; })
+      : [];
+
+    if (manifestPaths.length === 0) {
+      return { ok: false, error: "review_error", detail: "MANIFEST_REQUIRED" };
+    }
+
+    // ── Read spec + design (REQUIRED) ──────────────────────────────────────────
+    const specRead = await reg.invoke("fs.read_file", { path: orchRelDir + "/spec.json" }, { root });
+    if (!specRead || specRead.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, review_error: "REVIEW_INPUT_NOT_FOUND", advanced: false };
+    }
+    let spec;
+    try { spec = JSON.parse(specRead.output.content); }
+    catch { return { ok: true, loop_id: loopId, review_error: "REVIEW_INPUT_NOT_FOUND", advanced: false }; }
+
+    const designRead = await reg.invoke("fs.read_file", { path: orchRelDir + "/architect_design.json" }, { root });
+    if (!designRead || designRead.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, review_error: "REVIEW_INPUT_NOT_FOUND", advanced: false };
+    }
+    let design;
+    try { design = JSON.parse(designRead.output.content); }
+    catch { return { ok: true, loop_id: loopId, review_error: "REVIEW_INPUT_NOT_FOUND", advanced: false }; }
+
+    // ── Assemble the code object from the manifest files' on-disk content ───────
+    // Manifest-restricted: review only what THIS build wrote. A listed file that
+    // cannot be read is fail-closed (the authoritative record is broken).
+    const filesWritten = [];
+    for (const mp of manifestPaths) {
+      const fileRead = await reg.invoke("fs.read_file", { path: projectRelDir + "/" + mp }, { root });
+      if (!fileRead || fileRead.status !== "SUCCESS") {
+        return { ok: true, loop_id: loopId, review_error: "REVIEW_INPUT_NOT_FOUND", advanced: false };
+      }
+      filesWritten.push({ path: mp, content: fileRead.output.content || "" });
+    }
+
+    const code = {
+      files_written:      filesWritten,
+      summary:            "Build under review: " + filesWritten.length +
+                          " file(s) from build_manifest.json (built_at " +
+                          ((manifest && manifest.built_at) || "unknown") + ").",
+      dependencies_added: []
+    };
+
+    // Test-only forced timeout hook (never set in production code)
+    if (body._test_force_timeout) {
+      return { ok: true, loop_id: loopId, advanced: false, review_error: "REVIEWER_TIMEOUT" };
+    }
+
+    // ── Invoke reviewer (phase B), then security_auditor (phase CODE) ──────────
+    // Both fail-closed; a schema-invalid role output is REVIEW_PARSE_FAILED, any
+    // other non-SUCCESS is ROLE_INVOKE_FAILED (RULING-6). 30s timeout race per role.
+    const _invokeRole = async function (roleId, roleInput, provider, model, scenId) {
+      let timeoutHandle;
+      const timeoutPromise = new Promise((_, reject) => {
+        timeoutHandle = setTimeout(() => reject(new Error("REVIEWER_TIMEOUT")), 30000);
+      });
+      try {
+        const result = await Promise.race([
+          reg.invoke("role.invoke", Object.assign(
+            { role_id: roleId, input: roleInput, project_id: pid, provider },
+            model  ? { model }              : {},
+            scenId ? { scenario_id: scenId } : {}
+          ), { root }),
+          timeoutPromise
+        ]);
+        clearTimeout(timeoutHandle);
+        return { result };
+      } catch (err) {
+        clearTimeout(timeoutHandle);
+        return { error: err.message };
+      }
+    };
+
+    const reviewerCall = await _invokeRole(
+      "reviewer",
+      { phase: "B", spec, design, code, project_id: pid },
+      revProvider, revModel, revScenId
+    );
+    if (reviewerCall.error) {
+      return { ok: true, loop_id: loopId, advanced: false, review_error: reviewerCall.error };
+    }
+    const reviewerResult = reviewerCall.result;
+    if (!reviewerResult || reviewerResult.status !== "SUCCESS") {
+      const reason  = reviewerResult && reviewerResult.metadata && reviewerResult.metadata.reason;
+      const errCode = reason === "INVALID_ROLE_OUTPUT" ? "REVIEW_PARSE_FAILED" : "ROLE_INVOKE_FAILED";
+      return { ok: true, loop_id: loopId, advanced: false, review_error: errCode };
+    }
+
+    const securityCall = await _invokeRole(
+      "security_auditor",
+      { project_id: pid, phase: "CODE", spec, design, code },
+      secProvider, secModel, secScenId
+    );
+    if (securityCall.error) {
+      return { ok: true, loop_id: loopId, advanced: false, review_error: securityCall.error };
+    }
+    const securityResult = securityCall.result;
+    if (!securityResult || securityResult.status !== "SUCCESS") {
+      const reason  = securityResult && securityResult.metadata && securityResult.metadata.reason;
+      const errCode = reason === "INVALID_ROLE_OUTPUT" ? "REVIEW_PARSE_FAILED" : "ROLE_INVOKE_FAILED";
+      return { ok: true, loop_id: loopId, advanced: false, review_error: errCode };
+    }
+
+    // ── Derived verdict (RULING-6) ─────────────────────────────────────────────
+    const reviewerOut = reviewerResult.output;
+    const securityOut = securityResult.output;
+
+    const reviewerHasBlocker = Array.isArray(reviewerOut.findings) &&
+      reviewerOut.findings.some(function (f) { return f && f.severity === "BLOCKER"; });
+    const securityHasBlocker = Array.isArray(securityOut.findings) &&
+      securityOut.findings.some(function (f) { return f && f.severity === "BLOCKER"; });
+
+    const reviewer_approve = reviewerOut.verdict !== "REJECTED" && !reviewerHasBlocker;
+    const security_approve = ["CRITICAL", "HIGH"].indexOf(securityOut.threat_level) === -1 &&
+                             !securityHasBlocker;
+
+    const derived_verdict = (reviewer_approve && security_approve) ? "APPROVE" : "REQUEST_CHANGES";
+
+    // ── Persist merged review_report.json BEFORE any transition (fail-closed) ──
+    const review_report = {
+      reviewer:     reviewerOut,
+      security:     securityOut,
+      derived_verdict,
+      computed_at:  new Date().toISOString()
+    };
+
+    let reportWrite = null;
+    try {
+      reportWrite = await reg.invoke("fs.write_file", {
+        path:    orchRelDir + "/review_report.json",
+        content: JSON.stringify(review_report, null, 2)
+      }, { root });
+    } catch {
+      reportWrite = null;
+    }
+    if (!reportWrite || reportWrite.status !== "SUCCESS") {
+      return { ok: false, error: "review_error", detail: "REVIEW_WRITE_FAILED" };
+    }
+
+    // ── Branch ─────────────────────────────────────────────────────────────────
+    if (derived_verdict === "APPROVE") {
+      await reg.invoke("orchestration.advance_state", {
+        project_id:      pid,
+        loop_id:         loopId,
+        to_state:        "DOCUMENTATION",
+        transition_type: "NORMAL",
+        role_invoked:    "reviewer"
+      }, { root });
+
+      return {
+        ok:           true,
+        loop_id:      loopId,
+        advanced:     true,
+        advanced_to:  "DOCUMENTATION",
+        derived_verdict,
+        review_report
+      };
+    }
+
+    // REQUEST_CHANGES → cap-aware loop-back to BUILDER (findings persisted above)
+    const lbResult = await reg.invoke("orchestration.loop_back", {
+      project_id: pid, loop_id: loopId
+    }, { root });
+
+    if (!lbResult || lbResult.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, advanced: false,
+               review_error: "LOOP_BACK_FAILED", derived_verdict, review_report };
+    }
+
+    const lbOut = lbResult.output;
+
+    if (lbOut.escalated) {
+      return {
+        ok:              true,
+        loop_id:         loopId,
+        advanced:        true,
+        advanced_to:     "ESCALATED",
+        escalated:       true,
+        escalation_path: lbOut.escalation_path,
+        derived_verdict,
+        review_report
+      };
+    }
+
+    return {
+      ok:           true,
+      loop_id:      loopId,
+      advanced:     true,
+      advanced_to:  "BUILDER",
+      loop_back:    true,
+      derived_verdict,
+      review_report
+    };
+  }
+
   // ── Cost Estimate bridge (PHASE-25) ─────────────────────────────────────────
   //
   // estimateCost: drives the cost_estimator role from COST_ESTIMATE → ENV_REPORT.
@@ -2096,6 +2376,7 @@ function createConversationEngine(options = {}) {
     reviewSpec,
     buildProject,
     runTests,
+    reviewProject,
     estimateCost,
     designTests,
     reportEnv,

@@ -1,0 +1,19 @@
+{
+  "id": "S298",
+  "name": "reviewProject REQUEST_CHANGES — reviewer REJECTED+BLOCKER → loop_back BUILDER, iteration_count+1, audit from_state=REVIEWER_CODE_AND_SECURITY, findings persisted (PHASE-31)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/review_project_test_helper",
+  "method": "runS298RequestChangesLoopsBack",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "advanced_to_builder",             "expected": true },
+    { "type": "state_field_equals", "field": "loop_back_true",                  "expected": true },
+    { "type": "state_field_equals", "field": "derived_verdict_request_changes", "expected": true },
+    { "type": "state_field_equals", "field": "graph_state_builder",             "expected": true },
+    { "type": "state_field_equals", "field": "iteration_count_incremented",     "expected": true },
+    { "type": "state_field_equals", "field": "audit_from_state_reviewer",       "expected": true },
+    { "type": "state_field_equals", "field": "report_has_blocker",              "expected": true }
+  ]
+}

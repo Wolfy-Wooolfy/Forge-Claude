@@ -394,5 +394,47 @@
     "tokens_in": 100,
     "tokens_out": 10,
     "finish_reason": "stop"
+  },
+  "mock|mock-rev-s297|scenario:S297": {
+    "text": "{\"verdict\":\"APPROVED\",\"findings\":[{\"severity\":\"INFO\",\"issue\":\"Inline SQL is readable but could be centralized\",\"location\":\"src/controllers/todoController.js\",\"recommendation\":\"Consider a small data-access helper for query reuse\"}],\"summary\":\"The code plan covers the spec. Files map to the design; no blockers. One informational note about query organization.\"}",
+    "tokens_in": 800,
+    "tokens_out": 320,
+    "finish_reason": "stop"
+  },
+  "mock|mock-sec-s297|scenario:S297": {
+    "text": "{\"threat_level\":\"LOW\",\"findings\":[{\"severity\":\"INFO\",\"vulnerability\":\"No explicit input length cap on todo title\",\"location\":\"src/middleware/validation.js\",\"attack_vector\":\"Very large title strings could bloat storage over time\",\"mitigation\":\"Cap title length at a reasonable maximum in validation middleware\"}],\"summary\":\"Implementation has low threat exposure. No blockers. One hardening note about input length.\"}",
+    "tokens_in": 760,
+    "tokens_out": 300,
+    "finish_reason": "stop"
+  },
+  "mock|mock-rev-s298|scenario:S298": {
+    "text": "{\"verdict\":\"REJECTED\",\"findings\":[{\"severity\":\"BLOCKER\",\"issue\":\"update/delete handlers return success shapes for non-existent ids — this.changes is never inspected\",\"location\":\"src/controllers/todoController.js\",\"recommendation\":\"Inspect this.changes after UPDATE/DELETE and return 404 when zero rows were affected\"},{\"severity\":\"WARN\",\"issue\":\"No central error handler test path exercised\",\"location\":\"src/middleware/errorHandler.js\",\"recommendation\":\"Add a failing-route test to confirm errorHandler returns 500 JSON\"}],\"summary\":\"The code plan does not satisfy the spec's correctness criteria. One blocker prevents pipeline progression.\"}",
+    "tokens_in": 820,
+    "tokens_out": 360,
+    "finish_reason": "stop"
+  },
+  "mock|mock-sec-s298|scenario:S298": {
+    "text": "{\"threat_level\":\"LOW\",\"findings\":[{\"severity\":\"INFO\",\"vulnerability\":\"Parameterized queries used throughout\",\"location\":\"src/controllers/todoController.js\",\"attack_vector\":\"No injection vector observed in the reviewed build\",\"mitigation\":\"Maintain parameterized queries as routes grow\"}],\"summary\":\"Security review is clean. No blockers and low threat exposure; the change request originates from the code-quality axis, not security.\"}",
+    "tokens_in": 740,
+    "tokens_out": 280,
+    "finish_reason": "stop"
+  },
+  "mock|mock-rev-s299|scenario:S299": {
+    "text": "{\"verdict\":\"APPROVED\",\"findings\":[{\"severity\":\"INFO\",\"issue\":\"Route layer is thin and clear\",\"location\":\"src/routes/todoRoutes.js\",\"recommendation\":\"No action required\"}],\"summary\":\"The code plan covers the spec with no blockers from the reviewer's perspective.\"}",
+    "tokens_in": 780,
+    "tokens_out": 300,
+    "finish_reason": "stop"
+  },
+  "mock|mock-sec-s299|scenario:S299": {
+    "text": "{\"threat_level\":\"HIGH\",\"findings\":[{\"severity\":\"WARN\",\"vulnerability\":\"No authentication on mutating endpoints\",\"location\":\"src/routes/todoRoutes.js\",\"attack_vector\":\"Any unauthenticated client can POST/PUT/DELETE todos against the server\",\"mitigation\":\"Require an auth token middleware on all mutating routes before handlers execute\"}],\"summary\":\"Security review flags HIGH threat exposure: mutating endpoints are unauthenticated. No BLOCKER-severity finding, but the elevated threat level alone requires changes before progression.\"}",
+    "tokens_in": 800,
+    "tokens_out": 340,
+    "finish_reason": "stop"
+  },
+  "mock|mock-rev-s301|scenario:S301": {
+    "text": "{\"not_verdict\":\"this output is valid JSON but does not satisfy the reviewer OUTPUT_SCHEMA\"}",
+    "tokens_in": 120,
+    "tokens_out": 20,
+    "finish_reason": "stop"
   }
 }

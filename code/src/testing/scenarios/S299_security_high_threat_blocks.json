@@ -1,0 +1,17 @@
+{
+  "id": "S299",
+  "name": "reviewProject threat axis — reviewer APPROVED but security threat_level=HIGH (no BLOCKER) → derived REQUEST_CHANGES → loop_back BUILDER (PHASE-31 RULING-6 threat axis)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/review_project_test_helper",
+  "method": "runS299SecurityHighThreatBlocks",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "derived_verdict_request_changes", "expected": true },
+    { "type": "state_field_equals", "field": "advanced_to_builder",             "expected": true },
+    { "type": "state_field_equals", "field": "reviewer_verdict_approved",       "expected": true },
+    { "type": "state_field_equals", "field": "security_threat_high",            "expected": true },
+    { "type": "state_field_equals", "field": "graph_state_builder",             "expected": true }
+  ]
+}

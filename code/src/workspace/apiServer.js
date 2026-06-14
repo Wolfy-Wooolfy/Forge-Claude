@@ -1928,6 +1928,12 @@ function createWorkspaceApiServer(options = {}) {
         return;
       }
 
+      if (req.method === "POST" && pathname === "/api/ai-os/project/review-project") {
+        const body = await readBody(req);
+        sendJson(res, 200, await conversationEngine.reviewProject(body));
+        return;
+      }
+
       if (req.method === "GET" && pathname === "/api/projects") {
         sendJson(res, 200, await listProjects());
         return;
