@@ -2083,6 +2083,217 @@ function createConversationEngine(options = {}) {
     }
   }
 
+  // ── Quality Judge bridge (PHASE-33) ─────────────────────────────────────────
+  //
+  // judgeQuality: drives the quality_judge role at QUALITY_JUDGE. This is a
+  // persist-then-BLOCK bridge (mirrors reportEnv) — it does NOT advance. After the
+  // role SUCCESS, quality_report.json is persisted and the loop STAYS at QUALITY_JUDGE
+  // pending owner Gate 2 (resolved by respondGate gate_id:2). The QUALITY_JUDGE edges
+  // (conversation_graph.js) all carry a non-null gate_check ("Gate 2 …") — only the
+  // owner's gate response moves the loop (APPROVE_SHIP/APPROVE_WITH_CAVEATS →
+  // DEPLOYMENT_OR_END; REJECT_AND_LOOP → BUILDER/ESCALATED).
+  //
+  // Inputs: spec.json + architect_design.json (REQUIRED → INPUT_NOT_FOUND).
+  // Best-effort optionals (present on disk → include; absent → omit; NO fail-close):
+  //   review_report.json → security_audit; test_plan.json → test_plan;
+  //   documentation.json → documentation; cost_estimate.json → cost_estimate;
+  //   env_report.json → environment.
+  // The code/builder_output object is OPTIONAL and manifest-restricted (RULING-9,
+  // Option B — same rule documentProject applies):
+  //   build_manifest.json ABSENT          → GRACEFUL: omit builder_output; judge from
+  //                                          spec+design (+ best-effort optionals).
+  //   build_manifest.json PRESENT + valid → manifest-restricted builder_output built
+  //                                          from the listed files' on-disk content.
+  //   build_manifest.json PRESENT + corrupt/unparseable, OR lists a file absent on disk,
+  //                                          OR empty files[] → QUALITY_MANIFEST_CORRUPT,
+  //                                          FAIL-CLOSED (no write, no gate_pending).
+  //
+  // On role SUCCESS: persists quality_report.json; returns {quality_report,
+  // gate_pending:2, advanced:false}. Fail-closed taxonomy (advanced:false, no write):
+  //   WRONG_STATE / INPUT_NOT_FOUND / QUALITY_MANIFEST_CORRUPT / QUALITY_PARSE_FAILED /
+  //   QUALITY_FAILED / QUALITY_WRITE_FAILED.
+
+  async function judgeQuality(body = {}) {
+    const projectId = normalizeProjectId(body.project_id || "");
+    const state     = loadState(projectId);
+
+    if (!state) {
+      return { ok: true, loop_id: null, quality_error: "PROJECT_NOT_FOUND", advanced: false };
+    }
+
+    const loopId = body.loop_id || state.loop_id || null;
+    if (!loopId) {
+      return { ok: true, loop_id: null, quality_error: "NO_LOOP_ID", advanced: false };
+    }
+
+    // quality_judge_role defaults to anthropic; override to openai (owner has no
+    // ANTHROPIC_API_KEY). Same amendment pattern as the prior real bridges (LOCK-3).
+    const qjProvider   = body.quality_provider || "openai";
+    const qjModel      = body.quality_model || (qjProvider === "openai" ? "gpt-4o" : undefined);
+    const qjScenarioId = body.quality_scenario_id || undefined;
+
+    const reg = getDefaultRegistry();
+    const pid = normalizeProjectId(projectId);
+
+    // State guard: must be at QUALITY_JUDGE
+    const statusResult = await reg.invoke("orchestration.get_status", {
+      project_id: pid, loop_id: loopId
+    }, { root });
+
+    if (!statusResult || statusResult.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, quality_error: "GET_STATUS_FAILED", advanced: false };
+    }
+
+    const currentState = statusResult.output.current_state;
+    if (currentState !== "QUALITY_JUDGE") {
+      return { ok: true, loop_id: loopId, current_state: currentState,
+               quality_error: "WRONG_STATE", advanced: false };
+    }
+
+    const orchRelDir    = "artifacts/projects/" + pid + "/orchestration/" + loopId;
+    const projectRelDir = "artifacts/projects/" + pid;
+
+    // ── Read spec + design (REQUIRED) ──────────────────────────────────────────
+    const specRead = await reg.invoke("fs.read_file", { path: orchRelDir + "/spec.json" }, { root });
+    if (!specRead || specRead.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, quality_error: "INPUT_NOT_FOUND", advanced: false };
+    }
+    let spec;
+    try { spec = JSON.parse(specRead.output.content); }
+    catch { return { ok: true, loop_id: loopId, quality_error: "INPUT_NOT_FOUND", advanced: false }; }
+
+    const designRead = await reg.invoke("fs.read_file", { path: orchRelDir + "/architect_design.json" }, { root });
+    if (!designRead || designRead.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, quality_error: "INPUT_NOT_FOUND", advanced: false };
+    }
+    let design;
+    try { design = JSON.parse(designRead.output.content); }
+    catch { return { ok: true, loop_id: loopId, quality_error: "INPUT_NOT_FOUND", advanced: false }; }
+
+    const qjInput = { project_id: pid, spec, design };
+
+    // ── Best-effort optionals (LOCK-5: present → include; absent → omit; no fail-close) ──
+    async function _bestEffortObj(relPath) {
+      const r = await reg.invoke("fs.read_file", { path: relPath }, { root });
+      if (!r || r.status !== "SUCCESS") return undefined;
+      try { return JSON.parse(r.output.content); } catch { return undefined; }
+    }
+    const securityAudit = await _bestEffortObj(orchRelDir + "/review_report.json");
+    if (securityAudit) qjInput.security_audit = securityAudit;
+    const testPlan = await _bestEffortObj(orchRelDir + "/test_plan.json");
+    if (testPlan) qjInput.test_plan = testPlan;
+    const documentation = await _bestEffortObj(orchRelDir + "/documentation.json");
+    if (documentation) qjInput.documentation = documentation;
+    const costEstimate = await _bestEffortObj(orchRelDir + "/cost_estimate.json");
+    if (costEstimate) qjInput.cost_estimate = costEstimate;
+    const environment = await _bestEffortObj(orchRelDir + "/env_report.json");
+    if (environment) qjInput.environment = environment;
+
+    // ── RULING-9 (Option B): builder_output is OPTIONAL, manifest-restricted ───
+    const manifestRead = await reg.invoke("fs.read_file",
+      { path: orchRelDir + "/build_manifest.json" }, { root });
+
+    if (manifestRead && manifestRead.status === "SUCCESS") {
+      // manifest PRESENT — it must be valid, else fail-closed (never silent degrade).
+      let manifest;
+      try {
+        manifest = JSON.parse(manifestRead.output.content);
+      } catch {
+        return { ok: true, loop_id: loopId, quality_error: "QUALITY_MANIFEST_CORRUPT", advanced: false };
+      }
+
+      const manifestPaths = (manifest && Array.isArray(manifest.files))
+        ? manifest.files.map(function (f) { return f && f.path; })
+            .filter(function (p) { return typeof p === "string" && p.length > 0; })
+        : [];
+
+      if (manifestPaths.length === 0) {
+        return { ok: true, loop_id: loopId, quality_error: "QUALITY_MANIFEST_CORRUPT", advanced: false };
+      }
+
+      const filesWritten = [];
+      for (const mp of manifestPaths) {
+        const fileRead = await reg.invoke("fs.read_file", { path: projectRelDir + "/" + mp }, { root });
+        if (!fileRead || fileRead.status !== "SUCCESS") {
+          // manifest lists a file absent on disk → corrupt authoritative record
+          return { ok: true, loop_id: loopId, quality_error: "QUALITY_MANIFEST_CORRUPT", advanced: false };
+        }
+        filesWritten.push({ path: mp, content: fileRead.output.content || "" });
+      }
+
+      qjInput.builder_output = {
+        files_written:      filesWritten,
+        summary:            "Quality review of build: " + filesWritten.length +
+                            " file(s) from build_manifest.json (built_at " +
+                            ((manifest && manifest.built_at) || "unknown") + ").",
+        dependencies_added: []
+      };
+    }
+    // else: manifest ABSENT → graceful; judge from spec + design (+ best-effort optionals).
+
+    // ── Invoke quality_judge role (30s timeout, mirrors reportEnv) ─────────────
+    let timeoutHandle;
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutHandle = setTimeout(() => reject(new Error("QUALITY_JUDGE_TIMEOUT")), 30000);
+    });
+
+    try {
+      const qjResult = await Promise.race([
+        reg.invoke("role.invoke", Object.assign(
+          {
+            role_id:    "quality_judge",
+            input:      qjInput,
+            project_id: pid,
+            provider:   qjProvider
+          },
+          qjModel      ? { model:       qjModel      } : {},
+          qjScenarioId ? { scenario_id: qjScenarioId } : {}
+        ), { root }),
+        timeoutPromise
+      ]);
+      clearTimeout(timeoutHandle);
+
+      if (qjResult && qjResult.status === "SUCCESS") {
+        const quality_report = qjResult.output;
+
+        // Persist quality_report.json (fail-closed on throw/non-SUCCESS). NO advance —
+        // the loop stays at QUALITY_JUDGE pending Gate 2 (owner via respondGate).
+        let qjWrite = null;
+        try {
+          qjWrite = await reg.invoke("fs.write_file", {
+            path:    orchRelDir + "/quality_report.json",
+            content: JSON.stringify(quality_report, null, 2)
+          }, { root });
+        } catch {
+          qjWrite = null;
+        }
+        if (!qjWrite || qjWrite.status !== "SUCCESS") {
+          return { ok: true, loop_id: loopId, advanced: false, quality_error: "QUALITY_WRITE_FAILED" };
+        }
+
+        return {
+          ok:           true,
+          loop_id:      loopId,
+          quality_report,
+          gate_pending: 2,
+          advanced:     false,
+          model_used:   qjModel
+        };
+      }
+
+      // Role non-SUCCESS → fail-closed (no write, no gate_pending). A schema-invalid role
+      // output (INVALID_ROLE_OUTPUT) → QUALITY_PARSE_FAILED; any other reason →
+      // QUALITY_FAILED (mirrors documentProject's distinction via metadata.reason).
+      const reason  = qjResult && qjResult.metadata && qjResult.metadata.reason;
+      const qjError = reason === "INVALID_ROLE_OUTPUT" ? "QUALITY_PARSE_FAILED" : "QUALITY_FAILED";
+      return { ok: true, loop_id: loopId, advanced: false, quality_error: qjError, model_used: qjModel };
+
+    } catch (err) {
+      clearTimeout(timeoutHandle);
+      return { ok: true, loop_id: loopId, advanced: false, quality_error: err.message };
+    }
+  }
+
   // ── Cost Estimate bridge (PHASE-25) ─────────────────────────────────────────
   //
   // estimateCost: drives the cost_estimator role from COST_ESTIMATE → ENV_REPORT.
@@ -2460,12 +2671,25 @@ function createConversationEngine(options = {}) {
     }
   }
 
-  // ── Respond Gate bridge (PHASE-26) ────────────────────────────────────────────
+  // ── Respond Gate bridge (PHASE-26; Gate 2 added PHASE-33) ──────────────────────
   //
-  // respondGate: resolves Gate 1 (ENV_REPORT) via orchestration.respond.
-  // Guards: gate_id must be 1, response ∈ ["APPROVE","REJECT"], current_state === "ENV_REPORT".
-  // APPROVE → TEST_DESIGN; REJECT → ESCALATED.
-  // Invalid gate/response → {gate_error:"INVALID_GATE_RESPONSE", advanced:false}.
+  // respondGate: resolves an owner approval gate via orchestration.respond.
+  //   Gate 1 (host ENV_REPORT):    APPROVE → TEST_DESIGN; REJECT → ESCALATED.
+  //   Gate 2 (host QUALITY_JUDGE): APPROVE_SHIP / APPROVE_WITH_CAVEATS → DEPLOYMENT_OR_END;
+  //                                REJECT_AND_LOOP → BUILDER (or ESCALATED at cap, resolved
+  //                                inside fireGate → tryAdvanceForLoopBack).
+  // Guards: gate_id ∈ {1,2}; response must be valid for that gate; current_state must be
+  // the gate's host state. Invalid gate/response → {gate_error:"INVALID_GATE_RESPONSE"};
+  // wrong host state → {gate_error:"WRONG_STATE", current_state}. Both advanced:false.
+  // The next_state is owned by orchestration.respond (fireGate) — respondGate echoes it.
+
+  // Per-gate valid response sets + host state (mirror approval_gates.js §7.2–7.4).
+  // Gate 3 is intentionally NOT opened here (future phase) → falls through to INVALID.
+  const _GATE_RESPONSES = {
+    1: ["APPROVE", "REJECT"],
+    2: ["APPROVE_SHIP", "APPROVE_WITH_CAVEATS", "REJECT_AND_LOOP"]
+  };
+  const _GATE_HOST_STATE = { 1: "ENV_REPORT", 2: "QUALITY_JUDGE" };
 
   async function respondGate(body = {}) {
     const projectId = normalizeProjectId(body.project_id || "");
@@ -2483,7 +2707,8 @@ function createConversationEngine(options = {}) {
     const gate_id  = body.gate_id;
     const response = body.response;
 
-    if (gate_id !== 1 || !["APPROVE", "REJECT"].includes(response)) {
+    const validResponses = _GATE_RESPONSES[gate_id];
+    if (!validResponses || !validResponses.includes(response)) {
       return { ok: true, loop_id: loopId, gate_error: "INVALID_GATE_RESPONSE", advanced: false };
     }
 
@@ -2499,7 +2724,7 @@ function createConversationEngine(options = {}) {
     }
 
     const currentState = statusResult.output.current_state;
-    if (currentState !== "ENV_REPORT") {
+    if (currentState !== _GATE_HOST_STATE[gate_id]) {
       return { ok: true, loop_id: loopId, current_state: currentState, gate_error: "WRONG_STATE", advanced: false };
     }
 
@@ -2507,7 +2732,7 @@ function createConversationEngine(options = {}) {
       const respondResult = await reg.invoke("orchestration.respond", {
         project_id: normalizeProjectId(projectId),
         loop_id:    loopId,
-        gate_id:    1,
+        gate_id:    gate_id,   // LOCK-1: pass the caller's gate_id — NEVER a literal.
         response
       }, { root });
 
@@ -2520,7 +2745,7 @@ function createConversationEngine(options = {}) {
       return {
         ok:          true,
         loop_id:     loopId,
-        gate_id:     1,
+        gate_id:     gate_id,
         response,
         advanced_to: respondResult.output.next_state,
         advanced:    true
@@ -2571,6 +2796,7 @@ function createConversationEngine(options = {}) {
     runTests,
     reviewProject,
     documentProject,
+    judgeQuality,
     estimateCost,
     designTests,
     reportEnv,

@@ -1,0 +1,17 @@
+{
+  "id": "S307",
+  "name": "judgeQuality happy-path — QUALITY_JUDGE + valid spec+design+manifest (+best-effort optionals) → quality_judge role SUCCESS → quality_report.json persisted → gate_pending:2, advanced:false, loop stays QUALITY_JUDGE (PHASE-33)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/judge_quality_test_helper",
+  "method": "runS307JudgeHappyPath",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "gate_pending_2",            "expected": true },
+    { "type": "state_field_equals", "field": "advanced_false",            "expected": true },
+    { "type": "state_field_equals", "field": "quality_report_present",    "expected": true },
+    { "type": "state_field_equals", "field": "quality_report_written",    "expected": true },
+    { "type": "state_field_equals", "field": "graph_still_quality_judge", "expected": true }
+  ]
+}

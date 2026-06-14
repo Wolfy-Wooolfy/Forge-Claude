@@ -1,0 +1,18 @@
+{
+  "id": "S311",
+  "name": "respondGate Gate 2 APPROVE_SHIP — loop at QUALITY_JUDGE, Gate 2 fires APPROVE_SHIP, loop advances to DEPLOYMENT_OR_END (PHASE-33)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/judge_quality_test_helper",
+  "method": "runS311RespondGate2ApproveShip",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "ok_true",                 "expected": true },
+    { "type": "state_field_equals", "field": "advanced_true",           "expected": true },
+    { "type": "state_field_equals", "field": "advanced_to_deployment",  "expected": true },
+    { "type": "state_field_equals", "field": "gate_id_2",              "expected": true },
+    { "type": "state_field_equals", "field": "response_approve_ship",   "expected": true },
+    { "type": "state_field_equals", "field": "graph_deployment_or_end", "expected": true }
+  ]
+}
