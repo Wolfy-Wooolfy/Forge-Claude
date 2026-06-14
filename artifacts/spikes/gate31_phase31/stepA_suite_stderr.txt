@@ -1,0 +1,10 @@
+(node:31556) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[Forge] ⚠  WARNING: stale Forge copy detected.
+  Running from : C:\Users\KHALED~1.SAY\AppData\Local\Temp\forge-guard-test-IiQpxd
+  Stale copy at: D:\ForgeAI
+  Ensure pm2 runs from the correct path (see INSTALL.md).
+         FAIL assertion [status_equals]: status: expected 'SUCCESS', got 'FAILED'
+         FAIL assertion [state_field_equals]: state.adapter_id: expected "pip", got undefined
+         FAIL assertion [state_field_equals]: state.action: expected "install", got undefined
+         FAIL assertion [state_field_equals]: state.exit_code: expected 0, got undefined
