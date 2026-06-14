@@ -4,9 +4,9 @@
   "current_stage": "A",
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
-  "next_phase": "PHASE-33-PENDING-DECISION",
-  "next_step": "PHASE-32 CLOSED — DOCUMENTATION bridge: documentProject() DOCUMENTATION → QUALITY_JUDGE (gate_check null, persist-then-advance, never loops back); manifest-restricted code OPTIONAL per RULING-9 (absent→graceful; corrupt/missing-file/empty→DOC_MANIFEST_CORRUPT fail-closed); documentation.json persisted before advance; taxonomy WRONG_STATE/INPUT_NOT_FOUND/DOC_MANIFEST_CORRUPT/DOC_PARSE_FAILED/DOCUMENTATION_FAILED/DOC_WRITE_FAILED. POST /api/ai-os/project/document-project. S302–S306 added; suite 299/0/5 (304). Gate #10 REAL: advance to QUALITY_JUDGE, $0.01574, gpt-4o; attempt-1 surfaced VISION_NOT_FOUND seed gap (harness-only fix: locked vision.md seed; bridge unchanged); vision-lock+budget L3 gates first exercised non-mock and passed. L2=80, §ARC=8, roles 13, doctor 35. Next: PHASE-33 pending decision.",
-  "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-14-phase-32-documentation-bridge.md",
+  "next_phase": "PHASE-34-PENDING-DECISION",
+  "next_step": "PHASE-33 CLOSED — QUALITY_JUDGE bridge: judgeQuality() at QUALITY_JUDGE is persist-then-BLOCK (NO advance — every QUALITY_JUDGE edge has a non-null gate_check); persists quality_report.json, returns gate_pending:2. respondGate extended to gate_id∈{1,2} (LOCK-1: orchestration.respond gets the caller's gate_id, never literal 1). All 5 QUALITY_JUDGE transitions covered: S307 self-loop/gate_pending · S311 APPROVE_SHIP→DEPLOYMENT_OR_END · S313 APPROVE_WITH_CAVEATS→DEPLOYMENT_OR_END · S312 REJECT_AND_LOOP→BUILDER (iter↑, LOOP_BACK row) · S314 REJECT_AND_LOOP@cap→ESCALATED. Fail-closed guards S308/S309/S310; taxonomy WRONG_STATE/INPUT_NOT_FOUND/QUALITY_MANIFEST_CORRUPT/QUALITY_PARSE_FAILED/QUALITY_FAILED/QUALITY_WRITE_FAILED. RULING-9 extends to builder_output (no new RULING). POST /api/ai-os/project/judge-quality + respond-gate gate_id:2 extension. S307–S314 added; suite 307/0/5 (312). Gate #10 REAL_PASS: QUALITY_JUDGE→gate_pending:2→APPROVE_SHIP→DEPLOYMENT_OR_END, $0.019, gpt-4o, latency 4982ms; verdict APPROVED_WITH_CONCERNS/78 (vs mock APPROVED/88 → confirms real); real judge flagged the this.changes defect the PHASE-31 reviewer missed (reinforces reviewer/security prompt-tuning backlog). L2=80, §ARC=8, roles 13, doctor 35. Remaining pipeline gap = ONE bridge: DEPLOYMENT (deployProject DEPLOYMENT_OR_END→LIVE_DELIVERABLE, Gate 3). Next: PHASE-34 pending decision.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-14-phase-33-quality-judge-bridge.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -78,8 +78,8 @@
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
     "self_test_last_run": "2026-06-14",
-    "self_test_last_result": "299 passed, 0 failed, 5 skipped (304 total) — PHASE-32 CLOSED. S302-S306 GREEN. DOCUMENTATION bridge documentProject() DOCUMENTATION→QUALITY_JUDGE (persist-then-advance, gate_check null). RULING-9: manifest-restricted code OPTIONAL (absent→graceful; corrupt/missing-file/empty→DOC_MANIFEST_CORRUPT fail-closed). Gate #10 REAL PASS: advance to QUALITY_JUDGE, $0.01574, gpt-4o-2024-08-06, latency 7201ms; attempt-1 surfaced VISION_NOT_FOUND seed gap (harness-only fix: locked vision.md seed; bridge unchanged); vision-lock+budget L3 gates non-mock-only, first exercised by the real run and passed. S17/S28/S57 full-suite-load flakes GREEN on foreground. L2=80.",
-    "self_test_scenarios_pass": 299,
+    "self_test_last_result": "307 passed, 0 failed, 5 skipped (312 total) — PHASE-33 CLOSED. S307-S314 GREEN. QUALITY_JUDGE bridge judgeQuality() persist-then-BLOCK (no advance; gate_check non-null Gate 2); respondGate extended to gate_id∈{1,2} (LOCK-1: caller's gate_id, not literal 1). All 5 QUALITY_JUDGE transitions covered (S307 self-loop, S311 APPROVE_SHIP→DEPLOYMENT_OR_END, S313 APPROVE_WITH_CAVEATS→DEPLOYMENT_OR_END, S312 REJECT_AND_LOOP→BUILDER iter↑+LOOP_BACK row, S314 cap→ESCALATED) + guards S308/S309/S310. RULING-9 extends to builder_output (no new RULING). Gate #10 REAL PASS: QUALITY_JUDGE→gate_pending:2→APPROVE_SHIP→DEPLOYMENT_OR_END, $0.019, gpt-4o-2024-08-06, latency 4982ms; verdict APPROVED_WITH_CONCERNS/78 (vs mock APPROVED/88 → confirms real); real judge caught the this.changes defect PHASE-31 reviewer missed. S281-S283 Gate-1 regression GREEN (LOCK-2). L2=80.",
+    "self_test_scenarios_pass": 307,
     "self_test_scenarios_skip": 5,
     "self_test_scenarios_fail": 0,
     "providers_registered_count": 14,
@@ -168,9 +168,10 @@
       "PHASE-29",
       "PHASE-30",
       "PHASE-31",
-      "PHASE-32"
+      "PHASE-32",
+      "PHASE-33"
     ],
-    "next": "PHASE-33 (pending decision)",
+    "next": "PHASE-34 (pending decision)",
     "remaining": [],
     "phase_16_closed": "2026-05-28",
     "phase_17_closed": "2026-05-29",
@@ -183,6 +184,7 @@
     "phase_30_closed": "2026-06-11",
     "phase_31_closed": "2026-06-14",
     "phase_32_closed": "2026-06-14",
+    "phase_33_closed": "2026-06-14",
     "phase_16_corrective": "DECISION-2026-05-24T16-00-phase-16-ux-closure-gap.md — UX Closure Gap; 6 stages; outcome-based closure gate",
     "phase_15_closed": "2026-05-23T14:00:00.000Z",
     "deferred": [
@@ -808,6 +810,95 @@
     ],
     "cost_actuals_usd": 0.01574,
     "cumulative_real_spend_usd_est": 0.6
+  },
+  "phase_33": {
+    "status": "CLOSED",
+    "closed_at": "2026-06-14",
+    "title": "QUALITY_JUDGE Bridge (judgeQuality)",
+    "closure_artifact": "artifacts/decisions/DECISION-2026-06-14-phase-33-quality-judge-bridge.md",
+    "mid_checkpoint": "artifacts/decisions/_phase_33_checkpoints/stage_mid.md",
+    "step_a_checkpoint": "artifacts/decisions/_phase_33_checkpoints/stage_a.md",
+    "final_checkpoint": "artifacts/decisions/_phase_33_checkpoints/stage_final.md",
+    "suite_final": "307/0/5 (312 total)",
+    "scenarios_added": [
+      "S307",
+      "S308",
+      "S309",
+      "S310",
+      "S311",
+      "S312",
+      "S313",
+      "S314"
+    ],
+    "bridge": "judgeQuality() at QUALITY_JUDGE — persist-then-BLOCK (NO advance; every QUALITY_JUDGE edge has a non-null Gate 2 gate_check). On role SUCCESS persists quality_report.json, returns {gate_pending:2, advanced:false}; loop stays QUALITY_JUDGE pending owner Gate 2. respondGate extended to gate_id∈{1,2} via per-gate _GATE_RESPONSES + _GATE_HOST_STATE; next_state owned by orchestration.respond→fireGate (REJECT_AND_LOOP→tryAdvanceForLoopBack, reused unmodified). Fail-closed taxonomy: WRONG_STATE / INPUT_NOT_FOUND / QUALITY_MANIFEST_CORRUPT / QUALITY_PARSE_FAILED / QUALITY_FAILED / QUALITY_WRITE_FAILED (INVALID_ROLE_OUTPUT→QUALITY_PARSE_FAILED, other→QUALITY_FAILED via metadata.reason).",
+    "transitions_covered": {
+      "self_loop_gate_pending": "S307 (Gate 2 — BLOCK)",
+      "approve_ship": "S311 → DEPLOYMENT_OR_END",
+      "approve_with_caveats": "S313 → DEPLOYMENT_OR_END (caveats logged: GATE_APPROVE audit row gate 2)",
+      "reject_and_loop": "S312 → BUILDER (iteration_count 0→1, LOOP_BACK row from_state=QUALITY_JUDGE)",
+      "cap_escalate": "S314 → ESCALATED (iter=cap 5, no increment, ESCALATE row from_state=QUALITY_JUDGE, no LOOP_BACK)"
+    },
+    "guards": "S308 wrong-state (parked DOCUMENTATION) · S309 input-not-found · S310 QUALITY_MANIFEST_CORRUPT (3 variants: unparseable + missing-file + empty files[])",
+    "ruling_9": "Extends to builder_output (no new RULING): manifest ABSENT→graceful (judge from spec+design+optionals); PRESENT+valid→manifest-restricted builder_output from on-disk content; PRESENT+corrupt/missing-file/empty→QUALITY_MANIFEST_CORRUPT fail-closed. LOCK-5: the other optionals (security_audit/test_plan/documentation/cost_estimate/environment) are plain best-effort, NOT fail-closed.",
+    "locks": {
+      "lock_1": "orchestration.respond receives the caller's gate_id (never literal 1) — proven positively by S311 (APPROVE_SHIP through fireGate(2) → DEPLOYMENT_OR_END; a hardcoded 1 would have thrown invalid-response-for-gate-1).",
+      "lock_2": "S281/S282/S283 (Gate 1) regression GREEN under the new per-gate validation.",
+      "lock_3": "judgeQuality defaults quality_provider=openai, quality_model=gpt-4o (overrides quality_judge_role's anthropic default; owner has no ANTHROPIC_API_KEY)."
+    },
+    "endpoints": [
+      "POST /api/ai-os/project/judge-quality (new, 4-line mirror)",
+      "POST /api/ai-os/project/respond-gate (existing; now accepts gate_id:2)"
+    ],
+    "gate_10": "REAL_PASS",
+    "gate_10_branch": "QUALITY_JUDGE → gate_pending:2 → APPROVE_SHIP → DEPLOYMENT_OR_END",
+    "gate_10_run_ts": "2026-06-14T19:42:13Z",
+    "gate_10_confirmed_at": "2026-06-14",
+    "gate_10_cost_usd": 0.019,
+    "gate_10_evidence": "artifacts/spikes/gate33_phase33/gate33_result.json",
+    "gate_10_result": "Real openai/gpt-4o-2024-08-06 quality_judge on seeded loop phase33_gate10 → persist-then-BLOCK confirmed (pre QUALITY_JUDGE → mid QUALITY_JUDGE, advanced:false, gate_pending:2) → respondGate gate_id:2 APPROVE_SHIP → on-disk graph current_state DEPLOYMENT_OR_END. quality_report.json 2808 bytes (6 OUTPUT_SCHEMA keys); latency 4982ms real role (mock ~tens of ms); ledger row role=quality_judge tokens 1862/646 $0.019 success. Verdict APPROVED_WITH_CONCERNS/78 (vs S307 mock APPROVED/88 → confirms genuinely gpt-4o). vision-lock + budget L3 gates first exercised non-mock by the real run and passed (locked vision.md seeded — PHASE-32 attempt-1 lesson).",
+    "gate_10_findings": [
+      "Verdict variance (real APPROVED_WITH_CONCERNS/78 vs mock APPROVED/88) confirms real output.",
+      "Real judge flagged the this.changes WARN on updateTodo — the SAME defect class the PHASE-31 reviewer missed — plus an AC-2 test-coverage concern; the advisory cross-role judge adds value over reviewer/security. REINFORCES the reviewer/security prompt-tuning backlog (PHASE-35+ candidate); NOT actioned this phase.",
+      "Architectural (correct): quality_judge is ADVISORY; owner Gate 2 drives the transition. Loop advanced on APPROVE_SHIP despite CONCERNS — owner decides shipping, not the judge."
+    ],
+    "l2_tools": 80,
+    "agent_roles": 13,
+    "arc_ledger_count": 8,
+    "doctor_checks": 35,
+    "track_a": "CLEAN — judgeQuality() + respondGate extension + endpoint use reg.invoke only (fs.read_file/fs.write_file/orchestration.get_status/orchestration.respond/role.invoke); fs.*Sync=2 unchanged; 0 new forbidden patterns; §ARC=8; L2=80; roles=13. quality_judge_role.js / approval_gates.js / iteration_controller.js / conversation_graph.js / orchestration_tools.js NOT modified (wiring-only — consumed, not changed).",
+    "files_created": [
+      "code/src/testing/helpers/judge_quality_test_helper.js",
+      "code/src/testing/scenarios/S307_judge_happy_path.json",
+      "code/src/testing/scenarios/S308_judge_wrong_state.json",
+      "code/src/testing/scenarios/S309_judge_input_not_found.json",
+      "code/src/testing/scenarios/S310_judge_manifest_corrupt.json",
+      "code/src/testing/scenarios/S311_respond_gate2_approve_ship.json",
+      "code/src/testing/scenarios/S312_respond_gate2_reject_loop_back.json",
+      "code/src/testing/scenarios/S313_respond_gate2_approve_with_caveats.json",
+      "code/src/testing/scenarios/S314_respond_gate2_reject_cap_escalates.json",
+      "scripts/spikes/gate33_phase33_judge_quality.js",
+      "artifacts/decisions/_phase_33_checkpoints/stage_mid.md",
+      "artifacts/decisions/_phase_33_checkpoints/stage_a.md",
+      "artifacts/decisions/_phase_33_checkpoints/stage_final.md",
+      "artifacts/decisions/DECISION-2026-06-14-phase-33-quality-judge-bridge.md"
+    ],
+    "files_modified": [
+      "code/src/ai_os/conversationEngine.js",
+      "code/src/workspace/apiServer.js",
+      "code/src/runtime/agents/adapters/mock_responses.json",
+      "progress/status.json"
+    ],
+    "findings_open": [
+      "DEPLOYMENT bridge (deployProject DEPLOYMENT_OR_END→LIVE_DELIVERABLE, Gate 3) — the ONE remaining pipeline-completion bridge → PHASE-34 candidate.",
+      "reviewer/security prompt-tuning (logic-defect strength + parameterized-SQLi false-positive calibration) — reinforced by Gate #10 finding #2.",
+      "vision-lock + budget L3 gates non-mock-only → first-exercised at real-spend time across ALL bridges (scenario green / real path) — add a non-mock-stubbed permission path or permission-layer unit test.",
+      "Finding #4: harness fixture support — still OPEN/deferred.",
+      "§ARC code-vs-ledger drift reconciliation.",
+      "S17/S28/S57 full-suite-load flakes (GREEN on Windows foreground).",
+      "provider switch to Anthropic after ANTHROPIC_API_KEY set."
+    ],
+    "cost_actuals_usd": 0.019,
+    "cumulative_real_spend_usd_est": 0.62
   },
   "ux_task_2026_06_07_multiselect": {
     "status": "CLOSED",
