@@ -1,0 +1,72 @@
+{
+  "role_id": "documentation",
+  "overview": {
+    "title": "Task Management REST API",
+    "purpose": "A RESTful API for managing tasks, built with Node.js and SQLite.",
+    "key_capabilities": [
+      "Task CRUD operations",
+      "Input validation",
+      "SQLite persistence"
+    ]
+  },
+  "components": [
+    {
+      "name": "API Server",
+      "description": "Express.js HTTP server handling all API requests",
+      "interface_summary": "Exposes REST endpoints on configured PORT; responds with JSON"
+    },
+    {
+      "name": "Validation Middleware",
+      "description": "Validates inbound task payloads before they reach controllers",
+      "interface_summary": "Rejects malformed bodies with 400"
+    }
+  ],
+  "api_reference": [
+    {
+      "endpoint": "/todos",
+      "method": "POST",
+      "description": "Create a task",
+      "inputs": "JSON body: { title }",
+      "outputs": "201 with { id, title }",
+      "errors": [
+        "400 if title missing"
+      ]
+    },
+    {
+      "endpoint": "/todos/:id",
+      "method": "PUT",
+      "description": "Update a task by id",
+      "inputs": "path id; JSON body: { title }",
+      "outputs": "200 with { id, title }",
+      "errors": [
+        "404 if id not found"
+      ]
+    }
+  ],
+  "quickstart": {
+    "prerequisites": [
+      "Node.js >=20 installed"
+    ],
+    "steps": [
+      "Install dependencies: npm install",
+      "Start server: node src/app.js",
+      "Send POST /todos to create a task"
+    ]
+  },
+  "operations": {
+    "health_check": "GET /health returns 200 OK when server is running",
+    "logging": "Request method and path logged to stdout at INFO level",
+    "common_issues": [
+      {
+        "symptom": "400 on every create",
+        "cause": "title field missing from request body",
+        "fix": "Include a non-empty title string in the JSON body"
+      }
+    ]
+  },
+  "known_limitations": [
+    "Real-time task sync is out of scope",
+    "Authentication is out of scope"
+  ],
+  "summary": "Documentation covers both components and both API endpoints; intended for developer operators; covers the happy path and one common error scenario."
+}

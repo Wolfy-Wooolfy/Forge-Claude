@@ -1,0 +1,17 @@
+{
+  "count": 1,
+  "total_cost_usd": 0,
+  "new_entries": [
+    {
+      "role": "documentation",
+      "provider": "mock",
+      "model": "mock-doc-s302",
+      "tokens_in": 900,
+      "tokens_out": 600,
+      "latency_ms": 1,
+      "cost_usd_actual": 0,
+      "outcome": "success",
+      "ts": "2026-06-14T12:44:46.663Z"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "verdict": "STOP_AND_REPORT",
+  "stop_code": "VISION_NOT_FOUND_SEED_GAP",
+  "phase": "PHASE-32 Gate #10 (documentProject)",
+  "summary": "Attempt-1 (real openai/gpt-4o) returned doc_error=DOCUMENTATION_FAILED in 190ms with ZERO cost-ledger rows. Root cause is NOT a gpt-4o output/schema failure (the model was never called) and NOT a bridge defect. The L3 permission gate agent_budget_rule denied agent.invoke with VISION_NOT_FOUND because the freshly-seeded project had no locked vision.md. The bridge behaved CORRECTLY: fail-closed, no advance, no documentation.json written.",
+  "attempt_1_real": {
+    "request_body": { "project_id": "phase32_gate10", "loop_id": "gate32-doc-2f1de5f5" },
+    "http_status": 200,
+    "latency_ms": 190,
+    "response": { "ok": true, "advanced": false, "doc_error": "DOCUMENTATION_FAILED", "model_used": "gpt-4o" },
+    "cost_delta_usd": 0,
+    "ledger_rows_added": 0,
+    "decisive_audit_row": {
+      "ts": "2026-06-14T12:32:29.821Z",
+      "tool": "agent.invoke",
+      "stage": "agent_budget",
+      "required_mode": "WORKSPACE_WRITE",
+      "active_mode": "WORKSPACE_WRITE",
+      "allow": false,
+      "reason": "VISION_NOT_FOUND"
+    },
+    "interpretation": "documentProject -> role.invoke(documentation) -> agent.invoke DENIED (VISION_NOT_FOUND) -> role AGENT_FAILED -> bridge doc_error=DOCUMENTATION_FAILED (metadata.reason != INVALID_ROLE_OUTPUT). Mock/suite path passes because TEST mode bypasses the vision gate (TEST_MODE_ALLOWED); the real gate runs in WORKSPACE_WRITE where vision authority is enforced."
+  },
+  "root_cause": "Seed-completeness gap (harness), same class as PHASE-28's gate-script fix+rerun cycles. The gate seed did not create a locked vision.md; real pipeline projects (e.g. phase28_gate10) carry one. Without it, the L3 agent_budget_rule denies all agent.invoke calls for the project.",
+  "fix_applied": "gate32_phase32_documentation.js seedLoopToDocumentation() now also writes a locked artifacts/projects/phase32_gate10/vision.md (vision_locked:true), shape mirrored from the known-good artifacts/projects/phase28_gate10/vision.md. Harness-only; engine/bridge UNCHANGED.",
+  "fix_validated_dry_mock_zero_cost": {
+    "note": "GATE32_DRY_MOCK=1 run — exercises the FULL real-mode path (real apiServer in WORKSPACE_WRITE, real L3 vision-authority gate) with a $0 mock documentation completion. Proves the vision gate now PASSES and the bridge advances.",
+    "pre_state": "DOCUMENTATION",
+    "post_state": "QUALITY_JUDGE",
+    "real_advance": true,
+    "documentation_persisted": "artifacts/projects/phase32_gate10/orchestration/<loop>/documentation.json (2132 bytes, all 7 OUTPUT_SCHEMA keys)",
+    "cost_delta_usd": 0,
+    "evidence_file": "artifacts/spikes/gate32_phase32/gate32_drymock_result.json"
+  },
+  "bridge_assessment": "CORRECT. documentProject fail-closed on a denied agent call (no advance, no write) — exactly the intended behavior. No bridge change required.",
+  "next": "AWAITING CTO/owner GO to execute the SINGLE authorized real gpt-4o run (attempt-1 consumed $0 — the real completion was never made). On GO: run `node scripts/spikes/gate32_phase32_documentation.js` (no GATE32_DRY_MOCK) -> overwrites this file with the real HONEST_EVIDENCE result. If real gpt-4o output then fails OUTPUT_SCHEMA -> DOC_PARSE_FAILED, the script STOPs and reports the raw output per GO #7 (no faked PASS).",
+  "cost_so_far_usd": 0,
+  "timestamp": "2026-06-14T12:35:00.000Z"
+}

@@ -1,0 +1,142 @@
+{
+  "verdict": "HONEST_EVIDENCE",
+  "mode": "DRY_MOCK_$0",
+  "branch_taken": "DOCUMENT_TO_QUALITY_JUDGE",
+  "project_id": "phase32_gate10",
+  "loop_id": "gate32-doc-d076f321",
+  "port": 57318,
+  "request_body": {
+    "project_id": "phase32_gate10",
+    "loop_id": "gate32-doc-d076f321",
+    "doc_provider": "mock",
+    "doc_model": "mock-doc-s302",
+    "doc_scenario_id": "S302"
+  },
+  "response": {
+    "ok": true,
+    "loop_id": "gate32-doc-d076f321",
+    "advanced": true,
+    "advanced_to": "QUALITY_JUDGE",
+    "documentation": {
+      "role_id": "documentation",
+      "overview": {
+        "title": "Task Management REST API",
+        "purpose": "A RESTful API for managing tasks, built with Node.js and SQLite.",
+        "key_capabilities": [
+          "Task CRUD operations",
+          "Input validation",
+          "SQLite persistence"
+        ]
+      },
+      "components": [
+        {
+          "name": "API Server",
+          "description": "Express.js HTTP server handling all API requests",
+          "interface_summary": "Exposes REST endpoints on configured PORT; responds with JSON"
+        },
+        {
+          "name": "Validation Middleware",
+          "description": "Validates inbound task payloads before they reach controllers",
+          "interface_summary": "Rejects malformed bodies with 400"
+        }
+      ],
+      "api_reference": [
+        {
+          "endpoint": "/todos",
+          "method": "POST",
+          "description": "Create a task",
+          "inputs": "JSON body: { title }",
+          "outputs": "201 with { id, title }",
+          "errors": [
+            "400 if title missing"
+          ]
+        },
+        {
+          "endpoint": "/todos/:id",
+          "method": "PUT",
+          "description": "Update a task by id",
+          "inputs": "path id; JSON body: { title }",
+          "outputs": "200 with { id, title }",
+          "errors": [
+            "404 if id not found"
+          ]
+        }
+      ],
+      "quickstart": {
+        "prerequisites": [
+          "Node.js >=20 installed"
+        ],
+        "steps": [
+          "Install dependencies: npm install",
+          "Start server: node src/app.js",
+          "Send POST /todos to create a task"
+        ]
+      },
+      "operations": {
+        "health_check": "GET /health returns 200 OK when server is running",
+        "logging": "Request method and path logged to stdout at INFO level",
+        "common_issues": [
+          {
+            "symptom": "400 on every create",
+            "cause": "title field missing from request body",
+            "fix": "Include a non-empty title string in the JSON body"
+          }
+        ]
+      },
+      "known_limitations": [
+        "Real-time task sync is out of scope",
+        "Authentication is out of scope"
+      ],
+      "summary": "Documentation covers both components and both API endpoints; intended for developer operators; covers the happy path and one common error scenario."
+    },
+    "model_used": "mock-doc-s302"
+  },
+  "pre_state": "DOCUMENTATION",
+  "post_state": "QUALITY_JUDGE",
+  "advance_real": true,
+  "documentation": {
+    "on_disk_path": "artifacts\\projects\\phase32_gate10\\orchestration\\gate32-doc-d076f321\\documentation.json",
+    "on_disk_size_bytes": 2132,
+    "keys_present": [
+      "overview",
+      "components",
+      "api_reference",
+      "quickstart",
+      "operations",
+      "known_limitations",
+      "summary"
+    ],
+    "overview_title": "Task Management REST API",
+    "components_count": 2,
+    "api_reference_count": 2,
+    "summary": "Documentation covers both components and both API endpoints; intended for developer operators; covers the happy path and one common error scenario."
+  },
+  "manifest_files": [
+    "src/controllers/todoController.js",
+    "src/middleware/validation.js"
+  ],
+  "latency_ms": {
+    "http_round_trip": 877,
+    "real_role_max": 1,
+    "mock_signature_note": "S302 mock documentation calls return in ~tens of ms; this real call is ~thousands of ms"
+  },
+  "cost": {
+    "ledger_before_usd": 0,
+    "ledger_after_usd": 0,
+    "delta_usd": 0,
+    "per_role": [
+      {
+        "role": "documentation",
+        "provider": "mock",
+        "model": "mock-doc-s302",
+        "tokens_in": 900,
+        "tokens_out": 600,
+        "latency_ms": 1,
+        "cost_usd_actual": 0,
+        "outcome": "success",
+        "ts": "2026-06-14T12:44:46.663Z"
+      }
+    ]
+  },
+  "timestamp": "2026-06-14T12:44:46.872Z"
+}
