@@ -4,7 +4,7 @@ project_name: todo_rest_api
 domain: web_api
 vision_version: 1
 vision_locked: true
-vision_locked_at: 2026-06-14T12:44:41.749Z
+vision_locked_at: 2026-06-14T12:59:15.933Z
 locked_by_role: owner
 amendments_history: []
 goals:

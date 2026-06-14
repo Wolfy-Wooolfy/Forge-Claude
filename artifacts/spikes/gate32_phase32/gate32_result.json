@@ -1,39 +1,141 @@
 {
-  "verdict": "STOP_AND_REPORT",
-  "stop_code": "VISION_NOT_FOUND_SEED_GAP",
-  "phase": "PHASE-32 Gate #10 (documentProject)",
-  "summary": "Attempt-1 (real openai/gpt-4o) returned doc_error=DOCUMENTATION_FAILED in 190ms with ZERO cost-ledger rows. Root cause is NOT a gpt-4o output/schema failure (the model was never called) and NOT a bridge defect. The L3 permission gate agent_budget_rule denied agent.invoke with VISION_NOT_FOUND because the freshly-seeded project had no locked vision.md. The bridge behaved CORRECTLY: fail-closed, no advance, no documentation.json written.",
-  "attempt_1_real": {
-    "request_body": { "project_id": "phase32_gate10", "loop_id": "gate32-doc-2f1de5f5" },
-    "http_status": 200,
-    "latency_ms": 190,
-    "response": { "ok": true, "advanced": false, "doc_error": "DOCUMENTATION_FAILED", "model_used": "gpt-4o" },
-    "cost_delta_usd": 0,
-    "ledger_rows_added": 0,
-    "decisive_audit_row": {
-      "ts": "2026-06-14T12:32:29.821Z",
-      "tool": "agent.invoke",
-      "stage": "agent_budget",
-      "required_mode": "WORKSPACE_WRITE",
-      "active_mode": "WORKSPACE_WRITE",
-      "allow": false,
-      "reason": "VISION_NOT_FOUND"
+  "verdict": "HONEST_EVIDENCE",
+  "mode": "REAL_GPT4O",
+  "branch_taken": "DOCUMENT_TO_QUALITY_JUDGE",
+  "project_id": "phase32_gate10",
+  "loop_id": "gate32-doc-ba522d1c",
+  "port": 57822,
+  "request_body": {
+    "project_id": "phase32_gate10",
+    "loop_id": "gate32-doc-ba522d1c"
+  },
+  "response": {
+    "ok": true,
+    "loop_id": "gate32-doc-ba522d1c",
+    "advanced": true,
+    "advanced_to": "QUALITY_JUDGE",
+    "documentation": {
+      "role_id": "documentation",
+      "overview": {
+        "title": "Task Management REST API",
+        "purpose": "This project is a REST API for managing tasks, designed for users who need a simple way to keep track of their to-do items.",
+        "key_capabilities": [
+          "Create and manage tasks",
+          "CRUD operations on task data"
+        ]
+      },
+      "components": [
+        {
+          "name": "API Server",
+          "description": "Handles HTTP requests for task management operations.",
+          "interface_summary": "Clients interact with the API Server via HTTP using JSON payloads to perform CRUD operations on tasks."
+        }
+      ],
+      "api_reference": [
+        {
+          "endpoint": "/todos",
+          "method": "POST",
+          "description": "Creates a new to-do item.",
+          "inputs": "{ \"title\": \"string\" } - The title of the to-do item.",
+          "outputs": "{ \"id\": \"integer\", \"title\": \"string\" } - The id and title of the created to-do.",
+          "errors": [
+            "400: title required",
+            "500: Internal Server Error"
+          ]
+        },
+        {
+          "endpoint": "/todos/:id",
+          "method": "PUT",
+          "description": "Updates a to-do item by id.",
+          "inputs": "{ \"title\": \"string\" } - The new title for the to-do item, \"id\": \"integer\" path parameter.",
+          "outputs": "{ \"id\": \"integer\", \"title\": \"string\" } - The id and title of the updated to-do.",
+          "errors": [
+            "404: Not Found",
+            "500: Internal Server Error"
+          ]
+        }
+      ],
+      "quickstart": {
+        "prerequisites": [
+          "Node.js installed",
+          "SQLite installed"
+        ],
+        "steps": [
+          "Clone the repository from version control.",
+          "Navigate to the project directory.",
+          "Run 'npm install' to install dependencies.",
+          "Start the API with 'npm start'."
+        ]
+      },
+      "operations": {
+        "health_check": "Verify the server is running by sending a GET request to /todos and ensuring a 200 response.",
+        "logging": "Requests and errors are logged to the console with varying verbosity based on environment settings.",
+        "common_issues": [
+          {
+            "symptom": "POST /todos returns 400",
+            "cause": "Title field is missing or invalid in the request body.",
+            "fix": "Ensure the request body includes a valid 'title' string."
+          },
+          {
+            "symptom": "PUT /todos/:id returns 404",
+            "cause": "The specified to-do item id does not exist.",
+            "fix": "Verify the id in the request path is correct and exists."
+          }
+        ]
+      },
+      "known_limitations": [
+        "Real-time synchronization is out of scope."
+      ],
+      "summary": "This documentation covers the REST API for managing to-do tasks, intended for developers and system operators. It includes API endpoints, setup instructions, and troubleshooting information."
     },
-    "interpretation": "documentProject -> role.invoke(documentation) -> agent.invoke DENIED (VISION_NOT_FOUND) -> role AGENT_FAILED -> bridge doc_error=DOCUMENTATION_FAILED (metadata.reason != INVALID_ROLE_OUTPUT). Mock/suite path passes because TEST mode bypasses the vision gate (TEST_MODE_ALLOWED); the real gate runs in WORKSPACE_WRITE where vision authority is enforced."
+    "model_used": "gpt-4o"
   },
-  "root_cause": "Seed-completeness gap (harness), same class as PHASE-28's gate-script fix+rerun cycles. The gate seed did not create a locked vision.md; real pipeline projects (e.g. phase28_gate10) carry one. Without it, the L3 agent_budget_rule denies all agent.invoke calls for the project.",
-  "fix_applied": "gate32_phase32_documentation.js seedLoopToDocumentation() now also writes a locked artifacts/projects/phase32_gate10/vision.md (vision_locked:true), shape mirrored from the known-good artifacts/projects/phase28_gate10/vision.md. Harness-only; engine/bridge UNCHANGED.",
-  "fix_validated_dry_mock_zero_cost": {
-    "note": "GATE32_DRY_MOCK=1 run — exercises the FULL real-mode path (real apiServer in WORKSPACE_WRITE, real L3 vision-authority gate) with a $0 mock documentation completion. Proves the vision gate now PASSES and the bridge advances.",
-    "pre_state": "DOCUMENTATION",
-    "post_state": "QUALITY_JUDGE",
-    "real_advance": true,
-    "documentation_persisted": "artifacts/projects/phase32_gate10/orchestration/<loop>/documentation.json (2132 bytes, all 7 OUTPUT_SCHEMA keys)",
-    "cost_delta_usd": 0,
-    "evidence_file": "artifacts/spikes/gate32_phase32/gate32_drymock_result.json"
+  "pre_state": "DOCUMENTATION",
+  "post_state": "QUALITY_JUDGE",
+  "advance_real": true,
+  "documentation": {
+    "on_disk_path": "artifacts\\projects\\phase32_gate10\\orchestration\\gate32-doc-ba522d1c\\documentation.json",
+    "on_disk_size_bytes": 2764,
+    "keys_present": [
+      "overview",
+      "components",
+      "api_reference",
+      "quickstart",
+      "operations",
+      "known_limitations",
+      "summary"
+    ],
+    "overview_title": "Task Management REST API",
+    "components_count": 1,
+    "api_reference_count": 2,
+    "summary": "This documentation covers the REST API for managing to-do tasks, intended for developers and system operators. It includes API endpoints, setup instructions, and troubleshooting information."
   },
-  "bridge_assessment": "CORRECT. documentProject fail-closed on a denied agent call (no advance, no write) — exactly the intended behavior. No bridge change required.",
-  "next": "AWAITING CTO/owner GO to execute the SINGLE authorized real gpt-4o run (attempt-1 consumed $0 — the real completion was never made). On GO: run `node scripts/spikes/gate32_phase32_documentation.js` (no GATE32_DRY_MOCK) -> overwrites this file with the real HONEST_EVIDENCE result. If real gpt-4o output then fails OUTPUT_SCHEMA -> DOC_PARSE_FAILED, the script STOPs and reports the raw output per GO #7 (no faked PASS).",
-  "cost_so_far_usd": 0,
-  "timestamp": "2026-06-14T12:35:00.000Z"
+  "manifest_files": [
+    "src/controllers/todoController.js",
+    "src/middleware/validation.js"
+  ],
+  "latency_ms": {
+    "http_round_trip": 7548,
+    "real_role_max": 7201,
+    "mock_signature_note": "S302 mock documentation calls return in ~tens of ms; this real call is ~thousands of ms"
+  },
+  "cost": {
+    "ledger_before_usd": 0,
+    "ledger_after_usd": 0.01574,
+    "delta_usd": 0.01574,
+    "per_role": [
+      {
+        "role": "documentation",
+        "provider": "openai",
+        "model": "gpt-4o-2024-08-06",
+        "tokens_in": 1267,
+        "tokens_out": 627,
+        "latency_ms": 7201,
+        "cost_usd_actual": 0.01574,
+        "outcome": "success",
+        "ts": "2026-06-14T12:59:24.990Z"
+      }
+    ]
+  },
+  "timestamp": "2026-06-14T12:59:25.051Z"
 }

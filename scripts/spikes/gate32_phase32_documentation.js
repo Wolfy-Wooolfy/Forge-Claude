@@ -355,9 +355,18 @@ async function main() {
     const r = resp.body;
 
     // Honest fail-closed STOP triggers (per CTO STEP-B list #7) — report RAW output, no faking.
-    if (r && (r.doc_error === "DOC_PARSE_FAILED" || r.doc_error === "DOCUMENTATION_FAILED")) {
-      stopAndReport(r.doc_error,
+    // DOC_PARSE_FAILED = gpt-4o output failed OUTPUT_SCHEMA. DOCUMENTATION_FAILED = the
+    // agent.invoke itself failed (an L3 permission-gate denial — e.g. vision-lock/budget —
+    // OR a provider error), NOT a schema problem: inspect artifacts/audit/tool_audit.jsonl
+    // for the agent_budget row to find the exact reason.
+    if (r && r.doc_error === "DOC_PARSE_FAILED") {
+      stopAndReport("DOC_PARSE_FAILED",
         "real gpt-4o output failed OUTPUT_SCHEMA — reporting raw (no faked PASS, no schema loosening)",
+        { response: r, model_used: r.model_used });
+    }
+    if (r && r.doc_error === "DOCUMENTATION_FAILED") {
+      stopAndReport("DOCUMENTATION_FAILED",
+        "agent.invoke failed — likely an L3 permission-gate denial (vision-lock/budget) or provider error; check tool_audit.jsonl agent_budget row (NOT a schema failure)",
         { response: r, model_used: r.model_used });
     }
     if (r && (r.doc_error === "DOC_MANIFEST_CORRUPT" || r.doc_error === "DOC_WRITE_FAILED" ||

@@ -1,17 +1,17 @@
 {
-  "count": 1,
-  "total_cost_usd": 0,
+  "count": 2,
+  "total_cost_usd": 0.01574,
   "new_entries": [
     {
       "role": "documentation",
-      "provider": "mock",
-      "model": "mock-doc-s302",
-      "tokens_in": 900,
-      "tokens_out": 600,
-      "latency_ms": 1,
-      "cost_usd_actual": 0,
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 1267,
+      "tokens_out": 627,
+      "latency_ms": 7201,
+      "cost_usd_actual": 0.01574,
       "outcome": "success",
-      "ts": "2026-06-14T12:44:46.663Z"
+      "ts": "2026-06-14T12:59:24.990Z"
     }
   ]
 }
