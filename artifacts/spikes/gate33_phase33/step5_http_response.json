@@ -1,0 +1,18 @@
+{
+  "request_body": {
+    "project_id": "phase33_gate10",
+    "loop_id": "gate33-qj-cdc1303d",
+    "gate_id": 2,
+    "response": "APPROVE_SHIP"
+  },
+  "http_status": 200,
+  "latency_ms": 8,
+  "response": {
+    "ok": true,
+    "loop_id": "gate33-qj-cdc1303d",
+    "gate_id": 2,
+    "response": "APPROVE_SHIP",
+    "advanced_to": "DEPLOYMENT_OR_END",
+    "advanced": true
+  }
+}
