@@ -1,0 +1,16 @@
+{
+  "id": "S304",
+  "name": "documentProject input-missing — spec.json/architect_design.json absent → INPUT_NOT_FOUND; no role call, no write, no advance (PHASE-32)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/document_project_test_helper",
+  "method": "runS304DocInputNotFound",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "doc_error_input_not_found", "expected": true },
+    { "type": "state_field_equals", "field": "advanced_false",            "expected": true },
+    { "type": "state_field_equals", "field": "no_documentation_written",  "expected": true },
+    { "type": "state_field_equals", "field": "graph_still_documentation", "expected": true }
+  ]
+}

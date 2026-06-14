@@ -1,0 +1,19 @@
+{
+  "id": "S306",
+  "name": "documentProject RULING-9 manifest-CORRUPT — build_manifest.json present but lists a file absent on disk (and unparseable variant) → DOC_MANIFEST_CORRUPT, FAIL-CLOSED: no role call, no write, no advance (PHASE-32)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/document_project_test_helper",
+  "method": "runS306DocManifestCorruptFailClosed",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "missing_file_doc_manifest_corrupt", "expected": true },
+    { "type": "state_field_equals", "field": "missing_file_advanced_false",       "expected": true },
+    { "type": "state_field_equals", "field": "missing_file_no_write",             "expected": true },
+    { "type": "state_field_equals", "field": "missing_file_state_documentation",  "expected": true },
+    { "type": "state_field_equals", "field": "unparseable_doc_manifest_corrupt",  "expected": true },
+    { "type": "state_field_equals", "field": "unparseable_advanced_false",        "expected": true },
+    { "type": "state_field_equals", "field": "unparseable_no_write",              "expected": true }
+  ]
+}

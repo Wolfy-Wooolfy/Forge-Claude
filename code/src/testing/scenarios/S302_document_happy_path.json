@@ -1,0 +1,20 @@
+{
+  "id": "S302",
+  "name": "documentProject happy-path — DOCUMENTATION + valid spec+design+manifest → documentation role SUCCESS → documentation.json persisted → advance QUALITY_JUDGE (+ role-failure fail-closed guard, PHASE-32)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/document_project_test_helper",
+  "method": "runS302DocHappyPath",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "advanced_to_quality_judge", "expected": true },
+    { "type": "state_field_equals", "field": "documentation_present",     "expected": true },
+    { "type": "state_field_equals", "field": "documentation_written",     "expected": true },
+    { "type": "state_field_equals", "field": "graph_state_quality_judge", "expected": true },
+    { "type": "state_field_equals", "field": "role_failure_advanced_false", "expected": true },
+    { "type": "state_field_equals", "field": "role_failure_doc_parse_failed", "expected": true },
+    { "type": "state_field_equals", "field": "role_failure_no_write",      "expected": true },
+    { "type": "state_field_equals", "field": "role_failure_state_documentation", "expected": true }
+  ]
+}

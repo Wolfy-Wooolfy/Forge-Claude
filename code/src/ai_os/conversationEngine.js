@@ -1890,6 +1890,199 @@ function createConversationEngine(options = {}) {
     };
   }
 
+  // ── Documentation bridge (PHASE-32) ──────────────────────────────────────────
+  //
+  // documentProject: drives the documentation role from DOCUMENTATION → QUALITY_JUDGE.
+  // No owner gate on this edge (conversation_graph.js gate_check:null). This is a
+  // persist-then-advance bridge — it NEVER loops back.
+  //
+  // Inputs: spec.json + architect_design.json (REQUIRED). The code object is OPTIONAL
+  // and manifest-restricted (RULING-9, Option B):
+  //   build_manifest.json ABSENT          → GRACEFUL: omit code; document from spec+design.
+  //   build_manifest.json PRESENT + valid → manifest-restricted code object built from the
+  //                                          listed files' on-disk content (EXACTLY as
+  //                                          reviewProject assembles it).
+  //   build_manifest.json PRESENT + corrupt/unparseable, OR lists a file absent on disk →
+  //                                          DOC_MANIFEST_CORRUPT, FAIL-CLOSED (no write, no
+  //                                          advance). A corrupt authoritative record must
+  //                                          NEVER silently degrade to "document without code".
+  //
+  // On role SUCCESS: persists documentation.json BEFORE advancing; advances to QUALITY_JUDGE.
+  // Fail-closed taxonomy (advanced:false, no write):
+  //   WRONG_STATE / INPUT_NOT_FOUND / DOC_MANIFEST_CORRUPT / DOC_PARSE_FAILED /
+  //   DOCUMENTATION_FAILED / DOC_WRITE_FAILED.
+
+  async function documentProject(body = {}) {
+    const projectId = normalizeProjectId(body.project_id || "");
+    const state     = loadState(projectId);
+
+    if (!state) {
+      return { ok: true, loop_id: null, doc_error: "PROJECT_NOT_FOUND", advanced: false };
+    }
+
+    const loopId = body.loop_id || state.loop_id || null;
+    if (!loopId) {
+      return { ok: true, loop_id: null, doc_error: "NO_LOOP_ID", advanced: false };
+    }
+
+    const docProvider   = body.doc_provider || "openai";
+    const docModel      = body.doc_model || (docProvider === "openai" ? "gpt-4o" : undefined);
+    const docScenarioId = body.doc_scenario_id || undefined;
+
+    const reg = getDefaultRegistry();
+    const pid = normalizeProjectId(projectId);
+
+    // State guard: must be at DOCUMENTATION
+    const statusResult = await reg.invoke("orchestration.get_status", {
+      project_id: pid, loop_id: loopId
+    }, { root });
+
+    if (!statusResult || statusResult.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, doc_error: "GET_STATUS_FAILED", advanced: false };
+    }
+
+    const currentState = statusResult.output.current_state;
+    if (currentState !== "DOCUMENTATION") {
+      return { ok: true, loop_id: loopId, current_state: currentState,
+               doc_error: "WRONG_STATE", advanced: false };
+    }
+
+    const orchRelDir    = "artifacts/projects/" + pid + "/orchestration/" + loopId;
+    const projectRelDir = "artifacts/projects/" + pid;
+
+    // ── Read spec + design (REQUIRED) ──────────────────────────────────────────
+    const specRead = await reg.invoke("fs.read_file", { path: orchRelDir + "/spec.json" }, { root });
+    if (!specRead || specRead.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, doc_error: "INPUT_NOT_FOUND", advanced: false };
+    }
+    let spec;
+    try { spec = JSON.parse(specRead.output.content); }
+    catch { return { ok: true, loop_id: loopId, doc_error: "INPUT_NOT_FOUND", advanced: false }; }
+
+    const designRead = await reg.invoke("fs.read_file", { path: orchRelDir + "/architect_design.json" }, { root });
+    if (!designRead || designRead.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, doc_error: "INPUT_NOT_FOUND", advanced: false };
+    }
+    let design;
+    try { design = JSON.parse(designRead.output.content); }
+    catch { return { ok: true, loop_id: loopId, doc_error: "INPUT_NOT_FOUND", advanced: false }; }
+
+    // ── RULING-9 (Option B): code object is OPTIONAL, manifest-restricted ───────
+    let code;  // stays undefined when manifest is absent (graceful)
+    const manifestRead = await reg.invoke("fs.read_file",
+      { path: orchRelDir + "/build_manifest.json" }, { root });
+
+    if (manifestRead && manifestRead.status === "SUCCESS") {
+      // manifest PRESENT — it must be valid, else fail-closed (never silent degrade).
+      let manifest;
+      try {
+        manifest = JSON.parse(manifestRead.output.content);
+      } catch {
+        return { ok: true, loop_id: loopId, doc_error: "DOC_MANIFEST_CORRUPT", advanced: false };
+      }
+
+      const manifestPaths = (manifest && Array.isArray(manifest.files))
+        ? manifest.files.map(function (f) { return f && f.path; })
+            .filter(function (p) { return typeof p === "string" && p.length > 0; })
+        : [];
+
+      if (manifestPaths.length === 0) {
+        return { ok: true, loop_id: loopId, doc_error: "DOC_MANIFEST_CORRUPT", advanced: false };
+      }
+
+      const filesWritten = [];
+      for (const mp of manifestPaths) {
+        const fileRead = await reg.invoke("fs.read_file", { path: projectRelDir + "/" + mp }, { root });
+        if (!fileRead || fileRead.status !== "SUCCESS") {
+          // manifest lists a file absent on disk → corrupt authoritative record
+          return { ok: true, loop_id: loopId, doc_error: "DOC_MANIFEST_CORRUPT", advanced: false };
+        }
+        filesWritten.push({ path: mp, content: fileRead.output.content || "" });
+      }
+
+      code = {
+        files_written:      filesWritten,
+        summary:            "Documenting build: " + filesWritten.length +
+                            " file(s) from build_manifest.json (built_at " +
+                            ((manifest && manifest.built_at) || "unknown") + ").",
+        dependencies_added: []
+      };
+    }
+    // else: manifest ABSENT → graceful; document from spec + design only.
+
+    // ── Invoke documentation role (30s timeout, mirrors designTests) ───────────
+    const docInput = { project_id: pid, spec, design };
+    if (code) docInput.code = code;
+
+    let timeoutHandle;
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutHandle = setTimeout(() => reject(new Error("DOCUMENTATION_TIMEOUT")), 30000);
+    });
+
+    try {
+      const docResult = await Promise.race([
+        reg.invoke("role.invoke", Object.assign(
+          {
+            role_id:    "documentation",
+            input:      docInput,
+            project_id: pid,
+            provider:   docProvider
+          },
+          docModel      ? { model:       docModel      } : {},
+          docScenarioId ? { scenario_id: docScenarioId } : {}
+        ), { root }),
+        timeoutPromise
+      ]);
+      clearTimeout(timeoutHandle);
+
+      if (docResult && docResult.status === "SUCCESS") {
+        const documentation = docResult.output;
+
+        // Persist documentation.json BEFORE advancing (fail-closed on throw/non-SUCCESS).
+        let docWrite = null;
+        try {
+          docWrite = await reg.invoke("fs.write_file", {
+            path:    orchRelDir + "/documentation.json",
+            content: JSON.stringify(documentation, null, 2)
+          }, { root });
+        } catch {
+          docWrite = null;
+        }
+        if (!docWrite || docWrite.status !== "SUCCESS") {
+          return { ok: true, loop_id: loopId, advanced: false, doc_error: "DOC_WRITE_FAILED" };
+        }
+
+        await reg.invoke("orchestration.advance_state", {
+          project_id:      pid,
+          loop_id:         loopId,
+          to_state:        "QUALITY_JUDGE",
+          transition_type: "NORMAL",
+          role_invoked:    "documentation"
+        }, { root });
+
+        return {
+          ok:          true,
+          loop_id:     loopId,
+          advanced:    true,
+          advanced_to: "QUALITY_JUDGE",
+          documentation,
+          model_used:  docModel
+        };
+      }
+
+      // Role non-SUCCESS → fail-closed (no write, no advance). A schema-invalid role
+      // output (INVALID_ROLE_OUTPUT) → DOC_PARSE_FAILED; any other reason →
+      // DOCUMENTATION_FAILED (mirrors reviewProject's distinction via metadata.reason).
+      const reason   = docResult && docResult.metadata && docResult.metadata.reason;
+      const docError = reason === "INVALID_ROLE_OUTPUT" ? "DOC_PARSE_FAILED" : "DOCUMENTATION_FAILED";
+      return { ok: true, loop_id: loopId, advanced: false, doc_error: docError, model_used: docModel };
+
+    } catch (err) {
+      clearTimeout(timeoutHandle);
+      return { ok: true, loop_id: loopId, advanced: false, doc_error: err.message };
+    }
+  }
+
   // ── Cost Estimate bridge (PHASE-25) ─────────────────────────────────────────
   //
   // estimateCost: drives the cost_estimator role from COST_ESTIMATE → ENV_REPORT.
@@ -2377,6 +2570,7 @@ function createConversationEngine(options = {}) {
     buildProject,
     runTests,
     reviewProject,
+    documentProject,
     estimateCost,
     designTests,
     reportEnv,
