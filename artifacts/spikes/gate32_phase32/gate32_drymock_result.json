@@ -1,6 +1,10 @@
 {
-  "verdict": "HONEST_EVIDENCE",
+  "verdict": "BRIDGE_PATH_ONLY_$0",
   "mode": "DRY_MOCK_$0",
+  "scope": {
+    "proves": "the bridge persist+advance path end-to-end with a valid documentation output, at $0: HTTP -> engine -> role -> persist documentation.json -> advance DOCUMENTATION->QUALITY_JUDGE (on-disk current_state QUALITY_JUDGE).",
+    "does_NOT_prove": "the vision-lock or budget L3 gates. Both are non-mock-only in agent_budget_rule (vision: `!isMock`; budget: `if(isMock) return denied:false`), so a mock provider BYPASSES them. Those gates were first exercised — and passed — only by the REAL (non-mock) run; see gate32_result.json."
+  },
   "branch_taken": "DOCUMENT_TO_QUALITY_JUDGE",
   "project_id": "phase32_gate10",
   "loop_id": "gate32-doc-d076f321",
