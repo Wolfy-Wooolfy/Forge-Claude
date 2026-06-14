@@ -1,0 +1,17 @@
+{
+  "id": "S312",
+  "name": "respondGate Gate 2 REJECT_AND_LOOP — loop at QUALITY_JUDGE (iter 0 < cap 5), Gate 2 fires REJECT_AND_LOOP → loop_back to BUILDER, iteration_count 0→1, LOOP_BACK audit row from_state=QUALITY_JUDGE (PHASE-33)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/judge_quality_test_helper",
+  "method": "runS312RespondGate2RejectLoopBack",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "advanced_true",                   "expected": true },
+    { "type": "state_field_equals", "field": "advanced_to_builder",             "expected": true },
+    { "type": "state_field_equals", "field": "graph_state_builder",             "expected": true },
+    { "type": "state_field_equals", "field": "iteration_count_incremented",     "expected": true },
+    { "type": "state_field_equals", "field": "loop_back_row_from_quality_judge", "expected": true }
+  ]
+}

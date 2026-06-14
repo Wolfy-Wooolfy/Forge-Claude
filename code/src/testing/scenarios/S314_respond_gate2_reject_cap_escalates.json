@@ -1,0 +1,19 @@
+{
+  "id": "S314",
+  "name": "respondGate Gate 2 REJECT_AND_LOOP at cap — loop at QUALITY_JUDGE with iteration_count=5 (=cap), Gate 2 fires REJECT_AND_LOOP → ESCALATED (no further increment), ESCALATE audit row from_state=QUALITY_JUDGE, no LOOP_BACK row (PHASE-33)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/judge_quality_test_helper",
+  "method": "runS314RespondGate2RejectCapEscalates",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "cap_seeded_at_5",                 "expected": true },
+    { "type": "state_field_equals", "field": "advanced_true",                   "expected": true },
+    { "type": "state_field_equals", "field": "advanced_to_escalated",           "expected": true },
+    { "type": "state_field_equals", "field": "graph_state_escalated",           "expected": true },
+    { "type": "state_field_equals", "field": "iteration_count_unchanged",       "expected": true },
+    { "type": "state_field_equals", "field": "escalate_row_from_quality_judge", "expected": true },
+    { "type": "state_field_equals", "field": "no_loop_back_row",                "expected": true }
+  ]
+}

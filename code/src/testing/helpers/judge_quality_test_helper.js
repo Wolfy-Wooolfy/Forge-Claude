@@ -322,7 +322,338 @@ async function runS311RespondGate2ApproveShip() {
   }
 }
 
+// ── S308 — wrong-state: loop parked at DOCUMENTATION (not QUALITY_JUDGE) ──────
+
+async function runS308JudgeWrongState() {
+  const PID     = "s308_judge_wrong_state";
+  const LOOP_ID = "s308-loop-fixture";
+  const projectDir = _ensureProjectDir(PID);
+
+  try {
+    _writeState(projectDir, {
+      project_id: PID, project_name: "S308 Test",
+      active_runtime_state: "IDEATION", conversation_mode: "PIPELINE",
+      loop_id: LOOP_ID, last_updated_at: new Date().toISOString()
+    });
+
+    // Stop one state short of QUALITY_JUDGE.
+    await _seedLoopAtQualityJudge(PID, LOOP_ID, { advanceToQualityJudge: false });
+
+    const engine = _makeEngine();
+    const result = await engine.judgeQuality({
+      project_id:          PID,
+      loop_id:             LOOP_ID,
+      quality_provider:    "mock",
+      quality_model:       "mock-qj-s307",
+      quality_scenario_id: "S307"
+    });
+
+    const quality_error_wrong_state = result.quality_error === "WRONG_STATE";
+    const advanced_false            = result.advanced !== true;
+    const no_quality_report_written = !_qualityReportExists(PID, LOOP_ID);
+    const graph_unchanged           = (await _currentState(PID, LOOP_ID)) === "DOCUMENTATION";
+
+    return {
+      quality_error_wrong_state, advanced_false,
+      no_quality_report_written, graph_unchanged
+    };
+  } finally {
+    _cleanup(PID);
+  }
+}
+
+// ── S309 — input-missing: spec/design absent → INPUT_NOT_FOUND ────────────────
+
+async function runS309JudgeInputNotFound() {
+  const PID     = "s309_judge_input_missing";
+  const LOOP_ID = "s309-loop-fixture";
+  const projectDir = _ensureProjectDir(PID);
+
+  try {
+    _writeState(projectDir, {
+      project_id: PID, project_name: "S309 Test",
+      active_runtime_state: "IDEATION", conversation_mode: "PIPELINE",
+      loop_id: LOOP_ID, last_updated_at: new Date().toISOString()
+    });
+
+    // At QUALITY_JUDGE, but no spec.json / architect_design.json on disk.
+    await _seedLoopAtQualityJudge(PID, LOOP_ID, { writeInputs: false, writeManifest: false });
+
+    const engine = _makeEngine();
+    const result = await engine.judgeQuality({
+      project_id:          PID,
+      loop_id:             LOOP_ID,
+      quality_provider:    "mock",
+      quality_model:       "mock-qj-s307",
+      quality_scenario_id: "S307"
+    });
+
+    const quality_error_input_not_found = result.quality_error === "INPUT_NOT_FOUND";
+    const advanced_false                = result.advanced !== true;
+    const no_quality_report_written     = !_qualityReportExists(PID, LOOP_ID);
+    const graph_still_quality_judge     = (await _currentState(PID, LOOP_ID)) === "QUALITY_JUDGE";
+
+    return {
+      quality_error_input_not_found, advanced_false,
+      no_quality_report_written, graph_still_quality_judge
+    };
+  } finally {
+    _cleanup(PID);
+  }
+}
+
+// ── S310 — RULING-9 manifest-CORRUPT → QUALITY_MANIFEST_CORRUPT fail-closed ────
+// Three branches: (a) unparseable JSON, (b) lists a file absent on disk, (c) empty
+// files[]. All must fail-closed (no role call, no write, no advance). Mirrors S306.
+
+async function runS310JudgeManifestCorruptFailClosed() {
+  const PID = "s310_judge_manifest_corrupt";
+
+  const LOOP_A = "s310-loop-unparseable";
+  const LOOP_B = "s310-loop-missing-file";
+  const LOOP_C = "s310-loop-empty-files";
+
+  const projectDir = _ensureProjectDir(PID);
+
+  try {
+    _writeState(projectDir, {
+      project_id: PID, project_name: "S310 Test",
+      active_runtime_state: "IDEATION", conversation_mode: "PIPELINE",
+      loop_id: LOOP_A, last_updated_at: new Date().toISOString()
+    });
+
+    const engine = _makeEngine();
+
+    // (a) unparseable JSON as the manifest (inputs present, manifest not written by seed).
+    await _seedLoopAtQualityJudge(PID, LOOP_A, { writeManifest: false });
+    const orchDirA = path.join(PROJECTS_ROOT, PID, "orchestration", LOOP_A);
+    fs.mkdirSync(orchDirA, { recursive: true });
+    fs.writeFileSync(path.join(orchDirA, "build_manifest.json"), "{ not valid json ]]]", "utf8");
+
+    const resA = await engine.judgeQuality({
+      project_id: PID, loop_id: LOOP_A,
+      quality_provider: "mock", quality_model: "mock-qj-s307", quality_scenario_id: "S307"
+    });
+    const unparseable_manifest_corrupt = resA.quality_error === "QUALITY_MANIFEST_CORRUPT";
+    const unparseable_advanced_false   = resA.advanced !== true;
+    const unparseable_no_write         = !_qualityReportExists(PID, LOOP_A);
+    const unparseable_state_quality    = (await _currentState(PID, LOOP_A)) === "QUALITY_JUDGE";
+
+    // (b) manifest lists a file never materialized on disk.
+    await _seedLoopAtQualityJudge(PID, LOOP_B, { writeManifest: false });
+    _writeManifest(PID, LOOP_B, ["src/controllers/missing_never_written.js"]);
+
+    const resB = await engine.judgeQuality({
+      project_id: PID, loop_id: LOOP_B,
+      quality_provider: "mock", quality_model: "mock-qj-s307", quality_scenario_id: "S307"
+    });
+    const missing_file_manifest_corrupt = resB.quality_error === "QUALITY_MANIFEST_CORRUPT";
+    const missing_file_advanced_false   = resB.advanced !== true;
+    const missing_file_no_write         = !_qualityReportExists(PID, LOOP_B);
+
+    // (c) manifest with empty files[].
+    await _seedLoopAtQualityJudge(PID, LOOP_C, { writeManifest: false });
+    const orchDirC = path.join(PROJECTS_ROOT, PID, "orchestration", LOOP_C);
+    fs.mkdirSync(orchDirC, { recursive: true });
+    fs.writeFileSync(path.join(orchDirC, "build_manifest.json"),
+      JSON.stringify({ built_at: new Date().toISOString(), files: [] }, null, 2), "utf8");
+
+    const resC = await engine.judgeQuality({
+      project_id: PID, loop_id: LOOP_C,
+      quality_provider: "mock", quality_model: "mock-qj-s307", quality_scenario_id: "S307"
+    });
+    const empty_files_manifest_corrupt = resC.quality_error === "QUALITY_MANIFEST_CORRUPT";
+    const empty_files_advanced_false   = resC.advanced !== true;
+    const empty_files_no_write         = !_qualityReportExists(PID, LOOP_C);
+
+    return {
+      unparseable_manifest_corrupt, unparseable_advanced_false, unparseable_no_write,
+      unparseable_state_quality,
+      missing_file_manifest_corrupt, missing_file_advanced_false, missing_file_no_write,
+      empty_files_manifest_corrupt, empty_files_advanced_false, empty_files_no_write
+    };
+  } finally {
+    _cleanup(PID);
+  }
+}
+
+// ── S312 — Gate 2 REJECT_AND_LOOP → BUILDER (iter 0→1, LOOP_BACK row) ──────────
+// Reuses the existing fireGate(2) → tryAdvanceForLoopBack path (no new mechanism).
+
+async function runS312RespondGate2RejectLoopBack() {
+  const PID     = "s312_gate2_reject_loop";
+  const LOOP_ID = "s312-loop-fixture";
+  const projectDir = _ensureProjectDir(PID);
+
+  try {
+    _writeState(projectDir, {
+      project_id: PID, project_name: "S312 Test",
+      active_runtime_state: "IDEATION", conversation_mode: "PIPELINE",
+      loop_id: LOOP_ID, last_updated_at: new Date().toISOString()
+    });
+
+    await _seedLoopAtQualityJudge(PID, LOOP_ID, { writeInputs: false, writeManifest: false });
+
+    // Make iteration_count explicit (0 < cap 5) via the established loop_state path.
+    const ls    = require("../../runtime/orchestration/loop_state");
+    const graph = await ls.loadLoop(PID, LOOP_ID, { root: ROOT });
+    graph.iteration_count = 0;
+    await ls.saveLoop(PID, LOOP_ID, graph, { root: ROOT });
+
+    const engine = _makeEngine();
+    const result = await engine.respondGate({
+      project_id: PID, loop_id: LOOP_ID, gate_id: 2, response: "REJECT_AND_LOOP"
+    });
+
+    const advanced_true       = result.advanced === true;
+    const advanced_to_builder = result.advanced_to === "BUILDER";
+
+    const reg = require("../../runtime/tools/_registry").getDefaultRegistry();
+    const statusResult = await reg.invoke("orchestration.get_status", {
+      project_id: PID, loop_id: LOOP_ID
+    }, { root: ROOT });
+    const graph_state_builder = statusResult.status === "SUCCESS" &&
+      statusResult.output.current_state === "BUILDER";
+    const iteration_count_incremented = statusResult.status === "SUCCESS" &&
+      statusResult.output.iteration_count === 1;
+
+    const logResult = await reg.invoke("orchestration.read_log", {
+      project_id: PID, loop_id: LOOP_ID
+    }, { root: ROOT });
+    const auditRows   = (logResult && logResult.status === "SUCCESS") ? logResult.output.rows : [];
+    const loopBackRow = auditRows.find(r => r.transition_type === "LOOP_BACK" &&
+      r.from_state === "QUALITY_JUDGE");
+    const loop_back_row_from_quality_judge = !!loopBackRow;
+
+    return {
+      advanced_true, advanced_to_builder, graph_state_builder,
+      iteration_count_incremented, loop_back_row_from_quality_judge
+    };
+  } finally {
+    _cleanup(PID);
+  }
+}
+
+// ── S313 — Gate 2 APPROVE_WITH_CAVEATS → DEPLOYMENT_OR_END (caveats logged) ────
+
+async function runS313RespondGate2ApproveWithCaveats() {
+  const PID     = "s313_gate2_caveats";
+  const LOOP_ID = "s313-loop-fixture";
+  const projectDir = _ensureProjectDir(PID);
+
+  try {
+    _writeState(projectDir, {
+      project_id: PID, project_name: "S313 Test",
+      active_runtime_state: "IDEATION", conversation_mode: "PIPELINE",
+      loop_id: LOOP_ID, last_updated_at: new Date().toISOString()
+    });
+
+    await _seedLoopAtQualityJudge(PID, LOOP_ID, { writeInputs: false, writeManifest: false });
+
+    const engine = _makeEngine();
+    const result = await engine.respondGate({
+      project_id: PID, loop_id: LOOP_ID, gate_id: 2, response: "APPROVE_WITH_CAVEATS"
+    });
+
+    const advanced_true            = result.advanced === true;
+    const advanced_to_deployment   = result.advanced_to === "DEPLOYMENT_OR_END";
+    const response_approve_caveats = result.response === "APPROVE_WITH_CAVEATS";
+
+    const reg = require("../../runtime/tools/_registry").getDefaultRegistry();
+    const statusResult = await reg.invoke("orchestration.get_status", {
+      project_id: PID, loop_id: LOOP_ID
+    }, { root: ROOT });
+    const graph_deployment_or_end = statusResult.status === "SUCCESS" &&
+      statusResult.output.current_state === "DEPLOYMENT_OR_END";
+
+    // The caveats approval is logged as a GATE_APPROVE audit row for gate 2,
+    // from QUALITY_JUDGE → DEPLOYMENT_OR_END (the audit-trail evidence the graph
+    // trigger "caveats logged in audit trail" requires).
+    const logResult = await reg.invoke("orchestration.read_log", {
+      project_id: PID, loop_id: LOOP_ID
+    }, { root: ROOT });
+    const auditRows = (logResult && logResult.status === "SUCCESS") ? logResult.output.rows : [];
+    const caveatRow = auditRows.find(r => r.transition_type === "GATE_APPROVE" &&
+      r.owner_gate_id === 2 && r.from_state === "QUALITY_JUDGE" &&
+      r.to_state === "DEPLOYMENT_OR_END");
+    const caveats_logged_in_audit = !!caveatRow;
+
+    return {
+      advanced_true, advanced_to_deployment, response_approve_caveats,
+      graph_deployment_or_end, caveats_logged_in_audit
+    };
+  } finally {
+    _cleanup(PID);
+  }
+}
+
+// ── S314 — Gate 2 REJECT_AND_LOOP at cap → ESCALATED (no further increment) ────
+// Seeds iteration_count = ITERATION_CAP (5); reuses tryAdvanceForLoopBack's cap path.
+
+async function runS314RespondGate2RejectCapEscalates() {
+  const PID     = "s314_gate2_cap_escalate";
+  const LOOP_ID = "s314-loop-fixture";
+  const projectDir = _ensureProjectDir(PID);
+
+  try {
+    _writeState(projectDir, {
+      project_id: PID, project_name: "S314 Test",
+      active_runtime_state: "IDEATION", conversation_mode: "PIPELINE",
+      loop_id: LOOP_ID, last_updated_at: new Date().toISOString()
+    });
+
+    await _seedLoopAtQualityJudge(PID, LOOP_ID, { writeInputs: false, writeManifest: false });
+
+    // Seed iteration_count = ITERATION_CAP (5) via the established loop_state path.
+    const ls   = require("../../runtime/orchestration/loop_state");
+    const ctrl = require("../../runtime/orchestration/iteration_controller");
+    const graph = await ls.loadLoop(PID, LOOP_ID, { root: ROOT });
+    graph.iteration_count = ctrl.ITERATION_CAP; // 5
+    await ls.saveLoop(PID, LOOP_ID, graph, { root: ROOT });
+    const cap_seeded_at_5 = (await ls.loadLoop(PID, LOOP_ID, { root: ROOT })).iteration_count === 5;
+
+    const engine = _makeEngine();
+    const result = await engine.respondGate({
+      project_id: PID, loop_id: LOOP_ID, gate_id: 2, response: "REJECT_AND_LOOP"
+    });
+
+    const advanced_true          = result.advanced === true;
+    const advanced_to_escalated  = result.advanced_to === "ESCALATED";
+
+    const reg = require("../../runtime/tools/_registry").getDefaultRegistry();
+    const statusResult = await reg.invoke("orchestration.get_status", {
+      project_id: PID, loop_id: LOOP_ID
+    }, { root: ROOT });
+    const graph_state_escalated = statusResult.status === "SUCCESS" &&
+      statusResult.output.current_state === "ESCALATED";
+    const iteration_count_unchanged = statusResult.status === "SUCCESS" &&
+      statusResult.output.iteration_count === 5;
+
+    const logResult = await reg.invoke("orchestration.read_log", {
+      project_id: PID, loop_id: LOOP_ID
+    }, { root: ROOT });
+    const auditRows    = (logResult && logResult.status === "SUCCESS") ? logResult.output.rows : [];
+    const escalateRow  = auditRows.find(r => r.transition_type === "ESCALATE" &&
+      r.from_state === "QUALITY_JUDGE");
+    const escalate_row_from_quality_judge = !!escalateRow;
+    const no_loop_back_row = !auditRows.some(r => r.transition_type === "LOOP_BACK");
+
+    return {
+      cap_seeded_at_5, advanced_true, advanced_to_escalated, graph_state_escalated,
+      iteration_count_unchanged, escalate_row_from_quality_judge, no_loop_back_row
+    };
+  } finally {
+    _cleanup(PID);
+  }
+}
+
 module.exports = {
   runS307JudgeHappyPath,
-  runS311RespondGate2ApproveShip
+  runS308JudgeWrongState,
+  runS309JudgeInputNotFound,
+  runS310JudgeManifestCorruptFailClosed,
+  runS311RespondGate2ApproveShip,
+  runS312RespondGate2RejectLoopBack,
+  runS313RespondGate2ApproveWithCaveats,
+  runS314RespondGate2RejectCapEscalates
 };

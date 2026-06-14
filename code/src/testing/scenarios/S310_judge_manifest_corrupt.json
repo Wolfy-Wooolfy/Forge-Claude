@@ -1,0 +1,22 @@
+{
+  "id": "S310",
+  "name": "judgeQuality RULING-9 manifest-CORRUPT — build_manifest.json unparseable OR lists a file absent on disk OR empty files[] → QUALITY_MANIFEST_CORRUPT, FAIL-CLOSED: no role call, no write, no advance (PHASE-33)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/judge_quality_test_helper",
+  "method": "runS310JudgeManifestCorruptFailClosed",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "unparseable_manifest_corrupt",  "expected": true },
+    { "type": "state_field_equals", "field": "unparseable_advanced_false",    "expected": true },
+    { "type": "state_field_equals", "field": "unparseable_no_write",          "expected": true },
+    { "type": "state_field_equals", "field": "unparseable_state_quality",     "expected": true },
+    { "type": "state_field_equals", "field": "missing_file_manifest_corrupt", "expected": true },
+    { "type": "state_field_equals", "field": "missing_file_advanced_false",   "expected": true },
+    { "type": "state_field_equals", "field": "missing_file_no_write",         "expected": true },
+    { "type": "state_field_equals", "field": "empty_files_manifest_corrupt",  "expected": true },
+    { "type": "state_field_equals", "field": "empty_files_advanced_false",    "expected": true },
+    { "type": "state_field_equals", "field": "empty_files_no_write",          "expected": true }
+  ]
+}
