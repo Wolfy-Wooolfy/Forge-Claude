@@ -4,9 +4,9 @@
   "current_stage": "A",
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
-  "next_phase": "PHASE-31-PENDING-DECISION",
-  "next_step": "PHASE-31-PENDING-DECISION — await CTO decision: REVIEWER_CODE_AND_SECURITY bridge (loop phase28_gate10 genuinely parked there, iter 1, with a real latent defect to catch) vs Fixture Engine (Finding #4).",
-  "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-10-phase-30-test-loop-convergence.md",
+  "next_phase": "PHASE-32-PENDING-DECISION",
+  "next_step": "PHASE-32-PENDING-DECISION — await CTO decision. PHASE-31 CLOSED (REVIEWER_CODE_AND_SECURITY bridge). Open forward items: reviewer/security prompt-tuning (logic-defect strength + parameterized-SQLi false-positive calibration), Fixture Engine (Finding #4), §ARC drift, provider switch.",
+  "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-11-phase-31-reviewer-bridge.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
@@ -77,9 +77,9 @@
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
-    "self_test_last_run": "2026-06-11",
-    "self_test_last_result": "289 passed, 0 failed, 5 skipped (294 total) — PHASE-30 CLOSED. S293-S296 GREEN. Gate #10 PASS: PASS_TO_REVIEWER branch; build_manifest.json (RULING-4) + manifest-restricted entry derivation; 6/6 real report; loop at REVIEWER_CODE_AND_SECURITY iter-1. Finding #4 (fixtures) OPEN. L2=80.",
-    "self_test_scenarios_pass": 289,
+    "self_test_last_run": "2026-06-14",
+    "self_test_last_result": "294 passed, 0 failed, 5 skipped (299 total) — PHASE-31 CLOSED. S297-S301 GREEN. Gate #10 HONEST EVIDENCE: real dual gpt-4o review $0.03704 → derived REQUEST_CHANGES (security HIGH+2 BLOCKER drove it; reviewer missed this.changes defect; SQLi finding false-positive on parameterized code) → loop_back BUILDER iter-2. RULING-8 clean suite 294/0/5 → S57 confirmed env flake. Finding #4 (fixtures) OPEN. L2=80.",
+    "self_test_scenarios_pass": 294,
     "self_test_scenarios_skip": 5,
     "self_test_scenarios_fail": 0,
     "providers_registered_count": 14,
@@ -166,9 +166,10 @@
       "PHASE-27",
       "PHASE-28",
       "PHASE-29",
-      "PHASE-30"
+      "PHASE-30",
+      "PHASE-31"
     ],
-    "next": "PHASE-31 (pending decision)",
+    "next": "PHASE-32 (pending decision)",
     "remaining": [],
     "phase_16_closed": "2026-05-28",
     "phase_17_closed": "2026-05-29",
@@ -179,6 +180,7 @@
     "phase_28_closed": "2026-06-10",
     "phase_29_closed": "2026-06-10",
     "phase_30_closed": "2026-06-11",
+    "phase_31_closed": "2026-06-14",
     "phase_16_corrective": "DECISION-2026-05-24T16-00-phase-16-ux-closure-gap.md — UX Closure Gap; 6 stages; outcome-based closure gate",
     "phase_15_closed": "2026-05-23T14:00:00.000Z",
     "deferred": [
@@ -676,6 +678,65 @@
       "PHASE-29 Finding #5: plan↔build entry coherence + workspace hygiene (manifest-driven inertness)"
     ],
     "cost_actuals_usd": 0.03095
+  },
+  "phase_31": {
+    "status": "CLOSED",
+    "closed_at": "2026-06-14",
+    "title": "REVIEWER_CODE_AND_SECURITY Bridge (reviewProject)",
+    "plan_artifact": "artifacts/decisions/DECISION-2026-06-11-phase-31-reviewer-bridge.md",
+    "mid_checkpoint": "artifacts/decisions/_phase_31_checkpoints/stage_mid.md",
+    "final_checkpoint": "artifacts/decisions/_phase_31_checkpoints/stage_final.md",
+    "suite_final": "294/0/5 (299 total)",
+    "scenarios_added": ["S297", "S298", "S299", "S300", "S301"],
+    "rulings": {
+      "ruling_6": "derived verdict: reviewer_approve=(verdict!=REJECTED && no BLOCKER); security_approve=(threat_level not-in {CRITICAL,HIGH} && no BLOCKER); APPROVE iff both, else REQUEST_CHANGES. Fail-closed: INVALID_ROLE_OUTPUT→REVIEW_PARSE_FAILED; other non-SUCCESS→ROLE_INVOKE_FAILED.",
+      "ruling_7": "build_manifest.json REQUIRED (absent/corrupt/empty→MANIFEST_REQUIRED); spec.json+architect_design.json REQUIRED→REVIEW_INPUT_NOT_FOUND; code object manifest-restricted from on-disk content; reviewer phase B, security phase CODE; per-role mock disambiguation (mock-rev-* / mock-sec-*, S270 precedent).",
+      "ruling_8": "post-gate clean full-suite 294/0/5 (299) exit 0 → S57 confirmed environmental full-suite-load flake (pip --target, PHASE-3, untouched; green in isolation + off-load pkg cluster)."
+    },
+    "gate_10": "HONEST_EVIDENCE",
+    "gate_10_branch": "REQUEST_CHANGES_TO_BUILDER",
+    "gate_10_run_ts": "2026-06-14T08:50:00Z",
+    "gate_10_confirmed_at": "2026-06-14",
+    "gate_10_cost_usd": 0.03704,
+    "gate_10_evidence": "artifacts/spikes/gate31_phase31/gate31_result.json",
+    "gate_10_result": "Real dual gpt-4o-2024-08-06 review at REVIEWER_CODE_AND_SECURITY iter-1. reviewer APPROVED_WITH_CONCERNS (0 BLOCKER, missed this.changes defect); security_auditor HIGH + 2 BLOCKER (drove verdict). Derived REQUEST_CHANGES per RULING-6 → orchestration.loop_back → BUILDER iter-2; LOOP_BACK row from_state=REVIEWER_CODE_AND_SECURITY, mock:false. Both roles success; review_report.json persisted before transition.",
+    "gate_10_role_quality_findings": [
+      "Reviewer MISS (confirmed): update/delete lack this.changes row-existence checks; reviewer flagged persistence/deps/AC-3 instead.",
+      "Security SQLi BLOCKER = FALSE POSITIVE: all four queries parameterized (? + bound arrays).",
+      "Security sensitive-data-exposure (errorHandler returns err.message): DEFENSIBLE info-leak smell (BLOCKER aggressive; WARN would fit)."
+    ],
+    "forward_backlog": [
+      "Reviewer prompt strengthening on logic/contract defects (row-existence, not-found status codes) — PROMPT-tuning, not PHASE-31 code defect.",
+      "Security prompt calibration against parameterized-query SQLi false positives — PROMPT-tuning, not PHASE-31 code defect."
+    ],
+    "l2_tools": 80,
+    "agent_roles": 13,
+    "arc_ledger_count": 8,
+    "doctor_checks": 35,
+    "track_a": "CLEAN — reviewProject() + endpoint use reg.invoke only (fs.read_file/fs.write_file/orchestration.*/role.invoke); 0 new forbidden patterns; §ARC=8; L2=80 (no new tools). reviewer_role.js / security_auditor_role.js NOT modified (derived verdict computed in bridge per RULING-6).",
+    "files_created": [
+      "code/src/testing/helpers/review_project_test_helper.js",
+      "code/src/testing/scenarios/S297_review_approve_advances.json",
+      "code/src/testing/scenarios/S298_review_request_changes_loops_back.json",
+      "code/src/testing/scenarios/S299_security_high_threat_blocks.json",
+      "code/src/testing/scenarios/S300_review_manifest_required.json",
+      "code/src/testing/scenarios/S301_review_role_parse_failure.json",
+      "scripts/spikes/gate31_phase31_reviewer.js",
+      "artifacts/decisions/_phase_31_checkpoints/stage_mid.md",
+      "artifacts/decisions/_phase_31_checkpoints/stage_final.md"
+    ],
+    "files_modified": [
+      "code/src/ai_os/conversationEngine.js",
+      "code/src/workspace/apiServer.js",
+      "code/src/runtime/agents/adapters/mock_responses.json",
+      "progress/status.json"
+    ],
+    "s57_flake_note": "S57 (pkg.install pip --target, PHASE-3) flaked once under full-suite load (STEP A run, ~21.9 min); GREEN in isolation (8.2s), off-load pkg cluster (6/6), and RULING-8 clean suite (294/0/5). Confirmed environmental full-suite-load subprocess flake; same class as S120/121/124-127, S191.",
+    "findings_open": [
+      "Finding #4: harness fixture support — still OPEN/deferred."
+    ],
+    "cost_actuals_usd": 0.03704,
+    "cumulative_real_spend_usd_est": 0.58
   },
   "ux_task_2026_06_07_multiselect": {
     "status": "CLOSED",
@@ -1613,8 +1674,8 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-30 CLOSED — Test-loop convergence (Finding #5): build_manifest.json authoritative build record (RULING-4, fail-closed); runTests entry derivation manifest-restricted + dep-scan scoping + command rewrite (ENTRY_UNRESOLVED fail-closed). Gate #10 REAL: one gpt-4o rebuild $0.03095 → manifest on disk → 6/6 PASS → loop advanced to REVIEWER_CODE_AND_SECURITY iter-1 (PASS_TO_REVIEWER). Role-reversal proof: stale src/index.js (priority #1) excluded by manifest. T-3 passed via response echo (no persistence proof) — Finding #4 fixtures OPEN. S293–S296 added. L2=80, §ARC=8, suite 289/0/5 (294). Next: PHASE-31 pending decision (REVIEWER bridge vs Fixture Engine).",
-  "last_updated": "2026-06-11T13:10:44.891Z",
+  "current_task": "PHASE-31 CLOSED — REVIEWER_CODE_AND_SECURITY bridge: reviewProject() dual-role (reviewer phase B + security_auditor phase CODE), manifest-restricted code object, derived verdict per RULING-6 (reviewer≠REJECTED&&no-BLOCKER AND security∉{CRITICAL,HIGH}&&no-BLOCKER), review_report.json persisted, fail-closed (MANIFEST_REQUIRED / REVIEW_INPUT_NOT_FOUND / REVIEW_PARSE_FAILED / ROLE_INVOKE_FAILED / REVIEW_WRITE_FAILED). Gate #10 REAL: dual gpt-4o review $0.03704 → derived REQUEST_CHANGES (security HIGH+2 BLOCKER drove it; reviewer missed this.changes defect; SQLi finding was false-positive on parameterized code) → loop_back BUILDER iter-2. S297–S301 added. Suite 294/0/5 (299). L2=80, §ARC=8, roles 13. Next: PHASE-32 pending decision.",
+  "last_updated": "2026-06-14T09:20:00.000Z",
   "phase_16": {
     "status": "ACTIVE",
     "started_at": "2026-05-24T16:00:00.000Z",
