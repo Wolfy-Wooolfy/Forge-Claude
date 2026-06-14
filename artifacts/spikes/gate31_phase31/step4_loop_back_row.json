@@ -1,0 +1,11 @@
+{
+  "ts": "2026-06-14T09:17:48.863Z",
+  "loop_id": "98eae33f-105c-4dbc-8f96-71efbb4827b7",
+  "from_state": "REVIEWER_CODE_AND_SECURITY",
+  "to_state": "BUILDER",
+  "transition_type": "LOOP_BACK",
+  "role_invoked": null,
+  "mock": false,
+  "cost_usd": 0,
+  "owner_gate_id": 2
+}

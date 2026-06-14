@@ -1,0 +1,28 @@
+{
+  "count": 2,
+  "total_cost_usd": 0.037040000000000003,
+  "new_entries": [
+    {
+      "role": "reviewer",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2525,
+      "tokens_out": 233,
+      "latency_ms": 3821,
+      "cost_usd_actual": 0.01612,
+      "outcome": "success",
+      "ts": "2026-06-14T09:17:44.485Z"
+    },
+    {
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2564,
+      "tokens_out": 540,
+      "latency_ms": 4316,
+      "cost_usd_actual": 0.02092,
+      "outcome": "success",
+      "ts": "2026-06-14T09:17:48.820Z"
+    }
+  ]
+}

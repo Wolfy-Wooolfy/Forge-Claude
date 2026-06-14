@@ -1,0 +1,6 @@
+(node:34764) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[Forge] ⚠  WARNING: stale Forge copy detected.
+  Running from : C:\Users\KHALED~1.SAY\AppData\Local\Temp\forge-guard-test-vilDK3
+  Stale copy at: D:\ForgeAI
+  Ensure pm2 runs from the correct path (see INSTALL.md).

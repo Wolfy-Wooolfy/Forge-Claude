@@ -1,0 +1,13 @@
+{
+  "manifest_files": [
+    "src/models/todo.js",
+    "src/controllers/todoController.js",
+    "src/middleware/validation.js",
+    "src/middleware/errorHandler.js",
+    "src/routes/todoRoutes.js",
+    "src/server.js"
+  ],
+  "spec_present": true,
+  "design_present": true,
+  "note": "manifest-restricted code object assembled from these 6 files (incl. defective todoController.js)"
+}
