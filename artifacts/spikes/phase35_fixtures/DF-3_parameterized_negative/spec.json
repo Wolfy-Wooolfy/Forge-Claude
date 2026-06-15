@@ -2,7 +2,7 @@
   "scope": "A minimal Todo REST API (Express + SQLite) exposing CRUD endpoints for todo items.",
   "decisions": [
     { "decision": "Use Express.js as the HTTP framework", "rationale": "Minimal framework for a small CRUD API" },
-    { "decision": "Use SQLite via sqlite3 with parameterized queries", "rationale": "Zero-config storage; bound parameters prevent SQL injection" }
+    { "decision": "Use SQLite via sqlite3", "rationale": "Zero-config single-file storage" }
   ],
   "acceptance_criteria": [
     { "id": "AC-1", "description": "POST /todos with a valid title returns 201 and the created todo" },

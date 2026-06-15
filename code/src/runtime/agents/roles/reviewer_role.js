@@ -6,7 +6,7 @@ const { loadPrompt }                      = require("../_prompt_loader");
 const { emit: emitActivity }             = require("../_activity_emitter");
 const { getIndicator }                   = require("../_activity_catalog");
 
-const SYSTEM_PROMPT = loadPrompt("reviewer_v3");
+const SYSTEM_PROMPT = loadPrompt("reviewer_v4");
 
 const INPUT_SCHEMA = {
   type: "object",
@@ -44,7 +44,7 @@ module.exports = defineRole({
   description:      "Reviews specs (Phase A) and code plans (Phase B) for completeness and correctness",
   default_provider: "anthropic",
   default_model:    "claude-opus-4-7",
-  system_prompt_id: "reviewer_v3",
+  system_prompt_id: "reviewer_v4",
   input_schema:     INPUT_SCHEMA,
   output_schema:    OUTPUT_SCHEMA,
   authority_level:  "BLOCKING",

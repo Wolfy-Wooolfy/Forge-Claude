@@ -1,8 +1,5 @@
 const db = require('../models/todo');
 
-// Clean implementation: parameterized queries AND affected-row checks so that
-// update/delete of a non-existent id correctly returns 404 (satisfies AC-3, AC-4).
-
 exports.getTodos = (req, res, next) => {
   db.all('SELECT * FROM todos', [], (err, rows) => {
     if (err) return next(err);

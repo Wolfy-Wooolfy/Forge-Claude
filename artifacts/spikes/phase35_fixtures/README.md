@@ -3,7 +3,7 @@
 These are **inputs for STEP B's REAL Gate #10 run** — NOT mock scenarios, NOT part of the
 deterministic SU suite. Each fixture is a self-contained `{ spec, design, code }` payload that
 STEP B feeds to the tuned roles:
-- `reviewer` (phase **B**) with `system_prompt_id = reviewer_v3`
+- `reviewer` (phase **B**) with `system_prompt_id = reviewer_v4`
 - `security_auditor` (phase **CODE**) with `system_prompt_id = security_auditor_v2`
 
 ## Layout (per fixture)
@@ -25,17 +25,25 @@ production. No content is pre-embedded in JSON (avoids drift between the JSON an
 
 | Fixture | Probes | Defect present | Tuned-role expectation at STEP B |
 |---|---|---|---|
-| **DF-1** logic positive | `reviewer_v3` recall | `updateTodo`/`deleteTodo` parameterized but MISSING `this.changes` → 200/204 on a non-existent id (violates AC-3/AC-4 = 404) | reviewer raises a **BLOCKER** tied to the missing 404 / row-existence (this is the PHASE-31 miss) |
+| **DF-1** logic positive | `reviewer_v4` recall | `updateTodo`/`deleteTodo` parameterized but MISSING `this.changes` → 200/204 on a non-existent id (violates AC-3/AC-4 = 404) | reviewer raises a **BLOCKER** tied to the missing 404 / row-existence (this is the PHASE-31 miss) |
 | **DF-2** SQLi positive control | `security_auditor_v2` recall | `getTodoById`/`createTodo` **string-concatenate** untrusted input into SQL → real SQL injection | security **STILL** raises a SQLi **BLOCKER** (recall preserved; tuning didn't blunt it) |
 | **DF-3** parameterized negative | `security_auditor_v2` precision | none security-wise — the real phase28_gate10 controller: `?` placeholders + bound arrays | security must **NOT** flag SQL injection (the PHASE-31 false-positive must not recur) |
-| **DF-4** clean | both roles, no over-fire | none — parameterized AND `this.changes` → 404 | reviewer **APPROVE** (no BLOCKER); security threat_level **NONE/LOW**, no BLOCKER |
+| **DF-4** clean | both roles, no over-fire | none — parameterized AND `this.changes` → 404 | reviewer **no BLOCKER** (clean code not REJECTED); security **no BLOCKER + no SQLi false-positive** (a missing-auth WARN/MEDIUM is LEGITIMATE — see DF-4/expected.md §A-2.4) |
 
 ## STEP B success criterion (per CTO — "X of N trials", not "every time")
 Because real model output is non-deterministic, STEP B will run each fixture N times and score
 DF-1/DF-2/DF-3/DF-4 against the expectations above. The headline comparisons:
-- DF-1: reviewer_v3 catches the `this.changes` BLOCKER (reviewer_v2 missed it at PHASE-31).
+- DF-1: reviewer_v4 catches the `this.changes` BLOCKER (reviewer_v2 missed it at PHASE-31).
 - DF-3: security_auditor_v2 does NOT false-positive SQLi on parameterized queries
   (security_auditor_v1 raised a BLOCKER here at PHASE-31).
 - DF-2 + DF-4 are controls: recall and no-over-fire must hold.
 
 **STEP A delivers these as static inputs only. No real calls are made in STEP A.**
+
+> **STEP A-2 de-contamination (2026-06-15):** answer-narrating comments were removed from the
+> sources (DF-1 `// BUG: … this.changes …`; DF-2 `// VULNERABILITY: …`; DF-4 `// Clean implementation
+> …`) and the "already parameterized / already done" hints were removed from DF-3 spec.json +
+> design.json — so STEP B-2's A/B (reviewer_v4 vs reviewer_v2; security_v2 vs security_v1) can prove
+> causality instead of reading the answer from the fixture. **Code behavior is unchanged** in every
+> case (DF-1 still omits the row-existence check; DF-2 still concatenates; DF-3/DF-4 stay
+> parameterized). The reviewer role is now `reviewer_v4`; `security_auditor` stays `security_auditor_v2`.
