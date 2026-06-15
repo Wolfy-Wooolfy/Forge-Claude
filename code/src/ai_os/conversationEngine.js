@@ -2671,25 +2671,202 @@ function createConversationEngine(options = {}) {
     }
   }
 
-  // ── Respond Gate bridge (PHASE-26; Gate 2 added PHASE-33) ──────────────────────
+  // ── Deployment bridge (PHASE-34) — deployProject at DEPLOYMENT_OR_END ──────────
+  //
+  // Two paths (conversation_graph.js DEPLOYMENT_OR_END node):
+  //   • SKIP (LOCK-4 + LOCK-6): deployment_enabled === false (body-driven) → VACUOUS_SKIP
+  //     advance to LIVE_DELIVERABLE. Reuses orchestration.advance_state(transition_type:
+  //     "VACUOUS_SKIP", role_invoked:null) — the same mechanism as e2e_loop_helper.runS156.
+  //     No role call, no gate. shouldSkipGate3 skips ONLY on explicit === false; missing/
+  //     null/undefined/true → gated path (so Gate 3 is actually exercised by default).
+  //   • GATED (default): role.invoke(deployment) → persist deployment_plan.json BEFORE
+  //     returning → { gate_pending:3, advanced:false }. NO advance_state — every gated
+  //     DEPLOYMENT_OR_END edge carries a non-null Gate 3 gate_check; only the owner's Gate 3
+  //     response (via respondGate) moves the loop. The deployment role is ADVISORY — it
+  //     produces a deployment PLAN, not a live deploy (bridge-only; no deploy.* execution).
+  //
+  // Provider default openai/gpt-4o (LOCK-3; the role's own default is anthropic and the owner
+  // has no ANTHROPIC_API_KEY). The role input is spec+design (+optional environment) — there is
+  // NO build_manifest dependency, so no RULING-9 manifest branch (simpler than judgeQuality).
+  // Fail-closed taxonomy (no write, no advance): WRONG_STATE / INPUT_NOT_FOUND /
+  // DEPLOY_PARSE_FAILED (INVALID_ROLE_OUTPUT) / DEPLOYMENT_FAILED (other reason) /
+  // DEPLOY_WRITE_FAILED.
+
+  async function deployProject(body = {}) {
+    const projectId = normalizeProjectId(body.project_id || "");
+    const state     = loadState(projectId);
+
+    if (!state) {
+      return { ok: true, loop_id: null, deploy_error: "PROJECT_NOT_FOUND", advanced: false };
+    }
+
+    const loopId = body.loop_id || state.loop_id || null;
+    if (!loopId) {
+      return { ok: true, loop_id: null, deploy_error: "NO_LOOP_ID", advanced: false };
+    }
+
+    const reg = getDefaultRegistry();
+    const pid = normalizeProjectId(projectId);
+
+    // State guard: must be at DEPLOYMENT_OR_END
+    const statusResult = await reg.invoke("orchestration.get_status", {
+      project_id: pid, loop_id: loopId
+    }, { root });
+
+    if (!statusResult || statusResult.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, deploy_error: "GET_STATUS_FAILED", advanced: false };
+    }
+
+    const currentState = statusResult.output.current_state;
+    if (currentState !== "DEPLOYMENT_OR_END") {
+      return { ok: true, loop_id: loopId, current_state: currentState,
+               deploy_error: "WRONG_STATE", advanced: false };
+    }
+
+    // ── SKIP path (LOCK-4 + LOCK-6): deployment_enabled === false → VACUOUS_SKIP ──
+    const { shouldSkipGate3 } = require("../runtime/orchestration/approval_gates");
+    if (shouldSkipGate3({ deployment_enabled: body.deployment_enabled })) {
+      // role_invoked is omitted (NOT passed as null): the tool's input_schema types it as
+      // "string", so an explicit null fails validation. The audit row still records
+      // role_invoked:null via the tool's `input.role_invoked || null` default (LOCK-4).
+      const skipResult = await reg.invoke("orchestration.advance_state", {
+        project_id:      pid,
+        loop_id:         loopId,
+        to_state:        "LIVE_DELIVERABLE",
+        transition_type: "VACUOUS_SKIP"
+      }, { root });
+
+      if (!skipResult || skipResult.status !== "SUCCESS") {
+        return { ok: true, loop_id: loopId, advanced: false, deploy_error: "SKIP_ADVANCE_FAILED" };
+      }
+
+      return {
+        ok:           true,
+        loop_id:      loopId,
+        advanced:     true,
+        advanced_to:  "LIVE_DELIVERABLE",
+        skipped:      true,
+        gate_pending: null
+      };
+    }
+
+    // ── GATED path: deployment role → persist deployment_plan.json → BLOCK on Gate 3 ──
+    const depProvider   = body.deploy_provider || "openai";
+    const depModel      = body.deploy_model || (depProvider === "openai" ? "gpt-4o" : undefined);
+    const depScenarioId = body.deploy_scenario_id || undefined;
+
+    const orchRelDir = "artifacts/projects/" + pid + "/orchestration/" + loopId;
+
+    // Read spec + design (REQUIRED)
+    const specRead = await reg.invoke("fs.read_file", { path: orchRelDir + "/spec.json" }, { root });
+    if (!specRead || specRead.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, deploy_error: "INPUT_NOT_FOUND", advanced: false };
+    }
+    let spec;
+    try { spec = JSON.parse(specRead.output.content); }
+    catch { return { ok: true, loop_id: loopId, deploy_error: "INPUT_NOT_FOUND", advanced: false }; }
+
+    const designRead = await reg.invoke("fs.read_file", { path: orchRelDir + "/architect_design.json" }, { root });
+    if (!designRead || designRead.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, deploy_error: "INPUT_NOT_FOUND", advanced: false };
+    }
+    let design;
+    try { design = JSON.parse(designRead.output.content); }
+    catch { return { ok: true, loop_id: loopId, deploy_error: "INPUT_NOT_FOUND", advanced: false }; }
+
+    const depInput = { project_id: pid, spec, design };
+
+    // Best-effort optional environment (present → include; absent → omit; never fail-close).
+    const envRead = await reg.invoke("fs.read_file", { path: orchRelDir + "/env_report.json" }, { root });
+    if (envRead && envRead.status === "SUCCESS") {
+      try { depInput.environment = JSON.parse(envRead.output.content); } catch { /* omit on parse fail */ }
+    }
+
+    // Invoke deployment role (30s timeout, mirrors reportEnv/judgeQuality)
+    let timeoutHandle;
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutHandle = setTimeout(() => reject(new Error("DEPLOYMENT_TIMEOUT")), 30000);
+    });
+
+    try {
+      const depResult = await Promise.race([
+        reg.invoke("role.invoke", Object.assign(
+          {
+            role_id:    "deployment",
+            input:      depInput,
+            project_id: pid,
+            provider:   depProvider
+          },
+          depModel      ? { model:       depModel      } : {},
+          depScenarioId ? { scenario_id: depScenarioId } : {}
+        ), { root }),
+        timeoutPromise
+      ]);
+      clearTimeout(timeoutHandle);
+
+      if (depResult && depResult.status === "SUCCESS") {
+        const deployment_plan = depResult.output;
+
+        // Persist deployment_plan.json (fail-closed on throw/non-SUCCESS). NO advance —
+        // the loop stays at DEPLOYMENT_OR_END pending Gate 3 (owner via respondGate).
+        let depWrite = null;
+        try {
+          depWrite = await reg.invoke("fs.write_file", {
+            path:    orchRelDir + "/deployment_plan.json",
+            content: JSON.stringify(deployment_plan, null, 2)
+          }, { root });
+        } catch {
+          depWrite = null;
+        }
+        if (!depWrite || depWrite.status !== "SUCCESS") {
+          return { ok: true, loop_id: loopId, advanced: false, deploy_error: "DEPLOY_WRITE_FAILED" };
+        }
+
+        return {
+          ok:           true,
+          loop_id:      loopId,
+          deployment_plan,
+          gate_pending: 3,
+          advanced:     false,
+          model_used:   depModel
+        };
+      }
+
+      // Role non-SUCCESS → fail-closed. INVALID_ROLE_OUTPUT → DEPLOY_PARSE_FAILED; any other
+      // reason → DEPLOYMENT_FAILED (distinguished via metadata.reason, mirrors judgeQuality).
+      const reason   = depResult && depResult.metadata && depResult.metadata.reason;
+      const depError = reason === "INVALID_ROLE_OUTPUT" ? "DEPLOY_PARSE_FAILED" : "DEPLOYMENT_FAILED";
+      return { ok: true, loop_id: loopId, advanced: false, deploy_error: depError, model_used: depModel };
+
+    } catch (err) {
+      clearTimeout(timeoutHandle);
+      return { ok: true, loop_id: loopId, advanced: false, deploy_error: err.message };
+    }
+  }
+
+  // ── Respond Gate bridge (PHASE-26; Gate 2 added PHASE-33; Gate 3 added PHASE-34) ──
   //
   // respondGate: resolves an owner approval gate via orchestration.respond.
   //   Gate 1 (host ENV_REPORT):    APPROVE → TEST_DESIGN; REJECT → ESCALATED.
   //   Gate 2 (host QUALITY_JUDGE): APPROVE_SHIP / APPROVE_WITH_CAVEATS → DEPLOYMENT_OR_END;
   //                                REJECT_AND_LOOP → BUILDER (or ESCALATED at cap, resolved
   //                                inside fireGate → tryAdvanceForLoopBack).
-  // Guards: gate_id ∈ {1,2}; response must be valid for that gate; current_state must be
+  //   Gate 3 (host DEPLOYMENT_OR_END): APPROVE → LIVE_DELIVERABLE; REJECT → ESCALATED.
+  //                                LOCK-1: APPROVE requires selected_target — forwarded into
+  //                                orchestration.respond → fireGate (which THROWS if APPROVE
+  //                                lacks it); missing → GATE_RESPOND_FAILED (fail-closed).
+  // Guards: gate_id ∈ {1,2,3}; response must be valid for that gate; current_state must be
   // the gate's host state. Invalid gate/response → {gate_error:"INVALID_GATE_RESPONSE"};
   // wrong host state → {gate_error:"WRONG_STATE", current_state}. Both advanced:false.
   // The next_state is owned by orchestration.respond (fireGate) — respondGate echoes it.
 
   // Per-gate valid response sets + host state (mirror approval_gates.js §7.2–7.4).
-  // Gate 3 is intentionally NOT opened here (future phase) → falls through to INVALID.
   const _GATE_RESPONSES = {
     1: ["APPROVE", "REJECT"],
-    2: ["APPROVE_SHIP", "APPROVE_WITH_CAVEATS", "REJECT_AND_LOOP"]
+    2: ["APPROVE_SHIP", "APPROVE_WITH_CAVEATS", "REJECT_AND_LOOP"],
+    3: ["APPROVE", "REJECT"]
   };
-  const _GATE_HOST_STATE = { 1: "ENV_REPORT", 2: "QUALITY_JUDGE" };
+  const _GATE_HOST_STATE = { 1: "ENV_REPORT", 2: "QUALITY_JUDGE", 3: "DEPLOYMENT_OR_END" };
 
   async function respondGate(body = {}) {
     const projectId = normalizeProjectId(body.project_id || "");
@@ -2729,12 +2906,19 @@ function createConversationEngine(options = {}) {
     }
 
     try {
-      const respondResult = await reg.invoke("orchestration.respond", {
-        project_id: normalizeProjectId(projectId),
-        loop_id:    loopId,
-        gate_id:    gate_id,   // LOCK-1: pass the caller's gate_id — NEVER a literal.
-        response
-      }, { root });
+      // LOCK-1 (Gate 3): forward selected_target ONLY when present. Passing it as undefined
+      // would add a present key with an undefined value → fails orchestration.respond's
+      // type:"string" schema validation (same trap as role_invoked:null). Conditional
+      // Object.assign mirrors the model/scenario_id pattern used for role.invoke.
+      const respondResult = await reg.invoke("orchestration.respond", Object.assign(
+        {
+          project_id: normalizeProjectId(projectId),
+          loop_id:    loopId,
+          gate_id:    gate_id,   // LOCK-1: pass the caller's gate_id — NEVER a literal.
+          response
+        },
+        body.selected_target ? { selected_target: body.selected_target } : {}
+      ), { root });
 
       if (!respondResult || respondResult.status !== "SUCCESS") {
         const errDetail = (respondResult && respondResult.metadata && respondResult.metadata.detail)
@@ -2800,6 +2984,7 @@ function createConversationEngine(options = {}) {
     estimateCost,
     designTests,
     reportEnv,
+    deployProject,
     respondGate,
     CONFIRMATION_REQUIRED_TRANSITIONS
   };

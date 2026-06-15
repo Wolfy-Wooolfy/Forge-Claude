@@ -1,0 +1,20 @@
+{
+  "id": "S315",
+  "name": "deployProject skip path — deployment_enabled=false → VACUOUS_SKIP advance to LIVE_DELIVERABLE (no role, no gate, no deployment_plan written); reuses orchestration.advance_state(transition_type:VACUOUS_SKIP, role_invoked:null) per LOCK-4 (PHASE-34)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/deploy_project_test_helper",
+  "method": "runS315DeploySkipPath",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "advanced_true",              "expected": true },
+    { "type": "state_field_equals", "field": "advanced_to_live",           "expected": true },
+    { "type": "state_field_equals", "field": "skipped_true",               "expected": true },
+    { "type": "state_field_equals", "field": "no_deployment_plan_written", "expected": true },
+    { "type": "state_field_equals", "field": "graph_live_deliverable",     "expected": true },
+    { "type": "state_field_equals", "field": "vacuous_skip_row_present",   "expected": true },
+    { "type": "state_field_equals", "field": "vacuous_skip_no_role",       "expected": true },
+    { "type": "state_field_equals", "field": "no_gate3_row",               "expected": true }
+  ]
+}
