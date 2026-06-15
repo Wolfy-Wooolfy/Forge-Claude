@@ -54,10 +54,25 @@ const openaiAdapter = defineAdapter({
       messages.unshift(...input.context.prior_messages);
     }
 
-    const requestBody = {
-      model:    input.model || "gpt-4o",
-      messages
-    };
+    const model  = input.model || "gpt-4o";
+    const isGpt5 = /^gpt-5/i.test(model);
+
+    const requestBody = isGpt5
+      ? {
+          // gpt-5* (reasoning) dialect: send max_completion_tokens (NOT max_tokens —
+          // reasoning burns internal tokens; a small cap empties JSON content →
+          // INVALID_ROLE_OUTPUT). Expose reasoning_effort. Send NO temperature/top_p
+          // (reasoning models reject non-default values).
+          model,
+          messages,
+          max_completion_tokens: input.max_completion_tokens || 8000,
+          reasoning_effort:      input.reasoning_effort || "medium"
+        }
+      : {
+          // gpt-4*/other: byte-identical to the pre-gpt-5 body.
+          model,
+          messages
+        };
 
     let res;
     try {
@@ -90,7 +105,11 @@ const openaiAdapter = defineAdapter({
     const usage  = parsed.usage || {};
     const tokens_in  = usage.prompt_tokens     || 0;
     const tokens_out = usage.completion_tokens || 0;
-    const cost_usd   = (tokens_in / 1000) * 0.005 + (tokens_out / 1000) * 0.015;
+    // Cost rates ($/1K tokens). gpt-4o = $5/M in, $15/M out. gpt-5.4 = $2.50/M in,
+    // $15/M out (the 0.0025 input rate is gpt-5.4-specific; other gpt-5 variants may differ).
+    const rateIn   = isGpt5 ? 0.0025 : 0.005;
+    const rateOut  = 0.015;
+    const cost_usd   = (tokens_in / 1000) * rateIn + (tokens_out / 1000) * rateOut;
 
     return success(
       {

@@ -25,6 +25,9 @@ function _estimateCostUsd(tokensIn, tokensOut, model) {
   let rateIn, rateOut;
   if (m.includes("gpt-4o-mini")) {
     rateIn = 0.15; rateOut = 0.60;
+  } else if (m.startsWith("gpt-5")) {
+    // gpt-5.4 = $2.50/M input, $15/M output (other gpt-5 variants may differ).
+    rateIn = 2.5; rateOut = 15.0;
   } else if (m.includes("gpt-4o")) {
     rateIn = 5.0; rateOut = 15.0;
   } else {
