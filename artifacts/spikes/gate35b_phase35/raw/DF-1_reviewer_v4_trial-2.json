@@ -1,0 +1,42 @@
+{
+  "tag": "DF-1_reviewer_v4_trial-2",
+  "project_id": "phase28_gate10",
+  "ok": true,
+  "reason": null,
+  "output": {
+    "verdict": "REJECTED",
+    "findings": [
+      {
+        "severity": "BLOCKER",
+        "issue": "PUT /todos/:id does not check if the update affected any rows, violating AC-3.",
+        "location": "src/controllers/todoController.js (exports.updateTodo)",
+        "recommendation": "Add a check `if (this.changes === 0)` after the UPDATE query and return a 404 status code if no rows were updated."
+      },
+      {
+        "severity": "BLOCKER",
+        "issue": "DELETE /todos/:id does not check if the delete operation affected any rows, violating AC-4.",
+        "location": "src/controllers/todoController.js (exports.deleteTodo)",
+        "recommendation": "Add a check `if (this.changes === 0)` after the DELETE query and return a 404 status code if no rows were deleted."
+      },
+      {
+        "severity": "WARN",
+        "issue": "Missing input validation for required field 'title' in POST /todos.",
+        "location": "src/controllers/todoController.js (exports.createTodo)",
+        "recommendation": "Add validation to ensure 'title' is not undefined or an empty string before proceeding with the database insertion."
+      }
+    ],
+    "summary": "The implementation has critical issues in the PUT and DELETE handlers for non-existent resources as they do not implement row-affected checks, violating core acceptance criteria. Additionally, there is a minor issue with input validation for the POST endpoint."
+  },
+  "ledger": {
+    "tag": "DF-1_reviewer_v4_trial-2",
+    "role": "reviewer",
+    "provider": "openai",
+    "model": "gpt-4o-2024-08-06",
+    "tokens_in": 2068,
+    "tokens_out": 322,
+    "latency_ms": 5190,
+    "cost_usd_actual": 0.01517,
+    "outcome": "success",
+    "ts": "2026-06-15T21:25:18.829Z"
+  }
+}

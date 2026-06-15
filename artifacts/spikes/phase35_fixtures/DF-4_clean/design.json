@@ -1,5 +1,5 @@
 {
-  "design_summary": "Single-process Node.js/Express service backed by a local SQLite database, exposing a small todo CRUD API with correct not-found handling.",
+  "design_summary": "Single-process Node.js/Express service backed by a local SQLite database, exposing a small todo CRUD API.",
   "components": [
     { "name": "API Server", "tech": "Express", "purpose": "HTTP routing and request handling" },
     { "name": "Database", "tech": "SQLite (sqlite3)", "purpose": "Persist todo rows" }
@@ -13,6 +13,6 @@
     { "name": "REST API", "type": "API", "notes": "JSON over HTTP" }
   ],
   "identified_risks": [
-    { "risk": "None material for this scope", "severity": "LOW", "mitigation": "Parameterized queries and affected-row checks are in place" }
+    { "risk": "SQLite write contention under concurrent requests", "severity": "LOW", "mitigation": "Enable WAL mode or serialize writes if throughput becomes a concern" }
   ]
 }
