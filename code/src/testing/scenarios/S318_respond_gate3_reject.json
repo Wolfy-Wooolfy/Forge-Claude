@@ -1,0 +1,19 @@
+{
+  "id": "S318",
+  "name": "respondGate Gate 3 REJECT — loop at DEPLOYMENT_OR_END, Gate 3 fires REJECT, loop advances to ESCALATED; GATE_REJECT audit row (gate 3, DEPLOYMENT_OR_END→ESCALATED); reuses fireGate/_NEXT_STATE['3:REJECT'] (PHASE-34)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/deploy_project_test_helper",
+  "method": "runS318RespondGate3Reject",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "ok_true",                 "expected": true },
+    { "type": "state_field_equals", "field": "advanced_true",           "expected": true },
+    { "type": "state_field_equals", "field": "advanced_to_escalated",   "expected": true },
+    { "type": "state_field_equals", "field": "gate_id_3",               "expected": true },
+    { "type": "state_field_equals", "field": "response_reject",         "expected": true },
+    { "type": "state_field_equals", "field": "graph_escalated",         "expected": true },
+    { "type": "state_field_equals", "field": "gate3_reject_row_present", "expected": true }
+  ]
+}

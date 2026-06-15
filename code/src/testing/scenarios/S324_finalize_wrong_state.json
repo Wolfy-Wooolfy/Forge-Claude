@@ -1,0 +1,16 @@
+{
+  "id": "S324",
+  "name": "finalizeDeliverable wrong-state — loop parked at DEPLOYMENT_OR_END (not LIVE_DELIVERABLE) → WRONG_STATE; no summary written, no advance (PHASE-34)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/deploy_project_test_helper",
+  "method": "runS324FinalizeWrongState",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "finalize_error_wrong_state", "expected": true },
+    { "type": "state_field_equals", "field": "advanced_false",            "expected": true },
+    { "type": "state_field_equals", "field": "no_summary_written",        "expected": true },
+    { "type": "state_field_equals", "field": "graph_unchanged",           "expected": true }
+  ]
+}

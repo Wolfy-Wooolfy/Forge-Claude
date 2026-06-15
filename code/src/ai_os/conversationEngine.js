@@ -2844,6 +2844,82 @@ function createConversationEngine(options = {}) {
     }
   }
 
+  // ── Finalization (PHASE-34, LOCK-5) — finalizeDeliverable LIVE_DELIVERABLE → COMPLETE ──
+  //
+  // The pipeline-completing step (idea → live deliverable end-to-end closes here). It is a
+  // DISTINCT, explicit step — NOT folded into the Gate 3 APPROVE handler — so the owner sees
+  // LIVE_DELIVERABLE before COMPLETE. Reuses summary_writer.writeSummary() (consumed, NOT
+  // rewritten). Persist-then-advance, matching the graph trigger "orchestration_summary.md
+  // written; audit trail finalized": writeSummary BEFORE advancing, then advance to COMPLETE
+  // (the LIVE_DELIVERABLE → COMPLETE edge is gate_check null). State guard LIVE_DELIVERABLE else
+  // WRONG_STATE. writeSummary throw → SUMMARY_WRITE_FAILED (no advance). COMPLETE is terminal.
+
+  async function finalizeDeliverable(body = {}) {
+    const projectId = normalizeProjectId(body.project_id || "");
+    const state     = loadState(projectId);
+
+    if (!state) {
+      return { ok: true, loop_id: null, finalize_error: "PROJECT_NOT_FOUND", advanced: false };
+    }
+
+    const loopId = body.loop_id || state.loop_id || null;
+    if (!loopId) {
+      return { ok: true, loop_id: null, finalize_error: "NO_LOOP_ID", advanced: false };
+    }
+
+    const reg = getDefaultRegistry();
+    const pid = normalizeProjectId(projectId);
+
+    // State guard: must be at LIVE_DELIVERABLE
+    const statusResult = await reg.invoke("orchestration.get_status", {
+      project_id: pid, loop_id: loopId
+    }, { root });
+
+    if (!statusResult || statusResult.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, finalize_error: "GET_STATUS_FAILED", advanced: false };
+    }
+
+    const currentState = statusResult.output.current_state;
+    if (currentState !== "LIVE_DELIVERABLE") {
+      return { ok: true, loop_id: loopId, current_state: currentState,
+               finalize_error: "WRONG_STATE", advanced: false };
+    }
+
+    // Persist orchestration_summary.md BEFORE advancing (reuse summary_writer; do NOT rewrite).
+    const { writeSummary } = require("../runtime/orchestration/summary_writer");
+    let summaryPath = null;
+    try {
+      const sw = await writeSummary(pid, loopId, { root });
+      summaryPath = sw && sw.path;
+    } catch {
+      return { ok: true, loop_id: loopId, advanced: false, finalize_error: "SUMMARY_WRITE_FAILED" };
+    }
+    if (!summaryPath) {
+      return { ok: true, loop_id: loopId, advanced: false, finalize_error: "SUMMARY_WRITE_FAILED" };
+    }
+
+    // Advance LIVE_DELIVERABLE → COMPLETE (gate_check null edge; COMPLETE is terminal).
+    const advResult = await reg.invoke("orchestration.advance_state", {
+      project_id:      pid,
+      loop_id:         loopId,
+      to_state:        "COMPLETE",
+      transition_type: "NORMAL"
+    }, { root });
+
+    if (!advResult || advResult.status !== "SUCCESS") {
+      return { ok: true, loop_id: loopId, advanced: false,
+               finalize_error: "FINALIZE_ADVANCE_FAILED", summary_path: summaryPath };
+    }
+
+    return {
+      ok:           true,
+      loop_id:      loopId,
+      advanced:     true,
+      advanced_to:  "COMPLETE",
+      summary_path: summaryPath
+    };
+  }
+
   // ── Respond Gate bridge (PHASE-26; Gate 2 added PHASE-33; Gate 3 added PHASE-34) ──
   //
   // respondGate: resolves an owner approval gate via orchestration.respond.
@@ -2985,6 +3061,7 @@ function createConversationEngine(options = {}) {
     designTests,
     reportEnv,
     deployProject,
+    finalizeDeliverable,
     respondGate,
     CONFIRMATION_REQUIRED_TRANSITIONS
   };

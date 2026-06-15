@@ -1,0 +1,20 @@
+{
+  "id": "S321",
+  "name": "deployProject role-failure (two variants, both fail-closed) — (a) mock non-JSON → INVALID_ROLE_OUTPUT → DEPLOY_PARSE_FAILED; (b) non-object spec → role INVALID_INPUT (other reason) → DEPLOYMENT_FAILED; both no write, no advance (PHASE-34)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/deploy_project_test_helper",
+  "method": "runS321DeployRoleFailure",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "parse_failed",          "expected": true },
+    { "type": "state_field_equals", "field": "parse_advanced_false",  "expected": true },
+    { "type": "state_field_equals", "field": "parse_no_write",        "expected": true },
+    { "type": "state_field_equals", "field": "parse_state_unchanged", "expected": true },
+    { "type": "state_field_equals", "field": "deployment_failed",     "expected": true },
+    { "type": "state_field_equals", "field": "fail_advanced_false",   "expected": true },
+    { "type": "state_field_equals", "field": "fail_no_write",         "expected": true },
+    { "type": "state_field_equals", "field": "fail_state_unchanged",  "expected": true }
+  ]
+}

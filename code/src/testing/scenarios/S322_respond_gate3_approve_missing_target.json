@@ -1,0 +1,17 @@
+{
+  "id": "S322",
+  "name": "respondGate Gate 3 APPROVE WITHOUT selected_target — negative proof of LOCK-1: fireGate throws (APPROVE requires selected_target) → orchestration.respond non-SUCCESS → gate_error, advanced:false, graph stays DEPLOYMENT_OR_END, no GATE_APPROVE row (PHASE-34)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/deploy_project_test_helper",
+  "method": "runS322RespondGate3ApproveMissingTarget",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "advanced_false",            "expected": true },
+    { "type": "state_field_equals", "field": "gate_error_present",        "expected": true },
+    { "type": "state_field_equals", "field": "gate_error_mentions_target", "expected": true },
+    { "type": "state_field_equals", "field": "graph_unchanged",           "expected": true },
+    { "type": "state_field_equals", "field": "no_gate3_approve_row",      "expected": true }
+  ]
+}

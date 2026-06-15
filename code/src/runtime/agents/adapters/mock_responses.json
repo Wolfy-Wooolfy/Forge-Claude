@@ -155,6 +155,12 @@
     "tokens_out": 8,
     "finish_reason": "stop"
   },
+  "mock|mock-dep-s321|scenario:S321": {
+    "text": "I'm sorry, but I cannot generate a deployment plan for this project.",
+    "tokens_in": 180,
+    "tokens_out": 16,
+    "finish_reason": "stop"
+  },
   "mock|mock-dep-s316|scenario:S316": {
     "text": "{\"target_environment\":\"container\",\"prerequisites\":[{\"item\":\"Docker >=24 installed on host\",\"verified_by\":\"docker --version shows >=24.0\"},{\"item\":\"Port 3000 available on host\",\"verified_by\":\"netstat -tuln shows port 3000 not in use\"}],\"build_steps\":[{\"step\":1,\"description\":\"Build Docker image from project root using the provided Dockerfile\",\"artifact\":\"Docker image tagged forge-app:latest\",\"notes\":\"No secrets baked into the image\"}],\"deployment_sequence\":[{\"step\":1,\"description\":\"Create named volume for SQLite data persistence if not already present\",\"requires_elevated_privileges\":false,\"is_irreversible\":false,\"notes\":\"Volume persists across container restarts\"},{\"step\":2,\"description\":\"Run container with data volume mounted at /app/data\",\"requires_elevated_privileges\":false,\"is_irreversible\":false,\"notes\":\"Use --restart unless-stopped for production\"}],\"rollback_procedure\":[{\"step\":1,\"description\":\"Stop the running container\"},{\"step\":2,\"description\":\"Start previous image version with same volume and environment configuration\"}],\"health_verification\":{\"method\":\"Send GET request to http://localhost:3000/health\",\"expected_outcome\":\"HTTP 200 response with body OK\",\"timeout_seconds\":30},\"post_deployment_tasks\":[\"Verify GET /todos returns an empty data array on a fresh deploy\"],\"deployment_risks\":[{\"risk\":\"SQLite data volume not mounted — data lost on container restart\",\"severity\":\"HIGH\",\"mitigation\":\"Always specify volume mount in run command; verify /app/data path in container\"}],\"summary\":\"Container deployment to Docker; critical path is the data volume mount; top risk is data loss if the volume is omitted.\"}",
     "tokens_in": 800,
