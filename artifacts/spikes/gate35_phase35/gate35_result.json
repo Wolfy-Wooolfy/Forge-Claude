@@ -1,0 +1,1276 @@
+{
+  "mode": "REAL_GPT4O",
+  "provider": "openai",
+  "model": "gpt-4o",
+  "rescored_at": "2026-06-15T16:53:49.117Z",
+  "source": "recomputed from artifacts/spikes/gate35_phase35/raw/*.json (verbatim real gpt-4o outputs); NO new API calls",
+  "detector_correction": {
+    "issue": "Original run's SQLi detector matched the free-text attack_vector and 'sqli' inside 'SQLite', over-counting SQLi on non-SQLi findings.",
+    "strict_rule": "vulnerability field matches /sql[\\s_-]*injection|\\bsqli\\b/i",
+    "loose_rule": "vulnerability+attack_vector matches /sql[\\s-]*inject|sqli|injection/i (original, retained for audit)",
+    "disagreements": [
+      {
+        "fixture": "DF-3",
+        "version": "security_auditor_v2",
+        "trial": 1,
+        "sqli_loose": 1,
+        "sqli_strict": 0,
+        "vulnerabilities": [
+          "missing authentication",
+          "insecure data storage"
+        ]
+      },
+      {
+        "fixture": "DF-4",
+        "version": "security_auditor_v2",
+        "trial": 3,
+        "sqli_loose": 1,
+        "sqli_strict": 0,
+        "vulnerabilities": [
+          "Missing input validation",
+          "Missing access control"
+        ]
+      },
+      {
+        "fixture": "DF-3",
+        "version": "security_auditor_v1",
+        "trial": 2,
+        "sqli_loose": 2,
+        "sqli_strict": 0,
+        "vulnerabilities": [
+          "Missing Authentication",
+          "Missing Authorization",
+          "Missing Input Validation",
+          "Using Unencrypted Local Database"
+        ]
+      }
+    ]
+  },
+  "trials_parsed": 28,
+  "failed_trials": 0,
+  "n_main": 3,
+  "n_baseline": 2,
+  "total_calls": 28,
+  "overall_verdict": "HONEST_EVIDENCE",
+  "assessment": {
+    "tuned_main_behaviour_ok": true,
+    "overfire_control_ok": false,
+    "ab_attribution_proven": false,
+    "tuning_objective_met": false,
+    "summary": "Tuned roles behave correctly on the three core objectives in the production-config main run (DF-1 logic recall 3/3, DF-2 SQLi recall 3/3, DF-3 SQLi precision 3/3). HOWEVER: (1) DF-4 over-fire control FAILS — reviewer_v3 manufactured BLOCKERs on clean code in 1/3 trials and security_v2 rated clean code MEDIUM (not NONE/LOW) in 2/3; (2) the A/B attribution is INCONCLUSIVE — the retired prompts did NOT reproduce the PHASE-31 misses on these fixtures (reviewer_v2 also caught DF-1; security_v1 did not SQLi-false-positive DF-3) because the fixtures leak the answer (DF-1 'BUG' comments; DF-3 'already parameterized' design notes)."
+  },
+  "per_fixture": {
+    "DF-1": {
+      "probe": "reviewer_v3 recall — missing this.changes / 404 logic BLOCKER (the PHASE-31 reviewer_v2 miss)",
+      "criterion": "reviewer_v3 raises a BLOCKER tied to missing-404 / affected-row / this.changes",
+      "reviewer_catch": {
+        "met": 3,
+        "of": 3
+      },
+      "security_no_sqli": {
+        "met": 3,
+        "of": 3
+      },
+      "PASS": true
+    },
+    "DF-2": {
+      "probe": "security_auditor_v2 recall — genuine SQLi must still BLOCK",
+      "criterion": "security_v2 raises a SQLi BLOCKER (vulnerability=SQL injection) + threat_level HIGH/CRITICAL",
+      "security_sqli_blocker": {
+        "met": 3,
+        "of": 3
+      },
+      "PASS": true
+    },
+    "DF-3": {
+      "probe": "security_auditor_v2 precision — NO SQLi false-positive on parameterized (?-bound) queries (the PHASE-31 security_v1 FP)",
+      "criterion": "security_v2 raises NO SQLi finding (vulnerability never names SQL injection)",
+      "security_no_sqli": {
+        "met": 3,
+        "of": 3
+      },
+      "PASS": true
+    },
+    "DF-4": {
+      "probe": "no over-fire on clean, correct code (both roles)",
+      "criterion": "reviewer no BLOCKER AND security no BLOCKER + threat_level NONE/LOW",
+      "reviewer_no_blocker": {
+        "met": 2,
+        "of": 3
+      },
+      "security_clean": {
+        "met": 1,
+        "of": 3
+      },
+      "PASS": false
+    }
+  },
+  "decisive_comparisons": {
+    "DF-1_reviewer_catch": {
+      "metric": "BLOCKER tied to missing this.changes / 404 not-found path",
+      "v3_main": {
+        "caught": 3,
+        "of": 3
+      },
+      "v2_baseline": {
+        "caught": 2,
+        "of": 2
+      },
+      "phase31_baseline": "reviewer_v2 MISSED this defect at PHASE-31 (gate31_phase31/step4_role_reviewer_output.json)",
+      "controlled_proof": false,
+      "attribution_note": "A/B INCONCLUSIVE: reviewer_v2 ALSO catches the defect on this fixture, so the catch cannot be attributed to the prompt tuning. Root cause: DF-1 source carries explicit giveaway comments ('BUG: ... this.changes is never inspected') that the retired prompt also reads. The PHASE-31 miss used the real multi-file build without such comments."
+    },
+    "DF-3_security_no_false_positive": {
+      "metric": "SQLi finding (vulnerability=SQL injection) raised against parameterized queries",
+      "v2_main": {
+        "no_sqli_flag": 3,
+        "of": 3
+      },
+      "v1_baseline": {
+        "false_positive": 0,
+        "of": 2
+      },
+      "phase31_baseline": "security_auditor_v1 FALSE-POSITIVED a SQLi BLOCKER here at PHASE-31 (gate31_phase31/step4_role_security_output.json)",
+      "controlled_proof": false,
+      "attribution_note": "A/B INCONCLUSIVE: security_auditor_v1 did NOT reproduce the SQLi false-positive on this fixture (it flagged missing-auth / input-validation instead, never naming SQL injection), so the precision win cannot be attributed to the prompt tuning. Likely cause: DF-3 design.json states the queries are 'parameterized ... already done in this build', which suppresses the original false-positive even for the retired prompt."
+    }
+  },
+  "estimated_usd": 0.38818,
+  "representative_latency_ms": {
+    "count": 28,
+    "min": 1934,
+    "median": 4416,
+    "max": 6570
+  },
+  "main_trials": {
+    "DF-1": {
+      "reviewer_v3": [
+        {
+          "fixture": "DF-1",
+          "role": "reviewer",
+          "version": "reviewer_v3",
+          "trial": 1,
+          "is_baseline": false,
+          "ok": true,
+          "reason": null,
+          "verdict": "REJECTED",
+          "threat_level": null,
+          "blocker_count": 2,
+          "catches_defect": true,
+          "sqli_strict": 0,
+          "sqli_loose": 0,
+          "sqli_strict_blocker": false,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "updateTodo function does not check affected-row count, violating AC-3.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Check this.changes after the UPDATE query and return a 404 status when zero rows are matched.",
+              "attack_vector": null
+            },
+            {
+              "severity": "BLOCKER",
+              "title": "deleteTodo function does not check affected-row count, violating AC-4.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Check this.changes after the DELETE query and return a 404 status when zero rows are matched.",
+              "attack_vector": null
+            },
+            {
+              "severity": "WARN",
+              "title": "No dependencies listed in dependencies_added, though sqlite3 is implicitly used.",
+              "location": "dependencies_added",
+              "recommendation": "Add the sqlite3 dependency to the project dependencies to ensure proper module resolution.",
+              "attack_vector": null
+            }
+          ],
+          "cost_usd": 0.01375,
+          "latency_ms": 3574
+        },
+        {
+          "fixture": "DF-1",
+          "role": "reviewer",
+          "version": "reviewer_v3",
+          "trial": 2,
+          "is_baseline": false,
+          "ok": true,
+          "reason": null,
+          "verdict": "REJECTED",
+          "threat_level": null,
+          "blocker_count": 2,
+          "catches_defect": true,
+          "sqli_strict": 0,
+          "sqli_loose": 0,
+          "sqli_strict_blocker": false,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "The updateTodo function does not inspect the affected-row count and incorrectly returns 200 even when no row matched, violating AC-3.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Inspect this.changes after the UPDATE operation and return a 404 status if it is zero.",
+              "attack_vector": null
+            },
+            {
+              "severity": "BLOCKER",
+              "title": "The deleteTodo function does not inspect the affected-row count and incorrectly returns 204 even when no row is deleted, violating AC-4.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Inspect this.changes after the DELETE operation and return a 404 status if it is zero.",
+              "attack_vector": null
+            },
+            {
+              "severity": "WARN",
+              "title": "No dependencies were listed under dependencies_added even though sqlite3 is used.",
+              "location": "dependencies_added",
+              "recommendation": "Ensure that all necessary dependencies, including sqlite3, are listed in the dependencies_added field.",
+              "attack_vector": null
+            }
+          ],
+          "cost_usd": 0.01421,
+          "latency_ms": 5093
+        },
+        {
+          "fixture": "DF-1",
+          "role": "reviewer",
+          "version": "reviewer_v3",
+          "trial": 3,
+          "is_baseline": false,
+          "ok": true,
+          "reason": null,
+          "verdict": "REJECTED",
+          "threat_level": null,
+          "blocker_count": 2,
+          "catches_defect": true,
+          "sqli_strict": 0,
+          "sqli_loose": 0,
+          "sqli_strict_blocker": false,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "The updateTodo function does not check the affected-row count and returns 200 even when no row is updated.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Inspect this.changes after the UPDATE operation and return a 404 status when zero rows match.",
+              "attack_vector": null
+            },
+            {
+              "severity": "BLOCKER",
+              "title": "The deleteTodo function does not check the affected-row count and returns 204 even when no row is deleted.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Inspect this.changes after the DELETE operation and return a 404 status when zero rows match.",
+              "attack_vector": null
+            },
+            {
+              "severity": "INFO",
+              "title": "No dependencies are listed in dependencies_added despite the use of 'express' and 'sqlite3'.",
+              "location": "dependencies_added",
+              "recommendation": "Ensure that dependencies like 'express' and 'sqlite3' are listed if newly added or confirm they are already included.",
+              "attack_vector": null
+            }
+          ],
+          "cost_usd": 0.01337,
+          "latency_ms": 3356
+        }
+      ],
+      "security_v2": [
+        {
+          "fixture": "DF-1",
+          "role": "security_auditor",
+          "version": "security_auditor_v2",
+          "trial": 1,
+          "is_baseline": false,
+          "ok": true,
+          "reason": null,
+          "verdict": null,
+          "threat_level": "MEDIUM",
+          "blocker_count": 0,
+          "catches_defect": false,
+          "sqli_strict": 0,
+          "sqli_loose": 0,
+          "sqli_strict_blocker": false,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "Incorrect not-found handling",
+              "location": "src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "An attacker could exploit the lack of checking affected-row count to mask errors or probe the existence of specific IDs by observing the API's responses for non-existent IDs."
+            },
+            {
+              "severity": "INFO",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "There's a risk of invalid data (e.g., missing 'title', malformed JSON) being processed which could lead to overlooked errors or additional validation burdens down the line."
+            }
+          ],
+          "cost_usd": 0.01476,
+          "latency_ms": 4501
+        },
+        {
+          "fixture": "DF-1",
+          "role": "security_auditor",
+          "version": "security_auditor_v2",
+          "trial": 2,
+          "is_baseline": false,
+          "ok": true,
+          "reason": null,
+          "verdict": null,
+          "threat_level": "LOW",
+          "blocker_count": 0,
+          "catches_defect": false,
+          "sqli_strict": 0,
+          "sqli_loose": 0,
+          "sqli_strict_blocker": false,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "Improper Resource Handling",
+              "location": "src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "Attackers may receive misleading status codes on failed update or delete attempts for non-existent resources."
+            }
+          ],
+          "cost_usd": 0.01263,
+          "latency_ms": 3337
+        },
+        {
+          "fixture": "DF-1",
+          "role": "security_auditor",
+          "version": "security_auditor_v2",
+          "trial": 3,
+          "is_baseline": false,
+          "ok": true,
+          "reason": null,
+          "verdict": null,
+          "threat_level": "MEDIUM",
+          "blocker_count": 0,
+          "catches_defect": false,
+          "sqli_strict": 0,
+          "sqli_loose": 0,
+          "sqli_strict_blocker": false,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "Missing provenance validation for mandatory fields",
+              "location": "src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "An attacker can send a POST request to /todos without a title, causing the insertion of incomplete tasks or database errors if not handled."
+            },
+            {
+              "severity": "INFO",
+              "title": "Incorrect status codes for not-found resources",
+              "location": "src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "For PUT /todos/:id and DELETE /todos/:id, requests to non-existent ids are incorrectly returning status codes indicating success rather than 404, which allows inconsistencies with clients expecting correct HTTP semantics."
+            }
+          ],
+          "cost_usd": 0.01461,
+          "latency_ms": 5890
+        }
+      ]
+    },
+    "DF-2": {
+      "reviewer_v3": [
+        {
+          "fixture": "DF-2",
+          "role": "reviewer",
+          "version": "reviewer_v3",
+          "trial": 1,
+          "is_baseline": false,
+          "ok": true,
+          "reason": null,
+          "verdict": "REJECTED",
+          "threat_level": null,
+          "blocker_count": 2,
+          "catches_defect": false,
+          "sqli_strict": 0,
+          "sqli_loose": 0,
+          "sqli_strict_blocker": false,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "SQL Injection vulnerability due to untrusted input being directly concatenated into SQL queries.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Use parameterized queries with bound parameters to prevent SQL injection, for instance: db.get('SELECT * FROM todos WHERE id = ?', [id], callback).",
+              "attack_vector": null
+            },
+            {
+              "severity": "BLOCKER",
+              "title": "Missing input validation for the 'title' field in POST /todos, allowing potentially harmful input in the database.",
+              "location": "createTodo function in src/controllers/todoController.js",
+              "recommendation": "Validate the 'title' input and ensure it conforms to expected constraints (e.g., non-empty, max length) before use in queries.",
+              "attack_vector": null
+            },
+            {
+              "severity": "WARN",
+              "title": "No check for the number of affected rows after an INSERT operation.",
+              "location": "createTodo function in src/controllers/todoController.js",
+              "recommendation": "Verify that the insert operation affects the expected number of rows, especially considering input validation failures.",
+              "attack_vector": null
+            },
+            {
+              "severity": "INFO",
+              "title": "No dependencies have been added in dependencies_added.",
+              "location": "dependencies_added",
+              "recommendation": "Verify if any new packages or modules have been employed that need to be declared.",
+              "attack_vector": null
+            }
+          ],
+          "cost_usd": 0.01453,
+          "latency_ms": 5134
+        },
+        {
+          "fixture": "DF-2",
+          "role": "reviewer",
+          "version": "reviewer_v3",
+          "trial": 2,
+          "is_baseline": false,
+          "ok": true,
+          "reason": null,
+          "verdict": "REJECTED",
+          "threat_level": null,
+          "blocker_count": 3,
+          "catches_defect": true,
+          "sqli_strict": 0,
+          "sqli_loose": 0,
+          "sqli_strict_blocker": false,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "SQL Injection vulnerability due to untrusted input directly concatenated into SQL queries.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Use parameterized queries or bound parameters to safely incorporate user input into SQL queries.",
+              "attack_vector": null
+            },
+            {
+              "severity": "BLOCKER",
+              "title": "PostgreSQL mutation without checking affected row count.",
+              "location": "src/controllers/todoController.js - getTodoById function",
+              "recommendation": "Refactor code to use parameterized queries and verify affected rows after UPDATE/DELETE operations.",
+              "attack_vector": null
+            },
+            {
+              "severity": "BLOCKER",
+              "title": "Potential SQL Injection in createTodo due to user input embedded in SQL string.",
+              "location": "src/controllers/todoController.js - createTodo function",
+              "recommendation": "Use parameterized queries or bound parameters to safely incorporate user input into INSERT statements.",
+              "attack_vector": null
+            },
+            {
+              "severity": "INFO",
+              "title": "Missing error handling for invalid POST request payload.",
+              "location": "src/controllers/todoController.js - createTodo function",
+              "recommendation": "Implement input validation for request payloads to handle cases with unexpected or missing properties in the request body.",
+              "attack_vector": null
+            },
+            {
+              "severity": "WARN",
+              "title": "No dependencies added despite using SQLite.",
+              "location": "dependencies_added",
+              "recommendation": "Ensure that the SQLite dependency is properly declared in the package management file, such as package.json.",
+              "attack_vector": null
+            }
+          ],
+          "cost_usd": 0.01498,
+          "latency_ms": 4659
+        },
+        {
+          "fixture": "DF-2",
+          "role": "reviewer",
+          "version": "reviewer_v3",
+          "trial": 3,
+          "is_baseline": false,
+          "ok": true,
+          "reason": null,
+          "verdict": "REJECTED",
+          "threat_level": null,
+          "blocker_count": 3,
+          "catches_defect": true,
+          "sqli_strict": 0,
+          "sqli_loose": 0,
+          "sqli_strict_blocker": false,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "Potential SQL injection vulnerability due to direct concatenation of `req.params.id` into SQL query in `getTodoById`.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Use parameterized queries with placeholders to safely incorporate `req.params.id`.",
+              "attack_vector": null
+            },
+            {
+              "severity": "BLOCKER",
+              "title": "Potential SQL injection vulnerability due to direct interpolation of `title` into SQL query in `createTodo`.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Use parameterized queries with placeholders to safely incorporate `title`.",
+              "attack_vector": null
+            },
+            {
+              "severity": "BLOCKER",
+              "title": "Missing affected-rows check after executing SQL queries for mutation operations.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "After executing the `INSERT` statement in `createTodo`, verify if a row was actually affected and handle the case where no rows are inserted.",
+              "attack_vector": null
+            },
+            {
+              "severity": "INFO",
+              "title": "Dependencies required for SQLite were not added.",
+              "location": "dependencies_added",
+              "recommendation": "Ensure that the `sqlite3` dependency is added to the project so the application can interface with the SQLite database.",
+              "attack_vector": null
+            },
+            {
+              "severity": "INFO",
+              "title": "The location `db` in `require('../models/todo')` may not be correct if the `models/todo` file does not exist or is improperly linked.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Ensure that `../models/todo` exists and correctly initializes or exports the SQLite database connection.",
+              "attack_vector": null
+            }
+          ],
+          "cost_usd": 0.01558,
+          "latency_ms": 4610
+        }
+      ],
+      "security_v2": [
+        {
+          "fixture": "DF-2",
+          "role": "security_auditor",
+          "version": "security_auditor_v2",
+          "trial": 1,
+          "is_baseline": false,
+          "ok": true,
+          "reason": null,
+          "verdict": null,
+          "threat_level": "CRITICAL",
+          "blocker_count": 2,
+          "catches_defect": false,
+          "sqli_strict": 2,
+          "sqli_loose": 2,
+          "sqli_strict_blocker": true,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "SQL injection",
+              "location": "src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "An attacker can exploit the getTodoById endpoint by passing malicious SQL code through the id parameter. For example, executing GET /todos/0%20OR%201=1 will result in unauthorized data access."
+            },
+            {
+              "severity": "BLOCKER",
+              "title": "SQL injection",
+              "location": "src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "In the createTodo function, an attacker could pass a malicious title that includes SQL code, allowing manipulation of the SQL statement."
+            }
+          ],
+          "cost_usd": 0.01368,
+          "latency_ms": 4798
+        },
+        {
+          "fixture": "DF-2",
+          "role": "security_auditor",
+          "version": "security_auditor_v2",
+          "trial": 2,
+          "is_baseline": false,
+          "ok": true,
+          "reason": null,
+          "verdict": null,
+          "threat_level": "CRITICAL",
+          "blocker_count": 2,
+          "catches_defect": false,
+          "sqli_strict": 2,
+          "sqli_loose": 2,
+          "sqli_strict_blocker": true,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "SQL injection",
+              "location": "src/controllers/todoController.js - getTodoById",
+              "recommendation": null,
+              "attack_vector": "Untrusted input req.params.id is concatenated directly into the SQL query, allowing attackers to manipulate the query logic, e.g., using '0 OR 1=1' to bypass access controls."
+            },
+            {
+              "severity": "BLOCKER",
+              "title": "SQL injection",
+              "location": "src/controllers/todoController.js - createTodo",
+              "recommendation": null,
+              "attack_vector": "Untrusted input req.body.title is interpolated into the SQL query, allowing attackers to inject malicious SQL to manipulate the database."
+            }
+          ],
+          "cost_usd": 0.01394,
+          "latency_ms": 6400
+        },
+        {
+          "fixture": "DF-2",
+          "role": "security_auditor",
+          "version": "security_auditor_v2",
+          "trial": 3,
+          "is_baseline": false,
+          "ok": true,
+          "reason": null,
+          "verdict": null,
+          "threat_level": "CRITICAL",
+          "blocker_count": 2,
+          "catches_defect": false,
+          "sqli_strict": 2,
+          "sqli_loose": 2,
+          "sqli_strict_blocker": true,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "SQL injection",
+              "location": "src/controllers/todoController.js: getTodoById",
+              "recommendation": null,
+              "attack_vector": "Attacker can manipulate the SQL query via the 'id' parameter (e.g., GET /todos/0%20OR%201=1) to extract or modify unauthorized data."
+            },
+            {
+              "severity": "BLOCKER",
+              "title": "SQL injection",
+              "location": "src/controllers/todoController.js: createTodo",
+              "recommendation": null,
+              "attack_vector": "Attacker can manipulate the SQL query via 'title' in the request body to insert malformed or malicious data."
+            }
+          ],
+          "cost_usd": 0.01397,
+          "latency_ms": 5203
+        }
+      ]
+    },
+    "DF-3": {
+      "reviewer_v3": [
+        {
+          "fixture": "DF-3",
+          "role": "reviewer",
+          "version": "reviewer_v3",
+          "trial": 1,
+          "is_baseline": false,
+          "ok": true,
+          "reason": null,
+          "verdict": "REJECTED",
+          "threat_level": null,
+          "blocker_count": 2,
+          "catches_defect": true,
+          "sqli_strict": 0,
+          "sqli_loose": 0,
+          "sqli_strict_blocker": false,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "The 'updateTodo' handler does not check how many rows were affected by the UPDATE operation.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Check 'this.changes' after the 'db.run' UPDATE statement and return a 404 status code if no rows were affected.",
+              "attack_vector": null
+            },
+            {
+              "severity": "BLOCKER",
+              "title": "The 'deleteTodo' handler does not check how many rows were affected by the DELETE operation.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Check 'this.changes' after the 'db.run' DELETE statement and return a 404 status code if no rows were affected.",
+              "attack_vector": null
+            },
+            {
+              "severity": "WARN",
+              "title": "No validation on 'title' in the 'createTodo' function, which could lead to invalid entries in the database.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Perform input validation to check that 'title' is a non-empty string before attempting the database operation.",
+              "attack_vector": null
+            },
+            {
+              "severity": "WARN",
+              "title": "No validation on 'title' and 'completed' in the 'updateTodo' function, which could corrupt data integrity.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Ensure 'title' is a non-empty string and 'completed' is a boolean or valid number before performing the update.",
+              "attack_vector": null
+            }
+          ],
+          "cost_usd": 0.01531,
+          "latency_ms": 6218
+        },
+        {
+          "fixture": "DF-3",
+          "role": "reviewer",
+          "version": "reviewer_v3",
+          "trial": 2,
+          "is_baseline": false,
+          "ok": true,
+          "reason": null,
+          "verdict": "REJECTED",
+          "threat_level": null,
+          "blocker_count": 2,
+          "catches_defect": true,
+          "sqli_strict": 0,
+          "sqli_loose": 0,
+          "sqli_strict_blocker": false,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "The 'updateTodo' function does not verify how many rows were affected by the UPDATE operation.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Check 'this.changes' after the UPDATE query and return a 404 status if no rows were updated.",
+              "attack_vector": null
+            },
+            {
+              "severity": "BLOCKER",
+              "title": "The 'deleteTodo' function does not verify how many rows were affected by the DELETE operation.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Check 'this.changes' after the DELETE query and return a 404 status if no rows were deleted.",
+              "attack_vector": null
+            },
+            {
+              "severity": "WARN",
+              "title": "The 'createTodo' function does not validate input, which can lead to unexpected errors or behaviors.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Validate 'title' in the request body to ensure it meets required constraints before inserting into the database.",
+              "attack_vector": null
+            },
+            {
+              "severity": "WARN",
+              "title": "The 'getTodos' function should return an empty array for no results instead of relying on implicit behavior.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Ensure that 'db.all' returns a correctly typed empty array in the JSON response when no todos exist.",
+              "attack_vector": null
+            },
+            {
+              "severity": "INFO",
+              "title": "The implementation fulfills the necessity of using parameterized queries to prevent SQL injection.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Continue using parameterized queries for all SQL executions to maintain security.",
+              "attack_vector": null
+            }
+          ],
+          "cost_usd": 0.01592,
+          "latency_ms": 5243
+        },
+        {
+          "fixture": "DF-3",
+          "role": "reviewer",
+          "version": "reviewer_v3",
+          "trial": 3,
+          "is_baseline": false,
+          "ok": true,
+          "reason": null,
+          "verdict": "REJECTED",
+          "threat_level": null,
+          "blocker_count": 2,
+          "catches_defect": true,
+          "sqli_strict": 0,
+          "sqli_loose": 0,
+          "sqli_strict_blocker": false,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "The updateTodo function does not check if any rows were actually updated, which violates the requirement to handle not-found cases appropriately.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "After the db.run call in updateTodo, check if this.changes is zero and return a 404 status code if no rows were updated.",
+              "attack_vector": null
+            },
+            {
+              "severity": "BLOCKER",
+              "title": "The deleteTodo function does not verify the number of rows deleted, which can lead to incorrect success responses on non-existent resources.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "After the db.run call in deleteTodo, check if this.changes is zero and return a 404 status code if no rows were deleted.",
+              "attack_vector": null
+            },
+            {
+              "severity": "WARN",
+              "title": "The updateTodo function returns a success response without checking if the provided todo id exists prior to updating.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Query the database to confirm the existence of the todo item before attempting to update, or handle cases where no rows are affected with a 404 response.",
+              "attack_vector": null
+            },
+            {
+              "severity": "INFO",
+              "title": "No additional dependencies have been added, which is expected based on the spec but worth confirming with the developers.",
+              "location": "dependencies_added",
+              "recommendation": "Ensure that the necessary dependencies, such as Express and sqlite3, are already integrated into the project.",
+              "attack_vector": null
+            }
+          ],
+          "cost_usd": 0.0155,
+          "latency_ms": 4416
+        }
+      ],
+      "security_v2": [
+        {
+          "fixture": "DF-3",
+          "role": "security_auditor",
+          "version": "security_auditor_v2",
+          "trial": 1,
+          "is_baseline": false,
+          "ok": true,
+          "reason": null,
+          "verdict": null,
+          "threat_level": "MEDIUM",
+          "blocker_count": 0,
+          "catches_defect": false,
+          "sqli_strict": 0,
+          "sqli_loose": 1,
+          "sqli_strict_blocker": false,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "missing authentication",
+              "location": "AC-1 to AC-4",
+              "recommendation": null,
+              "attack_vector": "An attacker can perform CRUD operations on todos without any authentication or user credential validation, potentially allowing unauthorized access and modification of data."
+            },
+            {
+              "severity": "WARN",
+              "title": "insecure data storage",
+              "location": "src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "SQLite database could be accessed directly if the file system is compromised, as there is no encryption on the stored data."
+            }
+          ],
+          "cost_usd": 0.01351,
+          "latency_ms": 6570
+        },
+        {
+          "fixture": "DF-3",
+          "role": "security_auditor",
+          "version": "security_auditor_v2",
+          "trial": 2,
+          "is_baseline": false,
+          "ok": true,
+          "reason": null,
+          "verdict": null,
+          "threat_level": "HIGH",
+          "blocker_count": 1,
+          "catches_defect": false,
+          "sqli_strict": 0,
+          "sqli_loose": 0,
+          "sqli_strict_blocker": false,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "missing authentication",
+              "location": "API endpoints in src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "An unauthenticated attacker can access, modify, or delete any todo item by directly interacting with the CRUD endpoints."
+            },
+            {
+              "severity": "WARN",
+              "title": "missing input validation",
+              "location": "src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "Attackers can send malformed or unexpected data potentially leading to logical errors or other vulnerabilities."
+            }
+          ],
+          "cost_usd": 0.01347,
+          "latency_ms": 2227
+        },
+        {
+          "fixture": "DF-3",
+          "role": "security_auditor",
+          "version": "security_auditor_v2",
+          "trial": 3,
+          "is_baseline": false,
+          "ok": true,
+          "reason": null,
+          "verdict": null,
+          "threat_level": "LOW",
+          "blocker_count": 0,
+          "catches_defect": false,
+          "sqli_strict": 0,
+          "sqli_loose": 0,
+          "sqli_strict_blocker": false,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "missing authentication",
+              "location": "specification: out_of_scope",
+              "recommendation": null,
+              "attack_vector": "An unauthenticated user can perform CRUD operations on todos, potentially accessing or modifying data without permission."
+            },
+            {
+              "severity": "WARN",
+              "title": "missing input validation",
+              "location": "src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "The API accepts title and completed fields from user input without validation, which could lead to unexpected behavior or attacks if unexpected data types are processed."
+            }
+          ],
+          "cost_usd": 0.01357,
+          "latency_ms": 2108
+        }
+      ]
+    },
+    "DF-4": {
+      "reviewer_v3": [
+        {
+          "fixture": "DF-4",
+          "role": "reviewer",
+          "version": "reviewer_v3",
+          "trial": 1,
+          "is_baseline": false,
+          "ok": true,
+          "reason": null,
+          "verdict": "APPROVED",
+          "threat_level": null,
+          "blocker_count": 0,
+          "catches_defect": false,
+          "sqli_strict": 0,
+          "sqli_loose": 0,
+          "sqli_strict_blocker": false,
+          "findings": [
+            {
+              "severity": "INFO",
+              "title": "The GET /todos endpoint does not return a 204 status code when there are no todos.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Optionally check if rows is empty in getTodos and return 204 if necessary, or retain the current behavior as 200 with an empty array.",
+              "attack_vector": null
+            }
+          ],
+          "cost_usd": 0.01216,
+          "latency_ms": 6546
+        },
+        {
+          "fixture": "DF-4",
+          "role": "reviewer",
+          "version": "reviewer_v3",
+          "trial": 2,
+          "is_baseline": false,
+          "ok": true,
+          "reason": null,
+          "verdict": "APPROVED_WITH_CONCERNS",
+          "threat_level": null,
+          "blocker_count": 0,
+          "catches_defect": false,
+          "sqli_strict": 0,
+          "sqli_loose": 0,
+          "sqli_strict_blocker": false,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "Dependencies list is empty, which might not adequately reflect the actual dependencies required by the code.",
+              "location": "dependencies_added",
+              "recommendation": "Verify that 'express' and 'sqlite3' are included as dependencies in the project's package.json file.",
+              "attack_vector": null
+            },
+            {
+              "severity": "WARN",
+              "title": "The 'purpose' of the file to be created does not specify the need for handling edge cases or validation of input data.",
+              "location": "files_to_create",
+              "recommendation": "Explicitly include input validation requirements in the file's 'purpose' to guide implementations.",
+              "attack_vector": null
+            }
+          ],
+          "cost_usd": 0.01314,
+          "latency_ms": 2972
+        },
+        {
+          "fixture": "DF-4",
+          "role": "reviewer",
+          "version": "reviewer_v3",
+          "trial": 3,
+          "is_baseline": false,
+          "ok": true,
+          "reason": null,
+          "verdict": "REJECTED",
+          "threat_level": null,
+          "blocker_count": 2,
+          "catches_defect": false,
+          "sqli_strict": 0,
+          "sqli_loose": 0,
+          "sqli_strict_blocker": false,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "AC-2 requires a 200 status code and JSON array response on GET /todos. The implementation currently relies on automatic Express handling, which does not guarantee the status code is set.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Explicitly set res.status(200) before res.json(rows) in getTodos handler.",
+              "attack_vector": null
+            },
+            {
+              "severity": "BLOCKER",
+              "title": "AC-1 states POST /todos returns 201. The code returns 201 but does not verify input validity beyond the presence of a 'title'.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Add validation to check if the 'title' is non-empty and meets any minimum length requirements before performing the database operation.",
+              "attack_vector": null
+            }
+          ],
+          "cost_usd": 0.01342,
+          "latency_ms": 2846
+        }
+      ],
+      "security_v2": [
+        {
+          "fixture": "DF-4",
+          "role": "security_auditor",
+          "version": "security_auditor_v2",
+          "trial": 1,
+          "is_baseline": false,
+          "ok": true,
+          "reason": null,
+          "verdict": null,
+          "threat_level": "MEDIUM",
+          "blocker_count": 0,
+          "catches_defect": false,
+          "sqli_strict": 0,
+          "sqli_loose": 0,
+          "sqli_strict_blocker": false,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "An attacker can send invalid data for 'title' or 'completed' fields in the request body to 'POST /todos' or 'PUT /todos/:id', potentially causing unexpected behavior or application errors."
+            },
+            {
+              "severity": "INFO",
+              "title": "Lack of authorization",
+              "location": "Overall API design",
+              "recommendation": null,
+              "attack_vector": "Any client can access and manipulate todos via the API without restriction, as access control is explicitly out of scope."
+            }
+          ],
+          "cost_usd": 0.01412,
+          "latency_ms": 2190
+        },
+        {
+          "fixture": "DF-4",
+          "role": "security_auditor",
+          "version": "security_auditor_v2",
+          "trial": 2,
+          "is_baseline": false,
+          "ok": true,
+          "reason": null,
+          "verdict": null,
+          "threat_level": "MEDIUM",
+          "blocker_count": 0,
+          "catches_defect": false,
+          "sqli_strict": 0,
+          "sqli_loose": 0,
+          "sqli_strict_blocker": false,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "Missing authentication",
+              "location": "src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "An attacker can perform CRUD operations on todos without any authentication or authorization checks, affecting data integrity."
+            },
+            {
+              "severity": "INFO",
+              "title": "Unvalidated input",
+              "location": "src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "Client-side inputs 'title' from request body are not validated before being processed."
+            }
+          ],
+          "cost_usd": 0.01356,
+          "latency_ms": 1934
+        },
+        {
+          "fixture": "DF-4",
+          "role": "security_auditor",
+          "version": "security_auditor_v2",
+          "trial": 3,
+          "is_baseline": false,
+          "ok": true,
+          "reason": null,
+          "verdict": null,
+          "threat_level": "LOW",
+          "blocker_count": 0,
+          "catches_defect": false,
+          "sqli_strict": 0,
+          "sqli_loose": 1,
+          "sqli_strict_blocker": false,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "Unvalidated input data (such as title in createTodo and updateTodo) might lead to unexpected behavior or data integrity issues, though SQL injection is prevented by parameterized queries."
+            },
+            {
+              "severity": "WARN",
+              "title": "Missing access control",
+              "location": "General",
+              "recommendation": null,
+              "attack_vector": "Lack of authentication and authorization mechanisms allows any user to perform CRUD operations on todos without restriction, potentially altering or deleting data unexpectedly."
+            }
+          ],
+          "cost_usd": 0.01406,
+          "latency_ms": 2135
+        }
+      ]
+    }
+  },
+  "baseline_trials": {
+    "reviewer_v2_DF1": [
+      {
+        "fixture": "DF-1",
+        "role": "reviewer",
+        "version": "reviewer_v2",
+        "trial": 1,
+        "is_baseline": true,
+        "ok": true,
+        "reason": null,
+        "verdict": "REJECTED",
+        "threat_level": null,
+        "blocker_count": 1,
+        "catches_defect": true,
+        "sqli_strict": 0,
+        "sqli_loose": 0,
+        "sqli_strict_blocker": false,
+        "findings": [
+          {
+            "severity": "BLOCKER",
+            "title": "The implementation does not handle nonexistent IDs correctly in updateTodo and deleteTodo, violating AC-3 and AC-4.",
+            "location": "src/controllers/todoController.js",
+            "recommendation": "Inspect the affected-row count (this.changes) in updateTodo and deleteTodo, and return 404 if it is zero.",
+            "attack_vector": null
+          },
+          {
+            "severity": "WARN",
+            "title": "The files_to_create in the spec contains only src/controllers/todoController.js, which suggests potential missing components like database initialization and connection management.",
+            "location": "spec.files_to_create",
+            "recommendation": "Ensure that all necessary files for database connectivity and initialization are listed and created.",
+            "attack_vector": null
+          },
+          {
+            "severity": "INFO",
+            "title": "No dependencies were added, but sqlite3 is implied as needed.",
+            "location": "code.dependencies_added",
+            "recommendation": "Verify that sqlite3 is included in the actual project dependencies and update dependencies_added to reflect this.",
+            "attack_vector": null
+          }
+        ],
+        "cost_usd": 0.01204,
+        "latency_ms": 3096
+      },
+      {
+        "fixture": "DF-1",
+        "role": "reviewer",
+        "version": "reviewer_v2",
+        "trial": 2,
+        "is_baseline": true,
+        "ok": true,
+        "reason": null,
+        "verdict": "REJECTED",
+        "threat_level": null,
+        "blocker_count": 3,
+        "catches_defect": true,
+        "sqli_strict": 0,
+        "sqli_loose": 0,
+        "sqli_strict_blocker": false,
+        "findings": [
+          {
+            "severity": "BLOCKER",
+            "title": "The updateTodo function does not inspect the affected-row count, violating AC-3. It returns 200 instead of 404 when no row is updated.",
+            "location": "src/controllers/todoController.js",
+            "recommendation": "Modify the updateTodo function to check this.changes and return 404 if no row is updated.",
+            "attack_vector": null
+          },
+          {
+            "severity": "BLOCKER",
+            "title": "The deleteTodo function does not inspect the affected-row count, violating AC-4. It returns 204 instead of 404 when no row is deleted.",
+            "location": "src/controllers/todoController.js",
+            "recommendation": "Modify the deleteTodo function to check this.changes and return 404 if no row is deleted.",
+            "attack_vector": null
+          },
+          {
+            "severity": "BLOCKER",
+            "title": "The code does not add any required dependencies, which is necessary for Express and SQLite functionality.",
+            "location": "dependencies_added",
+            "recommendation": "Ensure necessary dependencies like express and sqlite3 are listed in dependencies_added.",
+            "attack_vector": null
+          }
+        ],
+        "cost_usd": 0.01219,
+        "latency_ms": 2490
+      }
+    ],
+    "security_v1_DF3": [
+      {
+        "fixture": "DF-3",
+        "role": "security_auditor",
+        "version": "security_auditor_v1",
+        "trial": 1,
+        "is_baseline": true,
+        "ok": true,
+        "reason": null,
+        "verdict": null,
+        "threat_level": "HIGH",
+        "blocker_count": 1,
+        "catches_defect": false,
+        "sqli_strict": 0,
+        "sqli_loose": 0,
+        "sqli_strict_blocker": false,
+        "findings": [
+          {
+            "severity": "BLOCKER",
+            "title": "missing authentication",
+            "location": "overall API design",
+            "recommendation": null,
+            "attack_vector": "An attacker can execute any CRUD operation on todos without authentication, potentially accessing or modifying sensitive data."
+          },
+          {
+            "severity": "WARN",
+            "title": "missing input validation",
+            "location": "src/controllers/todoController.js",
+            "recommendation": null,
+            "attack_vector": "Without input validation, malformed or malicious data could be processed and stored, leading to unexpected behavior or a DoS attack."
+          },
+          {
+            "severity": "INFO",
+            "title": "over-privileged operations",
+            "location": "src/controllers/todoController.js",
+            "recommendation": null,
+            "attack_vector": "Operations on todos could modify unintended data if route parameters aren't strictly controlled."
+          }
+        ],
+        "cost_usd": 0.01244,
+        "latency_ms": 2499
+      },
+      {
+        "fixture": "DF-3",
+        "role": "security_auditor",
+        "version": "security_auditor_v1",
+        "trial": 2,
+        "is_baseline": true,
+        "ok": true,
+        "reason": null,
+        "verdict": null,
+        "threat_level": "HIGH",
+        "blocker_count": 2,
+        "catches_defect": false,
+        "sqli_strict": 0,
+        "sqli_loose": 2,
+        "sqli_strict_blocker": false,
+        "findings": [
+          {
+            "severity": "BLOCKER",
+            "title": "Missing Authentication",
+            "location": "spec",
+            "recommendation": null,
+            "attack_vector": "An attacker can make unauthenticated requests to any of the CRUD endpoints to create, read, update, or delete todo items without restriction."
+          },
+          {
+            "severity": "BLOCKER",
+            "title": "Missing Authorization",
+            "location": "spec",
+            "recommendation": null,
+            "attack_vector": "A user can manipulate todo items of other users, potentially resulting in data exposure or corruption."
+          },
+          {
+            "severity": "WARN",
+            "title": "Missing Input Validation",
+            "location": "src/controllers/todoController.js",
+            "recommendation": null,
+            "attack_vector": "Input fields such as 'title', 'completed', and 'id' are directly used in SQL queries without validation, leading to potential injection or application errors."
+          },
+          {
+            "severity": "INFO",
+            "title": "Using Unencrypted Local Database",
+            "location": "design",
+            "recommendation": null,
+            "attack_vector": "Data stored in the local SQLite database is not encrypted, allowing anyone with access to the file system to read the data in clear text."
+          }
+        ],
+        "cost_usd": 0.01376,
+        "latency_ms": 2813
+      }
+    ]
+  }
+}

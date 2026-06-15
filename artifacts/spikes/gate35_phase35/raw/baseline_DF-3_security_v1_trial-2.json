@@ -1,0 +1,52 @@
+{
+  "tag": "baseline_DF-3_security_v1_trial-2",
+  "project_id": "phase28_gate10",
+  "ok": true,
+  "reason": null,
+  "output": {
+    "threat_level": "HIGH",
+    "findings": [
+      {
+        "severity": "BLOCKER",
+        "vulnerability": "Missing Authentication",
+        "location": "spec",
+        "attack_vector": "An attacker can make unauthenticated requests to any of the CRUD endpoints to create, read, update, or delete todo items without restriction.",
+        "mitigation": "Implement authentication and require it for all endpoints. Use JWT or sessions for managing user authentication."
+      },
+      {
+        "severity": "BLOCKER",
+        "vulnerability": "Missing Authorization",
+        "location": "spec",
+        "attack_vector": "A user can manipulate todo items of other users, potentially resulting in data exposure or corruption.",
+        "mitigation": "Implement authorization checks on each endpoint to ensure the user is permitted to perform the requested action on the todo items."
+      },
+      {
+        "severity": "WARN",
+        "vulnerability": "Missing Input Validation",
+        "location": "src/controllers/todoController.js",
+        "attack_vector": "Input fields such as 'title', 'completed', and 'id' are directly used in SQL queries without validation, leading to potential injection or application errors.",
+        "mitigation": "Validate and sanitize input parameters to ensure they meet expected formats and lengths before processing them."
+      },
+      {
+        "severity": "INFO",
+        "vulnerability": "Using Unencrypted Local Database",
+        "location": "design",
+        "attack_vector": "Data stored in the local SQLite database is not encrypted, allowing anyone with access to the file system to read the data in clear text.",
+        "mitigation": "Consider using SQLite encryption extensions or full disk encryption to protect data at rest."
+      }
+    ],
+    "summary": "The Todo REST API has high severity vulnerabilities due to missing authentication and authorization. Without these, the API is exposed to unauthorized access and manipulation. Top priority is to implement these controls. Input validation improvements and data encryption are also recommended for better security posture."
+  },
+  "ledger": {
+    "tag": "baseline_DF-3_security_v1_trial-2",
+    "role": "security_auditor",
+    "provider": "openai",
+    "model": "gpt-4o-2024-08-06",
+    "tokens_in": 1501,
+    "tokens_out": 417,
+    "latency_ms": 2813,
+    "cost_usd_actual": 0.01376,
+    "outcome": "success",
+    "ts": "2026-06-15T16:43:32.729Z"
+  }
+}
