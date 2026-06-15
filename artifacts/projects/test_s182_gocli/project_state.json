@@ -1,6 +1,6 @@
 {
-  "project_id": "diag_s182_pycli",
-  "project_name": "diag_s182_pycli",
+  "project_id": "test_s182_gocli",
+  "project_name": "test_s182_gocli",
   "project_type": "REVIEW",
   "project_mode": "EXTEND_EXISTING",
   "project_status": "ACTIVE",
@@ -37,8 +37,8 @@
     "has_decision_packet": false
   },
   "artifact_registry": {
-    "project_root": "artifacts/projects/diag_s182_pycli",
-    "project_state": "artifacts/projects/diag_s182_pycli/project_state.json",
+    "project_root": "artifacts/projects/test_s182_gocli",
+    "project_state": "artifacts/projects/test_s182_gocli/project_state.json",
     "decision_packet": "",
     "execution_package": ""
   },
@@ -52,5 +52,5 @@
   "vision_history": [],
   "conversation_mode": "PIPELINE",
   "active_project_flag": false,
-  "last_updated_at": "2026-06-15T12:16:06.212Z"
+  "last_updated_at": "2026-06-15T12:16:06.447Z"
 }
