@@ -1,0 +1,19 @@
+{
+  "request_body": {
+    "project_id": "phase34_gate10",
+    "loop_id": "gate34-dep-3b289d4d",
+    "gate_id": 3,
+    "response": "APPROVE",
+    "selected_target": "vercel"
+  },
+  "http_status": 200,
+  "latency_ms": 31,
+  "response": {
+    "ok": true,
+    "loop_id": "gate34-dep-3b289d4d",
+    "gate_id": 3,
+    "response": "APPROVE",
+    "advanced_to": "LIVE_DELIVERABLE",
+    "advanced": true
+  }
+}

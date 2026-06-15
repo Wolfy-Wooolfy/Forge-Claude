@@ -1,0 +1,17 @@
+{
+  "count": 1,
+  "total_cost_usd": 0.01728,
+  "new_entries": [
+    {
+      "role": "deployment",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 1109,
+      "tokens_out": 782,
+      "latency_ms": 9633,
+      "cost_usd_actual": 0.01728,
+      "outcome": "success",
+      "ts": "2026-06-15T10:06:12.147Z"
+    }
+  ]
+}

@@ -1,0 +1,190 @@
+{
+  "verdict": "HONEST_EVIDENCE",
+  "mode": "REAL_GPT4O",
+  "branch": "DEPLOYMENT_OR_END → gate_pending:3 → APPROVE(selected_target) → LIVE_DELIVERABLE → finalize → COMPLETE",
+  "provider": "openai",
+  "model": "gpt-4o",
+  "project_id": "phase34_gate10",
+  "loop_id": "gate34-dep-3b289d4d",
+  "port": 65060,
+  "selected_target": "vercel",
+  "pre_state": "DEPLOYMENT_OR_END",
+  "state_after_deploy": "DEPLOYMENT_OR_END",
+  "state_after_gate3": "LIVE_DELIVERABLE",
+  "final_state": "COMPLETE",
+  "advance_real": true,
+  "per_step_states": [
+    "DEPLOYMENT_OR_END",
+    "DEPLOYMENT_OR_END",
+    "LIVE_DELIVERABLE",
+    "COMPLETE"
+  ],
+  "deploy_response": {
+    "ok": true,
+    "loop_id": "gate34-dep-3b289d4d",
+    "deployment_plan": {
+      "role_id": "deployment",
+      "target_environment": "container",
+      "prerequisites": [
+        {
+          "item": "Node.js runtime version >= 20 must be installed in the container.",
+          "verified_by": "Check the installed Node.js version using 'node -v'."
+        },
+        {
+          "item": "An SQLite database setup with access permissions for the API server.",
+          "verified_by": "Ensure the database file exists and is readable and writable by the container user."
+        },
+        {
+          "item": "Availability of containerization software, e.g., Docker.",
+          "verified_by": "Verify Docker is running by executing 'docker --version' or checking the service status."
+        },
+        {
+          "item": "Environment variable 'PORT' with default of 3000 if not set.",
+          "verified_by": "Check if the 'PORT' environment variable is set or defaults correctly."
+        }
+      ],
+      "build_steps": [
+        {
+          "step": 1,
+          "description": "Install all Node.js dependencies specified in 'package.json'.",
+          "artifact": "node_modules folder populated with dependencies.",
+          "notes": "Assumes 'package.json' includes all required dependencies."
+        },
+        {
+          "step": 2,
+          "description": "Build the Docker image for the API server.",
+          "artifact": "Docker image containing the application.",
+          "notes": "Ensure Docker Daemon is running before attempting to build the image."
+        }
+      ],
+      "deployment_sequence": [
+        {
+          "step": 1,
+          "description": "Pull the latest Docker image from the known registry or build it from the source if not available.",
+          "requires_elevated_privileges": true,
+          "is_irreversible": false,
+          "notes": "Rollback can be done by re-pulling or rebuilding the previous image version."
+        },
+        {
+          "step": 2,
+          "description": "Run the Docker container with the proper environment variables and volume bindings for SQLite.",
+          "requires_elevated_privileges": false,
+          "is_irreversible": false,
+          "notes": "Ensure correct volume bindings for data persistence."
+        }
+      ],
+      "rollback_procedure": [
+        {
+          "step": 1,
+          "description": "Stop and remove the current Docker container instance."
+        },
+        {
+          "step": 2,
+          "description": "Re-run or re-deploy the previous stable Docker image version."
+        }
+      ],
+      "health_verification": {
+        "method": "Send a test HTTP request to the API endpoint and check the response.",
+        "expected_outcome": "The API responds with a 200 OK and valid body for a known good request.",
+        "timeout_seconds": 120
+      },
+      "post_deployment_tasks": [
+        "Perform data migration scripts to ensure SQLite database schema is up-to-date.",
+        "Warm up the application cache if caching is implemented.",
+        "Execute smoke tests to verify critical API endpoints."
+      ],
+      "deployment_risks": [
+        {
+          "risk": "Data loss due to misconfigured data volume or migration scripts.",
+          "severity": "LOW",
+          "mitigation": "Regular database backups and staging environment tests."
+        },
+        {
+          "risk": "Service unavailability during the container restart.",
+          "severity": "MEDIUM",
+          "mitigation": "Use rolling updates or load balancer to minimize downtime."
+        }
+      ],
+      "summary": "The target deployment is a containerized Node.js REST API using SQLite for data management. The deployment follows Docker image build and run procedures, with critical steps being source-dependent image creation and database integration. The top risk is service unavailability, mitigated by using a rolling update process."
+    },
+    "gate_pending": 3,
+    "advanced": false,
+    "model_used": "gpt-4o"
+  },
+  "gate3_response": {
+    "ok": true,
+    "loop_id": "gate34-dep-3b289d4d",
+    "gate_id": 3,
+    "response": "APPROVE",
+    "advanced_to": "LIVE_DELIVERABLE",
+    "advanced": true
+  },
+  "finalize_response": {
+    "ok": true,
+    "loop_id": "gate34-dep-3b289d4d",
+    "advanced": true,
+    "advanced_to": "COMPLETE",
+    "summary_path": "artifacts/projects/phase34_gate10/orchestration/gate34-dep-3b289d4d/orchestration_summary.md"
+  },
+  "deployment_plan": {
+    "on_disk_path": "artifacts\\projects\\phase34_gate10\\orchestration\\gate34-dep-3b289d4d\\deployment_plan.json",
+    "on_disk_size_bytes": 3532,
+    "keys_present": [
+      "target_environment",
+      "prerequisites",
+      "build_steps",
+      "deployment_sequence",
+      "rollback_procedure",
+      "health_verification",
+      "post_deployment_tasks",
+      "deployment_risks",
+      "summary"
+    ],
+    "target_environment": "container",
+    "deployment_step_count": 2,
+    "risk_count": 2,
+    "summary": "The target deployment is a containerized Node.js REST API using SQLite for data management. The deployment follows Docker image build and run procedures, with critical steps being source-dependent image creation and database integration. The top risk is service unavailability, mitigated by using a rolling update process."
+  },
+  "orchestration_summary": {
+    "on_disk_path": "artifacts\\projects\\phase34_gate10\\orchestration\\gate34-dep-3b289d4d\\orchestration_summary.md",
+    "on_disk_size_bytes": 1425,
+    "written_with_content": true
+  },
+  "inputs_seeded": {
+    "required": [
+      "spec.json",
+      "architect_design.json"
+    ],
+    "optionals_present": [
+      "env_report.json"
+    ]
+  },
+  "estimated_usd": 0.01728,
+  "latency_ms": {
+    "deploy_http_round_trip": 9795,
+    "deploy_real_role_max": 9633,
+    "gate3_http_round_trip": 31,
+    "finalize_http_round_trip": 55,
+    "mock_signature_note": "mock deployment calls return in ~tens of ms; this real call is ~thousands of ms; finalize is deterministic (no LLM)"
+  },
+  "cost": {
+    "ledger_before_usd": 0,
+    "ledger_after_usd": 0.01728,
+    "delta_usd": 0.01728,
+    "per_role": [
+      {
+        "role": "deployment",
+        "provider": "openai",
+        "model": "gpt-4o-2024-08-06",
+        "tokens_in": 1109,
+        "tokens_out": 782,
+        "latency_ms": 9633,
+        "cost_usd_actual": 0.01728,
+        "outcome": "success",
+        "ts": "2026-06-15T10:06:12.147Z"
+      }
+    ]
+  },
+  "raw_role_snippet": "{\"role_id\":\"deployment\",\"target_environment\":\"container\",\"prerequisites\":[{\"item\":\"Node.js runtime version >= 20 must be installed in the container.\",\"verified_by\":\"Check the installed Node.js version using 'node -v'.\"},{\"item\":\"An SQLite database setup with access permissions for the API server.\",\"verified_by\":\"Ensure the database file exists and is readable and writable by the container user.\"},{\"item\":\"Availability of containerization software, e.g., Docker.\",\"verified_by\":\"Verify Docker is running by executing 'docker --version' or checking the service status.\"},{\"item\":\"Environment variab…(truncated)",
+  "timestamp": "2026-06-15T10:06:12.271Z"
+}

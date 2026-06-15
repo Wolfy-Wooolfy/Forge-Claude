@@ -1,0 +1,15 @@
+{
+  "request_body": {
+    "project_id": "phase34_gate10",
+    "loop_id": "gate34-dep-3b289d4d"
+  },
+  "http_status": 200,
+  "latency_ms": 55,
+  "response": {
+    "ok": true,
+    "loop_id": "gate34-dep-3b289d4d",
+    "advanced": true,
+    "advanced_to": "COMPLETE",
+    "summary_path": "artifacts/projects/phase34_gate10/orchestration/gate34-dep-3b289d4d/orchestration_summary.md"
+  }
+}
