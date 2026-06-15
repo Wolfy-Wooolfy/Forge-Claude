@@ -1,0 +1,17 @@
+{
+  "scope": "A minimal Todo REST API (Express + SQLite) exposing CRUD endpoints plus fetch-by-id.",
+  "decisions": [
+    { "decision": "Use Express.js as the HTTP framework", "rationale": "Minimal framework for a small CRUD API" },
+    { "decision": "Use SQLite via sqlite3", "rationale": "Zero-config single-file storage" }
+  ],
+  "acceptance_criteria": [
+    { "id": "AC-1", "description": "POST /todos with a valid title returns 201 and the created todo" },
+    { "id": "AC-2", "description": "GET /todos returns 200 and a JSON array of todos" },
+    { "id": "AC-3", "description": "GET /todos/:id returns 200 and the todo, or 404 if not found" }
+  ],
+  "files_to_create": [
+    { "path": "src/controllers/todoController.js", "purpose": "CRUD + fetch-by-id route handlers for todos" }
+  ],
+  "files_to_modify": [],
+  "out_of_scope": ["Authentication", "Pagination"]
+}

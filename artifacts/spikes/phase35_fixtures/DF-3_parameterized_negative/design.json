@@ -1,0 +1,18 @@
+{
+  "design_summary": "Single-process Node.js/Express service backed by a local SQLite database, exposing a small todo CRUD API. This is the real phase28_gate10 build.",
+  "components": [
+    { "name": "API Server", "tech": "Express", "purpose": "HTTP routing and request handling" },
+    { "name": "Database", "tech": "SQLite (sqlite3)", "purpose": "Persist todo rows" }
+  ],
+  "data_flow": "Client -> Express route -> todoController -> SQLite -> JSON response",
+  "technology_choices": [
+    { "category": "language", "choice": "JavaScript/Node.js", "rationale": "Lightweight for CRUD workloads" },
+    { "category": "database", "choice": "SQLite", "rationale": "Zero-config single-file database" }
+  ],
+  "integration_points": [
+    { "name": "REST API", "type": "API", "notes": "JSON over HTTP" }
+  ],
+  "identified_risks": [
+    { "risk": "SQL injection if inputs are interpolated", "severity": "HIGH", "mitigation": "Use parameterized queries with bound parameters (already done in this build)" }
+  ]
+}

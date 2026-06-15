@@ -170,8 +170,13 @@ Converts an Architect design into a formal implementation contract. Does not add
 |---|---|
 | `id` | `reviewer` |
 | `authority_level` | `BLOCKING` |
-| `system_prompt_id` | `reviewer_v2` |
+| `system_prompt_id` | `reviewer_v3` |
 | `default_model` | `claude-opus-4-7` |
+
+> Version history: `reviewer_v3` (PHASE-35) supersedes `reviewer_v2` — same input/output schema and
+> verdict rules; adds Phase-B control-flow review (read actual `code.files_written[].content`),
+> `this.changes`/row-existence + not-found(404) correctness checks, and severity calibration
+> (behavioral/contract defect = BLOCKER). `reviewer_v2` / `reviewer_v1` retained verbatim in `18b`.
 
 **Input schema:** `{ phase: "A"|"B", spec: object, design: object, project_id: string, code?: object }`
 
@@ -210,8 +215,13 @@ Plans the implementation by describing files to create or modify. Delegates actu
 |---|---|
 | `id` | `security_auditor` |
 | `authority_level` | `BLOCKING` |
-| `system_prompt_id` | `security_auditor_v1` |
+| `system_prompt_id` | `security_auditor_v2` |
 | `default_model` | `claude-opus-4-7` |
+
+> Version history: `security_auditor_v2` (PHASE-35) supersedes `security_auditor_v1` — same
+> input/output schema, threat rubric, and severity ladder; adds a verify-before-flag discipline
+> (do NOT flag injection on parameterized/bound queries) and a false-positive prohibition.
+> `security_auditor_v1` retained verbatim in `18b`.
 
 **Input schema:** `{ project_id: string, phase: "SPEC"|"CODE", spec: object, design: object, code?: object }`
 

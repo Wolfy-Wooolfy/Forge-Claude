@@ -1,0 +1,38 @@
+const db = require('../models/todo');
+
+// Clean implementation: parameterized queries AND affected-row checks so that
+// update/delete of a non-existent id correctly returns 404 (satisfies AC-3, AC-4).
+
+exports.getTodos = (req, res, next) => {
+  db.all('SELECT * FROM todos', [], (err, rows) => {
+    if (err) return next(err);
+    res.json(rows);
+  });
+};
+
+exports.createTodo = (req, res, next) => {
+  const { title } = req.body;
+  db.run('INSERT INTO todos (title) VALUES (?)', [title], function (err) {
+    if (err) return next(err);
+    res.status(201).json({ id: this.lastID, title, completed: 0 });
+  });
+};
+
+exports.updateTodo = (req, res, next) => {
+  const { id } = req.params;
+  const { title, completed } = req.body;
+  db.run('UPDATE todos SET title = ?, completed = ? WHERE id = ?', [title, completed, id], function (err) {
+    if (err) return next(err);
+    if (this.changes === 0) return res.status(404).json({ error: 'Todo not found' });
+    res.json({ id, title, completed });
+  });
+};
+
+exports.deleteTodo = (req, res, next) => {
+  const { id } = req.params;
+  db.run('DELETE FROM todos WHERE id = ?', [id], function (err) {
+    if (err) return next(err);
+    if (this.changes === 0) return res.status(404).json({ error: 'Todo not found' });
+    res.status(204).end();
+  });
+};
