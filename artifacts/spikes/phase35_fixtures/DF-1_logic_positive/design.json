@@ -13,6 +13,6 @@
     { "name": "REST API", "type": "API", "notes": "JSON over HTTP" }
   ],
   "identified_risks": [
-    { "risk": "Incorrect not-found handling on update/delete", "severity": "MEDIUM", "mitigation": "Check affected-row count and return 404 when zero rows match" }
+    { "risk": "SQLite write contention under concurrent requests", "severity": "LOW", "mitigation": "Enable WAL mode or serialize writes if throughput becomes a concern" }
   ]
 }

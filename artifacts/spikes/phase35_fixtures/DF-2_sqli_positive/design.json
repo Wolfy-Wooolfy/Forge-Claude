@@ -13,6 +13,6 @@
     { "name": "REST API", "type": "API", "notes": "JSON over HTTP" }
   ],
   "identified_risks": [
-    { "risk": "SQL injection if request input is interpolated into queries", "severity": "HIGH", "mitigation": "Use parameterized queries with bound parameters" }
+    { "risk": "Unbounded result set returned by GET /todos as the table grows", "severity": "LOW", "mitigation": "Add pagination or a result limit if the dataset grows large" }
   ]
 }

@@ -170,13 +170,18 @@ Converts an Architect design into a formal implementation contract. Does not add
 |---|---|
 | `id` | `reviewer` |
 | `authority_level` | `BLOCKING` |
-| `system_prompt_id` | `reviewer_v3` |
+| `system_prompt_id` | `reviewer_v4` |
 | `default_model` | `claude-opus-4-7` |
 
-> Version history: `reviewer_v3` (PHASE-35) supersedes `reviewer_v2` — same input/output schema and
-> verdict rules; adds Phase-B control-flow review (read actual `code.files_written[].content`),
-> `this.changes`/row-existence + not-found(404) correctness checks, and severity calibration
-> (behavioral/contract defect = BLOCKER). `reviewer_v2` / `reviewer_v1` retained verbatim in `18b`.
+> Version history: `reviewer_v4` (PHASE-35 STEP A-2) supersedes `reviewer_v3` — same input/output
+> schema and verdict rules; adds a Phase-B precision/anti-over-fire clause (trace the handler before
+> raising an AC BLOCKER; a satisfied AC must NOT be a BLOCKER; a BLOCKER needs a concrete cite-a-line
+> defect) WITHOUT relaxing the v3 recall (a genuine behavioral/contract defect — missing
+> `this.changes`/row-existence → wrong status code, missing 404, unmet AC — is STILL a BLOCKER).
+> `reviewer_v3` (PHASE-35) superseded `reviewer_v2` — adds Phase-B control-flow review (read actual
+> `code.files_written[].content`), `this.changes`/row-existence + not-found(404) correctness checks,
+> and severity calibration (behavioral/contract defect = BLOCKER). `reviewer_v3` / `reviewer_v2` /
+> `reviewer_v1` retained verbatim in `18b`.
 
 **Input schema:** `{ phase: "A"|"B", spec: object, design: object, project_id: string, code?: object }`
 
