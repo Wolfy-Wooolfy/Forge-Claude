@@ -1,0 +1,92 @@
+{
+  "step": "PHASE-35-C-3a-preflight",
+  "mode": "REAL_GPT5",
+  "run_ts": "2026-06-16T09:10:19.505Z",
+  "provider": "openai",
+  "model": "gpt-5.4",
+  "model_returned": "gpt-5.4-2026-03-05",
+  "reasoning_effort": "medium",
+  "max_completion_tokens": 8000,
+  "vision_project": "phase28_gate10",
+  "fixture": "DF-4_clean",
+  "manifest_files": [
+    "src/controllers/todoController.js"
+  ],
+  "prompt_chars": 9202,
+  "verdict": "CLEAN",
+  "invoke_status": "SUCCESS",
+  "invoke_reason": null,
+  "finish_reason": "stop",
+  "finish_reason_is_stop": true,
+  "truncated": false,
+  "json_valid": true,
+  "json_parse_error": null,
+  "reviewer_shape_ok": true,
+  "parsed_verdict": {
+    "verdict": "REJECTED",
+    "findings": [
+      {
+        "severity": "BLOCKER",
+        "issue": "The POST handler has no input-validation branch for `title`. In `createTodo`, `const { title } = req.body;` is passed directly into `db.run('INSERT INTO todos (title) VALUES (?)', [title], ...)`, so a request with a missing/empty/invalid title does not return a deterministic 400 response and instead falls through to database behavior or can create an invalid row.",
+        "location": "src/controllers/todoController.js:createTodo",
+        "recommendation": "Validate `req.body.title` before calling `db.run` and return `400` with a clear error body when `title` is missing, empty, or not a string."
+      },
+      {
+        "severity": "BLOCKER",
+        "issue": "The PUT handler has no input-validation branch for the fields it writes. In `updateTodo`, `const { title, completed } = req.body;` is used directly in `db.run('UPDATE todos SET title = ?, completed = ? WHERE id = ?', [title, completed, id], ...)`, so malformed bodies can update an existing row with invalid values and still return 200.",
+        "location": "src/controllers/todoController.js:updateTodo",
+        "recommendation": "Validate the request body before the UPDATE and return `400` when `title`/`completed` are missing or of the wrong type; only execute the UPDATE for a valid payload."
+      },
+      {
+        "severity": "WARN",
+        "issue": "The controller imports `../models/todo`, but no corresponding file is listed in `spec.files_to_create` or included in `code.files_written`. If that module does not already exist, this file will fail at load time.",
+        "location": "src/controllers/todoController.js (`const db = require('../models/todo');`)",
+        "recommendation": "Confirm `src/models/todo.js` already exists in the repository; if not, add it to the spec/build output so the controller is runnable."
+      },
+      {
+        "severity": "WARN",
+        "issue": "`dependencies_added` is empty even though the feature depends on the runtime having the SQLite stack described in the spec/design. This is suspicious unless `express` and `sqlite3` were already present.",
+        "location": "code.dependencies_added",
+        "recommendation": "Verify the project manifest already includes the required runtime dependencies; otherwise add the missing packages explicitly."
+      }
+    ],
+    "summary": "The non-existent-id behavior for PUT and DELETE is implemented correctly, and GET/POST success paths align with the listed acceptance criteria. However, the POST and PUT handlers are missing required invalid-input handling, so the implementation is not safe to approve as a complete REST controller."
+  },
+  "tokens_in": 2123,
+  "tokens_out": 2895,
+  "cost_usd": 0.04873,
+  "latency_ms": 29769,
+  "cost_over_ceiling": false,
+  "cost_ceiling_usd": 0.2,
+  "ledger_row": {
+    "ts": "2026-06-16T09:10:19.499Z",
+    "invocation_id": "9c21167c-942a-461a-9983-1ac8cb8ad9d4",
+    "project_id": "phase28_gate10",
+    "provider": "openai",
+    "model": "gpt-5.4-2026-03-05",
+    "role": "reviewer",
+    "tokens_in": 2123,
+    "tokens_out": 2895,
+    "latency_ms": 29769,
+    "cost_usd_estimated": 0.0805,
+    "cost_usd_actual": 0.04873,
+    "outcome": "success"
+  },
+  "raw_envelope": {
+    "status": "SUCCESS",
+    "output": {
+      "text": "{\"verdict\":\"REJECTED\",\"findings\":[{\"severity\":\"BLOCKER\",\"issue\":\"The POST handler has no input-validation branch for `title`. In `createTodo`, `const { title } = req.body;` is passed directly into `db.run('INSERT INTO todos (title) VALUES (?)', [title], ...)`, so a request with a missing/empty/invalid title does not return a deterministic 400 response and instead falls through to database behavior or can create an invalid row.\",\"location\":\"src/controllers/todoController.js:createTodo\",\"recommendation\":\"Validate `req.body.title` before calling `db.run` and return `400` with a clear error body when `title` is missing, empty, or not a string.\"},{\"severity\":\"BLOCKER\",\"issue\":\"The PUT handler has no input-validation branch for the fields it writes. In `updateTodo`, `const { title, completed } = req.body;` is used directly in `db.run('UPDATE todos SET title = ?, completed = ? WHERE id = ?', [title, completed, id], ...)`, so malformed bodies can update an existing row with invalid values and still return 200.\",\"location\":\"src/controllers/todoController.js:updateTodo\",\"recommendation\":\"Validate the request body before the UPDATE and return `400` when `title`/`completed` are missing or of the wrong type; only execute the UPDATE for a valid payload.\"},{\"severity\":\"WARN\",\"issue\":\"The controller imports `../models/todo`, but no corresponding file is listed in `spec.files_to_create` or included in `code.files_written`. If that module does not already exist, this file will fail at load time.\",\"location\":\"src/controllers/todoController.js (`const db = require('../models/todo');`)\",\"recommendation\":\"Confirm `src/models/todo.js` already exists in the repository; if not, add it to the spec/build output so the controller is runnable.\"},{\"severity\":\"WARN\",\"issue\":\"`dependencies_added` is empty even though the feature depends on the runtime having the SQLite stack described in the spec/design. This is suspicious unless `express` and `sqlite3` were already present.\",\"location\":\"code.dependencies_added\",\"recommendation\":\"Verify the project manifest already includes the required runtime dependencies; otherwise add the missing packages explicitly.\"}],\"summary\":\"The non-existent-id behavior for PUT and DELETE is implemented correctly, and GET/POST success paths align with the listed acceptance criteria. However, the POST and PUT handlers are missing required invalid-input handling, so the implementation is not safe to approve as a complete REST controller.\"}",
+      "tokens_in": 2123,
+      "tokens_out": 2895,
+      "latency_ms": 29769,
+      "cost_usd": 0.04873,
+      "provider": "openai",
+      "model": "gpt-5.4-2026-03-05",
+      "finish_reason": "stop"
+    },
+    "metadata": {
+      "invocation_id": "9c21167c-942a-461a-9983-1ac8cb8ad9d4",
+      "cached": false
+    }
+  }
+}
