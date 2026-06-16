@@ -229,10 +229,21 @@ Plans the implementation by describing files to create or modify. Delegates actu
 |---|---|
 | `id` | `security_auditor` |
 | `authority_level` | `BLOCKING` |
-| `system_prompt_id` | `security_auditor_v5` |
+| `system_prompt_id` | `security_auditor_v6` |
 | `default_model` | `claude-opus-4-7` |
 
-> Version history: `security_auditor_v5` (PHASE-35 STEP G — mechanism change: few-shot, not more
+> Version history: `security_auditor_v6` (PHASE-35 STEP H — threat_level/severity disambiguation) is
+> `security_auditor_v5` VERBATIM + a single field-disambiguation note inside the few-shot block. First
+> 500 chars byte-identical to `security_auditor_v5` / `v3` / `v2` (protects S96–S99). Rationale: STEP G's
+> few-shot block SOLVED the over-fire (v5 = 7/8 vs v3 4/8 / v4 2/8) but its heavy repetition of "severity
+> WARN / severity BLOCKER" caused 2/14 trials to write a severity value (WARN/BLOCKER) into the top-level
+> `threat_level` field — a DIFFERENT enum (CRITICAL/HIGH/MEDIUM/LOW/NONE) — fail-closing as
+> INVALID_ROLE_OUTPUT (correct fail-close, not a wrong verdict, but 14% parse-failure is not
+> production-clean). v6 adds ONE note disambiguating the two fields to drive INVALID_ROLE_OUTPUT to 0;
+> over-fire/recall/precision inherited unchanged from v5. `security_auditor_v4` (STEP F) remains the
+> REGRESSED experiment (2/8, revived SQLi-FP), retained verbatim in `18b` but NOT active. See
+> DECISION-2026-06-16-phase-35-model-eval-and-rootcause-pivot.md.
+> `security_auditor_v5` (PHASE-35 STEP G — mechanism change: few-shot, not more
 > rules) is built from the `security_auditor_v3` BASE + a few-shot block of generic/synthetic worked
 > examples teaching the severity boundary by example. First 500 chars byte-identical to
 > `security_auditor_v3` / `v2` (protects S96–S99). **`security_auditor_v4` (STEP F) was a REGRESSED
@@ -260,7 +271,7 @@ Plans the implementation by describing files to create or modify. Delegates actu
 > `security_auditor_v2` (PHASE-35) supersedes `security_auditor_v1` — same
 > input/output schema, threat rubric, and severity ladder; adds a verify-before-flag discipline
 > (do NOT flag injection on parameterized/bound queries) and a false-positive prohibition.
-> `security_auditor_v4` / `security_auditor_v3` / `security_auditor_v2` / `security_auditor_v1` retained verbatim in `18b`.
+> `security_auditor_v5` / `security_auditor_v4` / `security_auditor_v3` / `security_auditor_v2` / `security_auditor_v1` retained verbatim in `18b`.
 
 **Input schema:** `{ project_id: string, phase: "SPEC"|"CODE", spec: object, design: object, code?: object }`
 

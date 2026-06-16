@@ -6,7 +6,7 @@ const { loadPrompt }                      = require("../_prompt_loader");
 const { emit: emitActivity }             = require("../_activity_emitter");
 const { getIndicator }                   = require("../_activity_catalog");
 
-const SYSTEM_PROMPT = loadPrompt("security_auditor_v5");
+const SYSTEM_PROMPT = loadPrompt("security_auditor_v6");
 
 const INPUT_SCHEMA = {
   type: "object",
@@ -45,7 +45,7 @@ module.exports = defineRole({
   description:      "Reviews specs (Phase SPEC) and code plans (Phase CODE) for security vulnerabilities",
   default_provider: "anthropic",
   default_model:    "claude-opus-4-7",
-  system_prompt_id: "security_auditor_v5",
+  system_prompt_id: "security_auditor_v6",
   input_schema:     INPUT_SCHEMA,
   output_schema:    OUTPUT_SCHEMA,
   authority_level:  "BLOCKING",

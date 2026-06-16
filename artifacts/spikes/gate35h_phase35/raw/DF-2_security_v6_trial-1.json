@@ -1,0 +1,45 @@
+{
+  "tag": "DF-2_security_v6_trial-1",
+  "project_id": "phase28_gate10",
+  "ok": true,
+  "reason": null,
+  "output": {
+    "threat_level": "CRITICAL",
+    "findings": [
+      {
+        "severity": "BLOCKER",
+        "vulnerability": "SQL injection",
+        "location": "src/controllers/todoController.js, getTodoById function",
+        "attack_vector": "An attacker can inject SQL through the `id` parameter in the URL, for example, `GET /todos/1 OR 1=1` to return all rows.",
+        "mitigation": "Use parameterized queries with placeholders and bound parameters for SQL statements."
+      },
+      {
+        "severity": "BLOCKER",
+        "vulnerability": "SQL injection",
+        "location": "src/controllers/todoController.js, createTodo function",
+        "attack_vector": "An attacker can inject SQL through the `title` parameter in the POST body, for example by sending a payload like \"'); DROP TABLE todos;--\".",
+        "mitigation": "Use parameterized queries with placeholders and bound parameters for SQL statements."
+      },
+      {
+        "severity": "WARN",
+        "vulnerability": "Missing input validation",
+        "location": "src/controllers/todoController.js, createTodo function",
+        "attack_vector": "Invalid or maliciously crafted input can be processed without checks, potentially leading to errors or misuse.",
+        "mitigation": "Implement input validation to check the type, length, and format of the `title` field."
+      }
+    ],
+    "summary": "The code has critical vulnerabilities related to SQL injection in the `getTodoById` and `createTodo` functions, as untrusted input is directly concatenated into SQL queries. Input validation is also missing, increasing the risk of unexpected errors or malicious payloads. Immediate mitigation is required for the SQL injection issues by using parameterized queries."
+  },
+  "ledger": {
+    "tag": "DF-2_security_v6_trial-1",
+    "role": "security_auditor",
+    "provider": "openai",
+    "model": "gpt-4o-2024-08-06",
+    "tokens_in": 2501,
+    "tokens_out": 377,
+    "latency_ms": 5752,
+    "cost_usd_actual": 0.01816,
+    "outcome": "success",
+    "ts": "2026-06-16T18:38:17.069Z"
+  }
+}

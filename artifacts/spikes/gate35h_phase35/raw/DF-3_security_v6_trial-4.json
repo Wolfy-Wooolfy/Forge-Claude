@@ -1,0 +1,31 @@
+{
+  "tag": "DF-3_security_v6_trial-4",
+  "project_id": "phase28_gate10",
+  "ok": true,
+  "reason": null,
+  "output": {
+    "threat_level": "MEDIUM",
+    "findings": [
+      {
+        "severity": "WARN",
+        "vulnerability": "Missing input validation",
+        "location": "src/controllers/todoController.js",
+        "attack_vector": "Unvalidated input in request body and parameters; potential data integrity issues.",
+        "mitigation": "Implement input validation for title, completed, and id fields to enforce type and length constraints."
+      }
+    ],
+    "summary": "The REST API implementation uses parameterized queries, effectively mitigating SQL injection risks. However, the lack of input validation for fields such as `title`, `completed`, and `id` may lead to data integrity issues or unexpected behavior. Implementing proper input validation is recommended as a precautionary measure to ensure robustness."
+  },
+  "ledger": {
+    "tag": "DF-3_security_v6_trial-4",
+    "role": "security_auditor",
+    "provider": "openai",
+    "model": "gpt-4o-2024-08-06",
+    "tokens_in": 2592,
+    "tokens_out": 164,
+    "latency_ms": 2994,
+    "cost_usd_actual": 0.01542,
+    "outcome": "success",
+    "ts": "2026-06-16T18:38:58.962Z"
+  }
+}
