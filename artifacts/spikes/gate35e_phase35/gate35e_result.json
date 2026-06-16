@@ -1,0 +1,1093 @@
+{
+  "mode": "REAL_GPT4O",
+  "provider": "openai",
+  "model": "gpt-4o",
+  "step": "PHASE-35-STEP-E",
+  "run_ts": "2026-06-16T10:29:18.153Z",
+  "n_df4": 8,
+  "n_core": 3,
+  "total_calls": 25,
+  "overall_verdict": "HONEST_EVIDENCE",
+  "assessment": {
+    "core_objectives_met": true,
+    "over_fire_acceptable": false,
+    "df4_reviewer_no_blocker": {
+      "met": 8,
+      "of": 8
+    },
+    "df4_security_no_overfire": {
+      "met": 4,
+      "of": 8
+    }
+  },
+  "per_objective": {
+    "DF-1_reviewer_catch": {
+      "criterion": "reviewer_v5 raises a missing-this.changes/404 BLOCKER",
+      "tally": {
+        "met": 3,
+        "of": 3
+      },
+      "PASS": true
+    },
+    "DF-2_security_recall": {
+      "criterion": "security_v3 raises a SQLi BLOCKER + threat HIGH/CRITICAL",
+      "tally": {
+        "met": 3,
+        "of": 3
+      },
+      "PASS": true
+    },
+    "DF-3_security_precision": {
+      "criterion": "security_v3 raises NO SQLi finding (parameterized)",
+      "tally": {
+        "met": 3,
+        "of": 3
+      },
+      "PASS": true
+    },
+    "DF-4_reviewer_no_overfire": {
+      "criterion": "reviewer_v5 NO BLOCKER on clean self-consistent code",
+      "tally": {
+        "met": 8,
+        "of": 8
+      },
+      "PASS": true
+    },
+    "DF-4_security_no_overfire": {
+      "criterion": "security_v3 NO BLOCKER + no SQLi-FP (auth out_of_scope)",
+      "tally": {
+        "met": 4,
+        "of": 8
+      },
+      "PASS": false,
+      "informational_auth_blocker": {
+        "met": 0,
+        "of": 8
+      }
+    }
+  },
+  "overfire_comparison": {
+    "reviewer_no_blocker": {
+      "cycle2_v4": {
+        "met": 2,
+        "of": 3
+      },
+      "stepE_v5": {
+        "met": 8,
+        "of": 8
+      }
+    },
+    "security_no_overfire": {
+      "cycle2_v2": {
+        "met": 1,
+        "of": 3
+      },
+      "stepE_v3": {
+        "met": 4,
+        "of": 8
+      }
+    },
+    "over_fire_acceptable": false,
+    "threshold": "no-BLOCKER ≥7/8 on BOTH roles (over-fire ≤1/8)"
+  },
+  "estimated_usd": 0.36778,
+  "representative_latency_ms": {
+    "count": 25,
+    "min": 853,
+    "median": 3248,
+    "max": 8117
+  },
+  "per_call_ledger": [
+    {
+      "tag": "DF-4_reviewer_v5_trial-1",
+      "role": "reviewer",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2593,
+      "tokens_out": 56,
+      "latency_ms": 3073,
+      "cost_usd_actual": 0.01381,
+      "outcome": "success",
+      "ts": "2026-06-16T10:28:01.781Z"
+    },
+    {
+      "tag": "DF-4_reviewer_v5_trial-2",
+      "role": "reviewer",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2593,
+      "tokens_out": 111,
+      "latency_ms": 2150,
+      "cost_usd_actual": 0.01463,
+      "outcome": "success",
+      "ts": "2026-06-16T10:28:03.981Z"
+    },
+    {
+      "tag": "DF-4_reviewer_v5_trial-3",
+      "role": "reviewer",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2593,
+      "tokens_out": 41,
+      "latency_ms": 1319,
+      "cost_usd_actual": 0.01358,
+      "outcome": "success",
+      "ts": "2026-06-16T10:28:05.340Z"
+    },
+    {
+      "tag": "DF-4_reviewer_v5_trial-4",
+      "role": "reviewer",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2593,
+      "tokens_out": 52,
+      "latency_ms": 971,
+      "cost_usd_actual": 0.01375,
+      "outcome": "success",
+      "ts": "2026-06-16T10:28:06.373Z"
+    },
+    {
+      "tag": "DF-4_reviewer_v5_trial-5",
+      "role": "reviewer",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2593,
+      "tokens_out": 60,
+      "latency_ms": 985,
+      "cost_usd_actual": 0.01387,
+      "outcome": "success",
+      "ts": "2026-06-16T10:28:07.387Z"
+    },
+    {
+      "tag": "DF-4_reviewer_v5_trial-6",
+      "role": "reviewer",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2593,
+      "tokens_out": 178,
+      "latency_ms": 2053,
+      "cost_usd_actual": 0.01564,
+      "outcome": "success",
+      "ts": "2026-06-16T10:28:09.471Z"
+    },
+    {
+      "tag": "DF-4_reviewer_v5_trial-7",
+      "role": "reviewer",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2593,
+      "tokens_out": 157,
+      "latency_ms": 1997,
+      "cost_usd_actual": 0.01532,
+      "outcome": "success",
+      "ts": "2026-06-16T10:28:11.502Z"
+    },
+    {
+      "tag": "DF-4_reviewer_v5_trial-8",
+      "role": "reviewer",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2593,
+      "tokens_out": 50,
+      "latency_ms": 853,
+      "cost_usd_actual": 0.01372,
+      "outcome": "success",
+      "ts": "2026-06-16T10:28:12.384Z"
+    },
+    {
+      "tag": "DF-4_security_v3_trial-1",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2303,
+      "tokens_out": 300,
+      "latency_ms": 4219,
+      "cost_usd_actual": 0.01601,
+      "outcome": "success",
+      "ts": "2026-06-16T10:28:16.638Z"
+    },
+    {
+      "tag": "DF-4_security_v3_trial-2",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2303,
+      "tokens_out": 289,
+      "latency_ms": 3925,
+      "cost_usd_actual": 0.01585,
+      "outcome": "success",
+      "ts": "2026-06-16T10:28:21.370Z"
+    },
+    {
+      "tag": "DF-4_security_v3_trial-3",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2303,
+      "tokens_out": 264,
+      "latency_ms": 3945,
+      "cost_usd_actual": 0.01548,
+      "outcome": "success",
+      "ts": "2026-06-16T10:28:25.350Z"
+    },
+    {
+      "tag": "DF-4_security_v3_trial-4",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2303,
+      "tokens_out": 276,
+      "latency_ms": 8117,
+      "cost_usd_actual": 0.01565,
+      "outcome": "success",
+      "ts": "2026-06-16T10:28:33.500Z"
+    },
+    {
+      "tag": "DF-4_security_v3_trial-5",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2303,
+      "tokens_out": 277,
+      "latency_ms": 4190,
+      "cost_usd_actual": 0.01567,
+      "outcome": "success",
+      "ts": "2026-06-16T10:28:37.717Z"
+    },
+    {
+      "tag": "DF-4_security_v3_trial-6",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2303,
+      "tokens_out": 300,
+      "latency_ms": 4925,
+      "cost_usd_actual": 0.01601,
+      "outcome": "success",
+      "ts": "2026-06-16T10:28:42.724Z"
+    },
+    {
+      "tag": "DF-4_security_v3_trial-7",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2303,
+      "tokens_out": 195,
+      "latency_ms": 3334,
+      "cost_usd_actual": 0.01444,
+      "outcome": "success",
+      "ts": "2026-06-16T10:28:46.096Z"
+    },
+    {
+      "tag": "DF-4_security_v3_trial-8",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2303,
+      "tokens_out": 274,
+      "latency_ms": 4489,
+      "cost_usd_actual": 0.01563,
+      "outcome": "success",
+      "ts": "2026-06-16T10:28:50.628Z"
+    },
+    {
+      "tag": "DF-1_reviewer_v5_trial-1",
+      "role": "reviewer",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2319,
+      "tokens_out": 234,
+      "latency_ms": 2115,
+      "cost_usd_actual": 0.01511,
+      "outcome": "success",
+      "ts": "2026-06-16T10:28:52.776Z"
+    },
+    {
+      "tag": "DF-1_reviewer_v5_trial-2",
+      "role": "reviewer",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2319,
+      "tokens_out": 323,
+      "latency_ms": 3500,
+      "cost_usd_actual": 0.01644,
+      "outcome": "success",
+      "ts": "2026-06-16T10:28:56.308Z"
+    },
+    {
+      "tag": "DF-1_reviewer_v5_trial-3",
+      "role": "reviewer",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2319,
+      "tokens_out": 211,
+      "latency_ms": 1977,
+      "cost_usd_actual": 0.01476,
+      "outcome": "success",
+      "ts": "2026-06-16T10:28:58.321Z"
+    },
+    {
+      "tag": "DF-2_security_v3_trial-1",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 1926,
+      "tokens_out": 273,
+      "latency_ms": 3248,
+      "cost_usd_actual": 0.01373,
+      "outcome": "success",
+      "ts": "2026-06-16T10:29:01.610Z"
+    },
+    {
+      "tag": "DF-2_security_v3_trial-2",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 1926,
+      "tokens_out": 304,
+      "latency_ms": 3700,
+      "cost_usd_actual": 0.01419,
+      "outcome": "success",
+      "ts": "2026-06-16T10:29:05.339Z"
+    },
+    {
+      "tag": "DF-2_security_v3_trial-3",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 1926,
+      "tokens_out": 365,
+      "latency_ms": 3962,
+      "cost_usd_actual": 0.01511,
+      "outcome": "success",
+      "ts": "2026-06-16T10:29:09.325Z"
+    },
+    {
+      "tag": "DF-3_security_v3_trial-1",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2017,
+      "tokens_out": 171,
+      "latency_ms": 2309,
+      "cost_usd_actual": 0.01265,
+      "outcome": "success",
+      "ts": "2026-06-16T10:29:11.666Z"
+    },
+    {
+      "tag": "DF-3_security_v3_trial-2",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2017,
+      "tokens_out": 255,
+      "latency_ms": 3614,
+      "cost_usd_actual": 0.01391,
+      "outcome": "success",
+      "ts": "2026-06-16T10:29:15.310Z"
+    },
+    {
+      "tag": "DF-3_security_v3_trial-3",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2017,
+      "tokens_out": 182,
+      "latency_ms": 2744,
+      "cost_usd_actual": 0.01282,
+      "outcome": "success",
+      "ts": "2026-06-16T10:29:18.137Z"
+    }
+  ],
+  "trials": {
+    "DF-1": {
+      "reviewer_v5": [
+        {
+          "fixture": "DF-1",
+          "role": "reviewer",
+          "version": "reviewer_v5",
+          "trial": 1,
+          "ok": true,
+          "reason": null,
+          "verdict": "REJECTED",
+          "blocker_count": 2,
+          "catches_defect": true,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "Missing existence check for updateTodo handler, resulting in the absence of 404 handling for non-existent IDs.",
+              "location": "src/controllers/todoController.js - updateTodo",
+              "recommendation": "After the UPDATE operation, check 'this.changes' to verify affected rows; return 404 if no row was updated.",
+              "attack_vector": null
+            },
+            {
+              "severity": "BLOCKER",
+              "title": "Missing existence check for deleteTodo handler, resulting in the absence of 404 handling for non-existent IDs.",
+              "location": "src/controllers/todoController.js - deleteTodo",
+              "recommendation": "After the DELETE operation, check 'this.changes' to verify affected rows; return 404 if no row was deleted.",
+              "attack_vector": null
+            }
+          ],
+          "latency_ms": 2115,
+          "cost_usd": 0.01511
+        },
+        {
+          "fixture": "DF-1",
+          "role": "reviewer",
+          "version": "reviewer_v5",
+          "trial": 2,
+          "ok": true,
+          "reason": null,
+          "verdict": "REJECTED",
+          "blocker_count": 2,
+          "catches_defect": true,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "The PUT /todos/:id handler does not check affected rows.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "After the UPDATE statement, check this.changes and return a 404 status if zero rows were updated.",
+              "attack_vector": null
+            },
+            {
+              "severity": "BLOCKER",
+              "title": "The DELETE /todos/:id handler does not check affected rows.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "After the DELETE statement, check this.changes and return a 404 status if zero rows were deleted.",
+              "attack_vector": null
+            },
+            {
+              "severity": "WARN",
+              "title": "Input validation is missing for the POST /todos endpoint.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Validate 'title' from req.body to ensure it is not undefined or empty before proceeding.",
+              "attack_vector": null
+            },
+            {
+              "severity": "INFO",
+              "title": "No dependencies were explicitly added in the build output, verify required packages are included in package.json.",
+              "location": "dependencies_added",
+              "recommendation": "Confirm dependencies for sqlite3 and express are present in package.json.",
+              "attack_vector": null
+            }
+          ],
+          "latency_ms": 3500,
+          "cost_usd": 0.01644
+        },
+        {
+          "fixture": "DF-1",
+          "role": "reviewer",
+          "version": "reviewer_v5",
+          "trial": 3,
+          "ok": true,
+          "reason": null,
+          "verdict": "REJECTED",
+          "blocker_count": 2,
+          "catches_defect": true,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "The updateTodo handler does not return a 404 status code when no rows are updated.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Check this.changes (or similar) after the UPDATE operation and return a 404 status code if no rows were affected.",
+              "attack_vector": null
+            },
+            {
+              "severity": "BLOCKER",
+              "title": "The deleteTodo handler always returns a 204 status code without verifying if a row was actually deleted.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Check this.changes after the DELETE operation and return a 404 status code if no rows were deleted.",
+              "attack_vector": null
+            }
+          ],
+          "latency_ms": 1977,
+          "cost_usd": 0.01476
+        }
+      ]
+    },
+    "DF-2": {
+      "security_v3": [
+        {
+          "fixture": "DF-2",
+          "role": "security_auditor",
+          "version": "security_auditor_v3",
+          "trial": 1,
+          "ok": true,
+          "reason": null,
+          "threat_level": "HIGH",
+          "blocker_count": 2,
+          "sqli_findings": 2,
+          "sqli_blocker": true,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "SQL injection",
+              "location": "src/controllers/todoController.js - getTodoById function",
+              "recommendation": null,
+              "attack_vector": "An attacker can manipulate the id parameter in the URL to execute arbitrary SQL queries."
+            },
+            {
+              "severity": "BLOCKER",
+              "title": "SQL injection",
+              "location": "src/controllers/todoController.js - createTodo function",
+              "recommendation": null,
+              "attack_vector": "An attacker can manipulate the title input in the request body to execute arbitrary SQL queries."
+            }
+          ],
+          "latency_ms": 3248,
+          "cost_usd": 0.01373
+        },
+        {
+          "fixture": "DF-2",
+          "role": "security_auditor",
+          "version": "security_auditor_v3",
+          "trial": 2,
+          "ok": true,
+          "reason": null,
+          "threat_level": "CRITICAL",
+          "blocker_count": 2,
+          "sqli_findings": 2,
+          "sqli_blocker": true,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "SQL injection",
+              "location": "src/controllers/todoController.js: getTodoById",
+              "recommendation": null,
+              "attack_vector": "The 'id' parameter from the route is directly concatenated into the SQL query, allowing an attacker to manipulate the query structure."
+            },
+            {
+              "severity": "BLOCKER",
+              "title": "SQL injection",
+              "location": "src/controllers/todoController.js: createTodo",
+              "recommendation": null,
+              "attack_vector": "The 'title' value from the request body is directly concatenated into the SQL query, potentially allowing an attacker to inject SQL code."
+            }
+          ],
+          "latency_ms": 3700,
+          "cost_usd": 0.01419
+        },
+        {
+          "fixture": "DF-2",
+          "role": "security_auditor",
+          "version": "security_auditor_v3",
+          "trial": 3,
+          "ok": true,
+          "reason": null,
+          "threat_level": "CRITICAL",
+          "blocker_count": 2,
+          "sqli_findings": 2,
+          "sqli_blocker": true,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "SQL injection",
+              "location": "src/controllers/todoController.js (getTodoById)",
+              "recommendation": null,
+              "attack_vector": "Attacker can manipulate the `id` parameter in the URL to execute arbitrary SQL commands."
+            },
+            {
+              "severity": "BLOCKER",
+              "title": "SQL injection",
+              "location": "src/controllers/todoController.js (createTodo)",
+              "recommendation": null,
+              "attack_vector": "Attacker can control the `title` field in the request body to execute arbitrary SQL commands."
+            },
+            {
+              "severity": "WARN",
+              "title": "Unbounded result set",
+              "location": "AC-2 (GET /todos)",
+              "recommendation": null,
+              "attack_vector": "As the todos table grows, requests to GET /todos will return increasingly large responses, leading to performance degradation and potential server strain."
+            }
+          ],
+          "latency_ms": 3962,
+          "cost_usd": 0.01511
+        }
+      ]
+    },
+    "DF-3": {
+      "security_v3": [
+        {
+          "fixture": "DF-3",
+          "role": "security_auditor",
+          "version": "security_auditor_v3",
+          "trial": 1,
+          "ok": true,
+          "reason": null,
+          "threat_level": "MEDIUM",
+          "blocker_count": 0,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "An attacker can send malformed or overly large payloads in HTTP requests, potentially causing unexpected behavior or denial of service."
+            }
+          ],
+          "latency_ms": 2309,
+          "cost_usd": 0.01265
+        },
+        {
+          "fixture": "DF-3",
+          "role": "security_auditor",
+          "version": "security_auditor_v3",
+          "trial": 2,
+          "ok": true,
+          "reason": null,
+          "threat_level": "LOW",
+          "blocker_count": 0,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "An attacker could send malformed data in the request body which is not validated on the server side before being processed."
+            },
+            {
+              "severity": "INFO",
+              "title": "Potentially large response data",
+              "location": "src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "The GET endpoint could return a very large number of todos, potentially impacting performance."
+            }
+          ],
+          "latency_ms": 3614,
+          "cost_usd": 0.01391
+        },
+        {
+          "fixture": "DF-3",
+          "role": "security_auditor",
+          "version": "security_auditor_v3",
+          "trial": 3,
+          "ok": true,
+          "reason": null,
+          "threat_level": "MEDIUM",
+          "blocker_count": 0,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "An attacker can send invalid or unexpected data types in the request body, potentially leading to unintended behavior within the application logic."
+            }
+          ],
+          "latency_ms": 2744,
+          "cost_usd": 0.01282
+        }
+      ]
+    },
+    "DF-4": {
+      "reviewer_v5": [
+        {
+          "fixture": "DF-4",
+          "role": "reviewer",
+          "version": "reviewer_v5",
+          "trial": 1,
+          "ok": true,
+          "reason": null,
+          "verdict": "APPROVED",
+          "blocker_count": 0,
+          "catches_defect": false,
+          "findings": [],
+          "latency_ms": 3073,
+          "cost_usd": 0.01381
+        },
+        {
+          "fixture": "DF-4",
+          "role": "reviewer",
+          "version": "reviewer_v5",
+          "trial": 2,
+          "ok": true,
+          "reason": null,
+          "verdict": "APPROVED",
+          "blocker_count": 0,
+          "catches_defect": false,
+          "findings": [
+            {
+              "severity": "INFO",
+              "title": "Concurrency risk identified with SQLite when under heavy write loads.",
+              "location": "design component - Database",
+              "recommendation": "Monitor write contention under actual use and consider enabling WAL mode if necessary.",
+              "attack_vector": null
+            }
+          ],
+          "latency_ms": 2150,
+          "cost_usd": 0.01463
+        },
+        {
+          "fixture": "DF-4",
+          "role": "reviewer",
+          "version": "reviewer_v5",
+          "trial": 3,
+          "ok": true,
+          "reason": null,
+          "verdict": "APPROVED",
+          "blocker_count": 0,
+          "catches_defect": false,
+          "findings": [],
+          "latency_ms": 1319,
+          "cost_usd": 0.01358
+        },
+        {
+          "fixture": "DF-4",
+          "role": "reviewer",
+          "version": "reviewer_v5",
+          "trial": 4,
+          "ok": true,
+          "reason": null,
+          "verdict": "APPROVED",
+          "blocker_count": 0,
+          "catches_defect": false,
+          "findings": [],
+          "latency_ms": 971,
+          "cost_usd": 0.01375
+        },
+        {
+          "fixture": "DF-4",
+          "role": "reviewer",
+          "version": "reviewer_v5",
+          "trial": 5,
+          "ok": true,
+          "reason": null,
+          "verdict": "APPROVED",
+          "blocker_count": 0,
+          "catches_defect": false,
+          "findings": [],
+          "latency_ms": 985,
+          "cost_usd": 0.01387
+        },
+        {
+          "fixture": "DF-4",
+          "role": "reviewer",
+          "version": "reviewer_v5",
+          "trial": 6,
+          "ok": true,
+          "reason": null,
+          "verdict": "APPROVED",
+          "blocker_count": 0,
+          "catches_defect": false,
+          "findings": [
+            {
+              "severity": "INFO",
+              "title": "The code correctly checks the affected rows for the UPDATE and DELETE operations, returning 404 when no rows are affected.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "No changes needed as the correct behavior is implemented.",
+              "attack_vector": null
+            },
+            {
+              "severity": "INFO",
+              "title": "The spec explicitly states that no new dependencies should be added, which aligns with the empty dependencies_added.",
+              "location": "dependencies_added",
+              "recommendation": "Ensure that any potential future dependencies are consciously reviewed for necessity.",
+              "attack_vector": null
+            }
+          ],
+          "latency_ms": 2053,
+          "cost_usd": 0.01564
+        },
+        {
+          "fixture": "DF-4",
+          "role": "reviewer",
+          "version": "reviewer_v5",
+          "trial": 7,
+          "ok": true,
+          "reason": null,
+          "verdict": "APPROVED",
+          "blocker_count": 0,
+          "catches_defect": false,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "The error handling across the CRUD endpoints uses a generic error handler by calling 'next(err)'. This may result in sensitive error details being exposed if not handled properly in middleware.",
+              "location": "src/controllers/todoController.js",
+              "recommendation": "Implement specific error responses in the endpoints or ensure that error-handling middleware obscures sensitive error content from clients.",
+              "attack_vector": null
+            }
+          ],
+          "latency_ms": 1997,
+          "cost_usd": 0.01532
+        },
+        {
+          "fixture": "DF-4",
+          "role": "reviewer",
+          "version": "reviewer_v5",
+          "trial": 8,
+          "ok": true,
+          "reason": null,
+          "verdict": "APPROVED",
+          "blocker_count": 0,
+          "catches_defect": false,
+          "findings": [],
+          "latency_ms": 853,
+          "cost_usd": 0.01372
+        }
+      ],
+      "security_v3": [
+        {
+          "fixture": "DF-4",
+          "role": "security_auditor",
+          "version": "security_auditor_v3",
+          "trial": 1,
+          "ok": true,
+          "reason": null,
+          "threat_level": "MEDIUM",
+          "blocker_count": 1,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js - createTodo, updateTodo",
+              "recommendation": null,
+              "attack_vector": "An attacker can send malformed or oversized data in the 'title' field in POST /todos or PUT /todos/:id to potentially cause errors or service instability."
+            },
+            {
+              "severity": "INFO",
+              "title": "Sensitive information exposure in error handling",
+              "location": "src/controllers/todoController.js - generic error handling",
+              "recommendation": null,
+              "attack_vector": "Database error details could potentially be exposed to clients if not handled properly, leading to information leakage."
+            }
+          ],
+          "latency_ms": 4219,
+          "cost_usd": 0.01601
+        },
+        {
+          "fixture": "DF-4",
+          "role": "security_auditor",
+          "version": "security_auditor_v3",
+          "trial": 2,
+          "ok": true,
+          "reason": null,
+          "threat_level": "MEDIUM",
+          "blocker_count": 1,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "An attacker can send requests with unexpected data types or overly long strings for parameters such as 'title' and 'completed', potentially causing application errors or data integrity issues."
+            },
+            {
+              "severity": "WARN",
+              "title": "Missing error handling",
+              "location": "src/models/todo.js",
+              "recommendation": null,
+              "attack_vector": "The absence of error handling for the database connection or queries might lead to application crashes if the SQLite database becomes unavailable or if there are query errors."
+            }
+          ],
+          "latency_ms": 3925,
+          "cost_usd": 0.01585
+        },
+        {
+          "fixture": "DF-4",
+          "role": "security_auditor",
+          "version": "security_auditor_v3",
+          "trial": 3,
+          "ok": true,
+          "reason": null,
+          "threat_level": "MEDIUM",
+          "blocker_count": 0,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "An attacker could supply invalid or malicious data types/values for the 'title' or 'completed' fields in POST/PUT requests, possibly causing unexpected behavior or errors."
+            },
+            {
+              "severity": "WARN",
+              "title": "Database locking",
+              "location": "src/models/todo.js",
+              "recommendation": null,
+              "attack_vector": "Write operations under high concurrency might lead to SQLite database locks, impacting availability."
+            }
+          ],
+          "latency_ms": 3945,
+          "cost_usd": 0.01548
+        },
+        {
+          "fixture": "DF-4",
+          "role": "security_auditor",
+          "version": "security_auditor_v3",
+          "trial": 4,
+          "ok": true,
+          "reason": null,
+          "threat_level": "MEDIUM",
+          "blocker_count": 0,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "Missing Input Validation",
+              "location": "src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "An attacker could send a malformed or unexpected input in the request body, which may potentially lead to unexpected behavior or errors."
+            },
+            {
+              "severity": "INFO",
+              "title": "Insecure Default Configuration",
+              "location": "src/models/todo.js",
+              "recommendation": null,
+              "attack_vector": "The SQLite database is created without explicit file permissions, potentially allowing unauthorized access to the database file."
+            }
+          ],
+          "latency_ms": 8117,
+          "cost_usd": 0.01565
+        },
+        {
+          "fixture": "DF-4",
+          "role": "security_auditor",
+          "version": "security_auditor_v3",
+          "trial": 5,
+          "ok": true,
+          "reason": null,
+          "threat_level": "HIGH",
+          "blocker_count": 1,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "An attacker can send malicious data in the 'title' or 'completed' fields of the request body to inject unwanted content."
+            },
+            {
+              "severity": "WARN",
+              "title": "Insecure data handling",
+              "location": "src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "The API may inadvertently log sensitive information in case of errors that are propagated without sanitization."
+            }
+          ],
+          "latency_ms": 4190,
+          "cost_usd": 0.01567
+        },
+        {
+          "fixture": "DF-4",
+          "role": "security_auditor",
+          "version": "security_auditor_v3",
+          "trial": 6,
+          "ok": true,
+          "reason": null,
+          "threat_level": "MEDIUM",
+          "blocker_count": 1,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "An attacker can send malformed or malicious input in the request body (e.g., script tags or invalid data types), which could result in unexpected behavior, XSS, or other client-side vulnerabilities."
+            },
+            {
+              "severity": "WARN",
+              "title": "Potential denial of service through resource exhaustion",
+              "location": "src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "An attacker could flood the server with requests to insert a large number of todos, potentially leading to disk space exhaustion or performance degradation due to unbounded storage growth."
+            }
+          ],
+          "latency_ms": 4925,
+          "cost_usd": 0.01601
+        },
+        {
+          "fixture": "DF-4",
+          "role": "security_auditor",
+          "version": "security_auditor_v3",
+          "trial": 7,
+          "ok": true,
+          "reason": null,
+          "threat_level": "MEDIUM",
+          "blocker_count": 0,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "An attacker could send an invalid or malicious payload to the POST or PUT endpoints as there is no validation on the request body fields."
+            }
+          ],
+          "latency_ms": 3334,
+          "cost_usd": 0.01444
+        },
+        {
+          "fixture": "DF-4",
+          "role": "security_auditor",
+          "version": "security_auditor_v3",
+          "trial": 8,
+          "ok": true,
+          "reason": null,
+          "threat_level": "MEDIUM",
+          "blocker_count": 0,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js",
+              "recommendation": null,
+              "attack_vector": "An attacker could send a JSON payload with invalid or malicious data types to the title field when creating or updating a todo, possibly leading to unexpected behavior."
+            },
+            {
+              "severity": "INFO",
+              "title": "Insecure database path",
+              "location": "src/models/todo.js",
+              "recommendation": null,
+              "attack_vector": "The use of __dirname and path.join without a whitelist or directory constraints could potentially allow for misconfigurations leading to unintended file locations."
+            }
+          ],
+          "latency_ms": 4489,
+          "cost_usd": 0.01563
+        }
+      ]
+    }
+  },
+  "notes": [
+    "MAIN via reg.invoke('role.invoke') on the registered tuned roles (reviewer_v5 / security_auditor_v3).",
+    "DF-4 fixture is self-consistent (STEP D): src/models/todo.js present in manifest+spec, so a 'missing import' BLOCKER is unambiguous over-fire.",
+    "STRICT SQLi detector: vulnerability field /sql[\\s_-]*injection|\\bsqli\\b/i. auth_blocker_count informational (Authentication is spec out_of_scope).",
+    "Core objective PASS = strict majority of 3. DF-4 over-fire PASS = no-BLOCKER >=7/8 (over-fire <=1/8).",
+    "Raw per-trial outputs under raw/ are the ground truth."
+  ]
+}
