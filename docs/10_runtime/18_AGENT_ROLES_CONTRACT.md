@@ -170,18 +170,27 @@ Converts an Architect design into a formal implementation contract. Does not add
 |---|---|
 | `id` | `reviewer` |
 | `authority_level` | `BLOCKING` |
-| `system_prompt_id` | `reviewer_v4` |
+| `system_prompt_id` | `reviewer_v5` |
 | `default_model` | `claude-opus-4-7` |
 
-> Version history: `reviewer_v4` (PHASE-35 STEP A-2) supersedes `reviewer_v3` — same input/output
+> Version history: `reviewer_v5` (PHASE-35 STEP D, root-cause pivot) supersedes `reviewer_v4` — same
+> input/output schema and verdict rules; first 500 chars byte-identical to `reviewer_v4` (protects the
+> S89/S90 mock prefix keys). Adds (1) severity discipline — a not-spec-required, non-exploitable
+> concern (input validation on an out-of-scope-for-auth endpoint, missing tests, optional
+> error-handling) is WARN/INFO, never a BLOCKER; do NOT REJECT clean code over WARN — and (2) a
+> generalized anti-fabrication clause — do not raise a finding about something absent from the input;
+> an import not in the input is a WARN, not a BLOCKER. Recall preserved (a real behavioral defect is
+> STILL a BLOCKER). Rationale: gpt-4o cycles 1-2 AND the gpt-5.4 C-3a pre-flight over-fired the same
+> way (see DECISION-2026-06-16-phase-35-model-eval-and-rootcause-pivot.md).
+> `reviewer_v4` (PHASE-35 STEP A-2) supersedes `reviewer_v3` — same input/output
 > schema and verdict rules; adds a Phase-B precision/anti-over-fire clause (trace the handler before
 > raising an AC BLOCKER; a satisfied AC must NOT be a BLOCKER; a BLOCKER needs a concrete cite-a-line
 > defect) WITHOUT relaxing the v3 recall (a genuine behavioral/contract defect — missing
 > `this.changes`/row-existence → wrong status code, missing 404, unmet AC — is STILL a BLOCKER).
 > `reviewer_v3` (PHASE-35) superseded `reviewer_v2` — adds Phase-B control-flow review (read actual
 > `code.files_written[].content`), `this.changes`/row-existence + not-found(404) correctness checks,
-> and severity calibration (behavioral/contract defect = BLOCKER). `reviewer_v3` / `reviewer_v2` /
-> `reviewer_v1` retained verbatim in `18b`.
+> and severity calibration (behavioral/contract defect = BLOCKER). `reviewer_v4` / `reviewer_v3` /
+> `reviewer_v2` / `reviewer_v1` retained verbatim in `18b`.
 
 **Input schema:** `{ phase: "A"|"B", spec: object, design: object, project_id: string, code?: object }`
 
@@ -220,13 +229,21 @@ Plans the implementation by describing files to create or modify. Delegates actu
 |---|---|
 | `id` | `security_auditor` |
 | `authority_level` | `BLOCKING` |
-| `system_prompt_id` | `security_auditor_v2` |
+| `system_prompt_id` | `security_auditor_v3` |
 | `default_model` | `claude-opus-4-7` |
 
-> Version history: `security_auditor_v2` (PHASE-35) supersedes `security_auditor_v1` — same
+> Version history: `security_auditor_v3` (PHASE-35 STEP D, root-cause pivot) supersedes
+> `security_auditor_v2` — same input/output schema, threat rubric, and severity ladder; first 500 chars
+> byte-identical to `security_auditor_v2` (protects the prefix-keyed mock scenarios). Adds (1) an
+> out_of_scope-respect clause — no finding (especially no BLOCKER) about spec `out_of_scope` items
+> (Authentication out-of-scope → "missing authentication" is not a finding) — and (2) severity
+> discipline (a not-required, non-exploitable concern is WARN, not BLOCKER). Recall preserved (a real
+> injection/SQLi/exploit is STILL a BLOCKER). Rationale: see
+> DECISION-2026-06-16-phase-35-model-eval-and-rootcause-pivot.md.
+> `security_auditor_v2` (PHASE-35) supersedes `security_auditor_v1` — same
 > input/output schema, threat rubric, and severity ladder; adds a verify-before-flag discipline
 > (do NOT flag injection on parameterized/bound queries) and a false-positive prohibition.
-> `security_auditor_v1` retained verbatim in `18b`.
+> `security_auditor_v2` / `security_auditor_v1` retained verbatim in `18b`.
 
 **Input schema:** `{ project_id: string, phase: "SPEC"|"CODE", spec: object, design: object, code?: object }`
 

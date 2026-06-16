@@ -2,7 +2,8 @@
   "scope": "A minimal Todo REST API (Express + SQLite) exposing CRUD endpoints for todo items.",
   "decisions": [
     { "decision": "Use Express.js as the HTTP framework", "rationale": "Minimal framework for a small CRUD API" },
-    { "decision": "Use SQLite via sqlite3 with parameterized queries", "rationale": "Zero-config storage; bound parameters prevent SQL injection" }
+    { "decision": "Use SQLite via sqlite3 with parameterized queries", "rationale": "Zero-config storage; bound parameters prevent SQL injection" },
+    { "decision": "express and sqlite3 are already present in the project manifest (pre-existing dependencies)", "rationale": "This build adds no new dependencies, so an empty dependencies_added is expected — not a missing-dependency defect" }
   ],
   "acceptance_criteria": [
     { "id": "AC-1", "description": "POST /todos with a valid title returns 201 and the created todo" },
@@ -11,6 +12,7 @@
     { "id": "AC-4", "description": "DELETE /todos/:id for a NON-EXISTENT id returns 404 (no row deleted)" }
   ],
   "files_to_create": [
+    { "path": "src/models/todo.js", "purpose": "Shared SQLite connection and todos table schema (the db handle the controller imports)" },
     { "path": "src/controllers/todoController.js", "purpose": "CRUD route handlers for todos" }
   ],
   "files_to_modify": [],
