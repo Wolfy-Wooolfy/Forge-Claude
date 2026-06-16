@@ -229,10 +229,19 @@ Plans the implementation by describing files to create or modify. Delegates actu
 |---|---|
 | `id` | `security_auditor` |
 | `authority_level` | `BLOCKING` |
-| `system_prompt_id` | `security_auditor_v4` |
+| `system_prompt_id` | `security_auditor_v5` |
 | `default_model` | `claude-opus-4-7` |
 
-> Version history: `security_auditor_v4` (PHASE-35 STEP F, security severity refinement) supersedes
+> Version history: `security_auditor_v5` (PHASE-35 STEP G — mechanism change: few-shot, not more
+> rules) is built from the `security_auditor_v3` BASE + a few-shot block of generic/synthetic worked
+> examples teaching the severity boundary by example. First 500 chars byte-identical to
+> `security_auditor_v3` / `v2` (protects S96–S99). **`security_auditor_v4` (STEP F) was a REGRESSED
+> experiment** — its sharper-rule wording dropped over-fire from 4/8 to 2/8 and revived a SQLi
+> false-positive; it is retained verbatim in `18b` for the record but is **NOT active** (v5 discards
+> v4's wording and returns to the v3 base). Rationale: rule-based tuning (v2→v3→v4) plateaued/regressed
+> on gpt-4o; v5 tests whether few-shot calibration breaks the ceiling. See
+> DECISION-2026-06-16-phase-35-model-eval-and-rootcause-pivot.md.
+> `security_auditor_v4` (PHASE-35 STEP F, security severity refinement) supersedes
 > `security_auditor_v3` — same input/output schema, threat rubric, and severity ladder; first 500 chars
 > byte-identical to `security_auditor_v3` (protects the S96–S99 mock scenarios). Adds an explicit
 > input-validation severity rule: a precautionary "missing input validation" with no demonstrated
@@ -251,7 +260,7 @@ Plans the implementation by describing files to create or modify. Delegates actu
 > `security_auditor_v2` (PHASE-35) supersedes `security_auditor_v1` — same
 > input/output schema, threat rubric, and severity ladder; adds a verify-before-flag discipline
 > (do NOT flag injection on parameterized/bound queries) and a false-positive prohibition.
-> `security_auditor_v3` / `security_auditor_v2` / `security_auditor_v1` retained verbatim in `18b`.
+> `security_auditor_v4` / `security_auditor_v3` / `security_auditor_v2` / `security_auditor_v1` retained verbatim in `18b`.
 
 **Input schema:** `{ project_id: string, phase: "SPEC"|"CODE", spec: object, design: object, code?: object }`
 

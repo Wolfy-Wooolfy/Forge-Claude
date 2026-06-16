@@ -1,0 +1,27 @@
+{
+  "tag": "DF-3_security_v5_trial-1",
+  "project_id": "phase28_gate10",
+  "ok": false,
+  "reason": "INVALID_ROLE_OUTPUT",
+  "output": {
+    "status": "FAILED",
+    "output": null,
+    "metadata": {
+      "reason": "INVALID_ROLE_OUTPUT",
+      "detail": "'threat_level': value \"WARN\" not in enum [\"CRITICAL\", \"HIGH\", \"MEDIUM\", \"LOW\", \"NONE\"]",
+      "context": {}
+    }
+  },
+  "ledger": {
+    "tag": "DF-3_security_v5_trial-1",
+    "role": "security_auditor",
+    "provider": "openai",
+    "model": "gpt-4o-2024-08-06",
+    "tokens_in": 2460,
+    "tokens_out": 166,
+    "latency_ms": 5699,
+    "cost_usd_actual": 0.01479,
+    "outcome": "success",
+    "ts": "2026-06-16T14:18:01.607Z"
+  }
+}

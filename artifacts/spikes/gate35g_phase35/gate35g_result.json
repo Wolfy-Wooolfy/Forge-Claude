@@ -1,0 +1,702 @@
+{
+  "mode": "REAL_GPT4O",
+  "provider": "openai",
+  "model": "gpt-4o",
+  "step": "PHASE-35-STEP-G",
+  "strategy": "few-shot (v3 base + worked examples)",
+  "run_ts": "2026-06-16T14:18:08.158Z",
+  "n_df4": 8,
+  "n_core": 3,
+  "total_calls": 14,
+  "overall_verdict": "HONEST_EVIDENCE",
+  "assessment": {
+    "security_over_fire_acceptable": true,
+    "recall_precision_hold": true,
+    "df4_security_no_overfire": {
+      "met": 7,
+      "of": 8
+    },
+    "both_roles_acceptable": true
+  },
+  "per_objective": {
+    "DF-2_security_recall": {
+      "criterion": "security_v5 raises a SQLi BLOCKER + threat HIGH/CRITICAL",
+      "tally": {
+        "met": 2,
+        "of": 3
+      },
+      "PASS": true
+    },
+    "DF-3_security_precision": {
+      "criterion": "security_v5 raises NO SQLi finding (and no BLOCKER leak)",
+      "tally": {
+        "met": 2,
+        "of": 3
+      },
+      "PASS": true,
+      "no_blocker_tally": {
+        "met": 2,
+        "of": 3
+      }
+    },
+    "DF-4_security_no_overfire": {
+      "criterion": "security_v5 NO BLOCKER + no SQLi-FP (input-validation = WARN)",
+      "tally": {
+        "met": 7,
+        "of": 8
+      },
+      "PASS": true,
+      "informational_auth_blocker": {
+        "met": 0,
+        "of": 8
+      },
+      "informational_inputval_blocker": {
+        "met": 0,
+        "of": 8
+      }
+    }
+  },
+  "overfire_comparison": {
+    "security_no_overfire_across_variants": {
+      "v3_rules_stepE": {
+        "met": 4,
+        "of": 8
+      },
+      "v4_rules_stepF": {
+        "met": 2,
+        "of": 8
+      },
+      "v5_fewshot_stepG": {
+        "met": 7,
+        "of": 8
+      }
+    },
+    "security_over_fire_acceptable": true,
+    "threshold": "no-over-fire ≥7/8 (over-fire ≤1/8)",
+    "reviewer_note": "reviewer_v5 already 8/8 in STEP E; both roles ≥7/8 ⇔ security reaches ≥7/8 here"
+  },
+  "estimated_usd": 0.24015,
+  "representative_latency_ms": {
+    "count": 14,
+    "min": 2663,
+    "median": 4875,
+    "max": 9818
+  },
+  "per_call_ledger": [
+    {
+      "tag": "DF-4_security_v5_trial-1",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2746,
+      "tokens_out": 298,
+      "latency_ms": 6689,
+      "cost_usd_actual": 0.0182,
+      "outcome": "success",
+      "ts": "2026-06-16T14:17:00.106Z"
+    },
+    {
+      "tag": "DF-4_security_v5_trial-2",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2746,
+      "tokens_out": 268,
+      "latency_ms": 4875,
+      "cost_usd_actual": 0.01775,
+      "outcome": "success",
+      "ts": "2026-06-16T14:17:05.013Z"
+    },
+    {
+      "tag": "DF-4_security_v5_trial-3",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2746,
+      "tokens_out": 283,
+      "latency_ms": 9818,
+      "cost_usd_actual": 0.01798,
+      "outcome": "success",
+      "ts": "2026-06-16T14:17:14.868Z"
+    },
+    {
+      "tag": "DF-4_security_v5_trial-4",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2746,
+      "tokens_out": 252,
+      "latency_ms": 7665,
+      "cost_usd_actual": 0.01751,
+      "outcome": "success",
+      "ts": "2026-06-16T14:17:22.589Z"
+    },
+    {
+      "tag": "DF-4_security_v5_trial-5",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2746,
+      "tokens_out": 173,
+      "latency_ms": 3730,
+      "cost_usd_actual": 0.01633,
+      "outcome": "success",
+      "ts": "2026-06-16T14:17:26.354Z"
+    },
+    {
+      "tag": "DF-4_security_v5_trial-6",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2746,
+      "tokens_out": 383,
+      "latency_ms": 6099,
+      "cost_usd_actual": 0.01948,
+      "outcome": "success",
+      "ts": "2026-06-16T14:17:32.480Z"
+    },
+    {
+      "tag": "DF-4_security_v5_trial-7",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2746,
+      "tokens_out": 252,
+      "latency_ms": 3730,
+      "cost_usd_actual": 0.01751,
+      "outcome": "success",
+      "ts": "2026-06-16T14:17:36.247Z"
+    },
+    {
+      "tag": "DF-4_security_v5_trial-8",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2746,
+      "tokens_out": 183,
+      "latency_ms": 2663,
+      "cost_usd_actual": 0.01648,
+      "outcome": "success",
+      "ts": "2026-06-16T14:17:38.945Z"
+    },
+    {
+      "tag": "DF-2_security_v5_trial-1",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2369,
+      "tokens_out": 398,
+      "latency_ms": 4839,
+      "cost_usd_actual": 0.01782,
+      "outcome": "success",
+      "ts": "2026-06-16T14:17:43.858Z"
+    },
+    {
+      "tag": "DF-2_security_v5_trial-2",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2369,
+      "tokens_out": 353,
+      "latency_ms": 7322,
+      "cost_usd_actual": 0.01714,
+      "outcome": "success",
+      "ts": "2026-06-16T14:17:51.215Z"
+    },
+    {
+      "tag": "DF-2_security_v5_trial-3",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2369,
+      "tokens_out": 366,
+      "latency_ms": 4623,
+      "cost_usd_actual": 0.01734,
+      "outcome": "success",
+      "ts": "2026-06-16T14:17:55.878Z"
+    },
+    {
+      "tag": "DF-3_security_v5_trial-1",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2460,
+      "tokens_out": 166,
+      "latency_ms": 5699,
+      "cost_usd_actual": 0.01479,
+      "outcome": "success",
+      "ts": "2026-06-16T14:18:01.607Z"
+    },
+    {
+      "tag": "DF-3_security_v5_trial-2",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2460,
+      "tokens_out": 238,
+      "latency_ms": 3171,
+      "cost_usd_actual": 0.01587,
+      "outcome": "success",
+      "ts": "2026-06-16T14:18:04.802Z"
+    },
+    {
+      "tag": "DF-3_security_v5_trial-3",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2460,
+      "tokens_out": 243,
+      "latency_ms": 3303,
+      "cost_usd_actual": 0.01595,
+      "outcome": "success",
+      "ts": "2026-06-16T14:18:08.140Z"
+    }
+  ],
+  "trials": {
+    "DF-2": {
+      "security_v5": [
+        {
+          "fixture": "DF-2",
+          "role": "security_auditor",
+          "version": "security_auditor_v5",
+          "trial": 1,
+          "ok": true,
+          "reason": null,
+          "threat_level": "CRITICAL",
+          "blocker_count": 2,
+          "sqli_findings": 2,
+          "sqli_blocker": true,
+          "auth_blocker_count": 0,
+          "inputval_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "SQL injection",
+              "location": "src/controllers/todoController.js: getTodoById",
+              "attack_vector": "The 'id' parameter is concatenated directly into the SQL query, allowing an attacker to execute arbitrary SQL queries by manipulating the 'id' path parameter.",
+              "mitigation": "Use parameterized queries to include the 'id' parameter, e.g., `db.get('SELECT * FROM todos WHERE id = ?', [id], ...);`."
+            },
+            {
+              "severity": "BLOCKER",
+              "title": "SQL injection",
+              "location": "src/controllers/todoController.js: createTodo",
+              "attack_vector": "The 'title' from user input is concatenated into the SQL query string, allowing arbitrary SQL code execution.",
+              "mitigation": "Use parameterized queries to include the 'title' in the SQL statement, e.g., `db.run('INSERT INTO todos (title) VALUES (?)', [title], ...);`."
+            },
+            {
+              "severity": "WARN",
+              "title": "missing input validation",
+              "location": "src/controllers/todoController.js: createTodo",
+              "attack_vector": "User can supply any data type or length for 'title', leading to potential schema violations or resource exhaustion.",
+              "mitigation": "Implement server-side validation and sanitization of 'title' (e.g., ensure it's a string of reasonable length)."
+            }
+          ],
+          "latency_ms": 4839,
+          "cost_usd": 0.01782
+        },
+        {
+          "fixture": "DF-2",
+          "role": "security_auditor",
+          "version": "security_auditor_v5",
+          "trial": 2,
+          "ok": false,
+          "reason": "INVALID_ROLE_OUTPUT",
+          "threat_level": null,
+          "blocker_count": null,
+          "sqli_findings": null,
+          "sqli_blocker": null,
+          "auth_blocker_count": null,
+          "inputval_blocker_count": null,
+          "findings": null,
+          "latency_ms": 7322,
+          "cost_usd": 0.01714
+        },
+        {
+          "fixture": "DF-2",
+          "role": "security_auditor",
+          "version": "security_auditor_v5",
+          "trial": 3,
+          "ok": true,
+          "reason": null,
+          "threat_level": "HIGH",
+          "blocker_count": 2,
+          "sqli_findings": 2,
+          "sqli_blocker": true,
+          "auth_blocker_count": 0,
+          "inputval_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "SQL injection",
+              "location": "src/controllers/todoController.js: getTodoById function",
+              "attack_vector": "req.params.id is concatenated directly into the SQL query string, allowing injection like id=1 OR 1=1",
+              "mitigation": "Use parameterized queries to securely bind id, e.g., db.get('SELECT * FROM todos WHERE id = ?', [id], ...)"
+            },
+            {
+              "severity": "BLOCKER",
+              "title": "SQL injection",
+              "location": "src/controllers/todoController.js: createTodo function",
+              "attack_vector": "req.body.title is concatenated directly into the SQL query string, allowing injection through the title field",
+              "mitigation": "Use parameterized queries to securely bind title, e.g., db.run('INSERT INTO todos (title) VALUES (?)', [title], ...)"
+            },
+            {
+              "severity": "WARN",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js: POST /todos",
+              "attack_vector": "No type or length validation on req.body.title, leading to potential application issues or abuse",
+              "mitigation": "Validate title input for appropriate type and length before using it in the query"
+            }
+          ],
+          "latency_ms": 4623,
+          "cost_usd": 0.01734
+        }
+      ]
+    },
+    "DF-3": {
+      "security_v5": [
+        {
+          "fixture": "DF-3",
+          "role": "security_auditor",
+          "version": "security_auditor_v5",
+          "trial": 1,
+          "ok": false,
+          "reason": "INVALID_ROLE_OUTPUT",
+          "threat_level": null,
+          "blocker_count": null,
+          "sqli_findings": null,
+          "sqli_blocker": null,
+          "auth_blocker_count": null,
+          "inputval_blocker_count": null,
+          "findings": null,
+          "latency_ms": 5699,
+          "cost_usd": 0.01479
+        },
+        {
+          "fixture": "DF-3",
+          "role": "security_auditor",
+          "version": "security_auditor_v5",
+          "trial": 2,
+          "ok": true,
+          "reason": null,
+          "threat_level": "LOW",
+          "blocker_count": 0,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "inputval_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "missing input validation",
+              "location": "src/controllers/todoController.js",
+              "attack_vector": "User input for 'title' in createTodo and updateTodo can include unexpected characters or data types",
+              "mitigation": "Implement input validation to ensure 'title' is a non-empty string with a reasonable length limit"
+            },
+            {
+              "severity": "INFO",
+              "title": "missing authorization checks",
+              "location": "todoController.js endpoints",
+              "attack_vector": "Without authentication and authorization, any user can alter todos",
+              "mitigation": "Implement authentication and authorization mechanisms to restrict access to CRUD operations"
+            }
+          ],
+          "latency_ms": 3171,
+          "cost_usd": 0.01587
+        },
+        {
+          "fixture": "DF-3",
+          "role": "security_auditor",
+          "version": "security_auditor_v5",
+          "trial": 3,
+          "ok": true,
+          "reason": null,
+          "threat_level": "MEDIUM",
+          "blocker_count": 0,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "inputval_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "missing input validation",
+              "location": "src/controllers/todoController.js",
+              "attack_vector": "Unvalidated 'title' field in POST /todos could lead to unexpected behavior or data corruption",
+              "mitigation": "Implement input validation for 'title' to enforce expected length and character set"
+            },
+            {
+              "severity": "WARN",
+              "title": "missing input validation",
+              "location": "src/controllers/todoController.js",
+              "attack_vector": "Unvalidated 'completed' field in PUT /todos/:id can lead to incorrect application state",
+              "mitigation": "Implement input validation for 'completed' to ensure it only accepts boolean values"
+            }
+          ],
+          "latency_ms": 3303,
+          "cost_usd": 0.01595
+        }
+      ]
+    },
+    "DF-4": {
+      "security_v5": [
+        {
+          "fixture": "DF-4",
+          "role": "security_auditor",
+          "version": "security_auditor_v5",
+          "trial": 1,
+          "ok": true,
+          "reason": null,
+          "threat_level": "MEDIUM",
+          "blocker_count": 1,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "inputval_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "Insecure data storage",
+              "location": "src/models/todo.js",
+              "attack_vector": "The SQLite database file (todos.db) is stored without encryption, making it accessible to anyone with file system access.",
+              "mitigation": "Encrypt the SQLite database file to protect sensitive data stored within, using a library such as 'sqlite3-crypt' or implement application-level encryption."
+            },
+            {
+              "severity": "WARN",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js",
+              "attack_vector": "User inputs for 'title' and 'completed' fields are used directly in SQL queries without validation. This could lead to data integrity issues.",
+              "mitigation": "Implement input validation for 'title' (e.g., checking for minimum and maximum length, allowed characters) and 'completed' (e.g., ensuring it's a boolean or valid integer)."
+            }
+          ],
+          "latency_ms": 6689,
+          "cost_usd": 0.0182
+        },
+        {
+          "fixture": "DF-4",
+          "role": "security_auditor",
+          "version": "security_auditor_v5",
+          "trial": 2,
+          "ok": true,
+          "reason": null,
+          "threat_level": "LOW",
+          "blocker_count": 0,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "inputval_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js",
+              "attack_vector": "Invalid or unexpected input can reach the database or influence application behavior as no input validation is performed on user-provided data.",
+              "mitigation": "Implement input validation to ensure that `title` and `completed` fields in the request body meet expected types and constraints before processing."
+            },
+            {
+              "severity": "WARN",
+              "title": "Insecure logging practices",
+              "location": "src/controllers/todoController.js",
+              "attack_vector": "Error messages are directly passed to `next(err)`, which could leak internal error details if not properly handled upstream, potentially revealing sensitive system information.",
+              "mitigation": "Ensure error logging and handling infrastructure sanitizes error messages before exposing them to users, and log details only to server logs."
+            }
+          ],
+          "latency_ms": 4875,
+          "cost_usd": 0.01775
+        },
+        {
+          "fixture": "DF-4",
+          "role": "security_auditor",
+          "version": "security_auditor_v5",
+          "trial": 3,
+          "ok": true,
+          "reason": null,
+          "threat_level": "MEDIUM",
+          "blocker_count": 0,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "inputval_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "missing input validation",
+              "location": "src/controllers/todoController.js",
+              "attack_vector": "Unvalidated input in `createTodo` and `updateTodo` endpoints could lead to unexpected behavior or data inconsistency if malformed data is provided.",
+              "mitigation": "Implement input validation to ensure `title` is a non-empty string and `completed` is a boolean or integer 0/1."
+            },
+            {
+              "severity": "WARN",
+              "title": "insecure database file permissions",
+              "location": "src/models/todo.js",
+              "attack_vector": "The SQLite database file may be accessible with overly permissive permissions, allowing unauthorized read/write if file system permissions are not explicitly set.",
+              "mitigation": "Explicitly set secure permissions for the SQLite database file to prevent unauthorized access."
+            }
+          ],
+          "latency_ms": 9818,
+          "cost_usd": 0.01798
+        },
+        {
+          "fixture": "DF-4",
+          "role": "security_auditor",
+          "version": "security_auditor_v5",
+          "trial": 4,
+          "ok": true,
+          "reason": null,
+          "threat_level": "LOW",
+          "blocker_count": 0,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "inputval_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "missing input validation",
+              "location": "src/controllers/todoController.js",
+              "attack_vector": "Malicious input in the title field could lead to unforeseen application behavior or errors.",
+              "mitigation": "Implement input validation for title field (e.g., check for type and length constraints) to ensure it meets expected criteria."
+            },
+            {
+              "severity": "WARN",
+              "title": "insecure logging of errors",
+              "location": "src/controllers/todoController.js",
+              "attack_vector": "Errors are handled with `next(err)`, which if not configured properly might expose internal error details in production environments.",
+              "mitigation": "Ensure that error handling middleware does not expose sensitive error details to the client and logs them securely."
+            }
+          ],
+          "latency_ms": 7665,
+          "cost_usd": 0.01751
+        },
+        {
+          "fixture": "DF-4",
+          "role": "security_auditor",
+          "version": "security_auditor_v5",
+          "trial": 5,
+          "ok": true,
+          "reason": null,
+          "threat_level": "LOW",
+          "blocker_count": 0,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "inputval_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js",
+              "attack_vector": "The 'title' field from req.body is directly passed to the database without validation, allowing for potential malformed data insertion.",
+              "mitigation": "Implement input validation to ensure 'title' is a non-empty string meeting any necessary length or character requirements before inserting into the database."
+            }
+          ],
+          "latency_ms": 3730,
+          "cost_usd": 0.01633
+        },
+        {
+          "fixture": "DF-4",
+          "role": "security_auditor",
+          "version": "security_auditor_v5",
+          "trial": 6,
+          "ok": true,
+          "reason": null,
+          "threat_level": "LOW",
+          "blocker_count": 0,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "inputval_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "missing input validation",
+              "location": "createTodo, updateTodo endpoints in src/controllers/todoController.js",
+              "attack_vector": "Client submits overly long or malformed title or completed fields which could lead to application instability or unexpected behavior.",
+              "mitigation": "Implement input validation for the title (e.g., check type and length) and completed (e.g., check type is boolean) fields before database operations."
+            },
+            {
+              "severity": "WARN",
+              "title": "missing error handling for database connection issues",
+              "location": "src/models/todo.js",
+              "attack_vector": "Database connection errors are not appropriately handled, potentially leading to unhandled exceptions if the database file is inaccessible or corrupted.",
+              "mitigation": "Add error handling logic for the database connection in src/models/todo.js to capture and manage connection failures gracefully."
+            },
+            {
+              "severity": "INFO",
+              "title": "potential for concurrent write contention",
+              "location": "SQLite usage note",
+              "attack_vector": "Multiple clients could attempt to write data simultaneously, causing contention and potential performance degradation or errors.",
+              "mitigation": "Enable SQLite WAL mode or ensure serialized access to the database to handle concurrent write operations effectively."
+            }
+          ],
+          "latency_ms": 6099,
+          "cost_usd": 0.01948
+        },
+        {
+          "fixture": "DF-4",
+          "role": "security_auditor",
+          "version": "security_auditor_v5",
+          "trial": 7,
+          "ok": true,
+          "reason": null,
+          "threat_level": "LOW",
+          "blocker_count": 0,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "inputval_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js - createTodo",
+              "attack_vector": "An attacker could insert unexpected characters or data into the 'title' field.",
+              "mitigation": "Implement input validation for the 'title' field to ensure it meets expected format and length requirements."
+            },
+            {
+              "severity": "WARN",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js - updateTodo",
+              "attack_vector": "An attacker could insert unexpected characters or data into the 'title' or 'completed' fields.",
+              "mitigation": "Implement input validation for the 'title' and 'completed' fields to ensure they meet expected format and length requirements."
+            }
+          ],
+          "latency_ms": 3730,
+          "cost_usd": 0.01751
+        },
+        {
+          "fixture": "DF-4",
+          "role": "security_auditor",
+          "version": "security_auditor_v5",
+          "trial": 8,
+          "ok": true,
+          "reason": null,
+          "threat_level": "LOW",
+          "blocker_count": 0,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "inputval_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "missing input validation",
+              "location": "src/controllers/todoController.js",
+              "attack_vector": "Unvalidated user input in `createTodo` and `updateTodo` functions could lead to issues if unexpected input types or lengths are processed.",
+              "mitigation": "Add server-side validation for the `title` in `createTodo` and `updateTodo` to ensure it meets expected criteria such as type and length."
+            }
+          ],
+          "latency_ms": 2663,
+          "cost_usd": 0.01648
+        }
+      ]
+    }
+  },
+  "notes": [
+    "security_v5 = v3 base + few-shot worked examples (generic items/label/search — NOT DF fixtures).",
+    "reviewer untouched (v5, 8/8 in STEP E — not re-run). DF-4 fixture self-consistent (STEP D).",
+    "STRICT SQLi detector on vulnerability field. inputval_blocker_count + auth_blocker_count informational.",
+    "DF-3 precision now also tracks no_blocker_tally (input-validation BLOCKER leak surfaced in STEP F v4 trial-3).",
+    "Core objective PASS = strict majority of 3. DF-4 over-fire PASS = no-over-fire >=7/8.",
+    "Raw per-trial outputs under raw/ are the ground truth."
+  ]
+}
