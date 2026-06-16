@@ -2,7 +2,7 @@
 
 **Decision ID:** DECISION-2026-06-16-phase-35-model-eval-and-rootcause-pivot
 **Date:** 2026-06-16
-**Status:** OPEN (STEP D BUILD-ONLY landed locally; pending STEP E real matrix + owner ratification at closure)
+**Status:** CLOSED (2026-06-16 — STEP E→H real gpt-4o matrices green; reviewer_v5 + security_v6 both ACTIVE and ≥7/8 on all axes; CTO-ratified under owner delegation — see §7 Closure)
 **Owner approval:** Owner delegated this call to the CTO verbatim — "خد القرار بنفسك باعلى درجات الاحترافية". Recorded here as a CTO decision under explicit owner delegation, **pending owner ratification at phase closure**.
 **Phase predecessor:** PHASE-34 CLOSED — ★ PIPELINE COMPLETE ★ (`phase-34-complete`). PHASE-35 is backlog/enhancement only (no pipeline bridges remain).
 **Real spend (this decision's track):** C-3a pre-flight = **$0.04873** (one real gpt-5.4 reviewer call). STEP D = **$0** (build + mock regression only). Cumulative real spend ≈ **$0.686**.
@@ -126,6 +126,95 @@ versions (reviewer_v4/v3/v2, security_auditor_v2/v1) are retained verbatim.
 **STEP E** — real gpt-4o matrix, DF-1..DF-4 (N=8 on DF-4) to measure whether over-fire dropped to an
 acceptable level under reviewer_v5 / security_auditor_v3. No closure, no status.json, no commit until
 the matrix is green and the owner ratifies.
+
+---
+
+## 7. CLOSURE — STEP E→H results + ratification (2026-06-16)
+
+The pivot in §3 (fix the root cause via prompts + fixture, not model) was executed and measured on
+real gpt-4o across STEP E→H. All objectives met. PHASE-35 is CLOSED.
+
+### 7.1 STEP E — real gpt-4o matrix (reviewer_v5 + security_v3)
+Evidence: [artifacts/spikes/gate35e_phase35/gate35e_result.json](../spikes/gate35e_phase35/gate35e_result.json).
+- **reviewer_v5 = 8/8 no-over-fire** (`df4_reviewer_no_blocker` 8/8) — the fabrication/over-fire that
+  gpt-5.4 also exhibited (§1 C-3a) is RESOLVED at the prompt layer. Clean correct code is no longer
+  REJECTED, and the "missing import / empty dependencies_added" fabrications are gone.
+- **3 core objectives 3/3:** DF-1 reviewer catch (the PHASE-31 `this.changes` miss), DF-2 security
+  SQLi recall, DF-3 security no-false-positive — recall/precision preserved.
+- **security_v3 = 4/8 no-over-fire** — the best *rule-based* security version, but over-fire still
+  above the ≥7/8 bar. Residual was EXCLUSIVELY a general "missing input validation" raised as a
+  BLOCKER (0/8 SQLi-FP, 0/8 out_of_scope auth — those two were fully fixed by the v3 clauses).
+- Spend: **$0.36778**.
+
+### 7.2 STEP F — security_v4 (sharper input-validation rule) — REGRESSED
+Evidence: [artifacts/spikes/gate35f_phase35/gate35f_result.json](../spikes/gate35f_phase35/gate35f_result.json).
+- v4 added an explicit "input-validation-as-WARN-not-BLOCKER" rule on top of v3. It **REGRESSED to
+  2/8** and **revived a SQLi false-positive**. recall/precision held but over-fire got worse.
+- **Documented as a failed experiment:** sharpening an abstract severity *rule* increased — not
+  decreased — the model's BLOCKER tendency on gpt-4o. v4 is retained verbatim in 18b but is NOT active.
+- Spend: **$0.22343**.
+
+### 7.3 STEP G — security_v5 (FEW-SHOT — mechanism change) — broke the ceiling
+Evidence: [artifacts/spikes/gate35g_phase35/gate35g_result.json](../spikes/gate35g_phase35/gate35g_result.json).
+- v5 = security_v3 BASE (v4 wording discarded) + a short FEW-SHOT block of generic/synthetic worked
+  examples (items/label/search — NOT the DF fixtures) teaching the severity boundary by example.
+- **7/8 no-over-fire** — broke the rule-based ceiling (v3 4/8 → v5 7/8). input-val BLOCKER 0/8,
+  SQLi-FP 0/8, out_of_scope auth 0/8. Recall (DF-2) and precision (DF-3) held.
+- Residual: **2/14 INVALID_ROLE_OUTPUT** — the heavy "severity WARN / severity BLOCKER" repetition in
+  the few-shot block occasionally made the model write a *severity* value into the *threat_level*
+  field (a different enum), which the role correctly fail-closed. Not a wrong verdict, but 14%
+  parse-failure is not production-clean.
+- Spend: **$0.24015**.
+
+### 7.4 STEP H — security_v6 (v5 + threat_level/severity disambiguation) — CLEAN
+Evidence: [artifacts/spikes/gate35h_phase35/gate35h_result.json](../spikes/gate35h_phase35/gate35h_result.json).
+- v6 = security_v5 VERBATIM + ONE field-disambiguation note inside the few-shot block (the two fields
+  use different enums: `findings[].severity` ∈ BLOCKER/WARN/INFO; top-level `threat_level` ∈
+  CRITICAL/HIGH/MEDIUM/LOW/NONE; never write a severity into threat_level).
+- **INVALID_ROLE_OUTPUT = 0/18** (v5 was 2/14) — parse-failures eliminated.
+- **over-fire 8/8** (even tighter than v5's 7/8): input-val BLOCKER 0/8, auth 0/8, SQLi-FP 0/8.
+- **recall 5/5** (SQLi BLOCKER + HIGH/CRITICAL on every parsed DF-2 trial) · **precision 5/5**
+  (no SQLi-FP, no BLOCKER leak on every parsed DF-3 trial). `security_clean = true`.
+- Spend: **$0.31054**.
+
+### 7.5 Model-eval track summary
+gpt-5.4 was evaluated (§1 C-3a) and was **NOT the fix** — it over-fired the same way gpt-4o did. The
+gpt-5 request-dialect support added to `openai_adapter.js` (§1 C-2) is **RETAINED as an asset** for
+future provider/model flexibility, independent of the review-layer model choice. The review layer
+stays on **gpt-4o** — the owner's actual toolchain.
+
+### 7.6 Over-fire progression (security, DF-4 no-over-fire /8)
+```
+v3 (rules)            4/8
+v4 (sharper rules)    2/8   ← REGRESSION
+v5 (few-shot)         7/8   ← ceiling broken
+v6 (few-shot + note)  8/8   ← clean (INVALID 0/18)
+```
+
+### 7.7 KEY LEARNING
+When abstract severity **RULES** plateau or regress (v2→v3→v4), concrete **FEW-SHOT examples** succeed
+at severity calibration (v5→v6) — models calibrate severity more reliably from worked examples than
+from prose rules. Second learning: a heavy few-shot block can bleed token patterns into adjacent
+schema fields; one explicit field-disambiguation note fixes it. The **STABLE-PREFIX discipline**
+(first-500 chars byte-identical across every version) protected the prefix-keyed mock scenarios
+**S96–S99** with **zero SU churn** — the SU suite stayed 317/0/5 across all of v2→v6.
+
+### 7.8 FINAL STATE
+**reviewer_v5** (8/8 no-over-fire, catch preserved) and **security_auditor_v6** (over-fire 8/8,
+recall 5/5, precision 5/5, INVALID 0/18) are both **ACTIVE** and **≥7/8 on all axes**. Prior versions
+(reviewer_v4/v3/v2, security_v5/v4/v3/v2/v1) retained verbatim in 18b.
+
+### 7.9 PHASE-35 real spend
+STEP E→H matrices: **$0.36778 + $0.22343 + $0.24015 + $0.31054 = $1.14190**.
+Including the earlier model-eval/STEP-D track (C-3a pre-flight + STEP B reruns ≈ $0.686, STEP D = $0),
+**cumulative PHASE-35 ≈ $1.83** — well under the **$3.00** kill bar.
+
+### 7.10 RATIFICATION
+Owner delegated this call to the CTO verbatim — "خد القرار بنفسك باعلى درجات الاحترافية" / "no
+half-solutions / highest professionalism". Under that delegation the **CTO ratifies PHASE-35 CLOSED**
+with all objectives met on **gpt-4o** (the owner's toolchain): over-fire eliminated for both roles,
+recall/precision preserved, parse-failures driven to zero. Closure committed LOCALLY; push/tag await
+the CTO's explicit "push GO".
 
 ---
 

@@ -4,7 +4,7 @@
   "current_stage": "A",
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
-  "next_phase": "PHASE-35-PENDING-DECISION",
+  "next_phase": "PHASE-36-PENDING-DECISION",
   "next_step": "PHASE-34 CLOSED — ★ PIPELINE COMPLETE ★. deployProject() at DEPLOYMENT_OR_END: skip path (deployment_enabled=false → VACUOUS_SKIP → LIVE_DELIVERABLE, role_invoked null, LOCK-4/6) + gated path (role.invoke(deployment) openai/gpt-4o LOCK-3 → persist deployment_plan.json → gate_pending:3, advanced:false, NO advance — every gated DEPLOYMENT_OR_END edge has a non-null Gate 3 gate_check). respondGate extended to gate_id∈{1,2,3}; Gate 3 APPROVE requires selected_target, forwarded CONDITIONALLY into orchestration.respond (LOCK-1 — positive S317, negative S322; unconditional-undefined would break Gates 1&2, caught by LOCK-2). finalizeDeliverable() LIVE_DELIVERABLE→COMPLETE reuses summary_writer.writeSummary (persist-then-advance, LOCK-5; distinct step, owner sees LIVE_DELIVERABLE before COMPLETE). Transitions covered: S315 skip→LIVE_DELIVERABLE · S316 gated→gate_pending:3 · S317 Gate3 APPROVE→LIVE_DELIVERABLE · S318 Gate3 REJECT→ESCALATED · S323 finalize→COMPLETE · S324 finalize wrong-state. Guards S319 WRONG_STATE/S320 INPUT_NOT_FOUND/S321 role-failure(DEPLOY_PARSE_FAILED+DEPLOYMENT_FAILED)/S322 APPROVE-missing-target. Fail-closed taxonomy deployProject (PROJECT_NOT_FOUND/NO_LOOP_ID/GET_STATUS_FAILED/WRONG_STATE/INPUT_NOT_FOUND/DEPLOY_PARSE_FAILED/DEPLOYMENT_FAILED/DEPLOY_WRITE_FAILED/SKIP_ADVANCE_FAILED) + finalizeDeliverable (WRONG_STATE/SUMMARY_WRITE_FAILED). Endpoints POST deploy-project + finalize-deliverable + respond-gate gate_id:3 extension. S315–S324 added; suite 317/0/5 (322). Gate #10 REAL_PASS: DEPLOYMENT_OR_END→gate_pending:3→APPROVE(vercel)→LIVE_DELIVERABLE→finalize→COMPLETE, openai/gpt-4o-2024-08-06 $0.01728, latency 9633ms (mock ~tens of ms), tokens 1109/782, final graph current_state=COMPLETE (terminal). ★ The full conversation graph is now wired end-to-end OWNER_INTENT→…→QUALITY_JUDGE→DEPLOYMENT_OR_END→LIVE_DELIVERABLE→COMPLETE; first idea→COMPLETE proven with a real gpt-4o call. ★ L2=80, §ARC=8, roles 13, doctor 35. NO pipeline bridges remain. Next: PHASE-35 pending decision (backlog/enhancement ONLY, not bridges — reviewer/security prompt-tuning, Fixture Engine, §ARC code-vs-ledger drift, suite memory footprint (--max-old-space-size=4096), provider-switch-to-Anthropic).",
   "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-15-phase-34-deployment-bridge.md",
   "blueprint_authority": {
@@ -73,7 +73,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-06-16T18:33:00.397Z",
+    "last_doctor_run": "2026-06-16T19:17:12.338Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
@@ -902,6 +902,72 @@
     ],
     "cost_actuals_usd": 0.019,
     "cumulative_real_spend_usd_est": 0.62
+  },
+  "phase_35": {
+    "status": "CLOSED",
+    "closed_at": "2026-06-16",
+    "title": "Reviewer/Security Prompt-Tuning — over-fire eliminated (few-shot breakthrough on gpt-4o)",
+    "summary": "Resolved the PHASE-31 review-layer over-fire (fabricated BLOCKERs on clean code) WITHOUT a model change. Model-eval track found gpt-5.4 over-fires the same way as gpt-4o (NOT the fix); root cause is prompt severity-calibration. reviewer_v5 (severity discipline + anti-fabrication) hit 8/8 no-over-fire with catch preserved. Security needed a mechanism change: rule-based v2→v3→v4 plateaued/regressed (best 4/8; v4 regressed to 2/8 + revived a SQLi-FP); a FEW-SHOT block (v5) broke the ceiling to 7/8; a threat_level/severity disambiguation note (v6) drove INVALID_ROLE_OUTPUT to 0/18 and over-fire to 8/8. All on gpt-4o (owner toolchain). STABLE-PREFIX (first-500 byte-identical across every version) kept the prefix-keyed mock scenarios S96–S99 green with zero SU churn.",
+    "closure_artifact": "artifacts/decisions/DECISION-2026-06-16-phase-35-model-eval-and-rootcause-pivot.md",
+    "checkpoint": "artifacts/decisions/_phase_35_checkpoints/closure.md",
+    "step_checkpoints": [
+      "artifacts/decisions/_phase_35_checkpoints/stage_a_mid.md",
+      "artifacts/decisions/_phase_35_checkpoints/stage_a_complete.md",
+      "artifacts/decisions/_phase_35_checkpoints/stage_a2_mid.md",
+      "artifacts/decisions/_phase_35_checkpoints/stage_a2_complete.md",
+      "artifacts/decisions/_phase_35_checkpoints/stage_d_build.md",
+      "artifacts/decisions/_phase_35_checkpoints/closure.md"
+    ],
+    "suite_final": "317/0/5 (322 total)",
+    "scenarios_added": [],
+    "su_churn": "ZERO — no scenarios added/changed; STABLE-PREFIX protected S96–S99 (security) and S89/S90 (reviewer) across v2→v6.",
+    "active_roles": {
+      "reviewer": "reviewer_v5",
+      "security_auditor": "security_auditor_v6"
+    },
+    "reviewer_v5": {
+      "no_over_fire": "8/8 (DF-4)",
+      "catch_preserved": "DF-1 reviewer catch 3/3; DF-2 SQLi recall + DF-3 no-FP core objectives 3/3",
+      "change": "reviewer_v4 + SEVERITY DISCIPLINE + generalized ANTI-FABRICATION clauses; first-500 byte-identical to reviewer_v4"
+    },
+    "security_v6": {
+      "over_fire": "8/8 (DF-4 no-over-fire; input-val BLOCKER 0/8, auth 0/8, SQLi-FP 0/8)",
+      "recall": "5/5 (DF-2 SQLi BLOCKER + HIGH/CRITICAL every parsed trial)",
+      "precision": "5/5 (DF-3 no SQLi-FP + no BLOCKER leak every parsed trial)",
+      "invalid_role_output": "0/18 (v5 was 2/14)",
+      "security_clean": true,
+      "change": "security_v5 (few-shot, v3 base) VERBATIM + ONE threat_level/severity disambiguation note; first-500 byte-identical to security_v3/v2"
+    },
+    "over_fire_progression": "security DF-4 no-over-fire: v3 4/8 · v4 2/8 (REGRESSION) · v5 7/8 (few-shot) · v6 8/8 (few-shot + note)",
+    "key_learning": "When abstract severity RULES plateau/regress, concrete FEW-SHOT examples succeed at severity calibration. A heavy few-shot block can bleed token patterns into adjacent schema fields; one field-disambiguation note fixes it. STABLE-PREFIX discipline = zero SU churn.",
+    "model_eval_track": "gpt-5.4 evaluated, NOT the fix (same over-fire tendency); gpt-5 request-dialect support in openai_adapter.js RETAINED as a reusable asset. Review layer stays on gpt-4o.",
+    "v4_status": "REGRESSED experiment — retained verbatim in 18b but NOT active.",
+    "evidence_dirs": [
+      "artifacts/spikes/gate35e_phase35 (reviewer_v5 8/8 + security_v3 4/8)",
+      "artifacts/spikes/gate35f_phase35 (security_v4 regression 2/8)",
+      "artifacts/spikes/gate35g_phase35 (security_v5 few-shot 7/8, INVALID 2/14)",
+      "artifacts/spikes/gate35h_phase35 (security_v6 8/8, INVALID 0/18, security_clean=true)"
+    ],
+    "real_spend_usd": {
+      "step_e": 0.36778,
+      "step_f": 0.22343,
+      "step_g": 0.24015,
+      "step_h": 0.31054,
+      "matrix_total_e_to_h": 1.1419,
+      "cumulative_phase_35_est": 1.83,
+      "kill_bar": 3,
+      "under_kill_bar": true
+    },
+    "both_roles_acceptable": true,
+    "track_a": "CLEAN — docs (18b prompts, 18 contract) + status + decision artifact + checkpoint + spike scripts/evidence only. Runtime code change limited to two system_prompt_id lines (reviewer_role.js → reviewer_v5; security_auditor_role.js → security_auditor_v6). No tools/roles/providers/engine changed. §ARC=8, L2=80, roles=13, doctor=35.",
+    "l2_tools": 80,
+    "agent_roles": 13,
+    "arc_ledger_count": 8,
+    "doctor_checks": 35,
+    "ratification": "Owner delegated to CTO verbatim ('خد القرار بنفسك باعلى درجات الاحترافية'); CTO ratifies PHASE-35 CLOSED with all objectives met on gpt-4o. LOCAL commit only — push/tag await owner/CTO 'push GO'.",
+    "cost_actuals_usd": 1.1419,
+    "findings_open": [],
+    "next_phase": "PHASE-36-PENDING-DECISION"
   },
   "phase_34": {
     "status": "CLOSED",
@@ -1940,7 +2006,7 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-31 CLOSED — REVIEWER_CODE_AND_SECURITY bridge: reviewProject() dual-role (reviewer phase B + security_auditor phase CODE), manifest-restricted code object, derived verdict per RULING-6 (reviewer≠REJECTED&&no-BLOCKER AND security∉{CRITICAL,HIGH}&&no-BLOCKER), review_report.json persisted, fail-closed (MANIFEST_REQUIRED / REVIEW_INPUT_NOT_FOUND / REVIEW_PARSE_FAILED / ROLE_INVOKE_FAILED / REVIEW_WRITE_FAILED). Gate #10 REAL: dual gpt-4o review $0.03704 → derived REQUEST_CHANGES (security HIGH+2 BLOCKER drove it; reviewer missed this.changes defect; SQLi finding was false-positive on parameterized code) → loop_back BUILDER iter-2. S297–S301 added. Suite 294/0/5 (299). L2=80, §ARC=8, roles 13. Next: PHASE-32 pending decision.",
+  "current_task": "PHASE-35 CLOSED — reviewer/security prompt-tuning: reviewer_v5 (8/8 no-over-fire, catch preserved) + security_v6 (over-fire 8/8, recall 5/5, precision 5/5, INVALID 0/18); few-shot broke the rule-based ceiling (security v3 4/8 · v4 2/8 REGRESSED · v5 7/8 · v6 8/8); threat_level/severity disambiguation note drove parse-failures to 0/18; gpt-5.4 evaluated and NOT the fix (gpt-5 adapter retained as asset); all on gpt-4o (owner toolchain). STABLE-PREFIX kept S96–S99 green with zero SU churn. Evidence gate35e/f/g/h. Suite 317/0/5 (322). L2=80, §ARC=8, roles 13, doctor 35. Next: PHASE-36 pending decision.",
   "last_updated": "2026-06-14T09:20:00.000Z",
   "phase_16": {
     "status": "ACTIVE",
