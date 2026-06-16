@@ -1,0 +1,668 @@
+{
+  "mode": "REAL_GPT4O",
+  "provider": "openai",
+  "model": "gpt-4o",
+  "step": "PHASE-35-STEP-F",
+  "run_ts": "2026-06-16T11:27:37.264Z",
+  "n_df4": 8,
+  "n_core": 3,
+  "total_calls": 14,
+  "overall_verdict": "HONEST_EVIDENCE",
+  "assessment": {
+    "security_over_fire_acceptable": false,
+    "recall_precision_hold": true,
+    "df4_security_no_overfire": {
+      "met": 2,
+      "of": 8
+    },
+    "both_roles_acceptable": false
+  },
+  "per_objective": {
+    "DF-2_security_recall": {
+      "criterion": "security_v4 raises a SQLi BLOCKER + threat HIGH/CRITICAL",
+      "tally": {
+        "met": 3,
+        "of": 3
+      },
+      "PASS": true
+    },
+    "DF-3_security_precision": {
+      "criterion": "security_v4 raises NO SQLi finding (parameterized)",
+      "tally": {
+        "met": 3,
+        "of": 3
+      },
+      "PASS": true
+    },
+    "DF-4_security_no_overfire": {
+      "criterion": "security_v4 NO BLOCKER + no SQLi-FP (input-validation = WARN)",
+      "tally": {
+        "met": 2,
+        "of": 8
+      },
+      "PASS": false,
+      "informational_auth_blocker": {
+        "met": 0,
+        "of": 8
+      }
+    }
+  },
+  "overfire_comparison": {
+    "security_no_overfire": {
+      "stepE_v3": {
+        "met": 4,
+        "of": 8
+      },
+      "stepF_v4": {
+        "met": 2,
+        "of": 8
+      }
+    },
+    "security_over_fire_acceptable": false,
+    "threshold": "no-over-fire ≥7/8 (over-fire ≤1/8)",
+    "reviewer_note": "reviewer_v5 already 8/8 in STEP E (not re-run); both roles ≥7/8 ⇔ security reaches ≥7/8 here"
+  },
+  "estimated_usd": 0.22343,
+  "representative_latency_ms": {
+    "count": 14,
+    "min": 2391,
+    "median": 3397,
+    "max": 5117
+  },
+  "per_call_ledger": [
+    {
+      "tag": "DF-4_security_v4_trial-1",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2541,
+      "tokens_out": 301,
+      "latency_ms": 4173,
+      "cost_usd_actual": 0.01722,
+      "outcome": "success",
+      "ts": "2026-06-16T11:26:50.536Z"
+    },
+    {
+      "tag": "DF-4_security_v4_trial-2",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2541,
+      "tokens_out": 292,
+      "latency_ms": 5117,
+      "cost_usd_actual": 0.01709,
+      "outcome": "success",
+      "ts": "2026-06-16T11:26:57.408Z"
+    },
+    {
+      "tag": "DF-4_security_v4_trial-3",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2541,
+      "tokens_out": 210,
+      "latency_ms": 3109,
+      "cost_usd_actual": 0.01585,
+      "outcome": "success",
+      "ts": "2026-06-16T11:27:00.551Z"
+    },
+    {
+      "tag": "DF-4_security_v4_trial-4",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2541,
+      "tokens_out": 205,
+      "latency_ms": 2391,
+      "cost_usd_actual": 0.01578,
+      "outcome": "success",
+      "ts": "2026-06-16T11:27:02.969Z"
+    },
+    {
+      "tag": "DF-4_security_v4_trial-5",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2541,
+      "tokens_out": 263,
+      "latency_ms": 3009,
+      "cost_usd_actual": 0.01665,
+      "outcome": "success",
+      "ts": "2026-06-16T11:27:06.010Z"
+    },
+    {
+      "tag": "DF-4_security_v4_trial-6",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2541,
+      "tokens_out": 201,
+      "latency_ms": 2544,
+      "cost_usd_actual": 0.01572,
+      "outcome": "success",
+      "ts": "2026-06-16T11:27:08.588Z"
+    },
+    {
+      "tag": "DF-4_security_v4_trial-7",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2541,
+      "tokens_out": 287,
+      "latency_ms": 3921,
+      "cost_usd_actual": 0.01701,
+      "outcome": "success",
+      "ts": "2026-06-16T11:27:12.540Z"
+    },
+    {
+      "tag": "DF-4_security_v4_trial-8",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2541,
+      "tokens_out": 268,
+      "latency_ms": 2909,
+      "cost_usd_actual": 0.01673,
+      "outcome": "success",
+      "ts": "2026-06-16T11:27:15.526Z"
+    },
+    {
+      "tag": "DF-2_security_v4_trial-1",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2164,
+      "tokens_out": 415,
+      "latency_ms": 4319,
+      "cost_usd_actual": 0.01705,
+      "outcome": "success",
+      "ts": "2026-06-16T11:27:19.893Z"
+    },
+    {
+      "tag": "DF-2_security_v4_trial-2",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2164,
+      "tokens_out": 319,
+      "latency_ms": 3397,
+      "cost_usd_actual": 0.01561,
+      "outcome": "success",
+      "ts": "2026-06-16T11:27:23.321Z"
+    },
+    {
+      "tag": "DF-2_security_v4_trial-3",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2164,
+      "tokens_out": 206,
+      "latency_ms": 3602,
+      "cost_usd_actual": 0.01391,
+      "outcome": "success",
+      "ts": "2026-06-16T11:27:26.981Z"
+    },
+    {
+      "tag": "DF-3_security_v4_trial-1",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2255,
+      "tokens_out": 179,
+      "latency_ms": 2553,
+      "cost_usd_actual": 0.01396,
+      "outcome": "success",
+      "ts": "2026-06-16T11:27:29.596Z"
+    },
+    {
+      "tag": "DF-3_security_v4_trial-2",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2255,
+      "tokens_out": 190,
+      "latency_ms": 2951,
+      "cost_usd_actual": 0.01413,
+      "outcome": "success",
+      "ts": "2026-06-16T11:27:32.584Z"
+    },
+    {
+      "tag": "DF-3_security_v4_trial-3",
+      "role": "security_auditor",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 2255,
+      "tokens_out": 363,
+      "latency_ms": 4632,
+      "cost_usd_actual": 0.01672,
+      "outcome": "success",
+      "ts": "2026-06-16T11:27:37.243Z"
+    }
+  ],
+  "trials": {
+    "DF-2": {
+      "security_v4": [
+        {
+          "fixture": "DF-2",
+          "role": "security_auditor",
+          "version": "security_auditor_v4",
+          "trial": 1,
+          "ok": true,
+          "reason": null,
+          "threat_level": "HIGH",
+          "blocker_count": 2,
+          "sqli_findings": 2,
+          "sqli_blocker": true,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "SQL Injection",
+              "location": "src/controllers/todoController.js - getTodoById",
+              "attack_vector": "Untrusted 'id' parameter from req.params is concatenated directly into SQL query without parameterization, allowing SQL injection.",
+              "mitigation": "Use parameterized queries by replacing 'db.get('SELECT * FROM todos WHERE id = ' + id' with 'db.get('SELECT * FROM todos WHERE id = ?', [id]'."
+            },
+            {
+              "severity": "BLOCKER",
+              "title": "SQL Injection",
+              "location": "src/controllers/todoController.js - createTodo",
+              "attack_vector": "Untrusted 'title' parameter from req.body is concatenated directly into SQL query without parameterization, allowing SQL injection.",
+              "mitigation": "Use parameterized queries by replacing 'db.run(\"INSERT INTO todos (title) VALUES ('\" + title + \"')\"' with 'db.run(\"INSERT INTO todos (title) VALUES (?)\", [title]' and ensure proper escaping or validation of the title."
+            },
+            {
+              "severity": "WARN",
+              "title": "Unbounded Result Set",
+              "location": "src/controllers/todoController.js - getTodos",
+              "attack_vector": "GET /todos returns all todo records without pagination, which can lead to performance issues as the dataset grows.",
+              "mitigation": "Implement pagination or a result limit to the query to prevent large data responses as the size of the dataset increases."
+            }
+          ],
+          "latency_ms": 4319,
+          "cost_usd": 0.01705
+        },
+        {
+          "fixture": "DF-2",
+          "role": "security_auditor",
+          "version": "security_auditor_v4",
+          "trial": 2,
+          "ok": true,
+          "reason": null,
+          "threat_level": "HIGH",
+          "blocker_count": 2,
+          "sqli_findings": 2,
+          "sqli_blocker": true,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "SQL injection",
+              "location": "src/controllers/todoController.js",
+              "attack_vector": "The `getTodoById` function directly concatenates the `id` parameter from the request URL into the SQL query without sanitization, allowing SQL injection.",
+              "mitigation": "Use parameterized queries to safely pass the `id` parameter into the SQL query, e.g., `db.get('SELECT * FROM todos WHERE id = ?', [id], callback)`. Also, ensure that `id` is validated as an integer before use."
+            },
+            {
+              "severity": "BLOCKER",
+              "title": "SQL injection",
+              "location": "src/controllers/todoController.js",
+              "attack_vector": "The `createTodo` function directly concatenates the `title` parameter from the request body into the SQL query without sanitization, allowing SQL injection.",
+              "mitigation": "Use parameterized queries to safely pass the `title` parameter into the SQL query, e.g., `db.run('INSERT INTO todos (title) VALUES (?)', [title], callback)`."
+            }
+          ],
+          "latency_ms": 3397,
+          "cost_usd": 0.01561
+        },
+        {
+          "fixture": "DF-2",
+          "role": "security_auditor",
+          "version": "security_auditor_v4",
+          "trial": 3,
+          "ok": true,
+          "reason": null,
+          "threat_level": "CRITICAL",
+          "blocker_count": 1,
+          "sqli_findings": 1,
+          "sqli_blocker": true,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "SQL injection",
+              "location": "src/controllers/todoController.js - getTodoById, createTodo",
+              "attack_vector": "Untrusted input from req.params.id and req.body.title is directly concatenated into SQL queries, allowing for SQL injection.",
+              "mitigation": "Use parameterized queries with bound parameters to securely handle user input. For example, use 'db.get(\"SELECT * FROM todos WHERE id = ?\", [id], callback)' and 'db.run(\"INSERT INTO todos (title) VALUES (?)\", [title], callback)'."
+            }
+          ],
+          "latency_ms": 3602,
+          "cost_usd": 0.01391
+        }
+      ]
+    },
+    "DF-3": {
+      "security_v4": [
+        {
+          "fixture": "DF-3",
+          "role": "security_auditor",
+          "version": "security_auditor_v4",
+          "trial": 1,
+          "ok": true,
+          "reason": null,
+          "threat_level": "MEDIUM",
+          "blocker_count": 0,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "Insecure data handling",
+              "location": "src/controllers/todoController.js",
+              "attack_vector": "Handling of user-provided data without input validation can lead to issues such as SQL injection or storage of invalid entries.",
+              "mitigation": "Implement input validation to ensure that 'title' is a non-empty string and does not contain any invalid data before using it in SQL statements."
+            }
+          ],
+          "latency_ms": 2553,
+          "cost_usd": 0.01396
+        },
+        {
+          "fixture": "DF-3",
+          "role": "security_auditor",
+          "version": "security_auditor_v4",
+          "trial": 2,
+          "ok": true,
+          "reason": null,
+          "threat_level": "MEDIUM",
+          "blocker_count": 0,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js",
+              "attack_vector": "An attacker can provide unexpected input types or malformed data in the request body for endpoints like createTodo and updateTodo, leading to potential data integrity issues.",
+              "mitigation": "Implement input validation for todo attributes (such as title and completed) to ensure they adhere to expected formats and types before processing the request."
+            }
+          ],
+          "latency_ms": 2951,
+          "cost_usd": 0.01413
+        },
+        {
+          "fixture": "DF-3",
+          "role": "security_auditor",
+          "version": "security_auditor_v4",
+          "trial": 3,
+          "ok": true,
+          "reason": null,
+          "threat_level": "MEDIUM",
+          "blocker_count": 3,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js - createTodo",
+              "attack_vector": "An attacker could submit input that leads to unintended application behavior because the input is not being validated.",
+              "mitigation": "Perform input validation on `title` to ensure it meets expected criteria (e.g., non-empty, within length limits)."
+            },
+            {
+              "severity": "BLOCKER",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js - updateTodo",
+              "attack_vector": "An attacker could submit input that leads to unintended application behavior because the inputs are not being validated.",
+              "mitigation": "Validate `title`, `completed`, and `id` to ensure they conform to expected types and constraints (e.g., non-empty, valid boolean for `completed`, and numeric `id`)."
+            },
+            {
+              "severity": "BLOCKER",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js - deleteTodo",
+              "attack_vector": "An attacker could provide an invalid `id` type, causing unintended application behavior.",
+              "mitigation": "Validate `id` to ensure it is a valid number."
+            }
+          ],
+          "latency_ms": 4632,
+          "cost_usd": 0.01672
+        }
+      ]
+    },
+    "DF-4": {
+      "security_v4": [
+        {
+          "fixture": "DF-4",
+          "role": "security_auditor",
+          "version": "security_auditor_v4",
+          "trial": 1,
+          "ok": true,
+          "reason": null,
+          "threat_level": "MEDIUM",
+          "blocker_count": 1,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "Missing Input Validation",
+              "location": "src/controllers/todoController.js - createTodo function",
+              "attack_vector": "An attacker could send a POST request to /todos with an invalid or malicious 'title' in the request body, potentially leading to unexpected behavior or future injection vulnerabilities if the input is logged or used unsafely elsewhere.",
+              "mitigation": "Implement proper input validation for the 'title' field to ensure it meets expected formats and lengths before being processed or stored."
+            },
+            {
+              "severity": "WARN",
+              "title": "Insecure Default Configuration",
+              "location": "src/models/todo.js",
+              "attack_vector": "The SQLite database is initialized without encryption, meaning sensitive data stored in 'todos.db' could be read if the file is accessed by unauthorized users.",
+              "mitigation": "Consider encrypting the SQLite database file or its sensitive columns to protect data at rest."
+            }
+          ],
+          "latency_ms": 4173,
+          "cost_usd": 0.01722
+        },
+        {
+          "fixture": "DF-4",
+          "role": "security_auditor",
+          "version": "security_auditor_v4",
+          "trial": 2,
+          "ok": true,
+          "reason": null,
+          "threat_level": "MEDIUM",
+          "blocker_count": 0,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js",
+              "attack_vector": "Unvalidated input in request body 'title', 'completed', and 'id' parameters could lead to unexpected behavior or errors.",
+              "mitigation": "Implement input validation and sanitization for 'title', 'completed', and 'id' fields to ensure they meet expected formats and constraints before processing."
+            },
+            {
+              "severity": "WARN",
+              "title": "Insecure data handling",
+              "location": "src/models/todo.js",
+              "attack_vector": "Database file 'todos.db' located in project directory without encryption or restricted access might be susceptible to unauthorized read and write access.",
+              "mitigation": "Ensure that the database file has appropriate file permissions to restrict access and consider using encryption to protect sensitive data."
+            }
+          ],
+          "latency_ms": 5117,
+          "cost_usd": 0.01709
+        },
+        {
+          "fixture": "DF-4",
+          "role": "security_auditor",
+          "version": "security_auditor_v4",
+          "trial": 3,
+          "ok": true,
+          "reason": null,
+          "threat_level": "MEDIUM",
+          "blocker_count": 1,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js - createTodo, updateTodo",
+              "attack_vector": "An attacker can submit arbitrary data to the APIs since there is no validation on `req.body`. This could lead to unexpected application behavior or errors.",
+              "mitigation": "Implement validation on input fields using a library like Joi or express-validator to ensure 'title' and 'completed' fields meet expected formats and constraints before database operations."
+            }
+          ],
+          "latency_ms": 3109,
+          "cost_usd": 0.01585
+        },
+        {
+          "fixture": "DF-4",
+          "role": "security_auditor",
+          "version": "security_auditor_v4",
+          "trial": 4,
+          "ok": true,
+          "reason": null,
+          "threat_level": "MEDIUM",
+          "blocker_count": 0,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "WARN",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js",
+              "attack_vector": "An attacker could inject unexpected data types or overly large strings into the title or completed fields via the POST and PUT endpoints, potentially leading to issues such as denial of service or data integrity problems.",
+              "mitigation": "Implement input validation to ensure that the title is a non-empty string and completed is a boolean value. Consider using a library such as Joi for validation."
+            }
+          ],
+          "latency_ms": 2391,
+          "cost_usd": 0.01578
+        },
+        {
+          "fixture": "DF-4",
+          "role": "security_auditor",
+          "version": "security_auditor_v4",
+          "trial": 5,
+          "ok": true,
+          "reason": null,
+          "threat_level": "MEDIUM",
+          "blocker_count": 1,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "Insecure data handling",
+              "location": "src/models/todo.js",
+              "attack_vector": "The SQLite database file is stored without encryption, allowing direct access by unauthorized users to the file system.",
+              "mitigation": "Implement encryption for the SQLite database to protect data at rest."
+            },
+            {
+              "severity": "WARN",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js",
+              "attack_vector": "The API endpoints do not validate the 'title' or 'completed' fields, potentially allowing invalid or harmful data to be stored and processed.",
+              "mitigation": "Add input validation checks for 'title' and 'completed' using a library like Joi or express-validator to ensure data integrity."
+            }
+          ],
+          "latency_ms": 3009,
+          "cost_usd": 0.01665
+        },
+        {
+          "fixture": "DF-4",
+          "role": "security_auditor",
+          "version": "security_auditor_v4",
+          "trial": 6,
+          "ok": true,
+          "reason": null,
+          "threat_level": "MEDIUM",
+          "blocker_count": 1,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js",
+              "attack_vector": "An attacker could perform an injection attack by providing malicious input to the `title` or `completed` attributes in POST or PUT requests due to lack of input validation.",
+              "mitigation": "Implement input validation for `title` and `completed` fields in the `createTodo` and `updateTodo` functions to ensure they meet expected criteria (e.g., non-empty strings for titles, boolean or integer values for completed)."
+            }
+          ],
+          "latency_ms": 2544,
+          "cost_usd": 0.01572
+        },
+        {
+          "fixture": "DF-4",
+          "role": "security_auditor",
+          "version": "security_auditor_v4",
+          "trial": 7,
+          "ok": true,
+          "reason": null,
+          "threat_level": "MEDIUM",
+          "blocker_count": 1,
+          "sqli_findings": 1,
+          "sqli_blocker": true,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "SQL injection",
+              "location": "src/controllers/todoController.js",
+              "attack_vector": "The GET /todos endpoint directly uses 'SELECT * FROM todos' which could be vulnerable if query was constructed with unsanitized user input.",
+              "mitigation": "Confirm that the query does not concatenate any untrusted input. If future changes involve dynamic queries, use parameterized queries throughout."
+            },
+            {
+              "severity": "WARN",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js",
+              "attack_vector": "Input from req.body (title and completed) is used directly in queries without validation. Malformed or malicious data could be inserted.",
+              "mitigation": "Implement input validation to ensure 'title' is a non-empty string and 'completed' is a boolean or integer."
+            }
+          ],
+          "latency_ms": 3921,
+          "cost_usd": 0.01701
+        },
+        {
+          "fixture": "DF-4",
+          "role": "security_auditor",
+          "version": "security_auditor_v4",
+          "trial": 8,
+          "ok": true,
+          "reason": null,
+          "threat_level": "HIGH",
+          "blocker_count": 1,
+          "sqli_findings": 0,
+          "sqli_blocker": false,
+          "auth_blocker_count": 0,
+          "findings": [
+            {
+              "severity": "BLOCKER",
+              "title": "Missing input validation",
+              "location": "src/controllers/todoController.js",
+              "attack_vector": "Unvalidated input from req.body and req.params can lead to SQL injection or unexpected behavior.",
+              "mitigation": "Implement validation and sanitization for user inputs (req.body.title, req.body.completed, req.params.id) using a library like Joi or express-validator."
+            },
+            {
+              "severity": "WARN",
+              "title": "Insecure default value",
+              "location": "src/models/todo.js",
+              "attack_vector": "Todos are created with 'completed' set to 0 by default. If this value is passed unchecked through user input, it might lead to misinterpretation.",
+              "mitigation": "Ensure the 'completed' field is validated and set explicitly based on business logic, if required."
+            }
+          ],
+          "latency_ms": 2909,
+          "cost_usd": 0.01673
+        }
+      ]
+    }
+  },
+  "notes": [
+    "security_v4 via reg.invoke('role.invoke'); reviewer untouched (v5, 8/8 in STEP E — not re-run).",
+    "DF-4 fixture self-consistent (STEP D). STRICT SQLi detector on vulnerability field. auth_blocker_count informational (Authentication is spec out_of_scope).",
+    "Core objective PASS = strict majority of 3. DF-4 over-fire PASS = no-over-fire >=7/8 (over-fire <=1/8).",
+    "Raw per-trial outputs under raw/ are the ground truth."
+  ]
+}

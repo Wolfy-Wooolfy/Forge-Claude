@@ -229,10 +229,18 @@ Plans the implementation by describing files to create or modify. Delegates actu
 |---|---|
 | `id` | `security_auditor` |
 | `authority_level` | `BLOCKING` |
-| `system_prompt_id` | `security_auditor_v3` |
+| `system_prompt_id` | `security_auditor_v4` |
 | `default_model` | `claude-opus-4-7` |
 
-> Version history: `security_auditor_v3` (PHASE-35 STEP D, root-cause pivot) supersedes
+> Version history: `security_auditor_v4` (PHASE-35 STEP F, security severity refinement) supersedes
+> `security_auditor_v3` — same input/output schema, threat rubric, and severity ladder; first 500 chars
+> byte-identical to `security_auditor_v3` (protects the S96–S99 mock scenarios). Adds an explicit
+> input-validation severity rule: a precautionary "missing input validation" with no demonstrated
+> exploit is a WARN, never a BLOCKER; BLOCKER is reserved for a concretely demonstrable
+> injection/bypass/corruption. Recall preserved. Rationale: STEP E measured `security_v3` over-fire at
+> 4/8, residual EXCLUSIVELY input-validation-as-BLOCKER (0/8 SQLi-FP, 0/8 out_of_scope auth). See
+> DECISION-2026-06-16-phase-35-model-eval-and-rootcause-pivot.md.
+> `security_auditor_v3` (PHASE-35 STEP D, root-cause pivot) supersedes
 > `security_auditor_v2` — same input/output schema, threat rubric, and severity ladder; first 500 chars
 > byte-identical to `security_auditor_v2` (protects the prefix-keyed mock scenarios). Adds (1) an
 > out_of_scope-respect clause — no finding (especially no BLOCKER) about spec `out_of_scope` items
@@ -243,7 +251,7 @@ Plans the implementation by describing files to create or modify. Delegates actu
 > `security_auditor_v2` (PHASE-35) supersedes `security_auditor_v1` — same
 > input/output schema, threat rubric, and severity ladder; adds a verify-before-flag discipline
 > (do NOT flag injection on parameterized/bound queries) and a false-positive prohibition.
-> `security_auditor_v2` / `security_auditor_v1` retained verbatim in `18b`.
+> `security_auditor_v3` / `security_auditor_v2` / `security_auditor_v1` retained verbatim in `18b`.
 
 **Input schema:** `{ project_id: string, phase: "SPEC"|"CODE", spec: object, design: object, code?: object }`
 
