@@ -78,7 +78,7 @@ function createPolicy(options) {
     }
 
     // Step 1 — Hard deny
-    const hd = checkHardDeny(tool, input, ctx);
+    const hd = checkHardDeny(tool, input, ctx, root);
     if (hd.denied) {
       return emit(
         { allow: false, reason: hd.reason, detail: hd.detail, rule_id: hd.rule_id },
@@ -148,7 +148,7 @@ function createPolicy(options) {
       ? dataModeSatisfies(data_mode, tool.required_mode)
       : (control_mode === tool.required_mode || control_mode === "TEST");
 
-    const scopeCheck = checkScope(tool, input, ctx, data_mode);
+    const scopeCheck = checkScope(tool, input, ctx, data_mode, root);
     const scopeOk    = !scopeCheck.applicable || scopeCheck.allowed !== false;
 
     if (dataAllows && scopeOk) {

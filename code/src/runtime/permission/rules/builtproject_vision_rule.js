@@ -2,6 +2,8 @@
 
 const path = require("path");
 
+const { resolveWithinRoot } = require("../_path_util");
+
 // L3 rule: fires at Step 1.10 in permissionPolicy.authorize().
 // Gate for builtproject.run_scenarios — analog to agent_budget_rule for agent.invoke.
 //
@@ -46,13 +48,15 @@ function createBuiltprojectVisionRule(options) {
       return { denied: true, reason: "PROJECT_ROOT_MISSING", detail: null };
     }
 
-    // ── A: Scope — project_root must be inside artifacts/projects/ ──────────
+    // ── A: Scope — project_root must RESOLVE inside artifacts/projects/ ─────
+    // (PHASE-36 §B: resolve before prefix-match via the shared helper — no raw-string
+    // traversal, consistent with checkScope.)
 
-    const normRoot      = projectRoot.replace(/\\/g, "/");
-    const allowedPrefix = path.resolve(_root, "artifacts", "projects")
-                              .replace(/\\/g, "/");
+    const { relative, escapes_root } = resolveWithinRoot(_root, projectRoot);
+    const inProjects = !escapes_root &&
+      (relative === "artifacts/projects" || relative.startsWith("artifacts/projects/"));
 
-    if (!normRoot.startsWith(allowedPrefix)) {
+    if (!inProjects) {
       return {
         denied: true,
         reason: "PROJECT_ROOT_OUT_OF_SCOPE",
@@ -62,7 +66,7 @@ function createBuiltprojectVisionRule(options) {
 
     // ── B: Vision lock ──────────────────────────────────────────────────────
 
-    const projectId = path.basename(normRoot);
+    const projectId = path.basename(relative);
     try {
       const frontmatter = _visionEngine().readVisionSync(projectId);
       if (!frontmatter) {

@@ -2,6 +2,8 @@
 
 const path = require("path");
 
+const { resolveWithinRoot } = require("./_path_util");
+
 // ── Scope zones (per SCHEMA §6) ───────────────────────────────────────────────
 
 const WORKSPACE_WRITE_PREFIXES = ["artifacts/", "progress/", "logs/"];
@@ -16,13 +18,18 @@ const FORGE_SELF_PREFIXES = [
 const HARD_DENY_RULES = [
   {
     id: "absolute_filesystem_root",
-    applies(tool, input /*, ctx */) {
+    applies(tool, input, ctx, policyRoot) {
       if (!tool.name.startsWith("fs.") && !tool.name.startsWith("artifact.")) return false;
       const p = input && (input.path || input.filename);
       if (!p) return false;
       const norm = String(p);
       if (norm.startsWith("/etc") || norm.startsWith("/var") || norm.startsWith("/root")) return true;
       if (/^[A-Za-z]:[\\\/]/.test(norm)) return true;
+      // PHASE-36 §B: also deny anything that RESOLVES outside the workspace root — route
+      // through the shared helper instead of raw "../" spotting. Root from ctx.root, else
+      // the policy's root (always defined); only skip if neither is known.
+      const root = (ctx && ctx.root) || policyRoot;
+      if (root && resolveWithinRoot(root, norm).escapes_root) return true;
       return false;
     },
     reason: "HARD_DENY_SYSTEM_PATH",
@@ -56,9 +63,9 @@ const HARD_DENY_RULES = [
 
 // ── checkHardDeny ─────────────────────────────────────────────────────────────
 
-function checkHardDeny(tool, input, ctx) {
+function checkHardDeny(tool, input, ctx, policyRoot) {
   for (const rule of HARD_DENY_RULES) {
-    if (rule.applies(tool, input, ctx)) {
+    if (rule.applies(tool, input, ctx, policyRoot)) {
       return { denied: true, rule_id: rule.id, reason: rule.reason, detail: rule.detail };
     }
   }
@@ -105,12 +112,7 @@ function extractWritePath(tool, input) {
   return null;
 }
 
-// ── _normalisePath ────────────────────────────────────────────────────────────
-
-function _normalisePath(p) {
-  // Normalise to forward-slash, no leading slash
-  return String(p).replace(/\\/g, "/").replace(/^\/+/, "");
-}
+// ── _matchesPrefix ────────────────────────────────────────────────────────────
 
 function _matchesPrefix(norm, prefix) {
   return norm === prefix.replace(/\/$/, "") || norm.startsWith(prefix);
@@ -118,7 +120,7 @@ function _matchesPrefix(norm, prefix) {
 
 // ── checkScope ────────────────────────────────────────────────────────────────
 
-function checkScope(tool, input, ctx, dataMode) {
+function checkScope(tool, input, ctx, dataMode, policyRoot) {
   // Read-only tools skip scope check entirely
   if (tool.required_mode === "READ_ONLY" || tool.is_read_only) {
     return { applicable: false };
@@ -131,12 +133,29 @@ function checkScope(tool, input, ctx, dataMode) {
     return { applicable: false };
   }
 
-  const norm = _normalisePath(writePath);
-
-  // DANGER_FULL_ACCESS — allow everywhere
+  // DANGER_FULL_ACCESS — allow everywhere (within-root containment is still enforced
+  // by the L2 tool's safeResolve; scope does not gate self-modify mode).
   if (dataMode === "DANGER_FULL_ACCESS") {
     return { applicable: true, allowed: true, reason: "DANGER_FULL_ACCESS" };
   }
+
+  // C1 (PHASE-36): resolve the write path against the workspace root BEFORE prefix-
+  // matching, so traversal ("artifacts/../code/x.js" → "code/x.js") is matched against
+  // its REAL zone. Root from ctx.root (tools' convention), else the policy's root (always
+  // defined: opts.root || process.cwd()). Fail CLOSED if neither — never raw-string match.
+  const root = (ctx && ctx.root) || policyRoot;
+  if (!root) {
+    return { applicable: true, allowed: false, reason: "SCOPE_NO_ROOT",
+             detail: "scope check requires a workspace root; failing closed" };
+  }
+
+  const { relative, escapes_root } = resolveWithinRoot(root, writePath);
+  if (escapes_root) {
+    return { applicable: true, allowed: false, reason: "SCOPE_OUTSIDE_ROOT",
+             detail: "Path '" + writePath + "' resolves outside the workspace root" };
+  }
+
+  const norm = relative;
 
   // Check WORKSPACE_WRITE_PREFIXES (artifacts/, progress/, logs/)
   for (const prefix of WORKSPACE_WRITE_PREFIXES) {
