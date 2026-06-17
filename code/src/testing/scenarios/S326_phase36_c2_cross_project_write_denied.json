@@ -1,0 +1,21 @@
+{
+  "id": "S326",
+  "name": "PHASE-36 C2 (RED): with active project 'phase36_a', fs.write_file into another project's dir MUST be DENIED SCOPE_CROSS_PROJECT",
+  "_phase36_red": "Asserts the SECURE behavior so it FAILS now. Gap: checkScope is prefix-scoped, not project-scoped — any path under artifacts/projects/ is allowed, so the active project can overwrite a different project's files. Active project is supplied via ctx.active_project_id (test-infra passthrough); PROMPT-B must enforce a cross-project deny AND thread the active project onto the real write path (conversationEngine + materializer pass only { root } today — see decision artifact §C2 real-path note). Executes (not preview) to prove the cross-project write actually lands; the .keep fixture registers artifacts/projects/phase36_b for harness cleanup so nothing leaks. Probe evidence: permissionRules.js:142-150 (artifacts/ prefix → WORKSPACE_WRITE allowed, no active-project comparison).",
+  "type": "direct_tool",
+  "permission": "WORKSPACE_WRITE",
+  "tool": "fs.write_file",
+  "ctx": { "active_project_id": "phase36_a" },
+  "fixture_files": [
+    { "path": "artifacts/projects/phase36_b/.keep", "content": "phase-36 C2 red fixture — registers phase36_b for cleanup" }
+  ],
+  "input": {
+    "path": "artifacts/projects/phase36_b/_phase36_probe.js",
+    "content": "// phase-36 C2 probe — cross-project write must be denied when active project is phase36_a\n"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "DENIED" },
+    { "type": "state_field_equals", "field": "reason", "expected": "SCOPE_CROSS_PROJECT" },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

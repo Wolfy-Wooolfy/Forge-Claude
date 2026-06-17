@@ -1,0 +1,18 @@
+{
+  "id": "S325",
+  "name": "PHASE-36 C1 (RED): WORKSPACE_WRITE fs.write_file with '..' traversal into code/ MUST be DENIED SCOPE_FORGE_SELF",
+  "_phase36_red": "Asserts the SECURE behavior so it FAILS now. Gap: checkScope prefix-matches the RAW string ('artifacts/..' startsWith 'artifacts/' → allowed) while the path resolves into Forge-self code/. preview_only isolates the authorize decision (the real enforcement point) with zero side effect — RED state returns PREVIEWED (authorize ALLOWED the traversal), GREEN after PROMPT-B returns DENIED before preview. Probe evidence: permissionRules.js:110-117 (_normalisePath no '..' resolution) + 142-150 (raw prefix match) vs fs_tools.js:10-16 (safeResolve only guards repo-root).",
+  "type": "direct_tool",
+  "permission": "WORKSPACE_WRITE",
+  "tool": "fs.write_file",
+  "ctx": { "preview_only": true },
+  "input": {
+    "path": "artifacts/../code/src/_phase36_probe.js",
+    "content": "// phase-36 C1 probe — must never be authorized in WORKSPACE_WRITE\n"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "DENIED" },
+    { "type": "state_field_equals", "field": "reason", "expected": "SCOPE_FORGE_SELF" },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}

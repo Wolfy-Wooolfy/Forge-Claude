@@ -253,10 +253,14 @@ async function _runDirectTool(scenario, root) {
 
   let raw;
   try {
+    // PHASE-36 §0: optional per-scenario ctx passthrough (test-infra only,
+    // backward-compatible — existing scenarios have no `ctx` → ctx stays { root }).
+    // Lets ctx-dependent permission scenarios (e.g. preview_only, active_project_id)
+    // be expressed deterministically without mutating shared on-disk state.
     raw = await registry.invoke(
       scenario.tool,
       scenario.input || {},
-      { root }
+      Object.assign({ root }, scenario.ctx || {})
     );
   } finally {
     for (const key of Object.keys(savedEnv)) {
