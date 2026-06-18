@@ -1,0 +1,18 @@
+{
+  "id": "S327",
+  "name": "PHASE-36 C2 (e2e): REAL build write path — buildProject's own writes ALLOWED (active project), and the real materializerEngine DENIES a cross-project write SCOPE_CROSS_PROJECT (victim untouched)",
+  "_phase36_note": "Closes the C2 real-path gate (Gate #10 discipline): not a hand-set direct_tool ctx like S326, but the real engine. PART A drives engine.buildProject for the ACTIVE project — buildProject injects ctx.active_project_id and the real materializerEngine writes the build's OWN file (seg==active → ALLOWED → advance to RUN_TESTS), proving the §2 threading does not break the build. PART B drives the SAME materializerEngine with input.project_id=victim while ctx.active_project_id=active — the §2 ctx propagation reaches the real fs.write_file, checkScope denies SCOPE_CROSS_PROJECT, and the victim sentinel file is left untouched; this FAILS if the materializer drops the threaded ctx. DOCUMENTED LIMITATION (stage_c2_mid.md): buildProject itself can never write cross-project (materializer prefixes every write with artifacts/projects/<input.project_id>/ + _isSafePath blocks '..', and buildProject sets input.project_id==active), so PART B drives the real engine directly — the closest honest real-path attempt.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/cross_project_write_test_helper",
+  "method": "runS327CrossProjectBuildDenied",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "own_project_build_allowed",          "expected": true },
+    { "type": "state_field_equals", "field": "own_file_written",                   "expected": true },
+    { "type": "state_field_equals", "field": "cross_project_denied",               "expected": true },
+    { "type": "state_field_equals", "field": "denied_reason_scope_cross_project",  "expected": true },
+    { "type": "state_field_equals", "field": "victim_file_untouched",              "expected": true }
+  ]
+}

@@ -157,6 +157,25 @@ function checkScope(tool, input, ctx, dataMode, policyRoot) {
 
   const norm = relative;
 
+  // C2 (PHASE-36): active-project write boundary. When the decision ctx carries an
+  // EXPLICIT active project id, a write under artifacts/projects/<seg>/ is allowed only
+  // when <seg> IS the active project; a cross-project write denies SCOPE_CROSS_PROJECT.
+  // Uses the already-resolved relative (norm) — no raw-string match, same discipline as C1.
+  // INERT when ctx.active_project_id is ABSENT: orchestration loop helpers and every other
+  // real write pass { root } only (no active id), so the boundary never touches them — this
+  // is what keeps the loop green (mirrors the C1 fail-closed regression lesson). The seg
+  // regex requires a trailing slash, so the bare project dir (project.create/activate, no
+  // sub-path) is unaffected — you can create/activate B before it becomes active.
+  const activeProjectId = ctx && ctx.active_project_id;
+  if (activeProjectId) {
+    const projMatch = norm.match(/^artifacts\/projects\/([^/]+)\//);
+    if (projMatch && projMatch[1] !== activeProjectId) {
+      return { applicable: true, allowed: false, reason: "SCOPE_CROSS_PROJECT",
+               detail: "Path '" + writePath + "' targets project '" + projMatch[1] +
+                       "' while active project is '" + activeProjectId + "'" };
+    }
+  }
+
   // Check WORKSPACE_WRITE_PREFIXES (artifacts/, progress/, logs/)
   for (const prefix of WORKSPACE_WRITE_PREFIXES) {
     if (_matchesPrefix(norm, prefix)) {

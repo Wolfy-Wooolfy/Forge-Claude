@@ -1132,6 +1132,15 @@ function createConversationEngine(options = {}) {
     const matModel       = body.mat_model         || body.model    || "gpt-4o";
     const matScenId      = body.mat_scenario_id   || undefined;
 
+    // PHASE-36 C2: thread the active project id onto the REAL build write path so the
+    // L3 cross-project boundary is ARMED for this build's OWN writes (materializer +
+    // build_manifest). Source is normalizeProjectId(body.project_id) — the SAME id the
+    // writes target (probe P4-b: guaranteed-consistent), so same-project writes are
+    // ALLOWED; only a write that lands in a DIFFERENT project would deny. NOT passed to
+    // the orchestration helpers (get_status / advance_state) — they MUST stay ctx-free so
+    // the cross-project boundary stays inert in the loop (the C1 fail-closed lesson).
+    const buildCtx = { root, active_project_id: normalizeProjectId(projectId) };
+
     const reg = getDefaultRegistry();
 
     // State guard: must be at BUILDER
@@ -1234,7 +1243,7 @@ function createConversationEngine(options = {}) {
         matModel    ? { model:       matModel    } : {},
         matScenId   ? { scenario_id: matScenId   } : {},
         smokeEntry  ? { smoke_entry: smokeEntry  } : {}
-      ), { root });
+      ), buildCtx);
 
       const matOut = matResult && matResult.output;
       if (!matResult || matResult.status !== "SUCCESS" || !matOut || matOut.status !== "SUCCESS") {
@@ -1259,7 +1268,7 @@ function createConversationEngine(options = {}) {
             built_at: new Date().toISOString(),
             files:    matOut.files_written
           }, null, 2)
-        }, { root });
+        }, buildCtx);
       } catch {
         manifestWrite = null;
       }

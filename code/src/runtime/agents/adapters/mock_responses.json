@@ -395,6 +395,24 @@
     "tokens_out": 40,
     "finish_reason": "stop"
   },
+  "mock|mock-bld-s327|scenario:S327": {
+    "text": "{\"files_written\":[{\"path\":\"app.js\",\"action\":\"create\",\"line_count\":1,\"sha256\":\"pending\"}],\"summary\":\"S327 single-file build for the active project.\",\"dependencies_added\":[],\"notes\":[]}",
+    "tokens_in": 100,
+    "tokens_out": 60,
+    "finish_reason": "stop"
+  },
+  "mock|mock-mat-s327|scenario:S327": {
+    "text": "{\"files\":[{\"path\":\"app.js\",\"content\":\"module.exports=function app(){return 'S327 active-project build';};\"}]}",
+    "tokens_in": 100,
+    "tokens_out": 60,
+    "finish_reason": "stop"
+  },
+  "mock|mock-mat-s327x|scenario:S327X": {
+    "text": "{\"files\":[{\"path\":\"guard.js\",\"content\":\"module.exports='S327 cross-project overwrite attempt — must be DENIED';\"}]}",
+    "tokens_in": 100,
+    "tokens_out": 60,
+    "finish_reason": "stop"
+  },
   "mock|mock|scenario:S273": {
     "text": "{\"phases\":[{\"phase\":\"المرحلة 1 - واجهة برمجة التطبيقات\",\"description\":\"بناء REST API باستخدام Node.js\",\"effort_low_hours\":20,\"effort_mid_hours\":30,\"effort_high_hours\":45,\"cost_drivers\":[\"تعقيد قاعدة البيانات\",\"تكامل المصادقة\"]},{\"phase\":\"المرحلة 2 - واجهة المستخدم\",\"description\":\"بناء واجهة المستخدم\",\"effort_low_hours\":15,\"effort_mid_hours\":25,\"effort_high_hours\":40,\"cost_drivers\":[\"تصميم UI\",\"استجابة التصميم\"]}],\"total_effort_low_hours\":35,\"total_effort_mid_hours\":55,\"total_effort_high_hours\":85,\"external_costs\":[{\"item\":\"استضافة السحابة\",\"cost_type\":\"monthly\",\"estimate_usd\":\"$10-50\",\"notes\":\"خادم صغير مع قاعدة بيانات\"}],\"top_risks\":[{\"risk\":\"تغيير متطلبات العميل\",\"impact\":\"MEDIUM\",\"mitigation\":\"توثيق المتطلبات بشكل واضح في بداية المشروع\"}],\"uncertainty_flags\":[\"متطلبات الأداء غير محددة\"],\"summary\":\"تقدير تكلفة المشروع: 35-85 ساعة عمل. التكاليف الخارجية محدودة.\"}",
     "tokens_in": 800,

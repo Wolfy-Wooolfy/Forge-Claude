@@ -52,6 +52,15 @@ function _tryParseCodegenResponse(text) {
 async function materialize(input, ctx) {
   const reg        = require("../tools/_registry").getDefaultRegistry();
   const root       = (ctx && ctx.root) || process.cwd();
+  // PHASE-36 C2: propagate the active project id from the incoming ctx onto the file
+  // writes so the L3 cross-project boundary is ARMED on the REAL build write path. The
+  // caller (conversationEngine.buildProject) passes active_project_id == this build's own
+  // project, so its writes are ALLOWED; a write that targets a different project denies
+  // SCOPE_CROSS_PROJECT. Inert when no active id is present (the materializer unit tests
+  // call this directly with { root } only) — preserves their behavior exactly.
+  const writeCtx   = (ctx && ctx.active_project_id)
+    ? { root, active_project_id: ctx.active_project_id }
+    : { root };
   const project_id = input.project_id;
   const plan       = Array.isArray(input.plan) ? input.plan : [];
   const spec       = input.spec   || {};
@@ -117,7 +126,7 @@ async function materialize(input, ctx) {
     const content = typeof file.content === "string" ? file.content : "";
     const relPath = "artifacts/projects/" + project_id + "/" + file.path;
 
-    const wr = await reg.invoke("fs.write_file", { path: relPath, content }, { root });
+    const wr = await reg.invoke("fs.write_file", { path: relPath, content }, writeCtx);
     if (!wr || wr.status !== "SUCCESS") {
       const reason = wr && wr.metadata && wr.metadata.reason;
       return {
