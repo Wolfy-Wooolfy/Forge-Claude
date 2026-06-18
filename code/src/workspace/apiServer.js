@@ -89,10 +89,6 @@ function createWorkspaceApiServer(options = {}) {
     path.resolve(root, "code")
   ];
 
-  function ensureDir(dirPath) {
-    fs.mkdirSync(dirPath, { recursive: true });
-  }
-
   function sendJson(res, statusCode, payload) {
     res.writeHead(statusCode, {
       "Content-Type": "application/json; charset=utf-8",
@@ -621,12 +617,16 @@ function createWorkspaceApiServer(options = {}) {
   }
 
   function listKnownProjectIds() {
-    ensureDir(projectsRoot);
-
-    const ids = fs.readdirSync(projectsRoot, { withFileTypes: true })
-      .filter((entry) => entry.isDirectory())
-      .map((entry) => entry.name)
-      .filter((name) => Boolean(name) && normalizeProjectId(name) === name);
+    // PHASE-37 Track A remediation: no direct mkdir. projectsRoot is created by
+    // the L2 fs.write_file tool (recursive parent creation) on the first real
+    // persist; listing only reads. Absent dir → empty scan (default_project is
+    // still prepended below) — behavior-identical to the prior ensureDir+readdir.
+    const ids = fs.existsSync(projectsRoot)
+      ? fs.readdirSync(projectsRoot, { withFileTypes: true })
+          .filter((entry) => entry.isDirectory())
+          .map((entry) => entry.name)
+          .filter((name) => Boolean(name) && normalizeProjectId(name) === name)
+      : [];
 
     if (!ids.includes("default_project")) {
       ids.unshift("default_project");
@@ -2097,7 +2097,7 @@ function createWorkspaceApiServer(options = {}) {
       }
 
       if (req.method === "POST" && pathname === "/api/governance/spec-completeness") {
-        sendJson(res, 200, runSpecCompletenessEnforcer({ root }));
+        sendJson(res, 200, await runSpecCompletenessEnforcer({ root }));
         return;
       }
 

@@ -5,16 +5,28 @@
 
 const fs = require("fs");
 const path = require("path");
+const { getDefaultRegistry } = require("../runtime/tools/_registry");
 
 const ROOT = path.resolve(__dirname, "../../..");
 
-function ensureDir(abs) { fs.mkdirSync(abs, { recursive: true }); }
 function readJsonSafe(p, fallback) {
   try { return fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, "utf-8")) : fallback; }
   catch (_) { return fallback; }
 }
-function writeJson(p, obj) {
-  ensureDir(path.dirname(p)); fs.writeFileSync(p, JSON.stringify(obj, null, 2), "utf-8");
+// PHASE-37 Track A remediation: writes route through the L2 fs.write_file tool
+// (which creates parent dirs recursively), NOT direct fs.writeFileSync/mkdirSync.
+async function writeJsonViaTool(root, relPath, obj) {
+  const reg = getDefaultRegistry();
+  const r = await reg.invoke(
+    "fs.write_file",
+    { path: relPath, content: JSON.stringify(obj, null, 2) },
+    { root }
+  );
+  if (r.status !== "SUCCESS") {
+    throw new Error("writeJsonViaTool failed [" + relPath + "]: " +
+      ((r.metadata && r.metadata.reason) || "") + ": " +
+      ((r.metadata && r.metadata.detail) || ""));
+  }
 }
 function nowIso() { return new Date().toISOString(); }
 
@@ -60,9 +72,9 @@ function checkAiOsDraftExists(root) {
   return { passed: true, note: fs.existsSync(draftPath) ? "Documentation draft exists" : "No draft yet — not required at this stage" };
 }
 
-function runSpecCompletenessEnforcer(options = {}) {
+async function runSpecCompletenessEnforcer(options = {}) {
   const root = String(options.root || ROOT);
-  const outputPath = path.join(root, "artifacts", "verify", "spec_completeness_report.json");
+  const outputRel = "artifacts/verify/spec_completeness_report.json";
 
   const checkResults = SPEC_COMPLETENESS_REQUIREMENTS.map((req) => {
     const result = req.check(root);
@@ -82,7 +94,7 @@ function runSpecCompletenessEnforcer(options = {}) {
     checks: checkResults
   };
 
-  writeJson(outputPath, artifact);
+  await writeJsonViaTool(root, outputRel, artifact);
 
   return {
     ok: passed,
