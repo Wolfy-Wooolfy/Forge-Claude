@@ -101,3 +101,27 @@ recorded here for the CTO mid-verify ruling before STEP B:
     not import-coupled). Its run/step/default commands dangle after deletion (the
     `status` command still works). Recommend adding bin/forge.js to the retire set as
     a 5th bin (CTO ruling pending).
+
+## AMENDMENT 2 — 2026-06-19 (CTO mid-verify ruling — full-domain dangling closure)
+CTO independently re-verified STEP A (48 deletions correct, live surface clean,
+§ARC=10, addenda correct) and ran a comprehensive repo-wide dangling scan that
+confirmed DISCOVERY-1/2 and surfaced the full extent of the legacy self-build
+domain's dead tooling. Ruling: complete the domain retirement (no half solutions).
+RETIRED in STEP B (all verified legacy-domain, none on the live surface, none in
+any automated gate — forge-doctor has no integrity check, the SU suite does not
+invoke them, and the sole consuming script `audit:smoke` is removed):
+  - bin/forge.js (legacy umbrella dispatcher: run/step/default spawn deleted bins;
+    status reads legacy artifacts only).
+  - verify/smoke/{runner_smoke, runner_dry_run_smoke, stage_transitions_smoke,
+    status_writer_smoke}.js (require the deleted orchestrator); smoke_check.js +
+    smoke_check.sh (spawn the 4); local_command_logger.js + local_command_log.jsonl
+    (used only by smoke_check); and the package.json `audit:smoke` script.
+  - tools/integrity.js (hardcoded FILES list of deleted orchestrator/bin paths) +
+    tools/pre_run_check.js (reads release_1.0.0.hashes.json; v1 pre-run check).
+PRESERVED (LIVE, not cluster-coupled): verify/smoke/{test_doctor, test_harness_meta,
+test_permission_layer, test_provider_contract_v2, test_tool_runtime}.js.
+LEFT AS FROZEN HISTORY: release_*.hashes.json (14), artifacts/release/*.manifest.md,
+artifacts/stage_B|C/*, archived task closures — point-in-time records, same
+treatment as artifacts/. Conceptual contract-doc references remain for the deferred
+documentation-reconciliation pass (FINDINGS-INFO-5).
+Total PHASE-38 retirement = 48 (STEP A) + 11 (STEP B) = 59 files + 1 npm script.

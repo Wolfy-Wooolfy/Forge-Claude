@@ -83,6 +83,8 @@ Implements:
 
 ## 5) Coverage Map — Tooling
 
+> **⚠ RETIRED — PHASE-38 (2026-06-19).** `tools/pre_run_check.js` + `tools/integrity.js` were **deleted** per `DECISION-2026-06-19-phase-38-legacy-cluster-retire.md` (STEP B). The live health check is `bin/forge-doctor.js` (L4 Doctor). §5.1/§5.2 below are historical mapping only.
+
 ### 5.1 tools/pre_run_check.js
 Covered by:
 - docs/10_runtime/10_10_Runtime_Entrypoints_and_Tooling.md (Section 3.1)
@@ -99,6 +101,8 @@ Baseline reference:
 - release_local_v2.hashes.json
 
 ## 6) Coverage Map — Verify Smoke
+
+> **⚠ RETIRED — PHASE-38 (2026-06-19).** The orchestrator/status smoke scripts under `verify/smoke/` (runner / runner_dry_run / status_writer / stage_transitions, + smoke_check / local_command_logger) were **deleted** per `DECISION-2026-06-19-phase-38-legacy-cluster-retire.md` (STEP B). Live smoke = `verify/smoke/test_*.js` + the SU suite (`bin/forge-test.js`). §6.1 below is historical mapping only.
 
 ### 6.1 verify/smoke/*
 Covered by:

@@ -22,7 +22,7 @@ The following CLI entrypoints were RETIRED (deleted) in PHASE-38:
 - `bin/forge-autonomous-run.js` — (was) the governed autonomous pipeline runner.
 - `bin/forge-run.js`, `bin/forge-autonomy-step.js` — (were) status-driven run/step wrappers.
 - `bin/forge-build-state.js` — (was) the Forge self-build state writer (via `code/src/forge/forge_state_writer.js`).
-- `bin/forge.js` — umbrella dispatcher that spawned the above; flagged for follow-up retirement (PHASE-38 STEP A note).
+- `bin/forge.js` — umbrella dispatcher that spawned the above; RETIRED (deleted) in PHASE-38.
 
 ### 2.2 Core Runtime Modules
 
@@ -50,6 +50,8 @@ Responsibilities:
 
 ## 3) Tooling
 
+> **⚠ RETIRED — PHASE-38 (2026-06-19).** `tools/pre_run_check.js` and `tools/integrity.js` were the Forge-v1 self-build pre-run / integrity checks; both were **deleted** per `DECISION-2026-06-19-phase-38-legacy-cluster-retire.md` (STEP B). The live health check is `bin/forge-doctor.js` (L4 Doctor). The §3.1/§3.2 descriptions below are historical mapping only.
+
 ### 3.1 Pre-run checks
 Path:
 - tools/pre_run_check.js
@@ -75,6 +77,8 @@ Rule:
 - Integrity verification must pass before any governed execution that claims baseline compliance.
 
 ## 4) Verify and Smoke
+
+> **⚠ RETIRED — PHASE-38 (2026-06-19).** The orchestrator/status smoke scripts listed in §4.1 (`runner_smoke.js`, `runner_dry_run_smoke.js`, `status_writer_smoke.js`, `stage_transitions_smoke.js`) were **deleted** per `DECISION-2026-06-19-phase-38-legacy-cluster-retire.md` (STEP B), together with `smoke_check.js` / `smoke_check.sh` / `local_command_logger.js` and the `audit:smoke` npm script. The live verification harness is the SU suite (`bin/forge-test.js`) plus the runtime smoke tests under `verify/smoke/test_*.js` (doctor, harness_meta, permission_layer, provider_contract_v2, tool_runtime). The §4.1 list below is historical mapping only.
 
 ### 4.1 Smoke tests
 Paths:

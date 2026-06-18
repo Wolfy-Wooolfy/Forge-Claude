@@ -10,8 +10,7 @@
     "start": "node start-api.js",
     "doctor": "node bin/forge-doctor.js",
     "test:scenarios": "node bin/forge-test.js",
-    "test:scenarios:one": "node bin/forge-test.js --scenario",
-    "audit:smoke": "node verify/smoke/runner_smoke.js"
+    "test:scenarios:one": "node bin/forge-test.js --scenario"
   },
   "dependencies": {
     "@lancedb/lancedb": "^0.21.0",
