@@ -551,6 +551,8 @@ Every existing file in `code/src/modules/`, `code/src/providers/`, `code/src/ai_
 
 **No deletions.** The existing 33 modules are well-factored at the validation layer; they just lacked a runtime that fed them clean inputs. The new layers feed them, they keep doing their job.
 
+> **ADDENDUM 2026-06-19 (PHASE-38 — partially SUPERSEDED → RETIRED).** The "No deletions" / blanket-KEEP disposition above predates the L1–L4 runtime. Of the 33 modules, only `visionComplianceGate.js` + `specCompletenessEnforcer.js` are on the live surface (live governance HTTP routes in `apiServer.js`) and remain KEEP. The other 31 were proven unreachable from the live surface by the PHASE-37 reachability audit (`DECISION-2026-06-18-phase-37-arc-drift-audit.md`) and were **RETIRED (deleted)** in PHASE-38 (`DECISION-2026-06-19-phase-38-legacy-cluster-retire.md`). git history preserves them.
+
 ### `code/src/providers/` (13 files)
 
 All MIGRATE — every one is rewritten as a thin handler over Provider Contract v2. The behavior does not change for callers; the boilerplate (OpenAI init, JSON-fence parsing, tool-call extraction) moves into the contract.
@@ -577,6 +579,8 @@ Stage 1 happens in a phase by itself before any other migration touches the file
 ### `code/src/orchestrator/` and `code/src/forge/`
 
 KEEP. Pipeline definition, runner, state writer remain authoritative. `autonomous_runner.js` is updated to emit Tool Runtime calls instead of direct fs writes (Stage 1 migration above).
+
+> **ADDENDUM 2026-06-19 (PHASE-38 — SUPERSEDED → RETIRED).** This KEEP clause was authored 2026-05-07, when `code/src/orchestrator/` WAS the pipeline. The v2 live pipeline was subsequently reimplemented as `code/src/runtime/orchestration/*` (conversation_graph, iteration_controller, approval_gates) + `code/src/ai_os/conversationEngine.js`. The PHASE-37 reachability audit (`DECISION-2026-06-18-phase-37-arc-drift-audit.md`) proved all of `code/src/orchestrator/*` + `code/src/forge/*` unreachable from the live surface (bin-only). Per this Blueprint's own conflict-resolution clause (header / Part A), the KEEP is **superseded** and the cluster was **RETIRED (deleted)** in PHASE-38 (`DECISION-2026-06-19-phase-38-legacy-cluster-retire.md`). The two LIVE governance modules in `code/src/modules/` (visionComplianceGate.js, specCompletenessEnforcer.js) remain KEEP.
 
 ---
 

@@ -17,10 +17,13 @@ It exists to:
 
 ## 2) Coverage Map — Runtime Entrypoints
 
-### 2.1 bin/forge-autonomous-run.js
+> **⚠ RETIRED — PHASE-38 (2026-06-19).** The runtime entrypoints, orchestrator modules, and task-execution modules mapped in §§2–4 below (`bin/forge-autonomous-run.js`, `bin/forge-run.js`, `bin/forge-autonomy-step.js`, `bin/forge-build-state.js`, `code/src/orchestrator/*`, `code/src/execution/*`) were **deleted from the active tree** in PHASE-38 (`DECISION-2026-06-19-phase-38-legacy-cluster-retire.md`; basis: the PHASE-37 reachability audit). They no longer exist in code. The live coverage targets are `start-api.js → code/src/workspace/apiServer.js`, `code/src/ai_os/**`, and `code/src/runtime/**`. The §§2–4 mappings are retained for historical traceability only. Note: live VISION_COMPLIANCE governance is `code/src/modules/visionComplianceGate.js` via an apiServer route — NOT the retired `execution/task_registry.js` of §4.3.
+
+### 2.1 bin/forge-autonomous-run.js — RETIRED (PHASE-38)
+Status: DELETED from the active tree per `DECISION-2026-06-19-phase-38-legacy-cluster-retire.md`. No current code implements this entry; the live entrypoint is `start-api.js`. Mapping retained for historical traceability.
 Covered by:
-- docs/10_runtime/10_10_Runtime_Entrypoints_and_Tooling.md (Section 2.1.A)
-Implements:
+- docs/10_runtime/10_10_Runtime_Entrypoints_and_Tooling.md (Section 2.1 — also marked RETIRED)
+Implements (historical):
 - Governed autonomous pipeline execution
 - Entry resolution from authoritative runtime artifacts
 - Forge/orchestration state synchronization

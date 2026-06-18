@@ -44,3 +44,60 @@ R4 git "U" auto-snapshot noise at closure → tag on clean closure commit, verif
 
 ## §8 Authorization
 Owner standing delegation (2026-06-19). CTO selected PHASE-38 = legacy cluster RETIRE; C2 isolation deferred to PHASE-39 (next live-surface item); Fixture Engine + Anthropic-switch remain backlog (Anthropic blocked on missing ANTHROPIC_API_KEY). Decision-artifact-first satisfied; §0 PROBE + STOP-AND-REPORT preserves the CTO verification gate before any destructive action.
+
+## AMENDMENT — 2026-06-19 (post-Step-0 CTO ruling)
+Step 0 PROBE surfaced three items needing CTO judgment; all independently
+re-verified by the CTO and ruled as follows. This amendment corrects the
+original §2 / §3(d) / §4 scope WITHOUT overwriting them (audit trail).
+
+A. Manifest finalized (FLAG-1 — orchestrator/forge are DEAD). Re-verified: the
+   live surface (apiServer + ai_os/** + runtime/**) imports zero cluster files
+   except the two preserved modules; the v2 live pipeline is
+   code/src/runtime/orchestration/* + code/src/ai_os/conversationEngine.js, not
+   code/src/orchestrator/. All 6 orchestrator/ + 2 forge/ files are bin-only and
+   DEAD. §3(d)'s LIVE criterion is corrected to "reached from the live surface"
+   only; the "OR Blueprint Part C KEEP" sub-clause is withdrawn as stale (see B).
+   Final SOURCE manifest = 44 files: code/src/modules/* (31 — all except
+   visionComplianceGate.js + specCompletenessEnforcer.js) + code/src/execution/*
+   (2) + code/src/cognitive/** (3) + code/src/orchestrator/* (6) +
+   code/src/forge/* (2).
+
+B. Layer-0 supersession of Blueprint Part C (per the Blueprint's own
+   conflict-resolution clause). Part C marks orchestrator/ + forge/ as
+   "KEEP … remain authoritative" and the 33 modules as "No deletions." Those
+   clauses (2026-05-07) predate the L1–L4 runtime and runtime/orchestration/,
+   when orchestrator/ WAS the pipeline. They are superseded by the PHASE-37
+   audit (2026-06-18) and this decision — the dedicated conflict-resolution
+   artifact the Blueprint requires. Part C gets a dated addendum recording the
+   supersession; the two LIVE modules remain KEEP.
+
+C. Scope additions (FLAG-2, FLAG-3). (i) A 4th dead CLI entry —
+   bin/forge-build-state.js (imports forge/forge_state_writer) — is added;
+   retired bins = 4 (forge-run, forge-autonomous-run, forge-autonomy-step,
+   forge-build-state). forge-reset-new-project.js + the live tooling bins
+   forge-doctor.js / forge-test.js are NOT cluster-coupled and are excluded.
+   (ii) Two LIVE docs present retired files as current entrypoints/coverage and
+   would dangle: docs/10_runtime/10_10_Runtime_Entrypoints_and_Tooling.md and
+   docs/08_audit/08_10_Docs_to_Code_Coverage_Map_Core_Runtime.md. STEP A
+   de-dangles exactly these (plus any other doc found presenting a retired file
+   as a live entrypoint/runtime/coverage target). Conceptual references in
+   contract docs are OUT OF SCOPE (deferred documentation-reconciliation pass,
+   Blueprint FINDINGS-INFO-5).
+
+## STEP A EXECUTION NOTE — newly surfaced dangling consequences (flagged, NOT actioned)
+STEP A's pre-deletion re-scan caught two same-legacy-domain couplings that the
+Step-0 dangling scan missed (both use `require(path.resolve(...))` / `spawnSync`,
+which the Step-0 quote-anchored regex did not match). Neither is on the live
+runtime surface, the SU suite, or the STEP B closure gate; both are OUTSIDE the
+CTO-fixed 44-source + 4-bin manifest, so STEP A does NOT touch them — they are
+recorded here for the CTO mid-verify ruling before STEP B:
+  - DISCOVERY-1: verify/smoke/{runner_smoke,runner_dry_run_smoke,status_writer_smoke,
+    stage_transitions_smoke}.js import the retired orchestrator/{runner,status_writer,
+    stage_transitions}; the package.json script `audit:smoke` → runner_smoke.js will
+    fail after deletion. Recommend retiring these 4 smoke files + the `audit:smoke`
+    script as a same-domain follow-up (STEP B or PHASE-39 housekeeping).
+  - DISCOVERY-2: bin/forge.js is an umbrella dispatcher that `spawnSync`s the retired
+    bin/forge-run.js + bin/forge-autonomy-step.js (no `require` of cluster source, so
+    not import-coupled). Its run/step/default commands dangle after deletion (the
+    `status` command still works). Recommend adding bin/forge.js to the retire set as
+    a 5th bin (CTO ruling pending).

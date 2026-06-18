@@ -16,39 +16,17 @@ It is execution-bound in the sense that:
 
 ### 2.1 Primary CLI Entrypoints
 
-#### A) Governed autonomous runner
-Path:
-- bin/forge-autonomous-run.js
+> **⚠ RETIRED — PHASE-38 (2026-06-19).** The Forge-v1 self-build CLI cluster described in this section was **deleted from the active tree** per `DECISION-2026-06-19-phase-38-legacy-cluster-retire.md` (basis: the PHASE-37 reachability audit found it unreachable from the live API). The **live entrypoint is `start-api.js`** (`npm start`); the live tooling CLIs are `bin/forge-doctor.js` and `bin/forge-test.js`. The descriptions below are retained for historical mapping only and no longer describe current code. git history preserves the deleted files.
 
-Purpose:
-- Executes the governed Forge pipeline run.
-- Resolves entry from authoritative runtime artifacts.
-- Writes governed Forge/orchestration state and keeps status reflection synchronized.
-
-Expected behavior:
-- Fail-closed: stops on any contract mismatch or idempotency violation.
-- Deterministic: same inputs produce same artifacts.
-- If the pipeline is already complete, emits `PIPELINE COMPLETE — NO ACTION REQUIRED` without mutating execution continuity.
-
-#### B) Legacy status-driven wrappers
-Paths:
-- bin/forge-run.js
-- bin/forge-autonomy-step.js
-- bin/forge.js
-- bin/forge-build-state.js
-
-Purpose:
-- Provide bounded compatibility tooling around the older status-driven runtime path.
-- Support direct status-driven runs where explicitly invoked.
-
-Expected behavior:
-- They MUST NOT override governed runtime authority.
-- They are subordinate to `bin/forge-autonomous-run.js` for current autonomous execution claims.
-- `bin/forge-build-state.js` writes and exposes the current Forge state artifact (`artifacts/forge/forge_state.json`) via `code/src/forge/forge_state_writer.js`.
-- `bin/forge-build-state.js` is used for state inspection and pre-run readiness validation.
-- `bin/forge-build-state.js` exits non-zero on error.
+The following CLI entrypoints were RETIRED (deleted) in PHASE-38:
+- `bin/forge-autonomous-run.js` — (was) the governed autonomous pipeline runner.
+- `bin/forge-run.js`, `bin/forge-autonomy-step.js` — (were) status-driven run/step wrappers.
+- `bin/forge-build-state.js` — (was) the Forge self-build state writer (via `code/src/forge/forge_state_writer.js`).
+- `bin/forge.js` — umbrella dispatcher that spawned the above; flagged for follow-up retirement (PHASE-38 STEP A note).
 
 ### 2.2 Core Runtime Modules
+
+> **⚠ RETIRED — PHASE-38 (2026-06-19).** `code/src/orchestrator/*` and `code/src/execution/*` listed below were **deleted** per `DECISION-2026-06-19-phase-38-legacy-cluster-retire.md`. The live pipeline is `code/src/runtime/orchestration/*` + `code/src/ai_os/conversationEngine.js`. The lists below are historical mapping only.
 
 #### Orchestrator
 Paths:
@@ -118,4 +96,5 @@ Purpose:
 
 This document does not override the governed runtime authority model.
 `progress/status.json` is a reflection/output artifact for status visibility.
-Execution authority remains with `artifacts/forge/forge_state.json`, `artifacts/orchestration/orchestration_state.json`, authoritative task closures under `artifacts/tasks/*`, and deterministic module order in `code/src/orchestrator/pipeline_definition.js`.
+
+> **⚠ RETIRED — PHASE-38 (2026-06-19).** The legacy self-build authority model described in this clause (`artifacts/forge/forge_state.json`, `artifacts/orchestration/orchestration_state.json`, `code/src/orchestrator/pipeline_definition.js` module order) belonged to the Forge-v1 self-build cluster, **deleted** per `DECISION-2026-06-19-phase-38-legacy-cluster-retire.md`. It no longer governs the live runtime (the v2 live surface is `start-api.js → apiServer.js` + `ai_os/**` + `runtime/**`). Retained for historical mapping only.
