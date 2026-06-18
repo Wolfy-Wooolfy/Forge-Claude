@@ -7,7 +7,10 @@ const path = require("path");
  * Aggregates individual scenario results into a summary report and writes it
  * to <projectRoot>/forge_tests/last_report.json.
  *
- * §ARC-1 Exception: fs.writeFileSync is permitted here for log-style writes.
+ * §ARC-10 Exception: fs.writeFileSync / fs.mkdirSync permitted here — built-project
+ * harness writer to the EXTERNAL project root (<projectRoot>/forge_tests/), which the
+ * Forge-scoped L2 fs tools / L3 policy cannot target. See
+ * docs/10_runtime/18_AGENT_ROLES_CONTRACT.md §ARC-10.
  *
  * @param {object[]} results   Array of runScenario() return values.
  * @param {string}   projectRoot  Absolute path to project root.

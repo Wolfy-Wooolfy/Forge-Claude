@@ -7,7 +7,10 @@ const path = require("path");
  * Writes a loopback signal to <projectRoot>/forge_tests/loopback_signal.json.
  * Used by the orchestrator to detect harness completion and trigger next steps.
  *
- * §ARC-1 Exception: fs.writeFileSync is permitted here for log-style writes.
+ * §ARC-10 Exception: fs.writeFileSync / fs.mkdirSync permitted here — built-project
+ * harness writer to the EXTERNAL project root (<projectRoot>/forge_tests/), which the
+ * Forge-scoped L2 fs tools / L3 policy cannot target. See
+ * docs/10_runtime/18_AGENT_ROLES_CONTRACT.md §ARC-10.
  *
  * @param {object} summary   Output of verdict_aggregator.aggregate().summary
  * @param {string} projectRoot  Absolute path to project root.
