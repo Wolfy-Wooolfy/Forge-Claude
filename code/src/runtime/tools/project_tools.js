@@ -215,15 +215,6 @@ const delete_ = defineTool({
       return failed("NOT_FOUND", "Project '" + input.id + "' not found");
     }
 
-    // PHASE-36 C3 (STEP B2) — active-delete guard (defense in depth). The primary
-    // enforcement is at apiServer.deleteProject (the real delete path); this tool guard
-    // makes the delete_active_project HARD_DENY rule's "delegated to tool-level check"
-    // comment TRUE for any caller that does reach this tool.
-    if (input.id === index.active) {
-      return failed("CANNOT_DELETE_ACTIVE",
-        "Cannot delete the active project '" + input.id + "'; activate another project first.");
-    }
-
     delete index.projects[input.id];
     if (index.active === input.id) index.active = null;
     _writeIndex(root, index);

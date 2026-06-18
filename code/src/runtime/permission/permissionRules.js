@@ -53,17 +53,15 @@ const HARD_DENY_RULES = [
   {
     id: "delete_active_project",
     applies(/* tool, input, ctx */) {
-      // Documentation-only marker (intentionally never fires). Active-project deletion is
-      // enforced where it actually happens (PHASE-36 C3): primarily at the REAL delete path
-      // apiServer.deleteProject (returns CANNOT_DELETE_ACTIVE before fs.delete_dir), and as
-      // defense-in-depth at the project.delete tool (project_tools.js → failed
-      // "CANNOT_DELETE_ACTIVE"). A blanket L3 hard-deny here cannot tell the active project
-      // from any other, so the tool/endpoint layer (which reads the active id) is the correct
-      // enforcement point — this rule stays inert.
+      // Documentation-only marker (intentionally inert; applies() returns false). Active-project
+      // deletion is intentionally ALLOWED — the backend auto-reverts the active pointer to
+      // default_project — per DECISION-2026-06-07 (D4, owner-confirmed via Gate #10); the
+      // multi-select-delete UX depends on it. This historical hard-deny marker is retained for the
+      // audit trail only. Do NOT activate it: doing so would contradict the ratified D4 behavior.
       return false;
     },
     reason: "HARD_DENY_ACTIVE_PROJECT_DELETE",
-    detail: "active-project delete is enforced at apiServer.deleteProject + project.delete tool"
+    detail: "inert marker — active-project delete is intentionally ALLOWED per DECISION-2026-06-07 (D4)"
   }
 ];
 
