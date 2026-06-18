@@ -332,6 +332,12 @@ artifacts/projects/*/orchestration/
 artifacts/projects/*/forge_tests/last_report.json
 artifacts/projects/*/forge_tests/loopback_signal.json
 artifacts/projects/*/intake_state.json
+# SU conversation-scenario byproducts (PHASE-36 C3 STEP D). test_conv_* projects are
+# created by scenario_runner._runConversation (test_conv_<scenario_id>); their
+# conversation_context.json is a regenerable test byproduct, NOT governance. Tightest
+# pattern on purpose — real-project ai_os/ history stays TRACKED (the §8 governance trail).
+# decision_log.json is deliberately NOT ignored (see §6 "KEEP committed … until >1MB").
+artifacts/projects/test_conv_*/ai_os/conversation_context.json
 artifacts/projects/project_registry.json
 artifacts/projects/*/kb/exports/
 artifacts/stage_*/evidence/

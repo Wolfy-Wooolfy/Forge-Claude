@@ -48,6 +48,30 @@ function createPolicy(options) {
   const root    = opts.root || process.cwd();
 
   let active_mode       = opts.active_mode       || fromEnv();
+
+  // PHASE-36 C3 (STEP A) — PROMPT-mode boot fail-fast.
+  // If the resolved control mode is PROMPT and NO respond surface is wired, every gated
+  // operation would call prompter.request(), block for the full DEFAULT_TIMEOUT_MS (~5 min),
+  // then settle DENY/"TIMEOUT" — a silent stall, not an honest failure. There are no
+  // interactive permission endpoints (/api/permission/*) implemented, so refuse to start
+  // instead of stalling. The data modes (WORKSPACE_WRITE / READ_ONLY / DANGER_FULL_ACCESS →
+  // control_mode null) and TEST control mode are UNAFFECTED — only a real PROMPT boot fails.
+  // opts.prompt_respond_surface is the future-proof opt-in: a caller that DOES wire a
+  // responder (e.g. the self-test harness' auto-deny prompter) passes true. The runtime
+  // PROMPT branches in authorize() are left untouched.
+  {
+    const { control_mode: _bootControlMode } = resolveActiveContext(active_mode, {});
+    if (_bootControlMode === "PROMPT" && opts.prompt_respond_surface !== true) {
+      throw new Error(
+        "Forge permission policy refusing to start in PROMPT control mode: no respond surface " +
+        "is wired (interactive permission endpoints are not implemented), so every gated " +
+        "operation would stall for DEFAULT_TIMEOUT_MS and then DENY. Set " +
+        "FORGE_PERMISSION_MODE=WORKSPACE_WRITE (or TEST for CI), or wire a respond surface and " +
+        "pass { prompt_respond_surface: true }."
+      );
+    }
+  }
+
   let inherited_data_mode = opts.inherited_data_mode || null;
   const prompter        = opts.prompter          || getDefaultPrompter();
   const on_decision     = opts.on_decision       || null; // optional callback

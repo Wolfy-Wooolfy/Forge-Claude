@@ -53,11 +53,17 @@ const HARD_DENY_RULES = [
   {
     id: "delete_active_project",
     applies(/* tool, input, ctx */) {
-      // Delegated to project_tools.delete tool-level check — documentation only.
+      // Documentation-only marker (intentionally never fires). Active-project deletion is
+      // enforced where it actually happens (PHASE-36 C3): primarily at the REAL delete path
+      // apiServer.deleteProject (returns CANNOT_DELETE_ACTIVE before fs.delete_dir), and as
+      // defense-in-depth at the project.delete tool (project_tools.js → failed
+      // "CANNOT_DELETE_ACTIVE"). A blanket L3 hard-deny here cannot tell the active project
+      // from any other, so the tool/endpoint layer (which reads the active id) is the correct
+      // enforcement point — this rule stays inert.
       return false;
     },
     reason: "HARD_DENY_ACTIVE_PROJECT_DELETE",
-    detail: "deleting the active project is delegated to tool-level check"
+    detail: "active-project delete is enforced at apiServer.deleteProject + project.delete tool"
   }
 ];
 

@@ -1,0 +1,17 @@
+{
+  "id": "S328",
+  "name": "PHASE-36 C3 (STEP A): createPolicy fails fast in PROMPT control mode with no respond surface; opt-in + TEST + WORKSPACE_WRITE do NOT throw",
+  "_phase36_note": "PROMPT mode has no respond surface wired (no /api/permission/* endpoints), so a real PROMPT boot would stall every gated op for DEFAULT_TIMEOUT_MS then DENY. createPolicy now throws at construction unless prompt_respond_surface:true is passed (the future-proof opt-in the self-test harness uses for its auto-deny prompter). TEST control mode and the data modes are unaffected.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/c3_permission_test_helper",
+  "method": "runS328PromptFailFast",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "prompt_no_surface_throws", "expected": true },
+    { "type": "state_field_equals", "field": "prompt_with_surface_ok",   "expected": true },
+    { "type": "state_field_equals", "field": "test_mode_ok",             "expected": true },
+    { "type": "state_field_equals", "field": "workspace_write_ok",       "expected": true }
+  ]
+}

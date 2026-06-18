@@ -905,6 +905,13 @@ function createWorkspaceApiServer(options = {}) {
     if (!fs.existsSync(projectRoot)) {
       return { ok: false, reason: "PROJECT_NOT_FOUND" };
     }
+    // PHASE-36 C3 (STEP B1) — active-delete guard at the REAL delete path. This endpoint,
+    // not the project.delete tool, is what actually removes a project (fs.delete_dir below).
+    // Without this guard it deleted the ACTIVE project's directory then silently reset active
+    // → default_project. Refuse: the owner must activate another project first.
+    if (projectId === readActiveProjectId()) {
+      return { ok: false, reason: "CANNOT_DELETE_ACTIVE" };
+    }
     const reg = getDefaultRegistry();
     const relPath = path.relative(root, projectRoot).split(path.sep).join("/");
     const dr = await reg.invoke("fs.delete_dir", { path: relPath }, { root });

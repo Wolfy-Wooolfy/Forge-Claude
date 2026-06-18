@@ -242,7 +242,12 @@ async function _runDirectTool(scenario, root) {
   const policy = createPolicy({
     root,
     active_mode: scenario.permission,
-    prompter
+    prompter,
+    // PHASE-36 C3 (STEP A): PROMPT scenarios wire _autoDenyPrompter (a real responder —
+    // answers DENY immediately, no stall), so they legitimately HAVE a respond surface and
+    // opt into the boot fail-fast escape hatch. Tied to the responder's presence: non-PROMPT
+    // scenarios pass undefined (prompter is undefined), so this is a no-op for them.
+    prompt_respond_surface: prompter ? true : undefined
   });
 
   const registry = createRegistry({ root });
