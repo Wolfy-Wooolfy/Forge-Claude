@@ -1,6 +1,6 @@
 # DECISION-2026-06-18 — PHASE-37 §0: §ARC Code-vs-Ledger Drift Audit
 
-**Status:** OPEN (read-only audit; proposal + open questions only — NO code/ledger/remediation changes)
+**Status:** CLOSED — 2026-06-18 (the audit pass was read-only; owner-approved remediation was then executed in STEP A + STEP B — see §9 Closure)
 **Date:** 2026-06-18
 **Author:** Claude (PHASE-37 §0 audit session)
 **Repo state:** HEAD `238a71bf` (working tree clean at audit start); pipeline COMPLETE; PHASE-36 TRULY CLOSED.
@@ -194,4 +194,39 @@ This cluster is the **Forge-v1 "Forge-builds-itself" engine** — `modules/` ↔
 4. Approve fixing the **mis-cited "§ARC-1" comments** in `verdict_aggregator.js` / `loopback_signal.js` as part of a future (separate, write-enabled) remediation phase?
 5. Should the ledger preamble formally state that `runtime/tools/*` is the sanctioned L2 home (not an exception)?
 
-> **No remediation performed.** This artifact is the sole output. `18_AGENT_ROLES_CONTRACT.md` and `status.json` are UNTOUCHED. Awaiting CTO verification.
+> **Audit pass note (superseded by §9):** the §0 audit pass was read-only and produced this artifact alone. Owner-approved remediation (STEP A/B/C) subsequently modified `18_AGENT_ROLES_CONTRACT.md`, two source files, two comment lines, and `status.json` — recorded below.
+
+---
+
+## 9. Closure (Status: CLOSED — 2026-06-18)
+
+> Sub-sections map to the STEP C prompt's §6.1–§6.6; renumbered to §9.x to avoid colliding with the existing §6 (Reverse Check). Mock-only, **$0**. LOCAL commit only — push + tag (`phase-37-complete`) await explicit CTO GO.
+
+### 9.1 STEP A — TRUE-DRIFT fix (the 3 live-reachable writes → `reg.invoke`)
+- `code/src/modules/specCompletenessEnforcer.js` — `writeJson`/`ensureDir` (direct `fs.writeFileSync`/`fs.mkdirSync`) replaced by `async writeJsonViaTool` → `reg.invoke("fs.write_file", …, { root })`; `runSpecCompletenessEnforcer` became `async`; sole call site `apiServer.js:2100` now `await`s it.
+- `code/src/workspace/apiServer.js:93` — `ensureDir` helper removed; `listKnownProjectIds` kept **synchronous** but guards `readdirSync` with `fs.existsSync(projectsRoot)`. `projectsRoot` is created by `fs.write_file` (recursive parent creation) on the first real persist.
+- **3 writes / 2 files.** `node --check` PASS; full mock SU **321/0/5 (326)** — no regression. (`fs.write_file` creates parent dirs, so no `ensure_dir` tool was needed.)
+
+### 9.2 STEP B — Ledger update (§ARC 8 → 10)
+- **§ARC-9** (runtime self-audit / forensic-trace / pre-runtime bootstrap re-entrancy): `permissionPolicy.js`, `toolAuditLog.js`, `providerTrace.js`, `metrics_initializer.js`, `runDoctor.js` — **5 files / 12 write-occurrences**.
+- **§ARC-10** (built-project harness writers to the external project root): `verdict_aggregator.js`, `loopback_signal.js` — **2 files / 6 writes**.
+- **§ARC-8** scope widened to cover the companion `fs.mkdirSync(uploadsDir)` in the upload handler.
+- **Drift fix:** the mis-cited inline `* §ARC-1 Exception` comments in `verdict_aggregator.js` / `loopback_signal.js` corrected to **§ARC-10** (comment-only; `node --check` PASS).
+- **Legacy-domain scope note** added (non-numbered).
+
+### 9.3 CTO verification record (Trust + Verify, bidirectional)
+The first audit pass reported **TRUE-DRIFT = 0** — a CTO-caught error: reachability had been scoped to `ai_os/` only. Re-running from the **full live surface** (`start-api.js → apiServer.js` all routes + `ai_os/*` + `runtime/*`) found the two governance modules wired to live routes, reclassifying `specCompletenessEnforcer` + `apiServer:93` as TRUE-DRIFT (3 writes / 2 files). Correction is recorded in §3.5. The CTO also independently confirmed the heavy self-build cluster stays unreachable. (Also caught during the audit: ripgrep's gitignore prune silently skipped `code/src/runtime/secrets/`; re-verified with `--no-ignore`.)
+
+### 9.4 Legacy-domain decision (owner-approved)
+**Ledger-as-legacy (OUT-OF-TRACK-A-SCOPE note), NOT migrate.** The Forge-v1 self-build CLI cluster — `modules/*` (except the two live governance modules), `execution/`, `cognitive/`, `orchestrator/`, `forge/` — **≈36 files / ≈198 writes** (+2 `child_process`, +1 `fetch`) is unreachable from the live API (audit §3.5) and CLI-invokable only (`bin/forge-run.js`, `bin/forge-autonomous-run.js`, `bin/forge-autonomy-step.js`). Tolerated pending a **future owner-gated migrate-or-retire** decision.
+
+### 9.5 Final metrics
+§ARC = **10** (§ARC-1..10) + legacy scope note · L2 tools = **80** · roles = **13** · doctor checks = **35** · suite **321/0/5 (326)**. Live runtime surface Track-A clean (0 TRUE-DRIFT). Mock-only, **$0**.
+
+### 9.6 Remaining backlog (owner-gated — do NOT auto-start)
+1. Legacy self-build cluster migrate-or-retire.
+2. C2 deferral orchestration redesign (block raw cross-project writes with NO ctx).
+3. Fixture Engine (Finding #4).
+4. Anthropic provider switch (after `ANTHROPIC_API_KEY` set).
+
+**PHASE-37 CLOSED.** LOCAL commit only; push + tag await explicit CTO GO.

@@ -4,8 +4,8 @@
   "current_stage": "A",
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
-  "next_phase": "PHASE-37-PENDING-DECISION",
-  "next_step": "PHASE-36 CLOSED — L3 permission real-path hardening (C1 traversal containment + C2 active-project cross-project boundary + C3 PROMPT boot fail-fast & honest dead-rule comment & .gitignore housekeeping). Suite 321/0/5 (326). The pipeline remains COMPLETE; PHASE-37+ is owner-gated BACKLOG ONLY (no automatic continuation) — candidates: the C2 deferral orchestration redesign (block raw cross-project writes with NO ctx), §ARC code-vs-ledger drift audit, Fixture Engine, provider-switch-to-Anthropic. Do NOT start PHASE-37 without an explicit owner decision. PRIOR (PHASE-34) next_step archived under phase_34. PHASE-34 CLOSED — ★ PIPELINE COMPLETE ★. deployProject() at DEPLOYMENT_OR_END: skip path (deployment_enabled=false → VACUOUS_SKIP → LIVE_DELIVERABLE, role_invoked null, LOCK-4/6) + gated path (role.invoke(deployment) openai/gpt-4o LOCK-3 → persist deployment_plan.json → gate_pending:3, advanced:false, NO advance — every gated DEPLOYMENT_OR_END edge has a non-null Gate 3 gate_check). respondGate extended to gate_id∈{1,2,3}; Gate 3 APPROVE requires selected_target, forwarded CONDITIONALLY into orchestration.respond (LOCK-1 — positive S317, negative S322; unconditional-undefined would break Gates 1&2, caught by LOCK-2). finalizeDeliverable() LIVE_DELIVERABLE→COMPLETE reuses summary_writer.writeSummary (persist-then-advance, LOCK-5; distinct step, owner sees LIVE_DELIVERABLE before COMPLETE). Transitions covered: S315 skip→LIVE_DELIVERABLE · S316 gated→gate_pending:3 · S317 Gate3 APPROVE→LIVE_DELIVERABLE · S318 Gate3 REJECT→ESCALATED · S323 finalize→COMPLETE · S324 finalize wrong-state. Guards S319 WRONG_STATE/S320 INPUT_NOT_FOUND/S321 role-failure(DEPLOY_PARSE_FAILED+DEPLOYMENT_FAILED)/S322 APPROVE-missing-target. Fail-closed taxonomy deployProject (PROJECT_NOT_FOUND/NO_LOOP_ID/GET_STATUS_FAILED/WRONG_STATE/INPUT_NOT_FOUND/DEPLOY_PARSE_FAILED/DEPLOYMENT_FAILED/DEPLOY_WRITE_FAILED/SKIP_ADVANCE_FAILED) + finalizeDeliverable (WRONG_STATE/SUMMARY_WRITE_FAILED). Endpoints POST deploy-project + finalize-deliverable + respond-gate gate_id:3 extension. S315–S324 added; suite 317/0/5 (322). Gate #10 REAL_PASS: DEPLOYMENT_OR_END→gate_pending:3→APPROVE(vercel)→LIVE_DELIVERABLE→finalize→COMPLETE, openai/gpt-4o-2024-08-06 $0.01728, latency 9633ms (mock ~tens of ms), tokens 1109/782, final graph current_state=COMPLETE (terminal). ★ The full conversation graph is now wired end-to-end OWNER_INTENT→…→QUALITY_JUDGE→DEPLOYMENT_OR_END→LIVE_DELIVERABLE→COMPLETE; first idea→COMPLETE proven with a real gpt-4o call. ★ L2=80, §ARC=8, roles 13, doctor 35. NO pipeline bridges remain. Next: PHASE-35 pending decision (backlog/enhancement ONLY, not bridges — reviewer/security prompt-tuning, Fixture Engine, §ARC code-vs-ledger drift, suite memory footprint (--max-old-space-size=4096), provider-switch-to-Anthropic).",
+  "next_phase": "PHASE-38-PENDING-DECISION",
+  "next_step": "PHASE-37 CLOSED — §ARC code-vs-ledger drift audit + remediation (LOCAL commit only; push/tag phase-37-complete await owner GO). Read-only audit: forward scan (rg --no-ignore) 262 fs.*Sync / 8 child_process importers / 1 real fetch (cognitive/drivers/openai_driver) / 1 real new OpenAI (openAiAdapter, sanctioned); path-split 17 SANCTIONED (runtime/tools/*) / 24 AUTHORIZED (§ARC) / 221 UNLEDGERED → 18 LEDGER-GAP (7 runtime files), 3 TRUE-DRIFT (2 live-reachable files), 198 unreachable-legacy (36 files). CTO caught first-pass TRUE-DRIFT=0 (reachability wrongly scoped to ai_os only) → corrected to 3/2 via full-live-surface reachability (apiServer+ai_os+runtime). STEP A migrated the 3 TRUE-DRIFT writes to reg.invoke('fs.write_file'): specCompletenessEnforcer writeJson/ensureDir→async tool call; apiServer:93 ensureDir removed, listKnownProjectIds existsSync-guarded (projectsRoot created by fs.write_file recursively). STEP B: §ARC 8→10 (+§ARC-9 runtime self-audit/trace/bootstrap 5 files/12 writes; +§ARC-10 built-project harness 2 files/6 writes), §ARC-8 widened (companion mkdir), mis-cited §ARC-1 comments→§ARC-10, legacy-domain OUT-OF-TRACK-A-SCOPE note. Legacy Forge-v1 self-build CLI cluster (~36 files/198 writes, unreachable from live API, CLI-only via bin/forge-run|forge-autonomous-run|forge-autonomy-step) scoped out pending owner-gated migrate-or-retire. Mock-only $0; suite 321/0/5 (326) no regression; §ARC=10, L2=80, roles=13, doctor=35. PHASE-38+ owner-gated BACKLOG ONLY (legacy migrate-or-retire; C2 deferral orchestration redesign; Fixture Engine; Anthropic provider switch) — do NOT auto-start. PRIOR (PHASE-36) next_step retained below. PHASE-36 CLOSED — L3 permission real-path hardening (C1 traversal containment + C2 active-project cross-project boundary + C3 PROMPT boot fail-fast & honest dead-rule comment & .gitignore housekeeping). Suite 321/0/5 (326). The pipeline remains COMPLETE; PHASE-37+ is owner-gated BACKLOG ONLY (no automatic continuation) — candidates: the C2 deferral orchestration redesign (block raw cross-project writes with NO ctx), §ARC code-vs-ledger drift audit, Fixture Engine, provider-switch-to-Anthropic. Do NOT start PHASE-37 without an explicit owner decision. PRIOR (PHASE-34) next_step archived under phase_34. PHASE-34 CLOSED — ★ PIPELINE COMPLETE ★. deployProject() at DEPLOYMENT_OR_END: skip path (deployment_enabled=false → VACUOUS_SKIP → LIVE_DELIVERABLE, role_invoked null, LOCK-4/6) + gated path (role.invoke(deployment) openai/gpt-4o LOCK-3 → persist deployment_plan.json → gate_pending:3, advanced:false, NO advance — every gated DEPLOYMENT_OR_END edge has a non-null Gate 3 gate_check). respondGate extended to gate_id∈{1,2,3}; Gate 3 APPROVE requires selected_target, forwarded CONDITIONALLY into orchestration.respond (LOCK-1 — positive S317, negative S322; unconditional-undefined would break Gates 1&2, caught by LOCK-2). finalizeDeliverable() LIVE_DELIVERABLE→COMPLETE reuses summary_writer.writeSummary (persist-then-advance, LOCK-5; distinct step, owner sees LIVE_DELIVERABLE before COMPLETE). Transitions covered: S315 skip→LIVE_DELIVERABLE · S316 gated→gate_pending:3 · S317 Gate3 APPROVE→LIVE_DELIVERABLE · S318 Gate3 REJECT→ESCALATED · S323 finalize→COMPLETE · S324 finalize wrong-state. Guards S319 WRONG_STATE/S320 INPUT_NOT_FOUND/S321 role-failure(DEPLOY_PARSE_FAILED+DEPLOYMENT_FAILED)/S322 APPROVE-missing-target. Fail-closed taxonomy deployProject (PROJECT_NOT_FOUND/NO_LOOP_ID/GET_STATUS_FAILED/WRONG_STATE/INPUT_NOT_FOUND/DEPLOY_PARSE_FAILED/DEPLOYMENT_FAILED/DEPLOY_WRITE_FAILED/SKIP_ADVANCE_FAILED) + finalizeDeliverable (WRONG_STATE/SUMMARY_WRITE_FAILED). Endpoints POST deploy-project + finalize-deliverable + respond-gate gate_id:3 extension. S315–S324 added; suite 317/0/5 (322). Gate #10 REAL_PASS: DEPLOYMENT_OR_END→gate_pending:3→APPROVE(vercel)→LIVE_DELIVERABLE→finalize→COMPLETE, openai/gpt-4o-2024-08-06 $0.01728, latency 9633ms (mock ~tens of ms), tokens 1109/782, final graph current_state=COMPLETE (terminal). ★ The full conversation graph is now wired end-to-end OWNER_INTENT→…→QUALITY_JUDGE→DEPLOYMENT_OR_END→LIVE_DELIVERABLE→COMPLETE; first idea→COMPLETE proven with a real gpt-4o call. ★ L2=80, §ARC=8, roles 13, doctor 35. NO pipeline bridges remain. Next: PHASE-35 pending decision (backlog/enhancement ONLY, not bridges — reviewer/security prompt-tuning, Fixture Engine, §ARC code-vs-ledger drift, suite memory footprint (--max-old-space-size=4096), provider-switch-to-Anthropic).",
   "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-15-phase-34-deployment-bridge.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
@@ -968,6 +968,54 @@
     "cost_actuals_usd": 1.1419,
     "findings_open": [],
     "next_phase": "PHASE-36-PENDING-DECISION"
+  },
+  "phase_37": {
+    "status": "CLOSED",
+    "closed_at": "2026-06-18",
+    "title": "§ARC Code-vs-Ledger Drift Audit + Remediation",
+    "summary": "Read-only audit reconciled the §ARC ledger against the code, then owner-approved remediation. Forward scan (rg --no-ignore, excl node_modules/testing): 262 fs.*Sync writes / 8 child_process importers / 1 real direct fetch (cognitive/drivers/openai_driver, legacy) / 1 real new OpenAI (openAiAdapter, sanctioned). Path-split: 17 SANCTIONED (runtime/tools/*), 24 AUTHORIZED (§ARC), 221 UNLEDGERED → judged 18 LEDGER-GAP (7 runtime files), 3 TRUE-DRIFT (2 live-reachable files), 198 unreachable-legacy (36 files). CTO caught a first-pass error (TRUE-DRIFT=0 — reachability wrongly scoped to ai_os only); corrected to 3/2 via full-live-surface reachability (apiServer all routes + ai_os + runtime). STEP A migrated the 3 TRUE-DRIFT writes to reg.invoke('fs.write_file') (fs.write_file creates parent dirs recursively, so no ensure_dir tool needed): specCompletenessEnforcer writeJson/ensureDir → async tool call; apiServer:93 ensureDir removed, listKnownProjectIds guarded with fs.existsSync. STEP B added §ARC-9 (runtime self-audit/forensic-trace/bootstrap re-entrancy: permissionPolicy, toolAuditLog, providerTrace, metrics_initializer, runDoctor — 5 files/12 writes) + §ARC-10 (built-project harness writers verdict_aggregator + loopback_signal — 2 files/6 writes), widened §ARC-8 (companion mkdir in upload handler), corrected the mis-cited inline §ARC-1 comments → §ARC-10, and added a legacy-domain OUT-OF-TRACK-A-SCOPE note. §ARC count 8 → 10. Legacy Forge-v1 self-build CLI cluster (~36 files/198 writes + 2 child_process + 1 fetch; unreachable from live API; CLI-only via bin/forge-run, forge-autonomous-run, forge-autonomy-step) scoped out pending owner-gated migrate-or-retire. Also caught: ripgrep gitignore-prune silently skipped code/src/runtime/secrets/; re-verified with --no-ignore. Mock-only, $0; suite 321/0/5 (326) — no regression.",
+    "audit_artifact": "artifacts/decisions/DECISION-2026-06-18-phase-37-arc-drift-audit.md",
+    "closure_artifact": "artifacts/decisions/DECISION-2026-06-18-phase-37-arc-drift-audit.md",
+    "checkpoints": [
+      "artifacts/decisions/_phase_37_checkpoints/stage_remediation_mid.md",
+      "artifacts/decisions/_phase_37_checkpoints/stage_ledger_mid.md",
+      "artifacts/decisions/_phase_37_checkpoints/stage_closure.md"
+    ],
+    "true_drift_migrated": {
+      "files": [
+        "code/src/modules/specCompletenessEnforcer.js",
+        "code/src/workspace/apiServer.js"
+      ],
+      "writes": 3,
+      "mechanism": "reg.invoke('fs.write_file') (recursive parent-dir creation); listKnownProjectIds guarded with fs.existsSync"
+    },
+    "ledger_changes": {
+      "arc_added": ["§ARC-9", "§ARC-10"],
+      "arc_8_widened": "companion fs.mkdirSync(uploadsDir) in the POST /api/intake/upload handler",
+      "comment_fix": "verdict_aggregator.js + loopback_signal.js mis-cited §ARC-1 → §ARC-10 (comment-only)",
+      "legacy_scope_note": "Forge-v1 self-build CLI cluster marked OUT-OF-TRACK-A-SCOPE (non-numbered note)"
+    },
+    "three_bucket_outcome": {
+      "true_drift_migrated": "3 writes / 2 files",
+      "ledger_gap_ledgered": "§ARC-9 (5 files/12 writes) + §ARC-10 (2 files/6 writes)",
+      "unreachable_legacy_scoped_out": "~36 files / ~198 writes (owner-gated migrate-or-retire pending)"
+    },
+    "suite_final": "321/0/5 (326)",
+    "arc_ledger_count": 10,
+    "l2_tools": 80,
+    "agent_roles": 13,
+    "doctor_checks": 35,
+    "track_a": "Live runtime surface (apiServer + ai_os + runtime) Track-A clean: 0 TRUE-DRIFT remaining; all direct side effects are SANCTIONED (runtime/tools/*) or §ARC-1..10. Legacy self-build cluster scoped out (non-numbered note).",
+    "ratification": "CTO-verified §0 audit + STEP A + STEP B in chat. LOCAL commit only — push/tag (phase-37-complete) await an explicit owner/CTO 'push GO'.",
+    "cost_actuals_usd": 0,
+    "findings_open": [],
+    "backlog_owner_gated": [
+      "Legacy self-build cluster migrate-or-retire decision",
+      "C2 deferral orchestration redesign (block raw cross-project writes with NO ctx)",
+      "Fixture Engine (Finding #4)",
+      "provider switch to Anthropic after ANTHROPIC_API_KEY set"
+    ],
+    "next_phase": "PHASE-38-PENDING-DECISION"
   },
   "phase_36": {
     "status": "CLOSED",
