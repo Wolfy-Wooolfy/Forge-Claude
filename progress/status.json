@@ -4,8 +4,8 @@
   "current_stage": "A",
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
-  "next_phase": "PHASE-36-PENDING-DECISION",
-  "next_step": "PHASE-34 CLOSED — ★ PIPELINE COMPLETE ★. deployProject() at DEPLOYMENT_OR_END: skip path (deployment_enabled=false → VACUOUS_SKIP → LIVE_DELIVERABLE, role_invoked null, LOCK-4/6) + gated path (role.invoke(deployment) openai/gpt-4o LOCK-3 → persist deployment_plan.json → gate_pending:3, advanced:false, NO advance — every gated DEPLOYMENT_OR_END edge has a non-null Gate 3 gate_check). respondGate extended to gate_id∈{1,2,3}; Gate 3 APPROVE requires selected_target, forwarded CONDITIONALLY into orchestration.respond (LOCK-1 — positive S317, negative S322; unconditional-undefined would break Gates 1&2, caught by LOCK-2). finalizeDeliverable() LIVE_DELIVERABLE→COMPLETE reuses summary_writer.writeSummary (persist-then-advance, LOCK-5; distinct step, owner sees LIVE_DELIVERABLE before COMPLETE). Transitions covered: S315 skip→LIVE_DELIVERABLE · S316 gated→gate_pending:3 · S317 Gate3 APPROVE→LIVE_DELIVERABLE · S318 Gate3 REJECT→ESCALATED · S323 finalize→COMPLETE · S324 finalize wrong-state. Guards S319 WRONG_STATE/S320 INPUT_NOT_FOUND/S321 role-failure(DEPLOY_PARSE_FAILED+DEPLOYMENT_FAILED)/S322 APPROVE-missing-target. Fail-closed taxonomy deployProject (PROJECT_NOT_FOUND/NO_LOOP_ID/GET_STATUS_FAILED/WRONG_STATE/INPUT_NOT_FOUND/DEPLOY_PARSE_FAILED/DEPLOYMENT_FAILED/DEPLOY_WRITE_FAILED/SKIP_ADVANCE_FAILED) + finalizeDeliverable (WRONG_STATE/SUMMARY_WRITE_FAILED). Endpoints POST deploy-project + finalize-deliverable + respond-gate gate_id:3 extension. S315–S324 added; suite 317/0/5 (322). Gate #10 REAL_PASS: DEPLOYMENT_OR_END→gate_pending:3→APPROVE(vercel)→LIVE_DELIVERABLE→finalize→COMPLETE, openai/gpt-4o-2024-08-06 $0.01728, latency 9633ms (mock ~tens of ms), tokens 1109/782, final graph current_state=COMPLETE (terminal). ★ The full conversation graph is now wired end-to-end OWNER_INTENT→…→QUALITY_JUDGE→DEPLOYMENT_OR_END→LIVE_DELIVERABLE→COMPLETE; first idea→COMPLETE proven with a real gpt-4o call. ★ L2=80, §ARC=8, roles 13, doctor 35. NO pipeline bridges remain. Next: PHASE-35 pending decision (backlog/enhancement ONLY, not bridges — reviewer/security prompt-tuning, Fixture Engine, §ARC code-vs-ledger drift, suite memory footprint (--max-old-space-size=4096), provider-switch-to-Anthropic).",
+  "next_phase": "PHASE-37-PENDING-DECISION",
+  "next_step": "PHASE-36 CLOSED — L3 permission real-path hardening (C1 traversal containment + C2 active-project cross-project boundary + C3 PROMPT boot fail-fast & honest dead-rule comment & .gitignore housekeeping). Suite 321/0/5 (326). The pipeline remains COMPLETE; PHASE-37+ is owner-gated BACKLOG ONLY (no automatic continuation) — candidates: the C2 deferral orchestration redesign (block raw cross-project writes with NO ctx), §ARC code-vs-ledger drift audit, Fixture Engine, provider-switch-to-Anthropic. Do NOT start PHASE-37 without an explicit owner decision. PRIOR (PHASE-34) next_step archived under phase_34. PHASE-34 CLOSED — ★ PIPELINE COMPLETE ★. deployProject() at DEPLOYMENT_OR_END: skip path (deployment_enabled=false → VACUOUS_SKIP → LIVE_DELIVERABLE, role_invoked null, LOCK-4/6) + gated path (role.invoke(deployment) openai/gpt-4o LOCK-3 → persist deployment_plan.json → gate_pending:3, advanced:false, NO advance — every gated DEPLOYMENT_OR_END edge has a non-null Gate 3 gate_check). respondGate extended to gate_id∈{1,2,3}; Gate 3 APPROVE requires selected_target, forwarded CONDITIONALLY into orchestration.respond (LOCK-1 — positive S317, negative S322; unconditional-undefined would break Gates 1&2, caught by LOCK-2). finalizeDeliverable() LIVE_DELIVERABLE→COMPLETE reuses summary_writer.writeSummary (persist-then-advance, LOCK-5; distinct step, owner sees LIVE_DELIVERABLE before COMPLETE). Transitions covered: S315 skip→LIVE_DELIVERABLE · S316 gated→gate_pending:3 · S317 Gate3 APPROVE→LIVE_DELIVERABLE · S318 Gate3 REJECT→ESCALATED · S323 finalize→COMPLETE · S324 finalize wrong-state. Guards S319 WRONG_STATE/S320 INPUT_NOT_FOUND/S321 role-failure(DEPLOY_PARSE_FAILED+DEPLOYMENT_FAILED)/S322 APPROVE-missing-target. Fail-closed taxonomy deployProject (PROJECT_NOT_FOUND/NO_LOOP_ID/GET_STATUS_FAILED/WRONG_STATE/INPUT_NOT_FOUND/DEPLOY_PARSE_FAILED/DEPLOYMENT_FAILED/DEPLOY_WRITE_FAILED/SKIP_ADVANCE_FAILED) + finalizeDeliverable (WRONG_STATE/SUMMARY_WRITE_FAILED). Endpoints POST deploy-project + finalize-deliverable + respond-gate gate_id:3 extension. S315–S324 added; suite 317/0/5 (322). Gate #10 REAL_PASS: DEPLOYMENT_OR_END→gate_pending:3→APPROVE(vercel)→LIVE_DELIVERABLE→finalize→COMPLETE, openai/gpt-4o-2024-08-06 $0.01728, latency 9633ms (mock ~tens of ms), tokens 1109/782, final graph current_state=COMPLETE (terminal). ★ The full conversation graph is now wired end-to-end OWNER_INTENT→…→QUALITY_JUDGE→DEPLOYMENT_OR_END→LIVE_DELIVERABLE→COMPLETE; first idea→COMPLETE proven with a real gpt-4o call. ★ L2=80, §ARC=8, roles 13, doctor 35. NO pipeline bridges remain. Next: PHASE-35 pending decision (backlog/enhancement ONLY, not bridges — reviewer/security prompt-tuning, Fixture Engine, §ARC code-vs-ledger drift, suite memory footprint (--max-old-space-size=4096), provider-switch-to-Anthropic).",
   "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-15-phase-34-deployment-bridge.md",
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
@@ -968,6 +968,58 @@
     "cost_actuals_usd": 1.1419,
     "findings_open": [],
     "next_phase": "PHASE-36-PENDING-DECISION"
+  },
+  "phase_36": {
+    "status": "CLOSED",
+    "closed_at": "2026-06-18",
+    "title": "L3 Permission Real-Path Hardening (C1 traversal + C2 cross-project boundary + C3 PROMPT fail-fast)",
+    "summary": "Closed the L3 'scenario-green / real-broken' gaps. C1: checkScope resolves the write path against root via the shared resolveWithinRoot helper BEFORE prefix-matching (no raw-string) → '..' traversal into Forge-self denies SCOPE_FORGE_SELF; root threaded from ctx.root else policy-root (the fail-closed→policy-root fix restored the 10 orchestration scenarios). C2: a write under artifacts/projects/<seg>/ denies SCOPE_CROSS_PROJECT when an EXPLICIT ctx.active_project_id is present and <seg> differs — INERT when absent (orchestration loop helpers pass { root } only, so the loop is untouched); the active id is threaded onto the REAL build path (buildProject buildCtx → materializerEngine writeCtx → fs.write_file). C3: createPolicy fails fast (throws) when control_mode resolves to PROMPT without a respond surface (opts.prompt_respond_surface opt-in; harness opts in via _autoDenyPrompter; production getDefaultPolicy() does not); delete_active_project rule comment corrected to state D4 governs; .gitignore housekeeping. A mid-C3 CTO 'active-delete gap' finding was RETRACTED (DECISION-2026-06-07 D4, owner Gate-#10, ratifies active-delete) — B1/B2/S329 reverted; caught via CLAUDE.md §8.",
+    "closure_artifact": "artifacts/decisions/DECISION-2026-06-17-phase-36-permission-real-path-hardening.md",
+    "checkpoint": "artifacts/decisions/_phase_36_checkpoints/stage_c3.md",
+    "step_checkpoints": [
+      "artifacts/decisions/_phase_36_checkpoints/stage_c1_mid.md",
+      "artifacts/decisions/_phase_36_checkpoints/stage_c2_mid.md",
+      "artifacts/decisions/_phase_36_checkpoints/stage_c3_mid.md",
+      "artifacts/decisions/_phase_36_checkpoints/stage_c3.md"
+    ],
+    "suite_final": "321/0/5 (326 total)",
+    "scenarios_added": [
+      "S325",
+      "S326",
+      "S327",
+      "S328"
+    ],
+    "scenarios_removed": [
+      "S329 (retraction — active-delete is intended behavior per D4)"
+    ],
+    "retraction": "§-1 — a mid-C3 CTO finding that apiServer.deleteProject deleting the active project was a security gap was INCORRECT (made without consulting governance). DECISION-2026-06-07 (D4, owner-confirmed via Gate #10) ratifies active-delete with auto-revert to default_project. Finding WITHDRAWN: B1 (endpoint guard) + B2 (tool guard) reverted byte-exact; S329 deleted; delete_active_project comment corrected; S259 (encodes D4) stays GREEN. Caught via CLAUDE.md §8 (artifact conflict → stop & ask).",
+    "c2_deferrals": [
+      "(a) a raw fs.write_file with NO ctx targeting project B while A is active is NOT blocked — the boundary keys on an explicit ctx.active_project_id; full closure needs an orchestration redesign (the probe proved a file-based checkScope approach breaks every orchestration scenario). Deferred to a future owner-gated phase.",
+      "(b) active_project.json field-name conflict (project_id vs active_project_id) — known issue; this design sources the active id from body.project_id and does not depend on the file."
+    ],
+    "c2_structural_finding": "The real build path cannot write cross-project anyway — materializerEngine prefixes every write with artifacts/projects/<input.project_id>/ AND _isSafePath rejects '..', and buildProject sets input.project_id == active. The boundary is defense-in-depth arming the materializer write; S327 proves the arming on the real engine (negative-control verified).",
+    "net_production_changes": [
+      "code/src/runtime/permission/_path_util.js (C1 shared resolve helper)",
+      "code/src/runtime/permission/permissionRules.js (C1 resolve-before-match + C2 SCOPE_CROSS_PROJECT rule + C3 B3 honest dead-rule comment)",
+      "code/src/runtime/permission/permissionPolicy.js (C1 policy-root threading + C3 PROMPT fail-fast guard)",
+      "code/src/ai_os/conversationEngine.js (C2 buildProject buildCtx)",
+      "code/src/runtime/orchestration/materializerEngine.js (C2 writeCtx ctx propagation)"
+    ],
+    "test_infra_changes": [
+      "code/src/testing/scenario_runner.js (_runDirectTool prompt_respond_surface opt-in for PROMPT scenarios)",
+      "code/src/testing/helpers/cross_project_write_test_helper.js (S327)",
+      "code/src/testing/helpers/c3_permission_test_helper.js (S328)",
+      "code/src/runtime/agents/adapters/mock_responses.json (S327 mock keys)"
+    ],
+    "track_a": "CLEAN — no new fs.*Sync / child_process / fetch / new OpenAI in production; the C3 fail-fast guard only throws.",
+    "l2_tools": 80,
+    "agent_roles": 13,
+    "arc_ledger_count": 8,
+    "doctor_checks": 35,
+    "ratification": "CTO-verified C1 + C2 + C3 in chat. LOCAL commit only — push/tag await an explicit owner/CTO 'push GO'.",
+    "cost_actuals_usd": 0,
+    "findings_open": [],
+    "next_phase": "PHASE-37-PENDING-DECISION"
   },
   "phase_34": {
     "status": "CLOSED",
@@ -2006,7 +2058,7 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-35 CLOSED — reviewer/security prompt-tuning: reviewer_v5 (8/8 no-over-fire, catch preserved) + security_v6 (over-fire 8/8, recall 5/5, precision 5/5, INVALID 0/18); few-shot broke the rule-based ceiling (security v3 4/8 · v4 2/8 REGRESSED · v5 7/8 · v6 8/8); threat_level/severity disambiguation note drove parse-failures to 0/18; gpt-5.4 evaluated and NOT the fix (gpt-5 adapter retained as asset); all on gpt-4o (owner toolchain). STABLE-PREFIX kept S96–S99 green with zero SU churn. Evidence gate35e/f/g/h. Suite 317/0/5 (322). L2=80, §ARC=8, roles 13, doctor 35. Next: PHASE-36 pending decision.",
+  "current_task": "PHASE-36 CLOSED — L3 permission real-path hardening. C1 traversal containment (shared resolveWithinRoot; checkScope resolves BEFORE prefix-match, no raw-string → SCOPE_FORGE_SELF; policy-root threading restored the 10 orchestration scenarios; S325 GREEN). C2 active-project write boundary keyed on EXPLICIT ctx.active_project_id (inert when absent → orchestration untouched) → SCOPE_CROSS_PROJECT; materializerEngine writeCtx propagation + buildProject buildCtx thread the active id onto the REAL build write path; S326 + S327 GREEN (S327 drives the real materializerEngine; negative-control proven). C3 PROMPT-mode boot FAIL-FAST in createPolicy (throws when control_mode resolves to PROMPT without a respond surface; opts.prompt_respond_surface opt-in; harness opts in via _autoDenyPrompter; production getDefaultPolicy() does NOT, so a real PROMPT boot still fails fast); delete_active_project rule comment corrected to state D4 governs (active-delete intentionally ALLOWED — NO enforcement); .gitignore: decision_log.json kept TRACKED, test_conv_* conversation_context.json byproducts ignored; S328 GREEN. §-1 RETRACTION: a mid-C3 CTO 'active-delete gap' finding was WITHDRAWN — DECISION-2026-06-07 (D4, owner Gate-#10) ratifies active-delete; B1/B2/S329 reverted; caught via CLAUDE.md §8. Two C2 deferrals: (a) raw fs.write_file with NO ctx targeting project B while A active is not blocked (needs orchestration redesign); (b) active_project.json field-name conflict (design does not depend on the file). Suite 321/0/5 (326). L2=80, §ARC=8, roles 13, doctor 35. Mock-only, $0. Next: PHASE-37 pending decision (owner-gated backlog only).",
   "last_updated": "2026-06-14T09:20:00.000Z",
   "phase_16": {
     "status": "ACTIVE",

@@ -1,8 +1,8 @@
 # DECISION — PHASE-36: Permission Real-Path Hardening (L3)
 
 **Decision ID:** DECISION-2026-06-17-phase-36-permission-real-path-hardening
-**Date:** 2026-06-17
-**Status:** OPEN
+**Date:** 2026-06-17 (CLOSED 2026-06-18)
+**Status:** CLOSED — 2026-06-18 (see §6 Closure)
 **Owner approval:** CTO scope ratified in chat — "no half-solutions / highest professionalism" (2026-06-17). Owner-ratified targets: C1 traversal containment, C2 active-project write boundary, C3 PROMPT-mode boot safety + dead-rule cleanup.
 **Phase predecessor:** PHASE-35 TRULY CLOSED (reviewer_v5 + security_v6), tag `phase-35-complete`.
 **Real spend (this step):** **$0.00** — read-only probe + mock RED scenarios only.
@@ -167,3 +167,80 @@ into `artifacts/projects/B/...` succeeds — project A can overwrite project B.
 CTO-ratified scope in chat (2026-06-17), "no half-solutions / highest professionalism."
 This artifact stays **OPEN** until PROMPT-B lands the fix, turns S325/S326 green, adds the C3
 fail-fast assertion, and the closure gate passes.
+
+---
+
+## 6. Closure — 2026-06-18
+
+PHASE-36 (L3 permission real-path hardening) is **CLOSED**. C1 + C2 + C3 implemented across
+PROMPT-B…F and CTO-verified. Full SU **321/0/5 (326 total)** on the owner toolchain. Mock-only, **$0**.
+
+### 6.0 — §-1 RETRACTION (recorded prominently)
+During C3, the CTO introduced a finding that `apiServer.deleteProject` deleting the **active** project
+was a security gap, and directed a `CANNOT_DELETE_ACTIVE` guard (B1 endpoint + B2 tool) plus scenario
+S329. **This was an INCORRECT inference made without consulting governance.**
+[DECISION-2026-06-07-ux-multiselect-delete.md](DECISION-2026-06-07-ux-multiselect-delete.md) (**D4**,
+owner-confirmed via Gate #10) ratifies active-delete with auto-revert to `default_project` as **intended**
+multi-select-delete behavior. The finding is **WITHDRAWN**; B1/B2 were reverted (working tree byte-exact
+to the originals) and S329 was deleted; the `delete_active_project` rule comment was corrected to state
+that D4 governs (active-delete intentionally ALLOWED; the marker stays inert). Caught via **CLAUDE.md §8**
+(artifact conflict → stop & ask). S259 (which encodes D4) stays GREEN.
+
+### 6.1 — C1 CLOSED (traversal containment)
+`checkScope` now resolves the write path against the workspace root via the shared
+`resolveWithinRoot` helper ([_path_util.js](../../code/src/runtime/permission/_path_util.js)) **before**
+prefix-matching — no raw-string match — so `artifacts/../code/x.js` collapses to its REAL zone and is
+denied **`SCOPE_FORGE_SELF`**. Root is taken from `ctx.root` else the policy's own root (threaded into
+`checkHardDeny`/`checkScope`); fail-closed only if neither is known. The policy-root threading fix
+restored the 10 orchestration scenarios that the first fail-closed attempt had broken. **S325 GREEN.**
+
+### 6.2 — C2 CLOSED (active-project write boundary)
+A write under `artifacts/projects/<seg>/` is denied **`SCOPE_CROSS_PROJECT`** when an EXPLICIT
+`ctx.active_project_id` is present and `<seg>` differs from it. **Inert when the active id is absent** —
+orchestration loop helpers pass `{ root }` only, so the loop is untouched. The active id is threaded onto
+the REAL build write path: `conversationEngine.buildProject` builds `buildCtx = { root,
+active_project_id }` and passes it to the materializer + manifest write; `materializerEngine` propagates
+`active_project_id` from its incoming ctx onto its inner `fs.write_file` (`writeCtx`). **S326 + S327
+GREEN** — S327 drives the **real** `materializerEngine` (not a hand-set tool ctx), with a negative
+control proving it fails if the propagation is dropped.
+
+**Documented deferrals (not gaps closed this phase):**
+- **(a)** a raw `fs.write_file` with NO ctx targeting project B while A is active is **not** blocked — the
+  boundary keys on an explicit `ctx.active_project_id`. Closing it fully needs an orchestration redesign
+  (the probe proved a file-based "read the active file in checkScope" approach breaks every orchestration
+  scenario). Deferred to a future owner-gated phase.
+- **(b)** the `active_project.json` field-name conflict (`project_id` vs `active_project_id`) — a known
+  issue; this design sources the active id from `body.project_id`, so it does **not** depend on the file.
+- **Structural-confinement finding:** the real build path **cannot** write cross-project anyway — the
+  materializer prefixes every write with `artifacts/projects/<input.project_id>/` and `_isSafePath`
+  rejects `..`, and `buildProject` sets `input.project_id == active`. The boundary is defense-in-depth
+  that arms the materializer write; S327 proves the arming on the real engine.
+
+### 6.3 — C3 CLOSED (PROMPT boot fail-fast + honest dead-rule comment + .gitignore)
+- **PROMPT-mode boot FAIL-FAST:** `createPolicy` throws when the resolved control mode is `PROMPT` and no
+  respond surface is wired (`opts.prompt_respond_surface !== true`) — no silent 5-min stall-then-DENY.
+  `opts.prompt_respond_surface` is the future-proof opt-in; the self-test harness opts in because
+  `_autoDenyPrompter` is a real responder; production `getDefaultPolicy()` does **not**, so a real
+  `FORGE_PERMISSION_MODE=PROMPT` boot still fails fast. Runtime PROMPT branches untouched. **S328 GREEN.**
+- **Honest dead-rule comment:** `delete_active_project` comment corrected to state that active-delete is
+  intentionally ALLOWED per D4 (inert marker; NOT activated). No active-delete enforcement (D4 honored).
+- **.gitignore:** `artifacts/llm/decision_log.json` kept **TRACKED** (per its "KEEP committed … until
+  >1MB" comment); the `test_conv_*` `conversation_context.json` SU byproducts now ignored (and untracked
+  at closure via `git rm --cached`).
+
+### 6.4 — Final metrics
+- Full SU **321 / 0 / 5 (326 total)** on the owner toolchain (Windows). Orchestration cluster
+  S139/S140/S145–S156 GREEN. New/changed scenarios: **S325, S326, S327 (C1/C2), S328 (C3)**; **S329
+  removed** (retraction).
+- **§ARC = 8** (no new side-effect channel) · **L2 = 80** · **roles = 13** · **doctor = 35**.
+- **Track A clean** — no new `fs.*Sync` / `child_process` / `fetch` / `new OpenAI` in production. The net
+  production deltas are: C1 (`_path_util.js` + `checkScope`/`permissionPolicy` root threading), C2
+  (`checkScope` cross-project rule + `conversationEngine.buildProject` buildCtx + `materializerEngine`
+  writeCtx), C3 (`permissionPolicy.createPolicy` fail-fast + `permissionRules` B3 comment).
+- Mock-only; **$0** real spend across the entire phase.
+
+**Closure checkpoint:** [_phase_36_checkpoints/stage_c3.md](_phase_36_checkpoints/stage_c3.md) (with the
+per-stage mids: `stage_c1_mid.md`, `stage_c2_mid.md`, `stage_c3_mid.md`).
+**Ratification:** CTO-verified C1 + C2 + C3 in chat. **LOCAL commit only** — push/tag await an explicit
+owner/CTO "push GO". Next: **PHASE-37-PENDING-DECISION** (owner-gated backlog only — the C2 deferral
+orchestration redesign, §ARC code-vs-ledger drift, Fixture Engine, provider-switch-to-Anthropic).
