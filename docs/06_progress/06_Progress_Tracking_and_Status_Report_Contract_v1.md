@@ -413,7 +413,7 @@ it is not a valid current_task.
 Valid:
 
 * "Close docs/04_autonomy/autonomy_policy.md"
-* "Run verify/smoke/smoke_check.sh"
+* "Run bin/forge-test.js"
 * "Generate code/src/memoryEngine/index.js"
 
 Invalid:

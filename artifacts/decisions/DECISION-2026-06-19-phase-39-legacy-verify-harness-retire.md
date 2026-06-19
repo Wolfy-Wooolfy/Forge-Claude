@@ -88,3 +88,30 @@ CTO RULINGS for Step A:
 - 08_audit: retire ONLY the v1 logger mechanism (audit_logger.js + audit_log.jsonl). The
   fail-closed BOUNDARY RULES themselves are NOT retired (Track A / §ARC still enforces them).
 - verify/unit/ + verify/audit/ retained as required dirs (10_Tech §6.1.3) via .gitkeep.
+
+## AMENDMENT 2 — CTO Step-A mid-review + Step-B closure — 2026-06-19
+CTO independently re-verified Step A from a fresh zip and confirmed: 10 manifest files
+retired; verify/unit/ + verify/audit/ hold only .gitkeep (dirs retained per 10_Tech §6.1.3;
+no live bootstrap creates them); specCompletenessEnforcer.js UNTOUCHED; the 5 verify/smoke/test_*.js
+intact; all 8 doc addenda are ADDITIVE dated banners (originals preserved); 08_audit retires the
+LOGGER MECHANISM ONLY (audit_logger.js → audit_log.jsonl) with the fail-closed boundary RULES
+explicitly preserved via Track A/§ARC + SU permission-layer + forge-doctor; the 09_19 path
+disambiguation (retired root verify/unit/ report vs. the LIVE artifacts/verify/unit/ read) present.
+STEP B closure metrics (all GREEN):
+- Full SU suite (mock, --max-old-space-size=4096): 321 passed / 0 failed / 5 skipped (326) —
+  UNCHANGED from PHASE-38 (PHASE-39 touched zero executable/test code). duration ~261s.
+- forge-doctor: exit 0, HEALTHY — 0 critical, 6 warning, 35 checks, 0 FAIL.
+- Track A live-surface: untouched (git status shows no code/src/{workspace,ai_os,runtime,providers}).
+- Dangling re-scan (code/config): zero true dangles — the only code hit is the deliberately-preserved
+  live read in specCompletenessEnforcer.js:41 (the DISTINCT artifacts/verify/unit/ path, substring-matched),
+  plus progress/status.json frozen PHASE-38 history. DOC re-scan: every hit sits inside/under a dated
+  RETIRED banner (zero uncovered).
+- 06_Progress L416 DISPOSITION: RESIDUAL CLOSED via clean micro-fix — the illustrative current_task
+  example "Run verify/smoke/smoke_check.sh" (PHASE-38-deleted) swapped to "Run bin/forge-test.js"
+  (live), command-string-only, preserving the Valid/Invalid teaching structure (no banner, no rewrite).
+- status.json: next_phase → PHASE-40-PENDING-DECISION; PHASE-39 closure summary prepended to next_step
+  (prior history retained); JSON validated.
+- §ARC=10 / L2=80 / roles=13 / doctor=35 unchanged; pipeline COMPLETE; mock-only $0.
+PHASE-40+ owner-gated BACKLOG ONLY (do NOT auto-start): (1) C2 cross-project write isolation;
+(2) Fixture Engine; (3) Anthropic provider switch (blocked on ANTHROPIC_API_KEY).
+LOCAL commit only — push + annotated tag phase-39-complete await explicit CTO closure-diff + GO.
