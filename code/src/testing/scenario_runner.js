@@ -254,6 +254,16 @@ async function _runDirectTool(scenario, root) {
   registry.load();
   registry.setAuthorizeFunction((tool, input, ctx) => policy.authorize(tool, input, ctx));
 
+  // PHASE-40 §0: optional per-scenario AMBIENT active-project passthrough (test-infra only,
+  // backward-compatible — existing scenarios have no `active_project` → no ambient is set).
+  // Lets a scenario establish the policy's ambient active project WITHOUT passing ctx, so the
+  // ctx-less cross-project deny (C2 deferral (a) close) can be proven deterministically. The
+  // fresh policy is discarded after this scenario (resetDefaultPolicy in the finally below),
+  // so there is no leak; the explicit clear in the finally is belt-and-suspenders.
+  if (typeof scenario.active_project === "string" && scenario.active_project) {
+    policy.setActiveProject(scenario.active_project);
+  }
+
   const startTs = new Date().toISOString();
 
   let raw;
@@ -268,6 +278,9 @@ async function _runDirectTool(scenario, root) {
       Object.assign({ root }, scenario.ctx || {})
     );
   } finally {
+    // PHASE-40: clear the ambient active project on this scenario's policy (belt-and-
+    // suspenders; the fresh policy is discarded by resetDefaultPolicy below anyway).
+    try { if (typeof policy.setActiveProject === "function") policy.setActiveProject(null); } catch { /* no-op */ }
     for (const key of Object.keys(savedEnv)) {
       if (savedEnv[key] === undefined) delete process.env[key];
       else process.env[key] = savedEnv[key];

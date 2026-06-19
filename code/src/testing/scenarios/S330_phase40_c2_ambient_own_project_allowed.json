@@ -1,0 +1,20 @@
+{
+  "id": "S330",
+  "name": "PHASE-40 C2 (POSITIVE control): ambient active project 'phase40_a', fs.write_file into phase40_a's OWN dir MUST be ALLOWED (SUCCESS)",
+  "_phase40_note": "Proves the PHASE-40 ambient boundary does NOT over-fire: a ctx-less write into the DECLARED active project's own dir is allowed. Active is established via the ambient register (scenario.active_project). GREEN before and after the fix (own-project write was always allowed); guards against an over-broad deny that would break the build's own writes.",
+  "type": "direct_tool",
+  "permission": "WORKSPACE_WRITE",
+  "tool": "fs.write_file",
+  "active_project": "phase40_a",
+  "fixture_files": [
+    { "path": "artifacts/projects/phase40_a/.keep", "content": "phase-40 positive-control fixture - registers phase40_a for cleanup" }
+  ],
+  "input": {
+    "path": "artifacts/projects/phase40_a/_phase40_ok.js",
+    "content": "// phase-40 C2 positive control - own-project write under the declared active project must be allowed\n"
+  },
+  "assertions": [
+    { "type": "status_equals", "expected": "SUCCESS" },
+    { "type": "audit_count",   "min": 1 }
+  ]
+}

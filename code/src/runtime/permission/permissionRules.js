@@ -124,7 +124,7 @@ function _matchesPrefix(norm, prefix) {
 
 // ── checkScope ────────────────────────────────────────────────────────────────
 
-function checkScope(tool, input, ctx, dataMode, policyRoot) {
+function checkScope(tool, input, ctx, dataMode, policyRoot, ambientActiveProject) {
   // Read-only tools skip scope check entirely
   if (tool.required_mode === "READ_ONLY" || tool.is_read_only) {
     return { applicable: false };
@@ -161,22 +161,29 @@ function checkScope(tool, input, ctx, dataMode, policyRoot) {
 
   const norm = relative;
 
-  // C2 (PHASE-36): active-project write boundary. When the decision ctx carries an
-  // EXPLICIT active project id, a write under artifacts/projects/<seg>/ is allowed only
-  // when <seg> IS the active project; a cross-project write denies SCOPE_CROSS_PROJECT.
-  // Uses the already-resolved relative (norm) — no raw-string match, same discipline as C1.
-  // INERT when ctx.active_project_id is ABSENT: orchestration loop helpers and every other
-  // real write pass { root } only (no active id), so the boundary never touches them — this
-  // is what keeps the loop green (mirrors the C1 fail-closed regression lesson). The seg
-  // regex requires a trailing slash, so the bare project dir (project.create/activate, no
-  // sub-path) is unaffected — you can create/activate B before it becomes active.
-  const activeProjectId = ctx && ctx.active_project_id;
-  if (activeProjectId) {
+  // C2 (PHASE-36 → PHASE-40): active-project write boundary. A write under
+  // artifacts/projects/<seg>/ is allowed only when <seg> IS the active project; a
+  // cross-project write denies SCOPE_CROSS_PROJECT. Uses the already-resolved relative
+  // (norm) — no raw-string match, same discipline as C1.
+  //
+  // PHASE-40 (C2 deferral (a) close): the "active project" reference is derived from EITHER
+  // the explicit ctx.active_project_id (per-call signal, PHASE-36) OR — when the ctx carries
+  // none — the policy's ambient active-project register (`ambientActiveProject`, set by an
+  // operation entry-point via policy.setActiveProject(); parallel to active_mode). This closes
+  // the ctx-less cross-project write hole: even a raw fs.write_file with NO ctx is checked
+  // while an operation has DECLARED its active project. The seg regex requires a trailing
+  // slash, so the bare project dir (project.create/activate, no sub-path) is unaffected.
+  // INERT only when NEITHER source yields an active project (ambient null AND no ctx id) →
+  // the null carve-out that preserves {root}-only bootstrap/creation, tests, and writes
+  // outside any declared operation. The PHASE-36 C1 fail-closed lesson stays honored: the
+  // orchestration loop helpers never DECLARE an ambient active project, so they stay inert.
+  const activeRef = (ctx && ctx.active_project_id) || ambientActiveProject || null;
+  if (activeRef) {
     const projMatch = norm.match(/^artifacts\/projects\/([^/]+)\//);
-    if (projMatch && projMatch[1] !== activeProjectId) {
+    if (projMatch && projMatch[1] !== activeRef) {
       return { applicable: true, allowed: false, reason: "SCOPE_CROSS_PROJECT",
                detail: "Path '" + writePath + "' targets project '" + projMatch[1] +
-                       "' while active project is '" + activeProjectId + "'" };
+                       "' while active project is '" + activeRef + "'" };
     }
   }
 

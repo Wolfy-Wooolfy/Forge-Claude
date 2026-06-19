@@ -1112,7 +1112,33 @@ function createConversationEngine(options = {}) {
   // Stage-split params (build_* / mat_*) allow different mock keys per stage in tests.
   // Production: omit build_*/mat_* and use provider/model for both stages.
 
+  // PHASE-40 (C2 deferral (a) close) — resolve the L3 policy for the entry-point seam.
+  // Lazy require (no top-level dependency / no load-order risk); returns null if the default
+  // policy predates PHASE-40 (no setActiveProject) so the seam degrades to a no-op safely.
+  function _getSeamPolicy() {
+    try {
+      const { getDefaultPolicy } = require("../runtime/permission/permissionPolicy");
+      const p = getDefaultPolicy();
+      return (p && typeof p.setActiveProject === "function") ? p : null;
+    } catch { return null; }
+  }
+
+  // PHASE-40 entry-point seam: DECLARE this build's active project on the L3 policy (ambient
+  // register) so cross-project writes are denied even on ctx-less write paths within the
+  // build, paired with a finally-clear (no leak between operations). The real work stays in
+  // _buildProjectImpl (unchanged); this thin wrapper only manages the seam.
   async function buildProject(body = {}) {
+    const _seamPolicy    = _getSeamPolicy();
+    const _seamProjectId = normalizeProjectId(body.project_id || "");
+    if (_seamPolicy) _seamPolicy.setActiveProject(_seamProjectId);
+    try {
+      return await _buildProjectImpl(body);
+    } finally {
+      if (_seamPolicy) _seamPolicy.setActiveProject(null);
+    }
+  }
+
+  async function _buildProjectImpl(body = {}) {
     const projectId = normalizeProjectId(body.project_id || "");
     const state     = loadState(projectId);
 

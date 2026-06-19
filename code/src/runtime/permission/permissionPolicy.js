@@ -49,6 +49,14 @@ function createPolicy(options) {
 
   let active_mode       = opts.active_mode       || fromEnv();
 
+  // PHASE-40 (C2 deferral (a) close) — ambient active-project register: the policy-scoped
+  // "active project", parallel to active_mode. Set/cleared by an operation entry-point via
+  // setActiveProject(); checkScope consults it when the per-call ctx carries no explicit
+  // active_project_id, closing the ctx-less cross-project write hole. null → no ambient
+  // constraint (the carve-out that preserves {root}-only bootstrap/creation, tests, and any
+  // write outside a declared operation).
+  let active_project    = opts.active_project    || null;
+
   // PHASE-36 C3 (STEP A) — PROMPT-mode boot fail-fast.
   // If the resolved control mode is PROMPT and NO respond surface is wired, every gated
   // operation would call prompter.request(), block for the full DEFAULT_TIMEOUT_MS (~5 min),
@@ -172,7 +180,7 @@ function createPolicy(options) {
       ? dataModeSatisfies(data_mode, tool.required_mode)
       : (control_mode === tool.required_mode || control_mode === "TEST");
 
-    const scopeCheck = checkScope(tool, input, ctx, data_mode, root);
+    const scopeCheck = checkScope(tool, input, ctx, data_mode, root, active_project);
     const scopeOk    = !scopeCheck.applicable || scopeCheck.allowed !== false;
 
     if (dataAllows && scopeOk) {
@@ -238,7 +246,19 @@ function createPolicy(options) {
     return active_mode;
   }
 
-  return { authorize, setActiveMode, getActiveMode };
+  // PHASE-40 — ambient active-project register (see `active_project` decl above). An
+  // operation entry-point declares its project: setActiveProject(id); try {…} finally
+  // { setActiveProject(null) }. checkScope consults it as the active-project reference
+  // when the per-call ctx carries no explicit active_project_id.
+  function setActiveProject(id) {
+    active_project = id || null;
+  }
+
+  function getActiveProject() {
+    return active_project;
+  }
+
+  return { authorize, setActiveMode, getActiveMode, setActiveProject, getActiveProject };
 }
 
 // ── installDefaultPolicy ──────────────────────────────────────────────────────

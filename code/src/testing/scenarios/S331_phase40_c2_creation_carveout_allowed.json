@@ -1,0 +1,19 @@
+{
+  "id": "S331",
+  "name": "PHASE-40 C2 (CREATION carve-out): with NO ambient active project declared (null), a ctx-less write into a NEW project's dir MUST be ALLOWED - the create->activate bootstrap window",
+  "_phase40_note": "Proves the null carve-out that preserves project creation/bootstrap: when no operation has DECLARED an active project (ambient null) and the ctx carries no active id, a project-targeted write is allowed. This is the window the real createProject runs in - the A.0 trace confirmed createProject calls writeActiveProject(B) BEFORE persistProjectState(B) (create->activate ordering on the real flow, apiServer.js:883-885), and the policy uses the AMBIENT register (not the on-disk active_project.json), so an on-disk active 'A' never denies B's own creation writes. GREEN before and after; guards against the fix breaking bootstrap. Contrast S329 (ambient declared -> cross-project denied).",
+  "type": "direct_tool",
+  "permission": "WORKSPACE_WRITE",
+  "tool": "fs.write_file",
+  "fixture_files": [
+    { "path": "artifacts/projects/phase40_create_b/.keep", "content": "phase-40 creation-carveout fixture - registers phase40_create_b for cleanup" }
+  ],
+  "input": {
+    "path": "artifacts/projects/phase40_create_b/project_state.json",
+    "content": "{\n  \"project_id\": \"phase40_create_b\",\n  \"project_name\": \"S331 creation carve-out\"\n}\n"
+  },
+  "assertions": [
+    { "type": "status_equals", "expected": "SUCCESS" },
+    { "type": "audit_count",   "min": 1 }
+  ]
+}

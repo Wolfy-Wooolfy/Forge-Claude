@@ -3,7 +3,7 @@
 Status:    APPROVED (owner autonomous-CTO delegation 2026-06-19: "قرر انت باعتبارك CTO المشروع باعلى درجات الاحترافية")
 Authored:  2026-06-19 — CTO advisor
 Phase:     PHASE-40
-Depends on: PHASE-36 (DECISION-2026-06-07 — C1/C2/C3 L3 real-path hardening; introduced the ctx-keyed C2 boundary + the two C2 deferrals) + PHASE-39 close (clean base).
+Depends on: PHASE-36 (DECISION-2026-06-17-phase-36-permission-real-path-hardening.md — C1/C2/C3 L3 real-path hardening; introduced the ctx-keyed C2 boundary + the two C2 deferrals) + PHASE-39 close (clean base). Creation/bootstrap carve-out governance: DECISION-2026-06-07-ux-multiselect-delete.md (D4 — active-pointer behavior).
 
 ## §0 Context
 PHASE-36 added the C2 active-project write boundary: the L3 policy keys on EXPLICIT
@@ -59,3 +59,19 @@ Owner autonomous-CTO delegation 2026-06-19. CTO selected PHASE-40 = C2 cross-pro
 isolation (only remaining live-surface correctness gap; deferred from PHASE-36; on a clean
 post-PHASE-39 base). DESIGN-FIRST: the §0 design proposal is CTO-reviewed before any live-code
 implementation. Fixture Engine + Anthropic switch remain backlog (Anthropic blocked on key).
+
+## AMENDMENT 1 — CTO design review + Step-A authorization — 2026-06-19
+CTO independently verified the Step 0 probe and APPROVES Option (i): PATH-DERIVED owning-project +
+policy-ambient active register (parallel to the existing active_mode/setActiveMode/getActiveMode),
+hybrid with the existing ctx.active_project_id branch. Options (ii)/(iii) rejected (disk-read breaks
+orchestration scenarios + adds policy direct-fs; mandatory-threading blast-radius repeats the
+PHASE-36 C1 fail-closed regression). SCOPE RULING (on record): Option (i) enforces cross-project
+write isolation DURING DECLARED OPERATIONS (the cross-contamination threat model); writes outside
+any declared operation are not constrained (no active operation to violate). This is the correct
+scope, NOT a hidden gap; the unconditional disk-reconciled variant is rejected. CARVE-OUT: primary =
+create→activate ordering (activate the new project before its init-writes; NO governance-filename
+whitelist); Step A.0 traces the real creation flow to confirm viability, else STOP for a carve-out
+decision. AMBIENT-REGISTER DISCIPLINE: set/clear via try/finally at the operation entry-point(s);
+null carve-out (active==null → allowed) preserves {root}-only writes, tests, and pre-declaration
+bootstrap. §ARC stays 10 (no new direct fs). Step A also confirms the pre-existing permission
+audit-log fs (permissionPolicy.js:28-32) is §ARC-ledgered.

@@ -1,0 +1,21 @@
+{
+  "id": "S329",
+  "name": "PHASE-40 C2 deferral(a) close (NEGATIVE control): ambient active project 'phase40_a' (NO ctx.active_project_id), fs.write_file into another project's dir MUST be DENIED SCOPE_CROSS_PROJECT",
+  "_phase40_note": "Proves the ctx-less cross-project write hole is closed. The active project is established via the policy's AMBIENT register (scenario.active_project -> policy.setActiveProject), NOT ctx.active_project_id, so this exercises exactly the path PHASE-36 left inert (deferral (a)). RED before the PHASE-40 fix (the write SUCCEEDS because no ctx id is present), GREEN after (the ambient register supplies the active reference). Contrast S330 (own-project write ALLOWED) + S331 (null-ambient creation carve-out ALLOWED).",
+  "type": "direct_tool",
+  "permission": "WORKSPACE_WRITE",
+  "tool": "fs.write_file",
+  "active_project": "phase40_a",
+  "fixture_files": [
+    { "path": "artifacts/projects/phase40_b/.keep", "content": "phase-40 negative-control fixture - registers phase40_b for cleanup" }
+  ],
+  "input": {
+    "path": "artifacts/projects/phase40_b/_phase40_probe.js",
+    "content": "// phase-40 C2 negative control - ctx-less cross-project write must be denied when ambient active project is phase40_a\n"
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "DENIED" },
+    { "type": "state_field_equals", "field": "reason", "expected": "SCOPE_CROSS_PROJECT" },
+    { "type": "audit_count",        "min": 1 }
+  ]
+}
