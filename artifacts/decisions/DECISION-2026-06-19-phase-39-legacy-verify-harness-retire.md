@@ -70,3 +70,21 @@ restores contract-doc/reality alignment). C2 cross-project write isolation queue
 (higher-value live-surface item, on a fully-clean base). Fixture Engine + Anthropic switch remain
 backlog (Anthropic blocked on missing ANTHROPIC_API_KEY). §0 PROBE + STOP-AND-REPORT preserves the
 CTO gate before any destructive or doc action.
+
+## AMENDMENT 1 — CTO Step-0 verification + Step-A authorization — 2026-06-19
+CTO independently re-verified Step 0 from a fresh zip and confirms: (a) all 10 manifest
+files orphaned (zero refs in code/src + bin + package.json; only frozen records); (b) §3b —
+specCompletenessEnforcer.js:41 reads artifacts/verify/unit/docs_gap_validation_report.json
+(artifacts-rooted, DISTINCT from the retired root verify/unit/ report) and line 43 returns a
+deferred PASS on absence; no live writer of that artifacts-rooted path exists — retirement
+breaks no live read; (c) the 5 verify/smoke/test_*.js import none of the manifest; (d) the SU
+suite (code/src/testing) references none of the manifest → suite count invariant.
+CTO RULINGS for Step A:
+- Bucket A docs (09_17, 09_18, 09_19, 08_audit) → dated addenda (originals preserved).
+- Bucket B: 09_Build_and_Verify_Playbook_Local.md + 10_Tech_Assumptions §6.1.3 → fold-in
+  (these contract docs present PHASE-38-deleted files as live workflow/must-exist).
+  06_Progress §(L416) + 05_16 (L376) → minimal one-line dated note, OR log as residual if
+  not cleanly a one-liner (no rewrites).
+- 08_audit: retire ONLY the v1 logger mechanism (audit_logger.js + audit_log.jsonl). The
+  fail-closed BOUNDARY RULES themselves are NOT retired (Track A / §ARC still enforces them).
+- verify/unit/ + verify/audit/ retained as required dirs (10_Tech §6.1.3) via .gitkeep.

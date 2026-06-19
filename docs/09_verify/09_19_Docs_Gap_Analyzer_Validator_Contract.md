@@ -167,6 +167,19 @@ No narrative allowed.
 
 ## 9. Gap Validation Output Artifact
 
+> **⚠ RETIRED — PHASE-39 (2026-06-19).** The v1 documentation-gap analyzer
+> (`verify/unit/docs_gap_analyzer.js`) and its output artifact
+> (`verify/unit/docs_gap_validation_report.json`) were retired per
+> `DECISION-2026-06-19-phase-39-legacy-verify-harness-retire.md`. Live verification is now
+> the SU scenario suite (`bin/forge-test.js`) + the runtime smoke tests
+> (`verify/smoke/test_*.js`) + `forge-doctor`. The output-artifact contract below is historical.
+>
+> **Path disambiguation (still live):** the retired ROOT `verify/unit/docs_gap_validation_report.json`
+> is DISTINCT from `artifacts/verify/unit/docs_gap_validation_report.json`, which
+> `code/src/modules/specCompletenessEnforcer.js` reads as a LIVE, gracefully-deferred check
+> (returns a deferred PASS when absent). That artifacts-rooted path was never produced by the
+> retired v1 script and is unaffected by this retirement.
+
 Path:
 
 verify/unit/docs_gap_validation_report.json

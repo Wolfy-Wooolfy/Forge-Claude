@@ -603,6 +603,16 @@ is a system violation.
 
 ## 6.1.3 Mandatory Writable Proof Paths (Hard)
 
+> **⚠ ADDENDUM — PHASE-39 (2026-06-19).** The DIRECTORIES `verify/audit/`, `verify/unit/`, and
+> `verify/smoke/` remain must-exist + writable (retained as v2 verification/audit output roots;
+> `.gitkeep` placeholders keep `verify/unit/` + `verify/audit/` present after a fresh clone). But
+> the v1 harness FILES `verify/unit/verification_report.json` and
+> `verify/smoke/local_command_log.jsonl` are RETIRED — they are no longer produced (PHASE-38
+> deleted the command logger; PHASE-39 retired the v1 `verify/unit/` harness; see
+> `DECISION-2026-06-19-phase-39-legacy-verify-harness-retire.md`). Live verification = the SU
+> scenario suite (`bin/forge-test.js`) + `verify/smoke/test_*.js` + `forge-doctor`. The original
+> path list below is preserved.
+
 Startup validation MUST verify that all mandatory proof and audit paths
 exist and are writable before any execution begins.
 

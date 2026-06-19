@@ -227,6 +227,13 @@ or imply recovery paths.
 
 ### 2.2.2 Boundary Audit PASS Logging (Hard)
 
+> **⚠ RETIRED — PHASE-39 (2026-06-19).** Only the v1 logging *mechanism*
+> (`verify/audit/audit_logger.js` → `verify/audit/audit_log.jsonl`) was retired per
+> `DECISION-2026-06-19-phase-39-legacy-verify-harness-retire.md`. The fail-closed boundary
+> RULES themselves remain in force — now enforced via Track A / the §ARC ledger
+> (`docs/10_runtime/18_AGENT_ROLES_CONTRACT.md`) + the SU permission-layer scenarios + `forge-doctor`.
+> `verify/audit/` is retained as the audit output root. The logging-format contract below is historical.
+
 Every Boundary Audit PASS MUST be recorded as a structured,
 machine-verifiable log entry.
 
@@ -626,6 +633,13 @@ and MUST trigger immediate execution halt.
 ---
 
 ## 7. Audit Logging & Traceability
+
+> **⚠ RETIRED — PHASE-39 (2026-06-19).** The v1 audit-log *mechanism*
+> (`verify/audit/audit_logger.js` → `verify/audit/audit_log.jsonl`) was retired per
+> `DECISION-2026-06-19-phase-39-legacy-verify-harness-retire.md`. The fail-closed boundary
+> RULES remain in force — enforced via Track A / the §ARC ledger
+> (`docs/10_runtime/18_AGENT_ROLES_CONTRACT.md`) + the SU permission-layer scenarios + `forge-doctor`.
+> `verify/audit/` is retained as the audit output root. The logging contract below is historical.
 
 All Boundary Audit executions MUST be logged under:
 `verify/audit/audit_log.jsonl`

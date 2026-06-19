@@ -8,6 +8,17 @@
 
 ---
 
+> **⚠ RETIRED / SUPERSEDED — PHASE-39 (2026-06-19).** The v1 local build-and-verify workflow
+> described throughout this playbook — the smoke entrypoint (`verify/smoke/smoke_check.js`),
+> the command trace (`verify/smoke/local_command_log.jsonl` + `verify/smoke/command_output/`),
+> the unit reports (`verify/unit/verification_report.json`, `verify/unit/retry_attempts/`), and
+> the `verify/audit/` loop/audit logs — is RETIRED/SUPERSEDED. PHASE-38 deleted the smoke
+> scripts + `local_command_logger`; PHASE-39 retired the v1 `verify/unit/` + `verify/audit/`
+> harness (see `DECISION-2026-06-19-phase-39-legacy-verify-harness-retire.md`). Live verification
+> is now the SU scenario suite (`bin/forge-test.js`) + the runtime smoke tests
+> (`verify/smoke/test_*.js`) + `forge-doctor`. The `verify/unit/`, `verify/audit/`, and
+> `verify/smoke/` DIRECTORIES are retained (10_Tech §6.1.3). The playbook below is historical.
+
 ## 1. Purpose
 
 This document defines the **mandatory local build, verification, retry, and rollback rules**

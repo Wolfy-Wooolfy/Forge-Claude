@@ -376,6 +376,8 @@ Must reference:
 - local_command_log.jsonl entries
 - stdout/stderr file paths
 
+> _Note (PHASE-39, 2026-06-19): `verify/unit/verification_report.json` + `local_command_log.jsonl` are retired v1 verify-harness artifacts (retired PHASE-38/39; see `DECISION-2026-06-19-phase-39-legacy-verify-harness-retire.md`); live verification = SU suite + `verify/smoke/test_*.js` + `forge-doctor`._
+
 No narrative claims allowed.
 
 ---

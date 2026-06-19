@@ -134,6 +134,13 @@ Undefined or orphan artifacts → FAIL
 
 ## 4. Review Output Artifact
 
+> **⚠ RETIRED — PHASE-39 (2026-06-19).** The v1 cross-document-consistency validator
+> (`verify/unit/cross_doc_consistency.js`) and its output artifact
+> (`verify/unit/cross_document_consistency_report.json`) were retired per
+> `DECISION-2026-06-19-phase-39-legacy-verify-harness-retire.md`. Live verification is now
+> the SU scenario suite (`bin/forge-test.js`) + the runtime smoke tests
+> (`verify/smoke/test_*.js`) + `forge-doctor`. The output-artifact contract below is historical.
+
 The review MUST produce exactly one artifact:
 
 Path:
