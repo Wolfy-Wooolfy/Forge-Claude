@@ -28,6 +28,12 @@ const { runScenarios } = require(
   path.join(ROOT, "code", "src", "testing", "scenario_runner")
 );
 
+// PHASE-41 Fixture Engine (D1): ephemeral overlay root so a full suite run leaves
+// ZERO byproducts in the tracked working tree (test-infra only; outside Track A).
+const { buildOverlay, teardownOverlay } = require(
+  path.join(ROOT, "code", "src", "testing", "fixture_overlay")
+);
+
 // ── CLI arg parsing ───────────────────────────────────────────────────────────
 
 function _parseArgs(argv) {
@@ -48,12 +54,21 @@ function _parseArgs(argv) {
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 (async () => {
+  let overlay     = null;
+  const _origCwd  = process.cwd();
+  let exitCode    = 2;
   try {
     const { scenarios } = _parseArgs(process.argv);
 
     console.log("\n── Forge Self-Test Harness ──────────────────────────────────────\n");
 
-    const report = await runScenarios({ root: ROOT, scenarios });
+    // Build the ephemeral overlay root and run the whole suite against it. cwd is
+    // moved into the overlay so cwd-default writers (e.g. runDoctor() with no root)
+    // and cwd-ROOT helpers also resolve inside the overlay, not the tracked repo.
+    overlay = buildOverlay(ROOT);
+    process.chdir(overlay.root);
+
+    const report = await runScenarios({ root: overlay.root, scenarios });
 
     for (const s of report.scenarios) {
       const icon = s.status === "PASS" ? "✓" : s.status === "SKIP" ? "○" : "✗";
@@ -80,9 +95,16 @@ function _parseArgs(argv) {
     console.log(ok + " — " + report.summary);
     console.log("duration: " + report.duration_ms + "ms\n");
 
-    process.exit(report.ok ? 0 : 1);
+    exitCode = report.ok ? 0 : 1;
   } catch (err) {
     console.error("forge-test crashed:", err);
-    process.exit(2);
+    exitCode = 2;
+  } finally {
+    // Restore cwd and tear down the overlay BEFORE exiting (process.exit would
+    // otherwise skip cleanup). teardown is synchronous + junction-safe.
+    try { process.chdir(_origCwd); } catch (_) { /* best-effort */ }
+    teardownOverlay(overlay);
   }
+
+  process.exit(exitCode);
 })();

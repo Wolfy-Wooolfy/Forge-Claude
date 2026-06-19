@@ -61,3 +61,41 @@ Owner standing-approval 2026-06-19 + the capability-arc framing. CTO selected PH
 as the FOUNDATION of the capability arc (eliminate test-run byproducts before the build-heavy capability
 work). PHASE-42 (Built-Project Test Harness) + 43+ (real demonstrable build) pending owner nod on the
 arc direction. The cross-project coverage extension (PHASE-40 follow-up) remains backlog.
+
+---
+## AMENDMENT 1 — 2026-06-19 — STEP-0 CTO verification + DESIGN DECISION (D1)
+
+### STEP-0 verified independently by the CTO (fresh zip)
+- Artifact present (63 lines).
+- Root cause confirmed: bin/forge-test.js L25 `ROOT = path.resolve(__dirname,"..")` (repo root) → L56
+  `runScenarios({ root: ROOT })`. The single `root` is threaded by scenario_runner for BOTH module
+  `require` (path.join(root,"code",...) at L165/205/322/357) AND data, plus `ctx.root` (L278) and the
+  per-scenario `_cleanup` rmSync (L296). Assertions resolve via ctx.root (artifact_exists.js:13,
+  file_json_field.js:14).
+- Both tracked-file writers honor the PASSED root (NOT __dirname): runDoctor `_patchStatusRuntimeHealth(root)`
+  → `root/progress/status.json` (L93-110); apiServer `root` → `root/artifacts/llm/decision_log.json`
+  (L56/61), and every engine is constructed with `{ root }` (L74-89). Byproduct inventory accepted
+  (S25 → decision_log.json; S196 → status.json; zero stray dirs; /api/system/doctor latent/unhit).
+
+### DECISION: D1 (Ephemeral Overlay Root)
+Rationale: (a) `root` is code-root AND data-root (runner requires via path.join(root,...)), so a "data-only
+redirect" (D2) would require threading a NEW data-root param through the LIVE surface (apiServer/runDoctor =
+Track A, invasive) OR building the same overlay for a subset of scenarios → D2 buys no clean simplicity here.
+(b) PHASE-36 already made every write honor the passed root (verified) → the runtime is root-relocatable →
+D1 just supplies a different root, test-harness-only, ZERO live-surface change. (c) D1 structurally confines
+ALL writes — current AND the capability arc's future writers — which is the reason for doing it before PHASE-42.
+D2 (targeted redirect) retained as FALLBACK only if A.2 cannot reach green.
+
+### Design shape
+fixtureRoot under os.tmpdir(): directory JUNCTIONS (fs.symlinkSync(absTarget, link, "junction") — Windows, no
+admin) for read-only inputs the runtime resolves via root (code/, docs/, node_modules/, web/, architecture/,
+and any others A.0 finds) + FRESH writable artifacts/ and progress/, SEEDED with the read-then-write files
+(progress/status.json, artifacts/llm/decision_log.json, artifacts/llm/approval_policy.json, + any reference
+files A.0 finds). Pass fixtureRoot as the `root` to runScenarios (→ engines/server/doctor/registry) AND as
+ctx.root. Guaranteed teardown: rmSync(fixtureRoot, {recursive,force}) in finally. Default PER-SUITE (preserves
+the current green cross-scenario sharing model; fast); per-scenario seed only if A.2 requires it for 325/0/5.
+
+### Gate (the real goal)
+After the suite runs on fixtureRoot, verification runs in the REAL repo working tree: `git status --porcelain`
+EMPTY (zero byproducts) + `git hash-object artifacts/llm/decision_log.json` unchanged + progress/status.json
+unchanged + suite 325/0/5 (330). §ARC=10 unchanged (scenario_runner is test-infra, outside Track A).
