@@ -1,0 +1,17 @@
+{
+  "id": "S332",
+  "name": "PHASE-40 C2 (REAL createProject path): boot apiServer; create A (active); create B WHILE A active -> B created + project_state.json written, NOT denied SCOPE_CROSS_PROJECT (creation carve-out on the real flow)",
+  "_phase40_note": "Closes the scenario-green/real-broken gap for the creation carve-out: drives the ACTUAL createProject flow via POST /api/projects/create on an in-process apiServer (isolated temp root + ephemeral port; S225/S228 pattern). The booted server's default policy is the PHASE-40 one (seam_present). Creating B while A is the active project succeeds (B activated before its init-writes per apiServer.js:883-885; createProject runs in the ambient-null window, not a buildProject seam) so B's artifacts/projects/<B>/project_state.json write is ALLOWED. Complements S331 (policy-level carve-out) and the read-only A.0 trace.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/phase40_real_create_test_helper",
+  "method": "runS332RealCreateProjectUnderActive",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "seam_present",                     "expected": true },
+    { "type": "state_field_equals", "field": "project_a_created",                "expected": true },
+    { "type": "state_field_equals", "field": "project_b_created_while_a_active", "expected": true },
+    { "type": "state_field_equals", "field": "b_state_written",                  "expected": true }
+  ]
+}

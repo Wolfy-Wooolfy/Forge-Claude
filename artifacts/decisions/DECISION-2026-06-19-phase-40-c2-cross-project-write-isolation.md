@@ -75,3 +75,53 @@ decision. AMBIENT-REGISTER DISCIPLINE: set/clear via try/finally at the operatio
 null carve-out (active==null → allowed) preserves {root}-only writes, tests, and pre-declaration
 bootstrap. §ARC stays 10 (no new direct fs). Step A also confirms the pre-existing permission
 audit-log fs (permissionPolicy.js:28-32) is §ARC-ledgered.
+
+## AMENDMENT 2 — CTO Step-A mid-review + Step-A.3/B authorization — 2026-06-19
+CTO independently verified Step A from a fresh zip: the unified checkScope rule (ctx OR ambient), the
+policy-ambient active register (parallel to active_mode/setActiveMode/getActiveMode), the buildProject
+try/finally seam (clear in finally — no leak between operations), the 3 controls re-run green in-container
+(S329 DENIED / S330 SUCCESS / S331 SUCCESS), the RED proof, Track A clean, §ARC=10. Implementation APPROVED.
+RULINGS: (1) SEAM-BREADTH — buildProject (the primary/structural write path) is covered; A.3a traces for a
+SINGLE common pipeline-dispatch seam and wires the same set/try/finally-clear pattern there ONLY IF all
+orchestration scenarios stay green; if ANY goes red (the PHASE-36 fail-closed lesson) or no single clean
+seam exists, REVERT to buildProject-only and document the remaining pipeline-stage coverage as a scoped
+PHASE-41 follow-up (justified: structural-confinement = zero current cross-project write; PHASE-36
+regression risk; lower marginal value). NO 10 individual seams. (2) CREATION — add a REAL-createProject-path
+test + confirm no createProject call site is nested inside a buildProject seam window. (3) BYPRODUCTS —
+selective staging at STEP B (never stage decision_log.json / test_apiserver_s28 leakage).
+
+## AMENDMENT 3 — Step-B closure — 2026-06-19
+PHASE-40 (C2 deferral(a) — ctx-less cross-project write isolation) is **CLOSED** (LOCAL commit; push/tag
+await CTO closure-diff + GO).
+
+**A.3a SEAM-BREADTH outcome — buildProject-only + PHASE-41 follow-up.** Trace finding: there is NO single
+common production pipeline-dispatch seam. The 10 pipeline-stage operations (formalizeSpec, reviewSpec,
+estimateCost, reportEnv, designTests, runTests, reviewProject, documentProject, judgeQuality, deployProject)
+are dispatched as 10 SEPARATE apiServer endpoints (apiServer.js:1885-1951), each calling its own
+conversationEngine method; the loop advances endpoint-by-endpoint (no production loop runner; the full-loop
+test scenarios use test helpers). Per the CTO ruling, did NOT wire 10 individual seams. buildProject (the
+primary/structural write path) keeps the seam; the remaining pipeline-stage coverage is a scoped PHASE-41
+follow-up. Justification: structural-confinement (each stage derives its write path from its own
+body.project_id and cannot target another project) + the PHASE-36 C1 fail-closed regression risk + defense-
+in-depth-only marginal value.
+
+**A.3b REAL-createProject test — DONE (not the fallback).** S332 drives the ACTUAL createProject flow via an
+in-process apiServer (POST /api/projects/create) in an isolated temp root + ephemeral port (the S225/S228
+pattern): create project A (active), then create project B WHILE A is active → B is created and its
+artifacts/projects/<B>/project_state.json is written (NOT denied SCOPE_CROSS_PROJECT), because createProject
+runs in the ambient-null window and activates B before its init-writes (apiServer.js:883-885). Confirmed by
+grep that NO createProject call site (apiServer.js:871 def, :1968 route handler) executes inside a
+buildProject seam window. The §A.0 read-only trace + S331 (policy-level carve-out) corroborate.
+
+**Closure metrics:** full SU **325 / 0 / 5 (330 total)** with --max-old-space-size=4096 (321 baseline + 4 new
+S329/S330/S331/S332). forge-doctor **exit 0, HEALTHY, 0 critical/FAIL, 35 checks** (6 known non-blocking
+warnings). **§ARC = 10** (no new exception) · **L2 = 80** · **roles = 13** · **doctor = 35** — all unchanged.
+Track A clean on the edited live files (permissionRules/permissionPolicy/conversationEngine): no new
+fs/child_process/fetch/new OpenAI; permissionPolicy's only fs is the pre-existing §ARC-9 audit append;
+conversationEngine's only `child_process` token is a string in a NODE_BUILTINS data whitelist. **Mock-only,
+$0.** S329 RED-proven (neutralizing the ambient term → SUCCESS, the exact deferral-(a) hole). Net production
+deltas: `permissionPolicy` (ambient register + thread into checkScope), `permissionRules.checkScope`
+(unified ctx-OR-ambient rule), `conversationEngine.buildProject` (try/finally seam wrapper). Test-infra:
+`scenario_runner` (active_project hook) + `phase40_real_create_test_helper` + 4 scenarios. status.json:
+next_phase → PHASE-41-PENDING-DECISION; closure summary prepended. Closure checkpoint:
+[_phase_40_checkpoints/stage_closure.md](_phase_40_checkpoints/stage_closure.md).
