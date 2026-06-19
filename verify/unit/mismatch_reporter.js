@@ -65,10 +65,7 @@ function main() {
       anchor = "smoke";
     }
 
-    let notes = "";
-    if (relPath === "verify/smoke/smoke_check.sh" && fileExists(repoRoot, "verify/smoke/smoke_check.js")) {
-      notes = "Windows runtime uses verify/smoke/smoke_check.js as a compatible replacement. Docs may still reference .sh.";
-    }
+    const notes = "";
 
     mismatches.push({
       mismatch_id: mismatchId,

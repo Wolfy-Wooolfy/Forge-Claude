@@ -125,3 +125,35 @@ artifacts/stage_B|C/*, archived task closures — point-in-time records, same
 treatment as artifacts/. Conceptual contract-doc references remain for the deferred
 documentation-reconciliation pass (FINDINGS-INFO-5).
 Total PHASE-38 retirement = 48 (STEP A) + 11 (STEP B) = 59 files + 1 npm script.
+
+## AMENDMENT 3 — 2026-06-19 (CTO §B.3 self-gate ruling — scope boundary at the CLI-cluster edge)
+STEP B's §B.3 dangling re-scan (self-gating) halted before commit with 4 references
+to deleted files outside the CLI-cluster manifest:
+  - A: tests/contracts/pipeline.stageC.entry.test.js — require() of the deleted
+    orchestrator/status_writer; a unit test of deleted v1 code; no runner.
+  - B: verify/unit/docs_gap_analyzer.js (~104-147) — hardcoded expected-file list
+    containing deleted bin/orchestrator/execution/tools/smoke paths.
+  - C: verify/unit/mismatch_reporter.js (~69-70) — dead branch referencing the
+    deleted smoke_check.{sh,js}.
+  - D: progress/status.json — historical narrative mentioning the deleted bins.
+CTO verification established that verify/unit/ + verify/audit/ are NOT the Forge-v1
+CLI cluster: they are a DISTINCT verification/audit subsystem, contracted by
+docs/09_verify/09_17|18|19 + docs/08_audit/08_Forge_Boundary_Audit, documented as
+must-exist/writable runtime dirs (docs/10_Tech_Assumptions), and adjacent to a live
+module (specCompletenessEnforcer.js reads artifacts/verify/unit/docs_gap_validation_report.json
+— a different, artifacts/-rooted path). Their scripts require only fs/path and do not
+import deleted code. Sweeping them as a PHASE-38 tail-end would over-reach a contracted
+subsystem and cause multi-doc drift.
+RULING — scope PHASE-38 at the CLI-cluster boundary; clear §B.3 minimally:
+  - A: RETIRE (dead test; empties tests/). Total deleted = 60 files.
+  - B, C: SURGICAL DE-DANGLE — removed only the references to PHASE-38-deleted files;
+    the files remain (contracted), not retired.
+  - D: historical narrative — left as-is; the §B.4.d PHASE-38 prepend frames it.
+DEFERRED (new owner-gated backlog item, folds into FINDINGS-INFO-5): retirement of the
+legacy v1 verification/audit harness — verify/unit/{docs_gap_analyzer, mismatch_reporter,
+cross_doc_consistency, trace_validator}.js + reports, verify/audit/{audit_logger.js,
+audit_log.jsonl} — TOGETHER WITH reconciliation of its contract docs (09_17/18/19,
+08_Forge_Boundary_Audit, 09_Build_and_Verify_Playbook, 10_Tech_Assumptions). Not auto-started.
+OBSERVATION (pre-existing, not PHASE-38-caused; for the deferred pass): specCompletenessEnforcer.js
+(LIVE) reads artifacts/verify/unit/docs_gap_validation_report.json — confirm a live writer
+exists or that absence is handled gracefully.

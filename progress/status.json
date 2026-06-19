@@ -73,7 +73,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-06-18T16:36:25.055Z",
+    "last_doctor_run": "2026-06-19T07:57:13.309Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
@@ -990,7 +990,10 @@
       "mechanism": "reg.invoke('fs.write_file') (recursive parent-dir creation); listKnownProjectIds guarded with fs.existsSync"
     },
     "ledger_changes": {
-      "arc_added": ["§ARC-9", "§ARC-10"],
+      "arc_added": [
+        "§ARC-9",
+        "§ARC-10"
+      ],
       "arc_8_widened": "companion fs.mkdirSync(uploadsDir) in the POST /api/intake/upload handler",
       "comment_fix": "verdict_aggregator.js + loopback_signal.js mis-cited §ARC-1 → §ARC-10 (comment-only)",
       "legacy_scope_note": "Forge-v1 self-build CLI cluster marked OUT-OF-TRACK-A-SCOPE (non-numbered note)"

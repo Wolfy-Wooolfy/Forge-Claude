@@ -101,8 +101,6 @@ function main() {
     "verify/unit/cross_document_consistency_report.json",
     "verify/unit/mismatch_report.json",
     "verify/audit/audit_log.jsonl",
-    "verify/smoke/local_command_log.jsonl",
-    "verify/smoke/smoke_check.sh",
   ];
 
   const expectedSchemas = [
@@ -132,19 +130,8 @@ function main() {
 
   const likelyUndocumentedCode = [];
   const coreCodeCandidates = [
-    "bin/forge-autonomy-step.js",
-    "bin/forge-run.js",
-    "tools/pre_run_check.js",
-    "tools/integrity.js",
-    "code/src/orchestrator/runner.js",
-    "code/src/orchestrator/stage_transitions.js",
-    "code/src/orchestrator/status_writer.js",
-    "code/src/execution/task_executor.js",
-    "code/src/execution/task_registry.js",
-    "verify/smoke/runner_smoke.js",
-    "verify/smoke/runner_dry_run_smoke.js",
-    "verify/smoke/stage_transitions_smoke.js",
-    "verify/smoke/status_writer_smoke.js",
+    // PHASE-38: the Forge-v1 self-build CLI-cluster paths formerly listed here were
+    // retired (deleted). See DECISION-2026-06-19-phase-38-legacy-cluster-retire.md.
   ];
 
   const coverageMapDoc = docsSet.has("docs/08_audit/08_10_Docs_to_Code_Coverage_Map_Core_Runtime.md");
