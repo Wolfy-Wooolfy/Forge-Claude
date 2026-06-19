@@ -99,3 +99,43 @@ the current green cross-scenario sharing model; fast); per-scenario seed only if
 After the suite runs on fixtureRoot, verification runs in the REAL repo working tree: `git status --porcelain`
 EMPTY (zero byproducts) + `git hash-object artifacts/llm/decision_log.json` unchanged + progress/status.json
 unchanged + suite 325/0/5 (330). §ARC=10 unchanged (scenario_runner is test-infra, outside Track A).
+
+---
+## AMENDMENT 2 — 2026-06-19 — STEP-A mid-checkpoint CTO verification + CLOSURE
+
+### STEP-A verified independently by the CTO (fresh zip)
+- code/src/testing/fixture_overlay.js (122 lines) verified. teardownOverlay is junction-SAFE: it rmdir's
+  every junction LINK first (removes the reparse point, not the target), and only rmSync's the overlay
+  tree once ALL junctions are confirmed cleared (`allCleared`); otherwise it leaves the temp dir in
+  os.tmpdir() and never risks the real repo. Junction lifecycle empirically de-risked (symlink "junction"
+  needs no admin; require resolves through it; lstat().isSymbolicLink()===true; rmdir+rmSync leave target intact).
+- buildOverlay correct: top-level junctions (code, docs, web, architecture, node_modules, scripts) + nested
+  junctions (artifacts/vendor, artifacts/test_fixtures, artifacts/projects/_reference_todo_api) + copied
+  config (package.json, ecosystem.config.js) + fresh writable artifacts/ & progress/ seeded with status.json
+  + approval_policy.json. decision_log.json created FRESH (not seeded) — no scenario asserts prior content.
+- bin/forge-test.js wiring correct: buildOverlay → process.chdir(overlay.root) → runScenarios({root: overlay.root})
+  → finally{ restore cwd + teardownOverlay } → process.exit AFTER finally (teardown guaranteed on success/failure).
+  process.chdir is required because runDoctor.js:10 defaults root to process.cwd() and S196 calls runDoctor()
+  with no args; chdir also isolates the cwd-ROOT helpers (const ROOT = process.cwd()).
+- Live surface UNTOUCHED: scenario_runner.js has 0 overlay refs; only fixture_overlay.js (new) + bin/forge-test.js
+  (modified) changed. §ARC=10 unchanged (test-infra fs only).
+
+### Gate met (CTO-reproduced reasoning over CC's run)
+Full suite 325 passed / 0 failed / 5 skipped (330); REAL-repo git status POST == PRE (zero byproducts);
+decision_log.json + progress/status.json hashes unchanged by the suite; 0 leftover overlay dirs (teardown ran).
+First overlay run was 305/20/5 (missing read-only inputs); after junctioning scripts/, artifacts/vendor,
+artifacts/test_fixtures, artifacts/projects/_reference_todo_api → 325/0/5. The tracked tree stayed clean even
+during the 20 failures (the failures were missing READS, never escaped WRITES).
+
+### Documented residual (accepted; not a blocker)
+The L5b reference-project harness writes (artifacts/projects/_reference_todo_api/forge_tests/last_report.json,
+loopback_signal.json) go THROUGH the _reference_todo_api junction into the real repo's GITIGNORED paths
+(.gitignore §17). The git-clean closure gate therefore holds, and this is identical to pre-overlay behavior.
+It does NOT affect the capability arc: newly built projects (PHASE-42+) are created under the FRESH writable
+overlay artifacts/projects/ and are fully isolated. Optional full-isolation refinement (copy the ref-project
+source + junction only its node_modules) is recorded as backlog gold-plating — not required.
+
+### Closure
+PHASE-41 (Fixture Engine, D1 Ephemeral Overlay Root) CLOSED. A full bin/forge-test.js run leaves ZERO
+byproducts in the tracked working tree. Suite 325/0/5; forge-doctor 35/0-FAIL; §ARC=10; L2 tools 80; roles 13.
+status.json next_phase → PHASE-42-PENDING-DECISION.
