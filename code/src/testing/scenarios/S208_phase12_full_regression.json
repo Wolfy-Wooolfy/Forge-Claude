@@ -1,7 +1,7 @@
 {
   "id": "S208",
   "name": "PHASE-12 full regression: service, secrets, backup, logging, auth, binding, uid_pin",
-  "description": "Stage 12.7 meta-regression. Mirrors the S183 pattern (Phase 11 full regression). Asserts key PHASE-12 structural properties by file inspection — no LLM calls, no real OS APIs touched. Verifies: service lifecycle module loads; secret_provider exports the 4-tier resolution chain; backup tools registered (create, verify, restore, export); log_writer exists with §ARC-6 boundary respected; auth middleware registered on api_server; api_server binds 127.0.0.1 default (OQ-2 fix); uid_pin module exports checkOrCreateUidPin; all 8 §ARC entries documented in 18_AGENT_ROLES_CONTRACT.md (§ARC-8 added for binary upload exemption — apiServer.js POST /api/intake/upload; documentation reconciled in PHASE-17). Note: the plan artifact (DECISION-2026-05-18T11-30-phase-12-plan.md) referenced a 'baseline/' subdirectory for this file — superseded by repo convention; all scenarios live in code/src/testing/scenarios/ directly.",
+  "description": "Stage 12.7 meta-regression. Mirrors the S183 pattern (Phase 11 full regression). Asserts key PHASE-12 structural properties by file inspection — no LLM calls, no real OS APIs touched. Verifies: service lifecycle module loads; secret_provider exports the 4-tier resolution chain; backup tools registered (create, verify, restore, export); log_writer exists with §ARC-6 boundary respected; auth middleware registered on api_server; api_server binds 127.0.0.1 default (OQ-2 fix); uid_pin module exports checkOrCreateUidPin; all 10 §ARC entries documented (§ARC-1..10; §ARC-9 + §ARC-10 added in PHASE-37) in 18_AGENT_ROLES_CONTRACT.md. Note: the plan artifact (DECISION-2026-05-18T11-30-phase-12-plan.md) referenced a 'baseline/' subdirectory for this file — superseded by repo convention; all scenarios live in code/src/testing/scenarios/ directly.",
   "type": "module_call",
   "permission": "READ_ONLY",
   "module": "code/src/testing/helpers/phase_12_regression_helper",
@@ -16,6 +16,6 @@
     { "type": "state_field_equals", "field": "auth_middleware_present_ok",    "expected": true },
     { "type": "state_field_equals", "field": "api_binding_default_ok",        "expected": true },
     { "type": "state_field_equals", "field": "uid_pin_format_ok",             "expected": true },
-    { "type": "state_field_equals", "field": "arc_count_equals_eight",        "expected": true }
+    { "type": "state_field_equals", "field": "arc_count_equals_ten",         "expected": true }
   ]
 }

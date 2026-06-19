@@ -157,3 +157,32 @@ audit_log.jsonl} — TOGETHER WITH reconciliation of its contract docs (09_17/18
 OBSERVATION (pre-existing, not PHASE-38-caused; for the deferred pass): specCompletenessEnforcer.js
 (LIVE) reads artifacts/verify/unit/docs_gap_validation_report.json — confirm a live writer
 exists or that absence is handled gracefully.
+
+## AMENDMENT 4 — 2026-06-19 (CTO §B2.5.a ruling — S208 / pre-existing PHASE-37 closure-gate gap)
+STEP B's §B2.5.a SU-suite gate returned 320/1/5 — one FAIL: S208 (PHASE-12 full
+regression), assertion arc_count_equals_eight. CTO independently confirmed the root
+cause and that S208 is the SOLE failure (the 60-file PHASE-38 retirement caused ZERO
+suite regressions; forge-doctor exit 0 / 35 checks / 0 FAIL; §B2.4 dangling re-scan clean).
+ROOT CAUSE (PHASE-37 debt, NOT PHASE-38-attributable): phase_12_regression_helper.js
+computed arc_count_equals_eight = doc18.includes("§ARC-8") && !doc18.includes("§ARC-9").
+PHASE-37 raised the ledger §ARC 8→10 and added §ARC-9 + §ARC-10 to doc 18 but did not
+update this hardcoded meta-assertion. §ARC-9 entered doc 18 at commit e57091e3, an
+ANCESTOR of the PHASE-37 closure commit e2dca357 (tag phase-37-complete) — so S208 was
+already RED at PHASE-37 close. PHASE-37's recorded "suite 321/0/5" was inaccurate; the
+true state was 320/1/5. Two process gaps are recorded: (a) the PHASE-37 closure gate did
+not re-run/verify the full suite green after the structural §ARC change; (b) the CTO's
+PHASE-37 state-verification accepted the 321/0/5 figure on report without a suite re-run.
+RULING: fix S208 within PHASE-38 (it blocks PHASE-38's suite-green closure gate; the fix
+is a 2-file alignment to the owner-approved, independently-verified §ARC=10 ledger and
+masks nothing). Labeled a folded-in PHASE-37-debt correction.
+  - phase_12_regression_helper.js: check → doc18.includes("§ARC-10") && !doc18.includes("§ARC-11");
+    field renamed arc_count_equals_ten. The tripwire is preserved (a future §ARC change
+    must update this assertion).
+  - S208_phase12_full_regression.json: assertion field → arc_count_equals_ten; description 8→10.
+After the fix the suite is genuinely 321/0/5 — PHASE-38 thereby CORRECTS the suite-green
+status PHASE-37 recorded inaccurately.
+PROCESS LESSON (logged): a closure gate that changes a structural count (§ARC / L2 tools /
+roles / doctor checks) must (a) update every meta-assertion hardcoding that count, and
+(b) re-run and verify the full SU suite genuinely green at closure; CTO verification of a
+closed phase should re-run the suite (or explicitly flag when it cannot) rather than
+accept the pass count on report.

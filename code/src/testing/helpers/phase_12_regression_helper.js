@@ -96,18 +96,19 @@ async function runS208Phase12FullRegression() {
     uid_pin_format_ok = typeof uidPin.checkOrCreateUidPin === "function";
   } catch (_e) { /* false */ }
 
-  // ── 8. arc_count_equals_eight ─────────────────────────────────────────────
-  // Verify 18_AGENT_ROLES_CONTRACT.md contains §ARC-8 but NOT §ARC-9.
-  // §ARC-8 was added in PHASE-13.8 (binary upload exemption, owner-approved 2026-05-26).
-  // Documentation reconciled in PHASE-17 (DECISION-2026-05-28-phase-17-idea-synthesis-gate.md).
-  let arc_count_equals_eight = false;
+  // ── 8. arc_count_equals_ten ───────────────────────────────────────────────
+  // Verify 18_AGENT_ROLES_CONTRACT.md contains §ARC-10 but NOT §ARC-11.
+  // §ARC-9 + §ARC-10 were added in PHASE-37 (§ARC code-vs-ledger drift audit;
+  // ledger 8→10, DECISION-2026-06-18-phase-37-arc-drift-audit.md). This is a
+  // tripwire: a future §ARC ledger change must update this meta-assertion.
+  let arc_count_equals_ten = false;
   try {
     const contractSrc = fs.readFileSync(
       path.join(ROOT, "docs", "10_runtime", "18_AGENT_ROLES_CONTRACT.md"), "utf8"
     );
-    arc_count_equals_eight =
-      contractSrc.includes("§ARC-8") &&
-      !contractSrc.includes("§ARC-9");
+    arc_count_equals_ten =
+      contractSrc.includes("§ARC-10") &&
+      !contractSrc.includes("§ARC-11");
   } catch (_e) { /* false */ }
 
   return {
@@ -118,7 +119,7 @@ async function runS208Phase12FullRegression() {
     auth_middleware_present_ok,
     api_binding_default_ok,
     uid_pin_format_ok,
-    arc_count_equals_eight
+    arc_count_equals_ten
   };
 }
 
