@@ -1,0 +1,142 @@
+{
+  "mode": "mock",
+  "force_test_fail": false,
+  "project_id": "phase43_notes_api",
+  "started_at": "2026-06-22T14:14:49.535Z",
+  "states": [
+    {
+      "label": "after confirmIdea",
+      "state": "ARCHITECT_DESIGN"
+    },
+    {
+      "label": "after architect (seeded)",
+      "state": "SPEC_WRITER_FORMALIZE"
+    },
+    {
+      "label": "before reviewSpec",
+      "state": "REVIEWER_SPEC"
+    },
+    {
+      "label": "after RUN_TESTS (PASS)",
+      "state": "REVIEWER_CODE_AND_SECURITY"
+    },
+    {
+      "label": "after finalize",
+      "state": "COMPLETE"
+    }
+  ],
+  "gates": [
+    {
+      "gate": 1,
+      "response": "APPROVE",
+      "advanced": true,
+      "advanced_to": "TEST_DESIGN"
+    },
+    {
+      "gate": 2,
+      "response": "APPROVE_SHIP",
+      "advanced": true,
+      "advanced_to": "DEPLOYMENT_OR_END"
+    }
+  ],
+  "steps": [
+    {
+      "hop": "confirmIdea",
+      "ok": true,
+      "loop_id": "810bf12f-5f3d-44b4-8102-5525390bed89",
+      "architect_error": null
+    },
+    {
+      "hop": "architect",
+      "seeded": true,
+      "advanced_to": "SPEC_WRITER_FORMALIZE"
+    },
+    {
+      "hop": "spec_writer",
+      "seeded": true,
+      "advanced_to": "REVIEWER_SPEC"
+    },
+    {
+      "hop": "reviewSpec",
+      "advanced": true,
+      "advanced_to": "COST_ESTIMATE",
+      "verdict": "APPROVED_WITH_CONCERNS"
+    },
+    {
+      "hop": "estimateCost",
+      "advanced": true,
+      "advanced_to": "ENV_REPORT"
+    },
+    {
+      "hop": "reportEnv",
+      "advanced": false,
+      "gate_pending": 1
+    },
+    {
+      "hop": "designTests",
+      "advanced": true,
+      "advanced_to": "BUILDER"
+    },
+    {
+      "hop": "buildProject",
+      "attempt": 1,
+      "advanced": true,
+      "advanced_to": "RUN_TESTS",
+      "build_error": null,
+      "files": 1
+    },
+    {
+      "hop": "runTests",
+      "attempt": 1,
+      "advanced": true,
+      "advanced_to": "REVIEWER_CODE_AND_SECURITY",
+      "report_summary": {
+        "overall_status": "PASS",
+        "total": 4,
+        "pass": 4,
+        "fail": 0,
+        "error": 0
+      },
+      "test_error": null
+    },
+    {
+      "hop": "reviewProject",
+      "advanced": true,
+      "advanced_to": "DOCUMENTATION",
+      "review_error": null
+    },
+    {
+      "hop": "documentProject",
+      "advanced": true,
+      "advanced_to": "QUALITY_JUDGE",
+      "doc_error": null
+    },
+    {
+      "hop": "judgeQuality",
+      "advanced": false,
+      "gate_pending": 2
+    },
+    {
+      "hop": "deployProject",
+      "advanced": true,
+      "advanced_to": "LIVE_DELIVERABLE",
+      "skipped": true
+    },
+    {
+      "hop": "finalizeDeliverable",
+      "advanced": true,
+      "advanced_to": "COMPLETE"
+    }
+  ],
+  "vision_locked": true,
+  "materialized_files": [
+    {
+      "path": "app.js",
+      "line_count": 1
+    }
+  ],
+  "verdict": "COMPLETE",
+  "final_state": "COMPLETE",
+  "loop_id": "810bf12f-5f3d-44b4-8102-5525390bed89",
+  "ended_at": "2026-06-22T14:14:50.892Z"
+}
