@@ -1,0 +1,17 @@
+{
+  "id": "S334",
+  "name": "PHASE-42 owner-facing test-report endpoint (REAL HTTP): a project that exists with NO prior run -> GET /api/ai-os/project/test-report fail-SOFT { ok:true, report:null, reason:NO_REPORT } (NOT a 500)",
+  "_phase42_note": "Locks the fail-SOFT branch of the owner-evidence surface. In-process apiServer (isolated temp root + token, S332 pattern); the helper seeds an existing project dir (project_state.json) with NO forge_tests/last_report.json. read_report returns REPORT_NOT_FOUND -> the endpoint maps it to a soft null, not an error. Contract: docs/09_verify/20_BUILT_PROJECT_TEST_CONTRACT.md §5.3.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/builtproject_report_endpoint_test_helper",
+  "method": "runReportEndpointNoReport",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "http_status",    "expected": 200 },
+    { "type": "state_field_equals", "field": "ok",             "expected": true },
+    { "type": "state_field_equals", "field": "report_is_null", "expected": true },
+    { "type": "state_field_equals", "field": "reason",         "expected": "NO_REPORT" }
+  ]
+}

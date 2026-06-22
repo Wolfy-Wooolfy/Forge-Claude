@@ -1,0 +1,22 @@
+{
+  "id": "S333",
+  "name": "PHASE-42 owner-facing test-report endpoint (REAL HTTP): a built project with a materialized forge_tests/last_report.json -> GET /api/ai-os/project/test-report returns ok + overall_status + a non-empty per-scenario verdict array",
+  "_phase42_note": "Locks the owner-evidence surface end-to-end on an in-process apiServer (isolated temp root + ephemeral port + token, S332 pattern). The isolated root cannot see the real _reference_todo_api report, so the helper MATERIALIZES forge_tests/last_report.json inside the temp project first, then GETs the endpoint. Endpoint sources the report via reg.invoke(builtproject.read_report) only (Track A). Contract: docs/09_verify/20_BUILT_PROJECT_TEST_CONTRACT.md §5.2.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/builtproject_report_endpoint_test_helper",
+  "method": "runReportEndpointHappyPath",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "http_status",                      "expected": 200 },
+    { "type": "state_field_equals", "field": "body.ok",                          "expected": true },
+    { "type": "state_field_equals", "field": "project_id_echoed_correctly",      "expected": true },
+    { "type": "state_field_equals", "field": "body.overall_status",              "expected": "PASS" },
+    { "type": "state_field_equals", "field": "body.total",                       "expected": 3 },
+    { "type": "state_field_equals", "field": "scenarios_is_nonempty_array",      "expected": true },
+    { "type": "state_field_equals", "field": "first_scenario_has_id_and_status", "expected": true },
+    { "type": "state_field_equals", "field": "body.scenarios[0].id",             "expected": "T-1" },
+    { "type": "state_field_equals", "field": "body.scenarios[0].status",         "expected": "PASS" }
+  ]
+}
