@@ -64,4 +64,13 @@ LOCAL, selective add of ONLY: `apiServer.js` was already committed (`e784a69`); 
 S334, `progress/status.json`, and this checkpoint. **NO push, NO tag.**
 Closure commit SHA: `d4852b7` (this checkpoint's SHA-fill is a follow-up bookkeeping commit).
 
+## C — current_task reconcile (post-closure, CTO-ruled 2026-06-22)
+CTO ruling: `status_json_valid` is PRESENCE-ONLY for `current_task` (REQUIRED_FIELDS membership; rejects only
+undefined/null; echoes the value in the PASS detail) — a VALUE-ONLY edit keeps it PASS, and the field has ZERO
+SU-scenario consumers. So `current_task` was reconciled from the stale PHASE-36 narrative to the PHASE-42 closure
+value (commit `2e28981`; `progress/status.json` only — that commit also carries the `last_doctor_run` timestamp
+auto-patched by the C.2 forge-doctor run, §ARC-9 self-instrumentation). forge-doctor re-run: **35 checks / 0 FAIL**,
+`status_json_valid` PASS with the new value. Full SU suite intentionally NOT re-run (value-only edit; only reader is
+the presence-only check; 327/0/5 provably preserved).
+
 **HARD STOP — awaiting CTO closure verification (push GO + tag `phase-42-complete` + owner Gate #10 follow).**
