@@ -73,7 +73,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-06-22T10:10:46.447Z",
+    "last_doctor_run": "2026-06-22T10:34:32.965Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
@@ -2109,7 +2109,7 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-36 CLOSED — L3 permission real-path hardening. C1 traversal containment (shared resolveWithinRoot; checkScope resolves BEFORE prefix-match, no raw-string → SCOPE_FORGE_SELF; policy-root threading restored the 10 orchestration scenarios; S325 GREEN). C2 active-project write boundary keyed on EXPLICIT ctx.active_project_id (inert when absent → orchestration untouched) → SCOPE_CROSS_PROJECT; materializerEngine writeCtx propagation + buildProject buildCtx thread the active id onto the REAL build write path; S326 + S327 GREEN (S327 drives the real materializerEngine; negative-control proven). C3 PROMPT-mode boot FAIL-FAST in createPolicy (throws when control_mode resolves to PROMPT without a respond surface; opts.prompt_respond_surface opt-in; harness opts in via _autoDenyPrompter; production getDefaultPolicy() does NOT, so a real PROMPT boot still fails fast); delete_active_project rule comment corrected to state D4 governs (active-delete intentionally ALLOWED — NO enforcement); .gitignore: decision_log.json kept TRACKED, test_conv_* conversation_context.json byproducts ignored; S328 GREEN. §-1 RETRACTION: a mid-C3 CTO 'active-delete gap' finding was WITHDRAWN — DECISION-2026-06-07 (D4, owner Gate-#10) ratifies active-delete; B1/B2/S329 reverted; caught via CLAUDE.md §8. Two C2 deferrals: (a) raw fs.write_file with NO ctx targeting project B while A active is not blocked (needs orchestration redesign); (b) active_project.json field-name conflict (design does not depend on the file). Suite 321/0/5 (326). L2=80, §ARC=8, roles 13, doctor 35. Mock-only, $0. Next: PHASE-37 pending decision (owner-gated backlog only).",
+  "current_task": "PHASE-42 CLOSED (LOCAL) — Built-Project Test Harness (L5b) owner-evidence surface: read-only GET /api/ai-os/project/test-report (sourced via builtproject.read_report; fail-soft NO_REPORT) + standalone web/test-report.html owner view + serving route before the SPA fallback; S333/S334 lock it via real in-process HTTP. Suite 327/0/5 (332); forge-doctor 35/0-FAIL; §ARC=10 (frozen); Track A clean (apiServer.js only on the live surface; ai_os/runtime untouched). Authoritative forward state: next_phase / next_step. (current_task reconciled 2026-06-22 from the stale PHASE-36 value per PHASE-42 A-1.4 #6; value-only edit — statusJsonValid is presence-only, zero SU-scenario consumers.) Pre-PHASE-42 detail retained in the phase_* blocks.",
   "last_updated": "2026-06-22T10:30:00.000Z",
   "phase_16": {
     "status": "ACTIVE",
