@@ -1672,6 +1672,24 @@ function createWorkspaceApiServer(options = {}) {
         return;
       }
 
+      // PHASE-42 — standalone owner-facing test-report view. Explicit route BEFORE
+      // the SPA fallback (Handler C) so it is not shadowed by index.html. Same static
+      // mechanism as Handler A (reg.invoke fs.read_file); token injected like the shell.
+      if (req.method === "GET" && pathname === "/test-report.html") {
+        const reg = getDefaultRegistry();
+        const r   = await reg.invoke("fs.read_file", { path: "web/test-report.html" }, { root });
+        if (r.status === "SUCCESS") {
+          const html = _activeToken !== null
+            ? _injectForgeToken(r.output.content, _activeToken)
+            : r.output.content;
+          res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+          res.end(html);
+        } else {
+          sendJson(res, 404, { error: "Not found" });
+        }
+        return;
+      }
+
       if (req.method === "GET" && pathname === "/health") {
         sendJson(res, 200, { ok: true, service: "forge-workspace-api" });
         return;
@@ -1925,6 +1943,52 @@ function createWorkspaceApiServer(options = {}) {
       if (req.method === "POST" && pathname === "/api/ai-os/project/run-tests") {
         const body = await readBody(req);
         sendJson(res, 200, await conversationEngine.runTests(body));
+        return;
+      }
+
+      // PHASE-42 — owner-facing built-project test report (READ-ONLY).
+      // Contract: docs/09_verify/20_BUILT_PROJECT_TEST_CONTRACT.md §5.
+      // Sources the report via the read_report tool only — NO direct fs (Track A / A-1.6).
+      if (req.method === "GET" && pathname === "/api/ai-os/project/test-report") {
+        const projectIdRaw = (requestUrl.searchParams.get("project_id") || "").trim();
+        if (!projectIdRaw) {
+          sendJson(res, 400, { ok: false, reason: "PROJECT_ID_REQUIRED" });
+          return;
+        }
+        const normId      = normalizeProjectId(projectIdRaw);
+        const projectRoot  = getProjectArtifactsRoot(normId);
+        const reg          = getDefaultRegistry();
+        const result       = await reg.invoke(
+          "builtproject.read_report",
+          { project_root: projectRoot },
+          { root }
+        );
+
+        if (result && result.status === "SUCCESS") {
+          const o = result.output || {};
+          sendJson(res, 200, {
+            ok:             true,
+            project_id:     normId,
+            overall_status: o.overall_status,
+            total:          o.total,
+            pass:           o.pass,
+            fail:           o.fail,
+            error:          o.error,
+            scenarios:      o.scenarios,
+            report_path:    o.report_path,
+            ran_at:         o.ran_at
+          });
+          return;
+        }
+
+        const reason = (result && result.metadata && result.metadata.reason) || "READ_REPORT_FAILED";
+        if (reason === "REPORT_NOT_FOUND") {
+          // Fail-SOFT: project reachable but no run yet — NOT a 500.
+          sendJson(res, 200, { ok: true, project_id: normId, report: null, reason: "NO_REPORT" });
+          return;
+        }
+        const detail = (result && result.metadata && result.metadata.detail) || null;
+        sendJson(res, 500, { ok: false, project_id: normId, reason, detail });
         return;
       }
 

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<!--
+  PHASE-42 — Owner-facing built-project test report view.
+  Standalone, vanilla HTML/CSS/JS. No framework, no build step.
+  Served by apiServer at GET /test-report.html (token injected into <head>).
+  Reads the report from GET /api/ai-os/project/test-report?project_id=<id>.
+  Contract: docs/09_verify/20_BUILT_PROJECT_TEST_CONTRACT.md §5.
+-->
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>تقرير اختبار المشروع</title>
+  <style>
+    :root { --green: #1a7f37; --red: #b91c1c; --ink: #1f2328; --muted: #656d76; --line: #d0d7de; --bg: #f6f8fa; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "Segoe UI", Tahoma, Arial, sans-serif; color: var(--ink); background: var(--bg); }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 24px 16px 48px; }
+    h1 { font-size: 20px; margin: 8px 0 16px; }
+    .controls { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .controls input { flex: 1 1 220px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 15px; }
+    .controls button { padding: 10px 18px; border: 0; border-radius: 8px; background: #0969da; color: #fff; font-size: 15px; cursor: pointer; }
+    .controls button:hover { background: #0a5fc2; }
+    .banner { border-radius: 10px; padding: 18px 20px; color: #fff; font-size: 22px; font-weight: 700; text-align: center; margin-bottom: 12px; }
+    .banner.pass { background: var(--green); }
+    .banner.fail { background: var(--red); }
+    .summary { font-size: 16px; color: var(--ink); margin-bottom: 4px; }
+    .ranat { font-size: 13px; color: var(--muted); margin-bottom: 18px; }
+    table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+    th, td { text-align: right; padding: 11px 14px; border-bottom: 1px solid var(--line); font-size: 15px; }
+    th { background: #f6f8fa; color: var(--muted); font-weight: 600; }
+    tr:last-child td { border-bottom: 0; }
+    .mark { font-size: 18px; font-weight: 700; }
+    .mark.ok { color: var(--green); }
+    .mark.bad { color: var(--red); }
+    .empty, .error { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 28px; text-align: center; color: var(--muted); font-size: 16px; }
+    .error { color: var(--red); border-color: #f1a9a9; }
+    .scen-name { color: var(--muted); font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>تقرير اختبار المشروع</h1>
+    <div class="controls">
+      <input id="pid" type="text" placeholder="اكتب معرّف المشروع (project id)" />
+      <button id="load">تحميل التقرير</button>
+    </div>
+    <div id="out"></div>
+  </div>
+
+  <script>
+    "use strict";
+
+    function qParam(name) {
+      return new URLSearchParams(window.location.search).get(name) || "";
+    }
+
+    function el(out) { document.getElementById("out").innerHTML = out; }
+
+    function esc(s) {
+      return String(s == null ? "" : s)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function renderReport(data) {
+      var isPass = data.overall_status === "PASS";
+      var banner = '<div class="banner ' + (isPass ? "pass" : "fail") + '">'
+        + (isPass ? "✓ نجح" : "✗ فشل") + "</div>";
+      var summary = '<div class="summary">نجح ' + esc(data.pass) + " من " + esc(data.total)
+        + " اختبار</div>";
+      var ranat = data.ran_at
+        ? '<div class="ranat">آخر تشغيل: ' + esc(data.ran_at) + "</div>"
+        : '<div class="ranat"></div>';
+
+      var rows = "";
+      var scen = Array.isArray(data.scenarios) ? data.scenarios : [];
+      for (var i = 0; i < scen.length; i++) {
+        var s = scen[i];
+        var ok = s.status === "PASS";
+        rows += "<tr><td><strong>" + esc(s.id) + "</strong>"
+          + (s.name ? '<div class="scen-name">' + esc(s.name) + "</div>" : "")
+          + "</td><td><span class='mark " + (ok ? "ok" : "bad") + "'>"
+          + (ok ? "✓" : "✗") + "</span> " + esc(s.status) + "</td></tr>";
+      }
+      var table = scen.length
+        ? "<table><thead><tr><th>الاختبار</th><th>النتيجة</th></tr></thead><tbody>"
+            + rows + "</tbody></table>"
+        : "";
+
+      el(banner + summary + ranat + table);
+    }
+
+    async function load(pid) {
+      if (!pid) { el('<div class="error">من فضلك اكتب معرّف المشروع.</div>'); return; }
+      el('<div class="empty">جارٍ التحميل…</div>');
+      try {
+        var headers = {};
+        if (window.__FORGE_TOKEN__) headers["Authorization"] = "Bearer " + window.__FORGE_TOKEN__;
+        var resp = await fetch("/api/ai-os/project/test-report?project_id=" + encodeURIComponent(pid),
+          { headers: headers });
+        var data = await resp.json();
+
+        if (data && data.ok && data.report === null && data.reason === "NO_REPORT") {
+          el('<div class="empty">لسه مفيش اختبار اتشغّل للمشروع ده.</div>');
+          return;
+        }
+        if (data && data.ok && data.overall_status) {
+          renderReport(data);
+          return;
+        }
+        var why = (data && data.reason) ? data.reason : "تعذّر تحميل التقرير";
+        el('<div class="error">حصل خطأ: ' + esc(why) + "</div>");
+      } catch (err) {
+        el('<div class="error">تعذّر الاتصال بالخادم: ' + esc(err && err.message) + "</div>");
+      }
+    }
+
+    document.getElementById("load").addEventListener("click", function () {
+      load(document.getElementById("pid").value.trim());
+    });
+    document.getElementById("pid").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") load(document.getElementById("pid").value.trim());
+    });
+
+    // Auto-load if project_id is in the query string.
+    var initial = qParam("project_id").trim();
+    if (initial) {
+      document.getElementById("pid").value = initial;
+      load(initial);
+    }
+  </script>
+</body>
+</html>
