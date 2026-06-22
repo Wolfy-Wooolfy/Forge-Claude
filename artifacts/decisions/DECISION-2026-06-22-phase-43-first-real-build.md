@@ -29,3 +29,41 @@ Deterministic, post-probe. Will include: a real idea->COMPLETE build producing a
 
 ## Amendment log
 - (pending) A-1 — scope + cost ceiling + closure gate, authored after the §0 probe, owner-ratified.
+
+---
+
+## AMENDMENT A-1 — Scope Lock + Cost Ceiling + Closure Gate (owner-ratified)
+
+> Ratified by owner Khaled in chat (2026-06-22): "موافق على توصياتك طالما باعلى درجات الاحترافية".
+> Authored by CTO advisor after the §0 read-only probe. Appends to the PROPOSAL above; the PROPOSAL text is preserved unchanged.
+
+### A-1.1 Demo project (scope lock)
+A **Notes API** — a small REST backend: notes with title, body, category, tags[]; create/read/update/delete; list with filter-by-category + keyword search (title/body); input validation with structured error responses; **pure-JS in-memory storage (NO sqlite / no native deps)**. Target ~10–12 files, ~10–15 generated test scenarios. The owner-intent text fed at OWNER_INTENT is fixed in the STEP-A driver (see A-1.4).
+
+### A-1.2 "Real" bar
+COMPLETE = built + tested + an owner-readable test report showing PASS, rendered in the browser (Gate #10). **Live deployment is OUT of scope** for PHASE-43 (deployment_enabled=false; Gate 3 skipped). Rationale: the deployment leg is independently proven (PHASE-34 real run); excluding it bounds the first full real build from a new idea. A real deploy may be its own later phase.
+
+### A-1.3 Cost ceiling (BINDING)
+- Expected ~$0.20–0.50 for one clean full build.
+- SOFT-STOP at $1.50 cumulative real spend for the run: STOP and report — do not continue.
+- HARD KILL at $3.00 (phase kill-bar).
+- Builder loopback cap = 2 (structural churn bound).
+- The STEP-B real run requires a SEPARATE explicit owner spend-approval in chat (estimate shown first) before any real LLM call.
+
+### A-1.4 Execution structure
+- STEP A (mock, $0): build + dry-run the full-build driver (idea→COMPLETE, deployment-skip, gate auto-approve, loopback cap=2, trace+report capture); satisfy vision-lock + budget L3 prerequisites; prove the full chain walks clean in mock. NO real LLM calls.
+- MID checkpoint → CTO verification.
+- STEP B (REAL, gated): flip provider to openai, run the build once, capture the build dir + real last_report.json + actual cost. Requires the separate spend-approval.
+
+### A-1.5 Deterministic closure gate
+PHASE-43 is CLOSED only when ALL hold:
+1. A real idea→COMPLETE build of the Notes API completed with provider=openai (gpt-4o), reaching the COMPLETE terminal state.
+2. Real generated code on disk under artifacts/projects/<id>/ (not mock stubs); generated files match the generated spec.
+3. RUN_TESTS produced a real last_report.json with overall_status=PASS (all generated scenarios pass).
+4. The owner-readable report renders in the browser via GET /test-report.html?project_id=<id> — green PASS card, X/Y scenarios (Gate #10, owner-confirmed).
+5. Actual real spend recorded (cost_ledger + status.json) and within the cost ceiling.
+6. Track A clean (no new live-surface side effects; §ARC=10 frozen).
+7. status.json next_phase advanced; STEP-A + STEP-B checkpoints written; a closure note records the idea, build, cost, and Gate #10 confirmation.
+
+### A-1.6 Track A constraint
+The full-build driver and any seeds are test-infra/spike (scripts/** + per-project artifacts), OUT of the Track A live-surface scope (apiServer.js + ai_os/** + runtime/**). No live-surface code is modified by PHASE-43. The real LLM call routes through the sanctioned openAiAdapter (§ARC). Any new side-effect home or §ARC entry → STOP → amendment → owner approval.
