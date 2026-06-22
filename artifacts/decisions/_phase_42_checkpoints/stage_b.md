@@ -62,6 +62,6 @@ owner-facing evidence surface** — NOT build the harness.
 ## Commit
 LOCAL, selective add of ONLY: `apiServer.js` was already committed (`e784a69`); this commit adds the test helper, S333,
 S334, `progress/status.json`, and this checkpoint. **NO push, NO tag.**
-SHA: __FILLED AT COMMIT__.
+Closure commit SHA: `d4852b7` (this checkpoint's SHA-fill is a follow-up bookkeeping commit).
 
 **HARD STOP — awaiting CTO closure verification (push GO + tag `phase-42-complete` + owner Gate #10 follow).**
