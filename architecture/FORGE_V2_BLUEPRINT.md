@@ -415,6 +415,8 @@ After every module (file group) Forge writes, it runs the scenario set. If a sce
 
 **Provider responsibility.** A new provider — `projectTestPlanProvider.js` — is the only thing allowed to invent assertions. It takes the project's vision + spec and emits a JSON list of scenarios. The user reviews and approves them before code generation starts. Once approved, scenarios become part of the spec and cannot drift.
 
+> **Addendum 2026-06-22 (PHASE-42 A-1, owner-ratified).** The L5b text above states built-project tests run "after every module". The adopted v2.0 model is PER-BUILD: the materializer writes the full file plan in one build pass, and the scenario set runs once at the RUN_TESTS state, with FAIL routing back to BUILDER (cap-aware) and no state advance on failure. This satisfies the L5b intent (deterministic tests + block-on-failure + loopback + owner-readable report) at build granularity. PER-MODULE (incremental build with per-module test runs) is deferred to the Iterative Build Loop phase (Roadmap PHASE-10). The `run_after_each_module.sh` filename in the L5b example is ILLUSTRATIVE ONLY and is not a required artifact in v2.0. Note: the Roadmap PHASE-8 file list still names `projectTestPlanProvider.js`; that predates the test_designer-role shift (DECISION-20260510) and is superseded — the authoritative reference for built-project testing is `docs/09_verify/20_BUILT_PROJECT_TEST_CONTRACT.md`.
+
 ---
 
 ## Part B-2 — Forge as Orchestration Layer (added 2026-05-09 via vision shift)

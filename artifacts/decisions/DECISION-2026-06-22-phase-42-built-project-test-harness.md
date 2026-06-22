@@ -57,3 +57,51 @@ status.json updated; checkpoint written.
 
 ## Amendment log
 - (pending) A-1 — STEP-A scope + closure gate, authored after the §0 probe, owner-ratified.
+
+---
+
+## AMENDMENT A-1 — Scope lock + closure gate (2026-06-22)
+
+> Status: APPROVED. Owner ratification: Khaled — "موافق على توصياتك طالما باعلى درجات الاحترافية" (2026-06-22), following the CTO §0 probe + independent verification against commit bedf6721.
+> Supersedes the scope-deferred §3/§6 wording of the PROPOSAL above (originals preserved per the amendment-append rule).
+
+### A-1.1 — §0 probe outcome (independently CTO-verified)
+The existing L5b surface is materially more complete than the PROPOSAL assumed. Verified PRESENT and wired END-TO-END on the live pipeline:
+- L2 tools builtproject.run_scenarios + builtproject.read_report.
+- Harness core: scenario_loader.js, harness_runner.js, verdict_aggregator.js, loopback_signal.js + 8 assertion types.
+- conversationEngine.runTests at RUN_TESTS: dep-install -> bridge test_plan -> builtproject.run_scenarios -> overall_status PASS advances to REVIEWER_CODE_AND_SECURITY; FAIL routes through orchestration.loop_back to BUILDER (cap-aware; ESCALATE at cap). No advance on FAIL = a real block + loopback. Proven with a real gpt-4o run in the PHASE-28/29 Gate #10.
+- test_designer agent role is the sanctioned test-plan generator; the designTests stage produces test_plan.json.
+- §ARC mapping (doc18): §ARC-3 = harness_runner.js (child_process.spawn); §ARC-10 = verdict_aggregator.js + loopback_signal.js (fs writes into the EXTERNAL built-project forge_tests/ root).
+
+Verified ABSENT: projectTestPlanProvider.js, builtProjectTestEngine.js, executeEngine.js, docs/09_verify/20_BUILT_PROJECT_TEST_CONTRACT.md, the run_after_each_module.sh referenced illustratively in the Blueprint, and — the key capability gap — ANY owner-facing surface for the test report (no endpoint, no view; the report is reachable only via the read_report tool).
+
+### A-1.2 — Corrections to the PROPOSAL (supersede §3 / §6)
+- §3 "believed present (partial)" -> CORRECTED: the harness EXECUTION layer is COMPLETE and live, not partial. PHASE-42 is a hardening + documentation + owner-evidence phase.
+- §6 "possibly one new provider (projectTestPlanProvider)" -> CORRECTED: projectTestPlanProvider is intentionally RETIRED, superseded by the test_designer role. PHASE-42 adds NO new provider and NO new §ARC entry; §ARC stays frozen at 10.
+
+### A-1.3 — Ruling G1 (per-build vs per-module) — owner-ratified
+The Blueprint L5b text says "after each module". The implemented model is PER-BUILD (materializer writes all plan files in one buildProject pass; runTests runs once at RUN_TESTS). RULING: ratify PER-BUILD as the accepted v2.0 model. PER-MODULE (incremental build + per-module test runs) is DEFERRED to the Iterative Build Loop phase (Roadmap PHASE-10). Recorded as a dated Blueprint addendum (STEP A.2). Rationale: per-build is proven end-to-end with a real LLM call; per-module is an architectural rework of the live build path and belongs to the iterative-build phase.
+
+### A-1.4 — Locked scope
+STEP A (documentation/governance; ZERO live code):
+1. This amendment (A-1).
+2. Blueprint dated addendum: ratify per-build for v2.0; per-module -> Iterative Build Loop (PHASE-10); mark run_after_each_module.sh as illustrative-only.
+3. NEW authority doc docs/09_verify/20_BUILT_PROJECT_TEST_CONTRACT.md documenting (a) the as-built harness and (b) the CONTRACT for the owner-facing test-report read surface that STEP B implements.
+
+STEP B (capability + closure):
+4. Implement the owner-facing test-report read surface to the contract in (3): a READ-ONLY endpoint returning the latest built-project test report (overall_status, totals, per-scenario verdicts) sourced via reg.invoke("builtproject.read_report") / tools.fs — NO direct fs on the live surface (Track A).
+5. A minimal owner-readable render of that report (non-React; must not pre-empt the PHASE-13 frontend rework).
+6. status.json cosmetic reconcile (current_task; runtime_health.self_test_last_result label; last_updated) — gated on NO SU/doctor assertion referencing those fields (STOP-AND-REPORT if any).
+7. >= 1 new deterministic SU scenario locking the owner-facing surface.
+
+### A-1.5 — Deterministic closure gate (PHASE-42)
+ALL must hold:
+- SU suite: 325 -> (325 + N) pass / 0 fail / 5 skip, where N = new scenarios added in STEP B (exact number recorded at STEP-B closure). No regression.
+- forge-doctor: 35 checks / 0 FAIL.
+- Track A grep clean on the live surface (no new fs.*Sync / child_process / fetch / new OpenAI on apiServer/ai_os/runtime outside tool homes + frozen §ARC-1..10).
+- 20_BUILT_PROJECT_TEST_CONTRACT.md present; Blueprint addendum present; this amendment present.
+- status.json updated; checkpoint written.
+- Mock-only, $0 (no LLM calls).
+
+### A-1.6 — Track A constraint (binding for STEP B)
+The owner-facing endpoint lives on the live surface (apiServer) and MUST source the report via reg.invoke / the read_report tool. Direct fs.* on the live surface is a Track A violation. §ARC stays frozen at 10.
