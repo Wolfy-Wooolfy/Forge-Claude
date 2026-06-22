@@ -43,6 +43,7 @@ A non-technical owner cannot read generated source code to judge whether a built
 - Fail-closed: `REPORT_NOT_FOUND` when `<project_root>/forge_tests/last_report.json` is absent; `REPORT_PARSE_ERROR` on malformed JSON.
 
 > **As-built note (binding on STEP B).** `read_report` takes `project_root` (an absolute path), **not** `project_id`. The owner-facing endpoint (§5) resolves `project_id → <root>/artifacts/projects/<project_id>` before invoking the tool. The tool output has **no** `ok` field of its own — the L2 tool contract wraps it with `status: "SUCCESS"`. The top-level success fields are exactly: `report_path, total, pass, fail, error, overall_status, ran_at, scenarios`.
+> **As-built note (2026-06-22, normalization).** The endpoint applies `normalizeProjectId` to `project_id` before building `project_root`, so the resolved path is `artifacts/projects/<normalized_id>/forge_tests/last_report.json` (leading/trailing `_` stripped, lower-cased, non-alphanumerics → `_`). See §5.1.
 
 ### 3.2 Harness core — `code/src/runtime/builtproject/`
 
@@ -120,6 +121,7 @@ GET /api/ai-os/project/test-report?project_id=<id>
 
 - **READ-ONLY.** No mutation, no LLM call, `$0`.
 - **Source:** the handler resolves `project_id → <root>/artifacts/projects/<project_id>` and invokes `reg.invoke("builtproject.read_report", { project_root })`. **No direct `fs.*` on the live surface** — Track A (see §6 + AMENDMENT A-1 §A-1.6).
+- **Note (2026-06-22, PHASE-42 Gate #10 prep).** The handler applies `normalizeProjectId(project_id)` BEFORE resolving (lower-cases, maps non-alphanumerics → `_`, strips leading/trailing `_`), so the resolved folder is `artifacts/projects/<normalized_id>/`. Consequently an underscore-prefixed id such as `_reference_todo_api` resolves to `reference_todo_api` — a built-project report must live under the **normalized** folder name to be reachable via this endpoint. (Real owner projects already use normalized ids; the underscore-prefixed reference fixture is the only exception.)
 
 ### 5.2 Success (200) — report present
 
