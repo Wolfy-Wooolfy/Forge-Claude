@@ -45,6 +45,7 @@
 //   PHASE43_MODE=real node scripts/spikes/phase43_notes_api_full_build.js           # STEP B
 
 const path = require("path");
+const fs   = require("fs");
 
 const ROOT = path.resolve(__dirname, "../..");
 
@@ -65,6 +66,8 @@ const { createConversationEngine } = require("../../code/src/ai_os/conversationE
 const PROJECT_ID          = "phase43_notes_api";
 const EVIDENCE_DIR        = "artifacts/spikes/phase43_notes_api";
 const DRIVER_LOOPBACK_CAP = 2;
+const COST_SOFT_STOP_USD  = 1.50;   // STOP the run immediately if run_delta exceeds this
+const COST_HARD_KILL_USD  = 3.00;   // absolute backstop (phase kill-bar)
 
 // Exact owner-intent text (A-1.4 — fixed).
 const OWNER_INTENT =
@@ -185,8 +188,9 @@ const HOP = IS_REAL ? REAL : MOCK;
 
 // ── Evidence / trace helpers ──────────────────────────────────────────────────
 const trace = { mode: MODE, force_test_fail: FORCE_TEST_FAIL, project_id: PROJECT_ID,
-                started_at: new Date().toISOString(), states: [], gates: [], steps: [] };
+                started_at: new Date().toISOString(), states: [], gates: [], steps: [], cost_by_hop: [] };
 let globalLoopId = null;
+let costBefore   = 0;   // project ledger USD total snapshotted before the run (real mode)
 
 async function saveJson(reg, relPath, data) {
   return reg.invoke("fs.write_file", { path: relPath, content: JSON.stringify(data, null, 2) }, { root: ROOT });
@@ -218,6 +222,26 @@ async function stop(reg, code, detail, extra) {
   process.exit(1);
 }
 
+// ── Cost soft-stop (real mode): per-hop run_delta vs $1.50 soft / $3.00 hard ──
+async function ledgerTotal(reg) {
+  const r = await reg.invoke("agent.read_ledger", { project_id: PROJECT_ID }, { root: ROOT });
+  return (r && r.status === "SUCCESS" && r.output) ? (r.output.total_cost || 0) : 0;
+}
+async function guardCost(reg, label) {
+  const total = await ledgerTotal(reg);
+  const delta = Math.round((total - costBefore) * 100000) / 100000;
+  trace.cost = { before_usd: costBefore, current_total_usd: total, run_delta_usd: delta, last_hop: label };
+  trace.cost_by_hop.push({ hop: label, run_delta_usd: delta });
+  if (IS_REAL) log("    [cost] run_delta=$" + delta.toFixed(5) + " (after " + label + ")");
+  if (delta > COST_HARD_KILL_USD) {
+    return await stop(reg, "COST_HARD_KILL", "run_delta $" + delta.toFixed(5) + " > hard kill $" + COST_HARD_KILL_USD, { run_delta_usd: delta });
+  }
+  if (delta > COST_SOFT_STOP_USD) {
+    return await stop(reg, "COST_SOFT_STOP", "run_delta $" + delta.toFixed(5) + " > soft stop $" + COST_SOFT_STOP_USD, { run_delta_usd: delta });
+  }
+  return delta;
+}
+
 // ── Build->Test leg with driver-side loopback cap ─────────────────────────────
 async function runBuildTestLeg(reg, engine) {
   let attempt = 0;
@@ -234,6 +258,7 @@ async function runBuildTestLeg(reg, engine) {
       return await stop(reg, "BUILD_FAILED", "buildProject did not advance to RUN_TESTS", b);
     }
     trace.materialized_files = (b.files_written || []).map(f => ({ path: f.path, line_count: f.line_count }));
+    await guardCost(reg, "buildProject#" + attempt);
 
     log("[RUN_TESTS attempt " + attempt + "] runTests ...");
     const runBody = Object.assign({ project_id: PROJECT_ID, loop_id: globalLoopId });
@@ -256,6 +281,7 @@ async function runBuildTestLeg(reg, engine) {
                        report_summary: rt.report_summary || null, test_error: rt.test_error || null });
     log("    advanced=" + rt.advanced + " -> " + rt.advanced_to + " report=" +
         JSON.stringify(rt.report_summary || rt.test_error || null));
+    await guardCost(reg, "runTests#" + attempt);
 
     if (rt.advanced_to === "REVIEWER_CODE_AND_SECURITY") return rt;             // PASS -> proceed
     if (rt.advanced_to === "ESCALATED") {
@@ -287,6 +313,20 @@ async function main() {
 
   const reg    = getDefaultRegistry();
   const engine = createConversationEngine({ root: ROOT });
+
+  // ── Fresh workspace: wipe the demo project dir so each run is a clean build ───
+  // (spike-only, out of Track A; runs inside this node process — no tool prompt).
+  const projDirAbs = path.join(ROOT, "artifacts", "projects", PROJECT_ID);
+  try { fs.rmSync(projDirAbs, { recursive: true, force: true }); log("workspace reset: removed " + path.relative(ROOT, projDirAbs)); }
+  catch (e) { log("workspace reset skipped: " + e.message); }
+
+  // ── Pre-run cost snapshot (project-scoped agent ledger) ──────────────────────
+  costBefore = await ledgerTotal(reg);
+  await saveJson(reg, EVIDENCE_DIR + "/stepB_ledger_before.json",
+    { project_id: PROJECT_ID, ledger_before_usd: costBefore,
+      soft_stop_usd: COST_SOFT_STOP_USD, hard_kill_usd: COST_HARD_KILL_USD, ts: new Date().toISOString() });
+  log("cost snapshot: ledger_before=$" + costBefore.toFixed(5) +
+      " (soft-stop $" + COST_SOFT_STOP_USD + " / hard-kill $" + COST_HARD_KILL_USD + ")");
 
   // ── Setup: project_state.json (IDEA_REVIEW) + idea_summary.json ──────────────
   log("\nSetup: project_state.json (IDEA_REVIEW) + idea_summary.json ...");
@@ -320,6 +360,7 @@ async function main() {
   log("    vision.md present + vision_locked:true = " + visionLocked);
   if (!visionLocked) return await stop(reg, "VISION_NOT_LOCKED", "confirmIdea did not produce a locked vision.md");
   await recordState(reg, "after confirmIdea");
+  await guardCost(reg, "confirmIdea(architect)");
 
   const orchBase = "artifacts/projects/" + PROJECT_ID + "/orchestration/" + globalLoopId;
 
@@ -331,6 +372,7 @@ async function main() {
       { spec_provider: "openai", spec_model: "gpt-4o" }));
     trace.steps.push({ hop: "formalizeSpec", advanced: sp.advanced, advanced_to: sp.advanced_to, spec_error: sp.spec_error || null });
     if (!sp.advanced || sp.advanced_to !== "REVIEWER_SPEC") return await stop(reg, "SPEC_FAILED", "formalizeSpec did not reach REVIEWER_SPEC", sp);
+    await guardCost(reg, "formalizeSpec");
   } else {
     // Mock: seed architect_design.json + spec.json (no scenario-tagged mock for these roles;
     // A-1.6 forbids editing code/src/runtime/mock_responses.json) and advance the state.
@@ -362,18 +404,21 @@ async function main() {
   log("    advanced=" + rs.advanced + " -> " + rs.advanced_to + " verdict=" + (rs.verdict || "?"));
   if (rs.advanced_to === "ESCALATED") return await stop(reg, "REVIEW_SPEC_ESCALATED", "reviewer escalated the spec", rs);
   if (!rs.advanced || rs.advanced_to !== "COST_ESTIMATE") return await stop(reg, "REVIEW_SPEC_FAILED", "did not reach COST_ESTIMATE", rs);
+  await guardCost(reg, "reviewSpec");
 
   // ── H5: estimateCost -> ENV_REPORT ───────────────────────────────────────────
   log("\nH5: estimateCost ...");
   const ec = await engine.estimateCost(Object.assign({ project_id: PROJECT_ID, loop_id: globalLoopId }, HOP.estimateCost));
   trace.steps.push({ hop: "estimateCost", advanced: ec.advanced, advanced_to: ec.advanced_to });
   if (!ec.advanced || ec.advanced_to !== "ENV_REPORT") return await stop(reg, "COST_FAILED", "did not reach ENV_REPORT", ec);
+  await guardCost(reg, "estimateCost");
 
   // ── H6: reportEnv -> gate_pending:1 ──────────────────────────────────────────
   log("\nH6: reportEnv (Gate 1) ...");
   const re = await engine.reportEnv(Object.assign({ project_id: PROJECT_ID, loop_id: globalLoopId }, HOP.reportEnv));
   trace.steps.push({ hop: "reportEnv", advanced: re.advanced, gate_pending: re.gate_pending });
   if (re.gate_pending !== 1) return await stop(reg, "ENV_GATE_FAILED", "expected gate_pending:1", re);
+  await guardCost(reg, "reportEnv");
 
   // ── Gate 1: APPROVE -> TEST_DESIGN ───────────────────────────────────────────
   log("G1: respondGate(gate_id:1, APPROVE) ...");
@@ -386,6 +431,7 @@ async function main() {
   const dt = await engine.designTests(Object.assign({ project_id: PROJECT_ID, loop_id: globalLoopId }, HOP.designTests));
   trace.steps.push({ hop: "designTests", advanced: dt.advanced, advanced_to: dt.advanced_to });
   if (!dt.advanced || dt.advanced_to !== "BUILDER") return await stop(reg, "DESIGN_FAILED", "did not reach BUILDER", dt);
+  await guardCost(reg, "designTests");
 
   // ── H8/H9: BUILDER -> RUN_TESTS (driver loopback cap) ────────────────────────
   await runBuildTestLeg(reg, engine);
@@ -397,18 +443,21 @@ async function main() {
   trace.steps.push({ hop: "reviewProject", advanced: rp.advanced, advanced_to: rp.advanced_to, review_error: rp.review_error || null });
   log("    advanced=" + rp.advanced + " -> " + rp.advanced_to + " err=" + (rp.review_error || "none"));
   if (!rp.advanced || rp.advanced_to !== "DOCUMENTATION") return await stop(reg, "REVIEW_CODE_FAILED", "did not reach DOCUMENTATION", rp);
+  await guardCost(reg, "reviewProject");
 
   // ── H11: documentProject -> QUALITY_JUDGE ────────────────────────────────────
   log("\nH11: documentProject ...");
   const dp = await engine.documentProject(Object.assign({ project_id: PROJECT_ID, loop_id: globalLoopId }, HOP.documentProject));
   trace.steps.push({ hop: "documentProject", advanced: dp.advanced, advanced_to: dp.advanced_to, doc_error: dp.doc_error || null });
   if (!dp.advanced || dp.advanced_to !== "QUALITY_JUDGE") return await stop(reg, "DOC_FAILED", "did not reach QUALITY_JUDGE", dp);
+  await guardCost(reg, "documentProject");
 
   // ── H12: judgeQuality -> gate_pending:2 ──────────────────────────────────────
   log("\nH12: judgeQuality (Gate 2) ...");
   const jq = await engine.judgeQuality(Object.assign({ project_id: PROJECT_ID, loop_id: globalLoopId }, HOP.judgeQuality));
   trace.steps.push({ hop: "judgeQuality", advanced: jq.advanced, gate_pending: jq.gate_pending });
   if (jq.gate_pending !== 2) return await stop(reg, "QUALITY_GATE_FAILED", "expected gate_pending:2", jq);
+  await guardCost(reg, "judgeQuality");
 
   // ── Gate 2: APPROVE_SHIP -> DEPLOYMENT_OR_END ────────────────────────────────
   log("G2: respondGate(gate_id:2, APPROVE_SHIP) ...");
@@ -432,9 +481,11 @@ async function main() {
   if (finalState !== "COMPLETE") return await stop(reg, "NOT_COMPLETE", "final state is " + finalState);
 
   // ── Result ────────────────────────────────────────────────────────────────────
+  const finalDelta  = await guardCost(reg, "final");
   trace.verdict     = "COMPLETE";
   trace.final_state = finalState;
   trace.loop_id     = globalLoopId;
+  trace.total_real_cost_usd = finalDelta;
   trace.ended_at    = new Date().toISOString();
   await saveJson(reg, EVIDENCE_DIR + "/phase43_trace.json", trace);
 

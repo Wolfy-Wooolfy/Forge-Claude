@@ -1,14 +1,14 @@
 {
-  "id": "T-1",
-  "name": "create_user_returns_201",
-  "description": "POST /users with valid credentials returns 201 and user id",
+  "id": "T-3",
+  "name": "update_note_returns_200",
+  "description": "PUT /notes/:id with valid data returns 200 and updates the note",
   "category": "http",
-  "fixture": "fresh_db",
+  "fixture": "populated_db",
   "setup": {
     "actions": [
       {
         "type": "start_server",
-        "command": "node app.js",
+        "command": "node src/server.js",
         "wait_for_port": 3000,
         "timeout_ms": 5000
       }
@@ -16,24 +16,25 @@
   },
   "execution": {
     "type": "http_request",
-    "method": "POST",
-    "url": "http://localhost:3000/users",
+    "method": "PUT",
+    "url": "http://localhost:3000/notes/1",
     "headers": {
       "Content-Type": "application/json"
     },
     "body": {
-      "username": "alice",
-      "password": "secure123"
+      "title": "Updated Note Title",
+      "content": "Updated content."
     }
   },
   "assertions": [
     {
       "type": "http_status_equals",
-      "expected": 201
+      "expected": 200
     },
     {
-      "type": "response_body_contains_key",
-      "key": "id"
+      "type": "response_body_field_equals",
+      "field": "title",
+      "expected": "Updated Note Title"
     }
   ],
   "teardown": {
@@ -45,7 +46,7 @@
   },
   "metadata": {
     "covers_ac": [
-      "AC-1"
+      "AC-3"
     ],
     "estimated_duration_ms": 500
   }
