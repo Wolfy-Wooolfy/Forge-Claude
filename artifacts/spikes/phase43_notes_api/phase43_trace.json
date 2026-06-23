@@ -1,16 +1,28 @@
 {
-  "mode": "real",
+  "mode": "mock",
   "force_test_fail": false,
   "project_id": "phase43_notes_api",
-  "started_at": "2026-06-23T09:03:57.963Z",
+  "started_at": "2026-06-23T09:32:33.622Z",
   "states": [
     {
       "label": "after confirmIdea",
+      "state": "ARCHITECT_DESIGN"
+    },
+    {
+      "label": "after architect (seeded)",
       "state": "SPEC_WRITER_FORMALIZE"
     },
     {
       "label": "before reviewSpec",
       "state": "REVIEWER_SPEC"
+    },
+    {
+      "label": "after RUN_TESTS (PASS)",
+      "state": "REVIEWER_CODE_AND_SECURITY"
+    },
+    {
+      "label": "after finalize",
+      "state": "COMPLETE"
     }
   ],
   "gates": [
@@ -19,20 +31,30 @@
       "response": "APPROVE",
       "advanced": true,
       "advanced_to": "TEST_DESIGN"
+    },
+    {
+      "gate": 2,
+      "response": "APPROVE_SHIP",
+      "advanced": true,
+      "advanced_to": "DEPLOYMENT_OR_END"
     }
   ],
   "steps": [
     {
       "hop": "confirmIdea",
       "ok": true,
-      "loop_id": "411a9776-b707-43f1-8535-83fce871a408",
+      "loop_id": "f0035a14-2f97-462b-9a15-75a715419882",
       "architect_error": null
     },
     {
-      "hop": "formalizeSpec",
-      "advanced": true,
-      "advanced_to": "REVIEWER_SPEC",
-      "spec_error": null
+      "hop": "architect",
+      "seeded": true,
+      "advanced_to": "SPEC_WRITER_FORMALIZE"
+    },
+    {
+      "hop": "spec_writer",
+      "seeded": true,
+      "advanced_to": "REVIEWER_SPEC"
     },
     {
       "hop": "reviewSpec",
@@ -52,47 +74,122 @@
     },
     {
       "hop": "designTests",
-      "advanced": false
+      "advanced": true,
+      "advanced_to": "BUILDER"
+    },
+    {
+      "hop": "buildProject",
+      "attempt": 1,
+      "advanced": true,
+      "advanced_to": "RUN_TESTS",
+      "build_error": null,
+      "files": 1
+    },
+    {
+      "hop": "runTests",
+      "attempt": 1,
+      "advanced": true,
+      "advanced_to": "REVIEWER_CODE_AND_SECURITY",
+      "report_summary": {
+        "overall_status": "PASS",
+        "total": 4,
+        "pass": 4,
+        "fail": 0,
+        "error": 0
+      },
+      "test_error": null
+    },
+    {
+      "hop": "reviewProject",
+      "advanced": true,
+      "advanced_to": "DOCUMENTATION",
+      "review_error": null
+    },
+    {
+      "hop": "documentProject",
+      "advanced": true,
+      "advanced_to": "QUALITY_JUDGE",
+      "doc_error": null
+    },
+    {
+      "hop": "judgeQuality",
+      "advanced": false,
+      "gate_pending": 2
+    },
+    {
+      "hop": "deployProject",
+      "advanced": true,
+      "advanced_to": "LIVE_DELIVERABLE",
+      "skipped": true
+    },
+    {
+      "hop": "finalizeDeliverable",
+      "advanced": true,
+      "advanced_to": "COMPLETE"
     }
   ],
   "cost_by_hop": [
     {
       "hop": "confirmIdea(architect)",
-      "run_delta_usd": 0.01749
-    },
-    {
-      "hop": "formalizeSpec",
-      "run_delta_usd": 0.0354
+      "run_delta_usd": 0
     },
     {
       "hop": "reviewSpec",
-      "run_delta_usd": 0.05483
+      "run_delta_usd": 0
     },
     {
       "hop": "estimateCost",
-      "run_delta_usd": 0.07414
+      "run_delta_usd": 0
     },
     {
       "hop": "reportEnv",
-      "run_delta_usd": 0.09036
+      "run_delta_usd": 0
+    },
+    {
+      "hop": "designTests",
+      "run_delta_usd": 0
+    },
+    {
+      "hop": "buildProject#1",
+      "run_delta_usd": 0
+    },
+    {
+      "hop": "runTests#1",
+      "run_delta_usd": 0
+    },
+    {
+      "hop": "reviewProject",
+      "run_delta_usd": 0
+    },
+    {
+      "hop": "documentProject",
+      "run_delta_usd": 0
+    },
+    {
+      "hop": "judgeQuality",
+      "run_delta_usd": 0
+    },
+    {
+      "hop": "final",
+      "run_delta_usd": 0
     }
   ],
   "vision_locked": true,
   "cost": {
-    "before_usd": 0.16037,
-    "current_total_usd": 0.25073,
-    "run_delta_usd": 0.09036,
-    "last_hop": "reportEnv"
+    "before_usd": 0.31667,
+    "current_total_usd": 0.31667,
+    "run_delta_usd": 0,
+    "last_hop": "final"
   },
-  "verdict": "STOP_AND_REPORT",
-  "stop_code": "DESIGN_FAILED",
-  "stop_detail": "did not reach BUILDER",
-  "stop_extra": {
-    "ok": true,
-    "loop_id": "411a9776-b707-43f1-8535-83fce871a408",
-    "advanced": false,
-    "test_error": "JSON parse failed: Expected ',' or '}' after property value in JSON at position 13893 (line 568 column 23)",
-    "model_used": "gpt-4o"
-  },
-  "ended_at": "2026-06-23T09:05:08.293Z"
+  "materialized_files": [
+    {
+      "path": "app.js",
+      "line_count": 1
+    }
+  ],
+  "verdict": "COMPLETE",
+  "final_state": "COMPLETE",
+  "loop_id": "f0035a14-2f97-462b-9a15-75a715419882",
+  "total_real_cost_usd": 0,
+  "ended_at": "2026-06-23T09:32:35.628Z"
 }
