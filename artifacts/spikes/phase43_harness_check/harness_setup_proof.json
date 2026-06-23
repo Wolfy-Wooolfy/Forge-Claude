@@ -1,0 +1,24 @@
+{
+  "verdict": "PROVEN",
+  "interpretation": "POS passes ONLY because the http_request setup action created the resource; NEG (same scenario without that setup action) fails 404 — the new setup branch executes and is decisive.",
+  "pos": {
+    "status": "PASS",
+    "assertions": [
+      {
+        "type": "http_status_equals",
+        "pass": true,
+        "reason": null
+      }
+    ]
+  },
+  "neg": {
+    "status": "FAIL",
+    "assertions": [
+      {
+        "type": "http_status_equals",
+        "pass": false,
+        "reason": "Expected HTTP 200, got 404"
+      }
+    ]
+  }
+}
