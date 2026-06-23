@@ -1,14 +1,172 @@
 {
   "project_id": "phase43_notes_api",
-  "port": 50480,
-  "timestamp": "2026-06-23T09:08:18.963Z",
+  "port": 52191,
+  "timestamp": "2026-06-23T09:45:27.899Z",
   "endpoint": {
     "http_status": 200,
     "body": {
       "ok": true,
       "project_id": "phase43_notes_api",
-      "report": null,
-      "reason": "NO_REPORT"
+      "overall_status": "FAIL",
+      "total": 9,
+      "pass": 5,
+      "fail": 4,
+      "error": 0,
+      "scenarios": [
+        {
+          "id": "T-1",
+          "name": "create_note_returns_201",
+          "status": "PASS",
+          "duration_ms": 1209,
+          "assertions": [
+            {
+              "type": "http_status_equals",
+              "pass": true,
+              "reason": null
+            },
+            {
+              "type": "response_body_contains_key",
+              "pass": true,
+              "reason": null
+            },
+            {
+              "type": "response_body_field_equals",
+              "pass": true,
+              "reason": null
+            }
+          ],
+          "error": null
+        },
+        {
+          "id": "T-2",
+          "name": "create_note_invalid_title_returns_400",
+          "status": "PASS",
+          "duration_ms": 1148,
+          "assertions": [
+            {
+              "type": "http_status_equals",
+              "pass": true,
+              "reason": null
+            }
+          ],
+          "error": null
+        },
+        {
+          "id": "T-3",
+          "name": "retrieve_all_notes_with_filter",
+          "status": "PASS",
+          "duration_ms": 710,
+          "assertions": [
+            {
+              "type": "http_status_equals",
+              "pass": true,
+              "reason": null
+            },
+            {
+              "type": "response_body_is_array",
+              "pass": true,
+              "reason": null
+            }
+          ],
+          "error": null
+        },
+        {
+          "id": "T-4",
+          "name": "fetch_single_note_by_id",
+          "status": "FAIL",
+          "duration_ms": 1148,
+          "assertions": [
+            {
+              "type": "http_status_equals",
+              "pass": false,
+              "reason": "Expected HTTP 200, got 404"
+            },
+            {
+              "type": "response_body_field_equals",
+              "pass": false,
+              "reason": "Response body is not a JSON object"
+            }
+          ],
+          "error": null
+        },
+        {
+          "id": "T-5",
+          "name": "fetch_non_existent_note_returns_404",
+          "status": "PASS",
+          "duration_ms": 891,
+          "assertions": [
+            {
+              "type": "http_status_equals",
+              "pass": true,
+              "reason": null
+            }
+          ],
+          "error": null
+        },
+        {
+          "id": "T-6",
+          "name": "update_note_returns_200",
+          "status": "FAIL",
+          "duration_ms": 938,
+          "assertions": [
+            {
+              "type": "http_status_equals",
+              "pass": true,
+              "reason": null
+            },
+            {
+              "type": "response_body_field_equals",
+              "pass": false,
+              "reason": "Response body is not a JSON object"
+            }
+          ],
+          "error": null
+        },
+        {
+          "id": "T-7",
+          "name": "update_non_existent_note_returns_404",
+          "status": "FAIL",
+          "duration_ms": 1342,
+          "assertions": [
+            {
+              "type": "http_status_equals",
+              "pass": false,
+              "reason": "Expected HTTP 404, got 200"
+            }
+          ],
+          "error": null
+        },
+        {
+          "id": "T-8",
+          "name": "delete_note_returns_204",
+          "status": "PASS",
+          "duration_ms": 939,
+          "assertions": [
+            {
+              "type": "http_status_equals",
+              "pass": true,
+              "reason": null
+            }
+          ],
+          "error": null
+        },
+        {
+          "id": "T-9",
+          "name": "delete_non_existent_note_returns_404",
+          "status": "FAIL",
+          "duration_ms": 688,
+          "assertions": [
+            {
+              "type": "http_status_equals",
+              "pass": false,
+              "reason": "Expected HTTP 404, got 204"
+            }
+          ],
+          "error": null
+        }
+      ],
+      "report_path": "D:\\S\\Halo\\Tech\\Forge-Claude\\artifacts\\projects\\phase43_notes_api\\forge_tests\\last_report.json",
+      "ran_at": "2026-06-23T09:43:39.722Z"
     }
   },
   "viewer": {
@@ -16,6 +174,6 @@
     "served": true,
     "bytes": 6033
   },
-  "verdict": "FAIL",
+  "verdict": "RENDERS",
   "owner_url": "/test-report.html?project_id=phase43_notes_api"
 }

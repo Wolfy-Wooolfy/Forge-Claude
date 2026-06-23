@@ -1,14 +1,13 @@
 {
-  "id": "T-3",
-  "name": "get_tasks_without_jwt_returns_401",
-  "description": "GET /tasks without Authorization header returns 401 Unauthorized",
+  "id": "T-9",
+  "name": "delete_non_existent_note_returns_404",
+  "description": "DELETE /notes/:id for nonexistent note returns 404",
   "category": "http",
-  "fixture": "fresh_db",
   "setup": {
     "actions": [
       {
         "type": "start_server",
-        "command": "node app.js",
+        "command": "node src/server.js",
         "wait_for_port": 3000,
         "timeout_ms": 5000
       }
@@ -16,15 +15,16 @@
   },
   "execution": {
     "type": "http_request",
-    "method": "GET",
-    "url": "http://localhost:3000/tasks",
-    "headers": {},
-    "body": null
+    "method": "DELETE",
+    "url": "http://localhost:3000/notes/999",
+    "headers": {
+      "Accept": "application/json"
+    }
   },
   "assertions": [
     {
       "type": "http_status_equals",
-      "expected": 401
+      "expected": 404
     }
   ],
   "teardown": {
@@ -36,7 +36,7 @@
   },
   "metadata": {
     "covers_ac": [
-      "AC-3"
+      "AC-5"
     ],
     "estimated_duration_ms": 500
   }

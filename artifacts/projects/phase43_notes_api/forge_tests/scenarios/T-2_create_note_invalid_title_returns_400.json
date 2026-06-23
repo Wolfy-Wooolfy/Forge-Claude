@@ -1,14 +1,13 @@
 {
   "id": "T-2",
-  "name": "login_with_valid_credentials_returns_jwt",
-  "description": "POST /auth/login with correct credentials returns a JWT token",
+  "name": "create_note_invalid_title_returns_400",
+  "description": "POST /notes with invalid title returns 400",
   "category": "http",
-  "fixture": "fresh_db",
   "setup": {
     "actions": [
       {
         "type": "start_server",
-        "command": "node app.js",
+        "command": "node src/server.js",
         "wait_for_port": 3000,
         "timeout_ms": 5000
       }
@@ -17,23 +16,24 @@
   "execution": {
     "type": "http_request",
     "method": "POST",
-    "url": "http://localhost:3000/auth/login",
+    "url": "http://localhost:3000/notes",
     "headers": {
       "Content-Type": "application/json"
     },
     "body": {
-      "username": "alice",
-      "password": "secure123"
+      "title": "",
+      "body": "This is a test note",
+      "category": "test",
+      "tags": [
+        "test",
+        "sample"
+      ]
     }
   },
   "assertions": [
     {
       "type": "http_status_equals",
-      "expected": 200
-    },
-    {
-      "type": "response_body_contains_key",
-      "key": "token"
+      "expected": 400
     }
   ],
   "teardown": {
@@ -45,7 +45,8 @@
   },
   "metadata": {
     "covers_ac": [
-      "AC-2"
+      "AC-1",
+      "AC-6"
     ],
     "estimated_duration_ms": 500
   }

@@ -1,0 +1,59 @@
+{
+  "id": "T-8",
+  "name": "delete_note_returns_204",
+  "description": "DELETE /notes/:id deletes the note and returns 204",
+  "category": "http",
+  "setup": {
+    "actions": [
+      {
+        "type": "start_server",
+        "command": "node src/server.js",
+        "wait_for_port": 3000,
+        "timeout_ms": 5000
+      },
+      {
+        "type": "http_request",
+        "method": "POST",
+        "url": "http://localhost:3000/notes",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "title": "To be deleted",
+          "body": "This will be deleted",
+          "category": "delete",
+          "tags": [
+            "delete"
+          ]
+        }
+      }
+    ]
+  },
+  "execution": {
+    "type": "http_request",
+    "method": "DELETE",
+    "url": "http://localhost:3000/notes/1",
+    "headers": {
+      "Accept": "application/json"
+    }
+  },
+  "assertions": [
+    {
+      "type": "http_status_equals",
+      "expected": 204
+    }
+  ],
+  "teardown": {
+    "actions": [
+      {
+        "type": "stop_server"
+      }
+    ]
+  },
+  "metadata": {
+    "covers_ac": [
+      "AC-5"
+    ],
+    "estimated_duration_ms": 500
+  }
+}
