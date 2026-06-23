@@ -57,22 +57,35 @@ const openaiAdapter = defineAdapter({
     const model  = input.model || "gpt-4o";
     const isGpt5 = /^gpt-5/i.test(model);
 
-    const requestBody = isGpt5
-      ? {
-          // gpt-5* (reasoning) dialect: send max_completion_tokens (NOT max_tokens —
-          // reasoning burns internal tokens; a small cap empties JSON content →
-          // INVALID_ROLE_OUTPUT). Expose reasoning_effort. Send NO temperature/top_p
-          // (reasoning models reject non-default values).
-          model,
-          messages,
-          max_completion_tokens: input.max_completion_tokens || 8000,
-          reasoning_effort:      input.reasoning_effort || "medium"
-        }
-      : {
-          // gpt-4*/other: byte-identical to the pre-gpt-5 body.
-          model,
-          messages
-        };
+    let requestBody;
+    if (isGpt5) {
+      // gpt-5* (reasoning) dialect: send max_completion_tokens (NOT max_tokens —
+      // reasoning burns internal tokens; a small cap empties JSON content →
+      // INVALID_ROLE_OUTPUT). Expose reasoning_effort. Send NO temperature/top_p
+      // (reasoning models reject non-default values).
+      requestBody = {
+        model,
+        messages,
+        max_completion_tokens: input.max_completion_tokens || 8000,
+        reasoning_effort:      input.reasoning_effort || "medium"
+      };
+    } else {
+      // gpt-4*/other (non-reasoning). A-3 JSON-reliability hardening:
+      //  - max_tokens: prevent truncation of large outputs (mirrors the reasoning cap).
+      //  - response_format json_object: force structurally valid JSON (eliminates the
+      //    syntax slips seen on large outputs). OpenAI's json mode REQUIRES the word
+      //    "json" in the messages; every Forge role prompt ends with "RESPOND WITH VALID
+      //    JSON ONLY", so the guard fires for all role calls and safely no-ops for any
+      //    non-JSON caller (avoids a 400).
+      requestBody = {
+        model,
+        messages,
+        max_tokens: input.max_tokens || 8000
+      };
+      if (/json/i.test(input.prompt || "")) {
+        requestBody.response_format = { type: "json_object" };
+      }
+    }
 
     let res;
     try {

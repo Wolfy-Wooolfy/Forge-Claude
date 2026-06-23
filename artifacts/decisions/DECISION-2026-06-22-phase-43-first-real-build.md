@@ -95,3 +95,27 @@ Fix pass is $0 (edits + SU re-run in mock + mock full-build dry-run). The STEP-B
 
 ### A-2.6 Honest caveat
 The prompt-tune is the minimal-diff path to the green and is likely sufficient, but structurally fragile (scope rides as prose through a schema with no field slot; spec_writer is intent-blind). If the real re-run still drops scope, the durable fix (structured key_features/data_entities slot in architect OUTPUT_SCHEMA and/or passing intent to spec_writer) is a deeper, separately-scoped change (backlog).
+
+---
+
+## AMENDMENT A-3 — JSON-reliability hardening (owner-ratified)
+
+> Ratified by owner Khaled in chat (2026-06-22): "موافق على توصيتك" + directive "مش عايز نسيب اي حاجة فيها مشاكل — أعلى درجات الاحترافية" (close the class properly, not a band-aid). Authored by CTO after the post-A-2 real re-run + CTO verification. Appends to A-2; prior text preserved.
+
+### A-3.1 Finding (CTO-verified)
+Post-A-2 real re-run cleared architect→spec→reviewer→cost→env→Gate1 and stopped at TEST_DESIGN. F2 (scope fidelity) RESOLVED at the design/spec layer (architect_design + spec carry body/category/tags/filter-by-?category=/keyword-?q=; body→content drift fixed; 7 concrete ACs). New blocker: test_designer real gpt-4o output was unparseable JSON (~14KB / 3524 tokens, syntax slip near line 568). Root (CTO-verified in openai_adapter.js): the gpt-4o role request sends {model, messages} only — no response_format (no JSON-mode guarantee) and no max_tokens (default cap risks truncation). Real spend this run $0.156 (cumulative PHASE-43 ≈ $0.317; within ceiling).
+
+### A-3.2 Remediation (robust — closes the JSON-reliability class)
+code/src/runtime/agents/adapters/openai_adapter.js (the only live file touched by A-3; §ARC-sanctioned):
+- (a) Add response_format: { type: "json_object" } to the gpt-4o (non-reasoning) role request → forces structurally valid JSON, eliminating syntax slips. Precondition CTO-verified: all role prompts contain "json".
+- (b) Add explicit max_tokens: 8000 to the gpt-4o role request (mirrors the reasoning path's max_completion_tokens) → prevents truncation of large outputs.
+- The reasoning (gpt-5*) dialect already sets max_completion_tokens and is unchanged. No new §ARC; §ARC stays 10.
+
+### A-3.3 SU-safety
+SU is mock-only and does not exercise the real openai_adapter request path, so the change cannot alter mock outputs; the full SU suite must still pass (confirming no load/wiring break). Real effect is validated only by the real re-run. All roles already emit/parse JSON (aligned with json_object), so none regresses.
+
+### A-3.4 Known structural fragility (NOT fixed here — A-4 after the green)
+F2 was fixed via prompt (A-2), which relies on LLM discipline; the underlying fragility remains: architect OUTPUT_SCHEMA has no structured slot for entity fields/features/endpoints (scope rides as prose); spec_writer never receives the intent. A durable structural fix (key_features/data_entities slot in the architect schema; and/or passing intent to spec_writer) is recommended as a dedicated pass (A-4) AFTER the pipeline first reaches an end-to-end full-scope green — hardening a proven baseline rather than big-bang.
+
+### A-3.5 Execution + closure
+A-3 implementation + SU re-verify is $0. The next real re-run (~$0.16, same A-1.3 envelope) requires a fresh explicit owner spend-approval. Closure gate A-1.5 unchanged.
