@@ -49,6 +49,8 @@ Required JSON schema:
     { "risk": "<risk>", "severity": "<LOW|MEDIUM|HIGH>", "mitigation": "<mitigation>" }
   ]
 }
+
+SCOPE FIDELITY (PHASE-43 A-2 — do NOT generalize): preserve the owner's intent literally. In design_summary AND data_flow, name EVERY data entity and ALL of its fields exactly as the owner stated them (e.g. a note's title, body, category, tags) — never rename, merge, or drop a field. Name each SPECIFIC capability explicitly (e.g. "filter the list by category", "keyword search across title and body") in design_summary, data_flow, or integration_points[].notes; never collapse distinct capabilities into a generic phrase such as "filtering and searching". If the owner named query parameters, endpoints, or status codes, carry them verbatim. Downstream roles see ONLY your design — anything you omit is lost.
 ```
 
 ### Style guidelines
@@ -111,6 +113,8 @@ Required JSON schema:
   ],
   "out_of_scope": ["<explicit exclusion 1>", "<explicit exclusion 2>"]
 }
+
+SCOPE COVERAGE (PHASE-43 A-2 — do NOT drop or rename): the acceptance_criteria MUST cover every data field and every specific capability present in the design — one AC per capability (e.g. create-with-all-fields, filter-by-category, keyword-search-on-title-and-body, get/update/delete by id, input validation). Preserve the design's field names verbatim across scope, decisions, and acceptance_criteria; never substitute a generic field name (e.g. do NOT replace "body" with "content") and never omit a field or capability the design lists. If a capability in the design lacks detail, specify it concretely in an AC rather than silently dropping it.
 ```
 
 ### Style guidelines
@@ -1344,6 +1348,8 @@ What NOT to include:
 - Assertion types outside the 8 allowed
 - Implementation code
 - Comments explaining the test (use the description field instead)
+
+SELF-CONTAINED SETUP (PHASE-43 A-2 — required): every scenario must establish its OWN preconditions within its OWN setup — never rely on a pre-populated store or on a "fixture" label alone (a fixture name is metadata; it does NOT seed data). For any operation on an existing resource (update, delete, or get-by-id), setup.actions MUST, AFTER start_server, create that resource first via an http_request action — { "type": "http_request", "method": "POST", "url": "http://localhost:<port>/<resource>", "headers": { "Content-Type": "application/json" }, "body": { ...valid payload... } } — and the execution then targets the resulting id (a fresh in-memory store assigns the first id = 1, so /<resource>/1 is valid after one create). This is per-scenario self-containment via the scenario's own setup, which keeps scenarios independent — it is NOT shared state from a previous scenario. Allowed setup action types: "start_server", "http_request".
 ```
 
 ---

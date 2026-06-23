@@ -67,3 +67,31 @@ PHASE-43 is CLOSED only when ALL hold:
 
 ### A-1.6 Track A constraint
 The full-build driver and any seeds are test-infra/spike (scripts/** + per-project artifacts), OUT of the Track A live-surface scope (apiServer.js + ai_os/** + runtime/**). No live-surface code is modified by PHASE-43. The real LLM call routes through the sanctioned openAiAdapter (§ARC). Any new side-effect home or §ARC entry → STOP → amendment → owner approval.
+
+---
+
+## AMENDMENT A-2 — Remediation (F1+F2) + A-1.6 live-surface amendment (owner-ratified)
+
+> Ratified by owner Khaled in chat (2026-06-22): "موافق على توصيتك طالما باعلى درجات الاحترافية" (the remediate-then-re-run path). Authored by CTO after the §R.0 probe (localized both findings; confirmed SU blast-radius). Appends to A-1; preserves prior text.
+
+### A-2.1 Findings (CTO-verified)
+- F1 (test_designer self-containment): T-3/T-4 emit update/delete on /notes/1 with setup=start_server only + a phantom "populated_db" fixture; harness seeds nothing → correct code returns 404 → fail. Root: (a) harness setup runs only start_server; (b) test_designer prompt doesn't require self-contained scenarios.
+- F2 (scope fidelity): idea_summary.json + vision.md carry full scope (title, body, category, tags, filter-by-category, keyword search); architect_design.json is the FIRST drop (generalized to "filtering and searching", no fields). spec_writer can't recover (input = {design, project_id} only); builder built the reduced spec (drifted body→content). Root: architect generalized the scope. Structural contributors (BACKLOG, not fixed here): architect OUTPUT_SCHEMA has no slot for entity fields/features/endpoints; spec_writer never receives the intent.
+
+### A-2.2 Remediation (minimal-diff, SU-safe)
+- F1-harness (the ONLY Track A live file touched): code/src/runtime/builtproject/harness_runner.js — ADD an additive branch in the setup-actions loop: if action.type === "http_request" → await _httpRequest(action) (reuse existing helper). start_server unchanged. No new §ARC; §ARC stays 10.
+- F1-test_designer prompt (docs/10_runtime/18b_ROLE_PROMPTS.md § test_designer_v2, APPEND-to-tail): every scenario self-contained; for any op on an existing resource (update/delete/get-by-id), setup.actions must first create it via an http_request POST and target the returned id; no reliance on a pre-populated store or phantom fixture.
+- F2-architect prompt (§ architect_v1, APPEND-to-tail): preserve owner scope literally — enumerate the entity's fields and name each specific capability (filter-by-<field>, keyword-search-on-<fields>) explicitly in design_summary/data_flow/integration_points; never collapse to generic "filtering and searching"; preserve owner field names verbatim.
+- F2-spec_writer prompt (§ spec_writer_v1, APPEND-to-tail): derive acceptance_criteria covering every data field and every specific capability in the design; preserve field names; do not drop or rename.
+
+### A-2.3 SU-safety (CTO-verified)
+All three prompt edits are APPEND-TO-TAIL only. test_designer is TAG-matched (safe regardless). architect_v1 (1407 chars) + spec_writer_v1 (1514 chars) exceed 500, so tail-append leaves prompt[0:500] unchanged → S83/S85/S86/S88 stay green. No SU scenario asserts prompt content. The harness change is additive (existing branches unchanged) and must keep S120–S127 + S333/S334 green; a focused deterministic test proves the new setup http_request branch executes.
+
+### A-2.4 A-1.6 amendment
+A-1.6 ("no live-surface code modified") is amended: the remediation modifies exactly ONE Track A live file — harness_runner.js (additive, reusing _httpRequest, no new §ARC) — plus role prompts in docs/ (append-only, not runtime code). Guard: full SU suite stays green (+ the new harness test) and forge-doctor 35/0.
+
+### A-2.5 Execution + closure
+Fix pass is $0 (edits + SU re-run in mock + mock full-build dry-run). The STEP-B real re-run (real spend ~$0.16, same A-1.3 envelope: soft-stop $1.50 / hard-kill $3 / cap=2) requires a fresh explicit owner spend-approval. Closure gate A-1.5 unchanged: real idea→COMPLETE FULL-SCOPE build (category/tags/filter present), last_report PASS, owner Gate #10 green, cost within ceiling, §ARC=10, SU green.
+
+### A-2.6 Honest caveat
+The prompt-tune is the minimal-diff path to the green and is likely sufficient, but structurally fragile (scope rides as prose through a schema with no field slot; spec_writer is intent-blind). If the real re-run still drops scope, the durable fix (structured key_features/data_entities slot in architect OUTPUT_SCHEMA and/or passing intent to spec_writer) is a deeper, separately-scoped change (backlog).

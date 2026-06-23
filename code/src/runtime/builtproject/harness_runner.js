@@ -57,6 +57,11 @@ async function runScenario(scenario, projectRoot) {
         const result = await _startServer(action, projectRoot);
         serverProcess = result.process;
         stdout = result.stdout;
+      } else if (action.type === "http_request") {
+        // Self-contained scenarios: seed pre-existing state (e.g. create-first
+        // before update/delete/get-by-id) by issuing an HTTP request during setup.
+        // Reuses the same helper as execution; result is intentionally unused here.
+        await _httpRequest(action);
       }
     }
 
