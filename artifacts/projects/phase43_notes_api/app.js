@@ -1,0 +1,1 @@
+module.exports=function app(){return 'S327 active-project build';};
