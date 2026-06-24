@@ -60,6 +60,13 @@ const TPL_NEG = { id: "TPL-NEG", name: "get_by_literal_1_control", category: "ht
   execution: { type: "http_request", method: "GET", url: "http://localhost:3000/notes/1",
                headers: { "Accept": "application/json" } },
   assertions: ASSERT_200, teardown: { actions: [{ type: "stop_server" }] } };
+// Fail-closed (CLAUDE.md §3.5): a {{created.id}} placeholder with NO create-first setup must
+// ERROR (the resolver throws), not silently hit a wrong URL.
+const TPL_ERR = { id: "TPL-ERR", name: "unresolved_placeholder_fails_closed", category: "http",
+  setup: { actions: [START] },
+  execution: { type: "http_request", method: "GET", url: "http://localhost:3000/notes/{{created.id}}",
+               headers: { "Accept": "application/json" } },
+  assertions: ASSERT_200, teardown: { actions: [{ type: "stop_server" }] } };
 
 async function main() {
   console.log("=== PHASE-43 A-4 §T.3 — harness {{created.id}} templating proof ($0) ===");
@@ -74,15 +81,20 @@ async function main() {
   const neg = await runScenario(TPL_NEG, FIXTURE_DIR);
   console.log("  TPL-NEG:", neg.status, JSON.stringify(neg.assertions));
 
-  const proof = tpl.status === "PASS" && neg.status === "FAIL";
+  console.log("TPL-ERR (placeholder, NO create-first — must fail closed) running ...");
+  const err = await runScenario(TPL_ERR, FIXTURE_DIR);
+  console.log("  TPL-ERR:", err.status, "error=" + JSON.stringify(err.error || null));
+
+  const proof = tpl.status === "PASS" && neg.status === "FAIL" && err.status === "ERROR";
   const out = {
     verdict: proof ? "PROVEN" : "NOT_PROVEN",
-    interpretation: "Fixture assigns non-sequential ids (first = '1001'). TPL passes ONLY because {{created.id}} resolved to the real created id; TPL-NEG (literal /notes/1) fails 404 — proving the placeholder targets the actual created id and is decisive against a non-/1 id scheme.",
+    interpretation: "Fixture assigns non-sequential ids (first = '1001'). TPL passes ONLY because {{created.id}} resolved to the real created id; TPL-NEG (literal /notes/1) fails 404 — proving the placeholder is decisive against a non-/1 id scheme; TPL-ERR (placeholder with no create-first) ERRORs — proving fail-closed (CLAUDE.md §3.5) rather than a silent wrong-URL 404.",
     tpl: { status: tpl.status, assertions: tpl.assertions },
-    tpl_neg: { status: neg.status, assertions: neg.assertions }
+    tpl_neg: { status: neg.status, assertions: neg.assertions },
+    tpl_err: { status: err.status, error: err.error || null }
   };
   fs.writeFileSync(path.join(path.dirname(FIXTURE_DIR), "templating_proof.json"), JSON.stringify(out, null, 2), "utf8");
-  console.log("\nverdict:", out.verdict, "(TPL=PASS, TPL-NEG=FAIL expected)");
+  console.log("\nverdict:", out.verdict, "(TPL=PASS, TPL-NEG=FAIL, TPL-ERR=ERROR expected)");
   console.log("evidence: artifacts/spikes/phase43_templating_check/templating_proof.json");
   process.exit(proof ? 0 : 1);
 }

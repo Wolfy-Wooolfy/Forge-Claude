@@ -30,11 +30,13 @@ function _buildCodegenPrompt(plan, spec, design, scenario_id) {
   const specSummary  = (spec  && (spec.scope   || spec.summary))       || "see design";
   const designSummary = (design && design.design_summary)              || "see spec";
 
-  // A-4 (ROOT-1 fix): feed the FULL acceptance criteria + each file's plan description
-  // into the codegen prompt. Previously the prompt carried only file paths + a one-line
-  // scope summary, so the LLM wrote code blind to the detailed contract (missing routes
-  // like GET /:id, missing 404-on-missing). These blocks are additive; scope/design and
-  // the scenarioTag are unchanged (the SU mock match keys off SCENARIO_TAG, not body).
+  // A-4 (ROOT-1 fix): feed the FULL acceptance criteria + each file's purpose into the
+  // codegen prompt. Previously the prompt carried only file paths + a one-line scope
+  // summary, so the LLM wrote code blind to the detailed contract (missing routes like
+  // GET /:id, missing 404-on-missing). Per-file purposes come from spec.files_to_create
+  // (the builder plan carries only path/action/line_count/sha256 — no description). These
+  // blocks are additive; scope/design and the scenarioTag are unchanged (the SU mock
+  // match keys off SCENARIO_TAG, not body).
   const acs = (spec && Array.isArray(spec.acceptance_criteria)) ? spec.acceptance_criteria : [];
   const acBlock = acs.length
     ? "\nAcceptance criteria (implement EVERY one completely):\n" +
@@ -42,10 +44,11 @@ function _buildCodegenPrompt(plan, spec, design, scenario_id) {
         return "- " + (a && a.id ? a.id + ": " : "") + ((a && (a.description || a.text)) || "");
       }).join("\n")
     : "";
-  const fileDescs = (plan || []).filter(function (p) { return p && p.path; })
-    .map(function (p) { return "- " + p.path + ": " + (p.description || p.purpose || "(no description)"); })
+  const filesToCreate = (spec && Array.isArray(spec.files_to_create)) ? spec.files_to_create : [];
+  const fileDescs = filesToCreate.filter(function (f) { return f && f.path; })
+    .map(function (f) { return "- " + f.path + ": " + ((f.purpose || f.description) || ""); })
     .join("\n");
-  const fileBlock = fileDescs ? "\nFile responsibilities:\n" + fileDescs : "";
+  const fileBlock = fileDescs ? "\nFile responsibilities (from the spec):\n" + fileDescs : "";
 
   return (
     "You are a code generator. Return STRICT JSON only — no markdown, no code blocks, no prose before or after." +
