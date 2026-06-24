@@ -1,6 +1,6 @@
 {
   "verdict": "PROVEN",
-  "interpretation": "Fixture assigns non-sequential ids (first = '1001'). TPL passes ONLY because {{created.id}} resolved to the real created id; TPL-NEG (literal /notes/1) fails 404 — proving the placeholder targets the actual created id and is decisive against a non-/1 id scheme.",
+  "interpretation": "Fixture assigns non-sequential ids (first = '1001'). TPL passes ONLY because {{created.id}} resolved to the real created id; TPL-NEG (literal /notes/1) fails 404 — proving the placeholder is decisive against a non-/1 id scheme; TPL-ERR (placeholder with no create-first) ERRORs — proving fail-closed (CLAUDE.md §3.5) rather than a silent wrong-URL 404.",
   "tpl": {
     "status": "PASS",
     "assertions": [
@@ -20,5 +20,9 @@
         "reason": "Expected HTTP 200, got 404"
       }
     ]
+  },
+  "tpl_err": {
+    "status": "ERROR",
+    "error": "Unresolved scenario placeholder {{created.id}} — the create-first setup response did not provide field 'id'"
   }
 }
