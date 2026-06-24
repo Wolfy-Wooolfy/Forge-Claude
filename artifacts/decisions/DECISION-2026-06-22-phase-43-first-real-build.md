@@ -252,3 +252,25 @@ Reviewer SU mocks (S89/S90 prompt-prefix-matched; bridge S261–S266 TAG-matched
 
 ### A-9.6 Sequencing + execution
 A-9 unblocks the reviewer gate so re-run #7 can reach BUILDER + RUN_TESTS with a complete, reviewer-passing spec. A-5 (build loopback) is sequenced after re-run #7 (designed against the real build-failure data we will finally see). A-9 implementation + SU re-verify is $0. The next real re-run #7 (cap=1) requires a fresh explicit owner spend-approval (~$0.16). Run protocol unchanged.
+
+---
+
+## AMENDMENT A-10 — Endpoint-path coherence: serve exactly the AC-declared paths (owner-directed)
+
+> Owner directive: fix every issue properly. Authored by CTO after real re-run #7 — the FIRST run to reach RUN_TESTS — + CTO verification of the generated code. Appends to A-9. A-5 (build loopback) is now data-ready (clean RUN_TESTS failure data from this run) and is the committed next durable step. Prior text preserved.
+
+### A-10.1 Real re-run #7 result (CTO-verified) — BREAKTHROUGH
+Single-attempt real build (cap=1), $0.18678 (cumulative ≈ $1.087). FIRST run to reach RUN_TESTS. All prior gates passed (CTO-verified from generated code + trace): A-9 ✅ reviewSpec APPROVED_WITH_CONCERNS (advanced); A-7 ✅ designTests no timeout; A-6 ✅ proper src/server.js entry (app + app.listen(process.env.PORT||3000)) booted; A-8 ✅ data layer uses server-assigned sequential int from 1 (this.currentId=1; const id=this.currentId++), not Date.now(); A-4 ✅ 404-on-missing in routes + data layer signals not-found + the fail-closed {{created.id}} resolver correctly errored on the 404'd create. RUN_TESTS executed: 10 scenarios, FAIL — 3 pass / 4 fail / 3 error.
+
+### A-10.2 Root cause — a single endpoint base-path mismatch
+All 7 non-passing scenarios trace to ONE defect (CTO-verified): src/server.js mounts the router at /api (app.use('/api', notesRouter)) while src/routes/notes.js defines routes with the /notes prefix (router.post('/notes', …)). The build serves /api/notes, but the acceptance criteria + generated test scenarios use /notes → every /notes request 404s. T-1/T-2/T-6/T-10 FAIL (404); T-3/T-4/T-5 ERROR (create-first 404'd → {{created.id}} unresolved, A-4 fail-closed = correct); T-7/T-8/T-9 PASS for the wrong reason (everything 404s). The materializer invented an /api base-path prefix the ACs never declared. The build is otherwise high-quality — one coherence bug from green.
+
+### A-10.3 Remediation — endpoint-path coherence (SU-safe)
+- materializer directive (materializerEngine.js _buildCodegenPrompt; live, SU-safe — tag-matched): the served paths MUST exactly equal the AC-declared paths. When mounting a router in the entry file, the mount path combined with the router's route paths MUST equal the AC-declared paths. Do NOT introduce a base-path/version prefix (e.g. /api, /v1) unless the ACs explicitly include it. If the ACs say POST /notes, the app must serve POST /notes (not /api/notes).
+- spec_writer_v1 (18b, append-to-tail, prompt[0:500] preserved): the spec must state the exact endpoint base path; absent an explicit owner/vision request for a prefix, the base path is root (no /api, no version prefix).
+
+### A-10.4 SU-safety + Track A
+The materializer SU mocks are tag-matched → the directive addition is SU-safe. The spec_writer append is append-to-tail (prompt[0:500] preserved; guard S86/S87/S88 green). Live file touched: materializerEngine.js only (prompt-construction; no forbidden patterns). No new §ARC; §ARC=10. Guard: full SU suite green + forge-doctor 35/0.
+
+### A-10.5 Sequencing + execution
+A-10 targets the single remaining defect with high confidence. A-5 (build loopback self-correction) is now data-ready (this run produced the clean RUN_TESTS failure data) and is the committed next durable step. A-10 implementation + SU re-verify is $0. The next real re-run #8 (cap=1) requires a fresh explicit owner spend-approval (~$0.16). Run protocol unchanged.

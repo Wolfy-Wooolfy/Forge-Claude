@@ -71,6 +71,12 @@ function _buildCodegenPrompt(plan, spec, design, scenario_id) {
     "the list contains NO entry file (none of src/server.js, src/index.js, src/app.js, index.js, " +
     "server.js, app.js), ALSO generate src/server.js with that bootstrap. Do not add persistence/backup " +
     "or test files beyond the spec's declared scope." +
+    "\nEndpoint paths: the served paths MUST exactly equal the paths the acceptance criteria declare. When " +
+    "you mount a router in the entry file, the mount path joined with the router's route paths MUST equal " +
+    "the AC-declared paths — do NOT introduce a base-path or version prefix (e.g. /api, /v1) unless the " +
+    "acceptance criteria explicitly include it. If the ACs say POST /notes, the app must serve POST /notes, " +
+    "NOT /api/notes (e.g. app.use(router) with router.post('/notes', ...), OR app.use('/notes', router) with " +
+    "router.post('/', ...) — but NEVER both prefixes)." +
     "\nRESPOND WITH VALID JSON ONLY."
   );
 }
