@@ -1,14 +1,13 @@
 {
-  "id": "T-2",
-  "name": "login_with_valid_credentials_returns_jwt",
-  "description": "POST /auth/login with correct credentials returns a JWT token",
+  "id": "T-7",
+  "name": "retrieve_note_not_found",
+  "description": "GET /notes/:id for a non-existing note returns 404",
   "category": "http",
-  "fixture": "fresh_db",
   "setup": {
     "actions": [
       {
         "type": "start_server",
-        "command": "node app.js",
+        "command": "node src/server.js",
         "wait_for_port": 3000,
         "timeout_ms": 5000
       }
@@ -16,24 +15,17 @@
   },
   "execution": {
     "type": "http_request",
-    "method": "POST",
-    "url": "http://localhost:3000/auth/login",
+    "method": "GET",
+    "url": "http://localhost:3000/notes/999999",
     "headers": {
       "Content-Type": "application/json"
     },
-    "body": {
-      "username": "alice",
-      "password": "secure123"
-    }
+    "body": {}
   },
   "assertions": [
     {
       "type": "http_status_equals",
-      "expected": 200
-    },
-    {
-      "type": "response_body_contains_key",
-      "key": "token"
+      "expected": 404
     }
   ],
   "teardown": {
@@ -45,7 +37,7 @@
   },
   "metadata": {
     "covers_ac": [
-      "AC-2"
+      "AC-3"
     ],
     "estimated_duration_ms": 500
   }
