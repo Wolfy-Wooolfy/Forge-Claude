@@ -194,3 +194,30 @@ SU runs against the instant mock adapter → every role call resolves immediatel
 
 ### A-7.4 Sequencing + execution
 A-7 is the immediate blocker (without it the pipeline cannot reach BUILDER, so A-6 cannot be exercised). A-5 is sequenced AFTER re-run #5 so it can be designed against real failure data (the exact failing assertions). A-7 implementation + SU re-verify is $0. The next real re-run #5 (cap=1, single attempt — loopback still blind) requires a fresh explicit owner spend-approval (~$0.16). Run protocol unchanged: first build is the only real chance; if it stops or returns <9/9, STOP and inspect.
+
+---
+
+## AMENDMENT A-8 — Spec/design completeness: ID scheme, tags, response formats (owner-directed)
+
+> Owner directive: fix every issue properly. Authored by CTO after real re-run #5 + CTO verification of the reviewer findings. Appends to A-7. A-5 (loopback self-correction) remains sequenced after the next run (re-run #6) so it can be designed against real build-failure data. Prior text preserved.
+
+### A-8.1 Real re-run #5 result (CTO-verified)
+Single-attempt real build (cap=1), $0.03294 (cumulative ≈ $0.822; within ceiling). A-7 worked — architect, spec_writer, and reviewer all completed within 150s (no timeout; prior blocker resolved). Stopped at REVIEWER_SPEC, verdict REJECTED → ESCALATED, 3 BLOCKER findings (CTO-verified from the trace):
+- BLOCKER-1 (tags): acceptance criteria reference a `tags` field, but the design does not specify how tags are stored/validated.
+- BLOCKER-2 (ID assignment): neither spec nor design specifies how new-note IDs are generated. Same root as the id-coherence issue A-4 addressed at the build level.
+- BLOCKER-3 (response formats): the design does not specify the JSON structure for CRUD success/error responses.
+- Plus WARN (scalability) + INFO (input sanitization).
+Note: reviewSpec verdict is non-deterministic across runs (APPROVED_WITH_CONCERNS in re-run #2/#3/#4; REJECTED here). reviewSpec ESCALATED is a reviewer-gate before BUILDER — distinct from the RUN_TESTS→BUILDER loopback (A-5 does not apply here).
+
+### A-8.2 Remediation — spec/design completeness (SU-safe; prompts-only)
+- architect_v1 (18b, append-to-tail, prompt[0:500] preserved): the design MUST specify (a) the ID-generation scheme — server-assigned, a sequential integer starting at 1 (auto-generated, never user-supplied); (b) how every declared field (including tags) is stored, validated, and serialized; (c) the JSON response shape for success AND error on every operation.
+- spec_writer_v1 (18b, append-to-tail, prompt[0:500] preserved): the acceptance_criteria + spec MUST carry the same — server-assigned sequential-integer IDs, tags handling/validation, and success/error JSON response formats — so design and spec are internally consistent (no omission for the reviewer to reject).
+
+### A-8.3 Why this also helps downstream
+A specified server-assigned sequential-integer ID scheme (a) removes BLOCKER-2; (b) gives the materializer a concrete id contract (reinforcing A-4 route quality); (c) aligns with the harness — both A-4's {{created.id}} and a literal /notes/1 resolve when the first created id is 1. tags + response-format specification removes BLOCKER-1/3 and improves the build contract.
+
+### A-8.4 SU-safety + Track A
+architect/spec_writer SU mocks are prompt[0:500]-matched → appends are append-to-tail (prompt[0:500] byte-identical; guard S83/S85/S86/S87/S88 green). NO live code file is touched by A-8 (prompts only, in 18b_ROLE_PROMPTS.md) — Track A live surface unchanged. No new §ARC; §ARC=10. Guard: full SU suite green + forge-doctor 35/0.
+
+### A-8.5 Sequencing + execution
+A-8 removes the reviewer-gate blocker so re-run #6 can reach BUILDER + RUN_TESTS with a reviewer-passing, complete spec. A-5 (test-failure loopback) is sequenced after re-run #6 so it is designed against real build-failure data from a complete-spec build. A-8 implementation + SU re-verify is $0. The next real re-run #6 (cap=1, single attempt — loopback still blind) requires a fresh explicit owner spend-approval (~$0.16). Run protocol unchanged.
