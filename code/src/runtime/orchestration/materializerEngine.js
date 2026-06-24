@@ -65,6 +65,12 @@ function _buildCodegenPrompt(plan, spec, design, scenario_id) {
     "not found — for GET, PUT, and DELETE), and all entity fields. The data layer must signal " +
     "found vs not-found (e.g. return null/undefined for a missing id) so the route handlers can " +
     "return 404 instead of silently succeeding." +
+    "\nRunnability: if this is an HTTP API or web service, it MUST include a server/entry file that " +
+    "creates the app, mounts ALL routes, and calls app.listen(process.env.PORT || 3000) so it boots " +
+    "and accepts HTTP requests. Implement the entry file already in the list (e.g. src/server.js); if " +
+    "the list contains NO entry file (none of src/server.js, src/index.js, src/app.js, index.js, " +
+    "server.js, app.js), ALSO generate src/server.js with that bootstrap. Do not add persistence/backup " +
+    "or test files beyond the spec's declared scope." +
     "\nRESPOND WITH VALID JSON ONLY."
   );
 }

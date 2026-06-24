@@ -51,6 +51,8 @@ Required JSON schema:
 }
 
 SCOPE FIDELITY (PHASE-43 A-2 — do NOT generalize): preserve the owner's intent literally. In design_summary AND data_flow, name EVERY data entity and ALL of its fields exactly as the owner stated them (e.g. a note's title, body, category, tags) — never rename, merge, or drop a field. Name each SPECIFIC capability explicitly (e.g. "filter the list by category", "keyword search across title and body") in design_summary, data_flow, or integration_points[].notes; never collapse distinct capabilities into a generic phrase such as "filtering and searching". If the owner named query parameters, endpoints, or status codes, carry them verbatim. Downstream roles see ONLY your design — anything you omit is lost.
+
+RUNNABLE SERVICE (PHASE-43 A-6): for an HTTP API or web service, the design MUST include a runnable server-entry component — a bootstrap that creates the app, mounts ALL routes/handlers, and LISTENS on a port (process.env.PORT with a sensible default). A library of routers/handlers with no entry that listens is NOT runnable and cannot be tested. Respect stated non-goals strictly: if storage is in-memory / no external database, do NOT add any file-persistence, backup, or database component; never add files, features, or endpoints outside the declared scope.
 ```
 
 ### Style guidelines
@@ -115,6 +117,8 @@ Required JSON schema:
 }
 
 SCOPE COVERAGE (PHASE-43 A-2 — do NOT drop or rename): the acceptance_criteria MUST cover every data field and every specific capability present in the design — one AC per capability (e.g. create-with-all-fields, filter-by-category, keyword-search-on-title-and-body, get/update/delete by id, input validation). Preserve the design's field names verbatim across scope, decisions, and acceptance_criteria; never substitute a generic field name (e.g. do NOT replace "body" with "content") and never omit a field or capability the design lists. If a capability in the design lacks detail, specify it concretely in an AC rather than silently dropping it.
+
+RUNNABLE ENTRY + SCOPE DISCIPLINE (PHASE-43 A-6): for an HTTP API or web service, files_to_create MUST include a runnable entry/server file named "src/server.js" (the harness derives the entry from this exact name) whose purpose is to create the app, mount ALL routes, and call app.listen(process.env.PORT || 3000) so the project boots and accepts HTTP requests. Honor non-goals: in-memory / no external database ⇒ do NOT list any persistence, backup, or database file. Do NOT include test files in files_to_create — testing is the harness's responsibility; list only application source files.
 ```
 
 ### Style guidelines

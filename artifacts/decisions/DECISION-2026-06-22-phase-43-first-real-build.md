@@ -144,3 +144,30 @@ buildProject re-invokes with identical inputs and never reads last_report.json/l
 
 ### A-4.5 Execution + closure
 A-4 implementation + SU re-verify is $0. The next real re-run (~$0.16, same A-1.3 envelope) requires a fresh explicit owner spend-approval. Closure gate A-1.5 unchanged.
+
+---
+
+## AMENDMENT A-6 — Runnable server-entry contract + scope discipline (owner-directed)
+
+> Owner directive: highest-professionalism / fix every issue properly. Authored by CTO after real re-run #3 + CTO verification of the generated code. Appends to A-4. A-5 (loopback self-correction) remains deferred and is sequenced AFTER A-6. Prior text preserved.
+
+### A-6.1 Real re-run #3 result (CTO-verified)
+Single-attempt real build (cap=1), $0.17874 (cumulative PHASE-43 ≈ $0.695; within ceiling). Stopped at RUN_TESTS with ENTRY_UNRESOLVED — 0/9 scenarios ran. Two findings:
+- GOOD — A-4 succeeded at the code level (CTO-verified by reading generated src/NotesAPI.js + InMemoryStorage.js): GET /notes/:id → 404-on-missing, PUT /:id → 404, DELETE /:id → 404; data layer signals found/not-found (read→null, update/delete→null/false). All four prior failures (T-4/T-6/T-7/T-9) are fixed in the generated code. The AC-enrichment reached the materializer and was honored.
+- BLOCKER (new, upstream) — the spec produced a router-only library: src/NotesAPI.js exports a router (module.exports = router) with NO bootstrap file that creates the app and calls app.listen(PORT). files_to_create had no entry/server file (it had NotesAPI router, InMemoryStorage, ValidationModule, helpers/serializer [over-scoped file persistence — violates the in-memory non-goal], test/NotesAPITest [a test file the build should not emit]). The L5b harness spawns a server + makes HTTP requests; with no runnable entry it fails entry-derivation → ENTRY_UNRESOLVED. Re-run #2 happened to emit src/server.js with .listen (ran); #3 did not. The pipeline has no contract that an HTTP-service build is runnable via a conventional entry — structural non-determinism.
+
+### A-6.2 Remediation — runnable server-entry contract (SU-safe; build-side)
+- architect_v1 (18b, append-to-tail, prompt[0:500] preserved): the design for an HTTP API / web service MUST include a runnable server-entry component (a bootstrap that creates the app, mounts all routes/handlers, listens on a port). Respect stated non-goals strictly (in-memory storage ⇒ NO file-persistence/backup components); do not add files/features outside the declared scope.
+- spec_writer_v1 (18b, append-to-tail, prompt[0:500] preserved): files_to_create MUST include the entry/server file using the harness-recognized convention (per A-6.3), whose purpose is to create the app, mount all routes, and listen on process.env.PORT || <default>. Honor non-goals (in-memory ⇒ no persistence files). Do NOT include test files in files_to_create — testing is the harness's responsibility.
+- materializer directive (materializerEngine.js, live, SU-safe — tag-matched): reinforce — the entry/server file must instantiate the app, mount all routes, and call app.listen(process.env.PORT || <default>) so the project boots; in-memory only (no file writes for data).
+
+### A-6.3 Entry-convention alignment (implementation prerequisite)
+Before editing prompts, read the entry-derivation logic (source of ENTRY_UNRESOLVED) and record its accepted conventions (file names such as src/server.js / src/index.js, and/or package.json "main", and/or a .listen scan). The spec_writer instruction names the SAME convention the harness accepts, so the produced entry is discoverable.
+
+CTO-verified (conversationEngine.js:1419-1440): the entry is derived from the build_manifest by (1) an ENTRY_PRIORITY filename match — src/index.js, src/server.js, src/app.js, index.js, server.js, app.js (priority order); else (2) a `.listen(` scan — exactly one manifest .js containing the substring `.listen(`; else (3) ENTRY_UNRESOLVED. package.json "main" is NOT consulted. The chosen instruction pins src/server.js, which resolves on the ENTRY_PRIORITY filename branch ALONE (content-blind — the priority match short-circuits before the `.listen(` fallback scan is reached). The required app.listen(process.env.PORT || 3000) is for actual RUNNABILITY (so the derived entry boots when the harness spawns it), enforced by prompt — the harness does not verify `.listen(` for a priority-named entry. [Adversarial-review strengthening] Because entry-EXISTENCE otherwise rests solely on spec_writer listing src/server.js, the materializer directive is made SELF-HEALING: if the plan contains no entry file, the codegen ALSO generates src/server.js with the bootstrap — defense-in-depth so a single spec_writer miss does not recur ENTRY_UNRESOLVED.
+
+### A-6.4 SU-safety + Track A
+architect/spec_writer SU mocks are prompt[0:500]-matched → appends are append-to-tail (prompt[0:500] byte-identical; guard S83/S85/S86/S88 green). The materializer is tag-matched → its directive addition is SU-safe. Live file touched by A-6: materializerEngine.js only (prompt-construction; no forbidden patterns). No new §ARC; §ARC=10. Guard: full SU suite green + forge-doctor 35/0.
+
+### A-6.5 Sequencing + execution
+A-6 is sequenced BEFORE A-5. A-6 implementation + SU re-verify is $0. The next real re-run #4 (cap=1, single attempt — loopback still blind until A-5) requires a fresh explicit owner spend-approval (~$0.16). Run protocol unchanged: first build is the only real chance; if it stops or returns <9/9, STOP and inspect.
