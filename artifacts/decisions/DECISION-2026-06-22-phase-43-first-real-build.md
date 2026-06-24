@@ -171,3 +171,26 @@ architect/spec_writer SU mocks are prompt[0:500]-matched → appends are append-
 
 ### A-6.5 Sequencing + execution
 A-6 is sequenced BEFORE A-5. A-6 implementation + SU re-verify is $0. The next real re-run #4 (cap=1, single attempt — loopback still blind until A-5) requires a fresh explicit owner spend-approval (~$0.16). Run protocol unchanged: first build is the only real chance; if it stops or returns <9/9, STOP and inspect.
+
+---
+
+## AMENDMENT A-7 — Per-role engine timeout tuning (owner-directed)
+
+> Owner directive: fix every issue properly / cost is not the deciding factor. Authored by CTO after real re-run #4 + CTO verification of the timeout layering. Appends to A-6. A-5 (loopback self-correction) remains deferred and is now sequenced AFTER the next diagnostic run (re-run #5) so it can be designed against real failure data. Prior text preserved.
+
+### A-7.1 Real re-run #4 result (CTO-verified)
+Single-attempt real build (cap=1), $0.0937 (cumulative ≈ $0.789; within ceiling). Stopped at TEST_DESIGN with test_error TEST_DESIGNER_TIMEOUT — BEFORE reaching BUILDER, so A-6's server-entry fix was not exercised. CTO-verified:
+- The engine wraps each role call in a 30s Promise.race (conversationEngine.js); the designTests call hit the 30s ceiling before the real gpt-4o response returned. NOT a JSON/parse failure (A-3 json_object works — designTests succeeded in re-run #2/#3). The richer full-scope spec (post-A-6) + normal gpt-4o latency pushed test-plan generation past 30s; the call was abandoned in-flight (no ledger row, ~$0 wasted).
+- The 30s Promise.race pattern is present on ELEVEN role calls (CTO-verified): ARCHITECT, SPEC_WRITER, REVIEWER (x2), BUILDER, DOCUMENTATION, QUALITY_JUDGE, COST_ESTIMATOR, TEST_DESIGNER, ENV_REPORT, DEPLOYMENT — all 30000ms. Critically BUILDER_TIMEOUT (the materializer codegen path, the largest single output) is also 30s — a designTests-only fix would just move the timeout to the materializer on re-run #5.
+- The adapter HTTP timeout is 60s (openai_adapter.js, input.budget_ms || 60000) — looser than the engine's 30s, so the engine pre-empts.
+
+### A-7.2 Remediation — comprehensive per-role timeout tuning (SU-safe)
+- conversationEngine.js: raise ALL eleven per-role Promise.race timeouts from 30000ms to 150000ms (consistent across roles; the engine timeout must be ≥ the adapter timeout so the adapter's own timeout/retry governs the network wait, with the engine as a backstop).
+- openai_adapter.js: raise the per-call HTTP timeout default from 60000ms to 120000ms (input.budget_ms || 120000) so the largest generation (materializer codegen) completes within the adapter network timeout.
+- Net: engine 150s ≥ adapter 120s; both comfortably exceed observed generation times. Tuning constants only; no behavior/logic change.
+
+### A-7.3 SU-safety + Track A
+SU runs against the instant mock adapter → every role call resolves immediately, far inside any timeout → raising the timeouts cannot change any SU outcome. Guard: identify any SU scenario asserting a *_TIMEOUT path and preserve it; the full suite must stay 327/0/5. Live files touched by A-7: conversationEngine.js + openai_adapter.js (timeout constants; no forbidden patterns). No new §ARC; §ARC=10.
+
+### A-7.4 Sequencing + execution
+A-7 is the immediate blocker (without it the pipeline cannot reach BUILDER, so A-6 cannot be exercised). A-5 is sequenced AFTER re-run #5 so it can be designed against real failure data (the exact failing assertions). A-7 implementation + SU re-verify is $0. The next real re-run #5 (cap=1, single attempt — loopback still blind) requires a fresh explicit owner spend-approval (~$0.16). Run protocol unchanged: first build is the only real chance; if it stops or returns <9/9, STOP and inspect.

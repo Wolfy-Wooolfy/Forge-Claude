@@ -797,7 +797,7 @@ function createConversationEngine(options = {}) {
 
       let timeoutHandle;
       const timeoutPromise = new Promise((_, reject) => {
-        timeoutHandle = setTimeout(() => reject(new Error("ARCHITECT_TIMEOUT")), 30000);
+        timeoutHandle = setTimeout(() => reject(new Error("ARCHITECT_TIMEOUT")), 150000);
       });
 
       try {
@@ -925,7 +925,7 @@ function createConversationEngine(options = {}) {
     // D5: 30s timeout, mirroring architect block
     let timeoutHandle;
     const timeoutPromise = new Promise((_, reject) => {
-      timeoutHandle = setTimeout(() => reject(new Error("SPEC_WRITER_TIMEOUT")), 30000);
+      timeoutHandle = setTimeout(() => reject(new Error("SPEC_WRITER_TIMEOUT")), 150000);
     });
 
     try {
@@ -1051,7 +1051,7 @@ function createConversationEngine(options = {}) {
     // D5: 30s timeout, mirroring formalizeSpec
     let timeoutHandle;
     const timeoutPromise = new Promise((_, reject) => {
-      timeoutHandle = setTimeout(() => reject(new Error("REVIEWER_TIMEOUT")), 30000);
+      timeoutHandle = setTimeout(() => reject(new Error("REVIEWER_TIMEOUT")), 150000);
     });
 
     try {
@@ -1224,7 +1224,7 @@ function createConversationEngine(options = {}) {
     // 30s timeout, mirroring formalizeSpec/reviewSpec
     let timeoutHandle;
     const timeoutPromise = new Promise((_, reject) => {
-      timeoutHandle = setTimeout(() => reject(new Error("BUILDER_TIMEOUT")), 30000);
+      timeoutHandle = setTimeout(() => reject(new Error("BUILDER_TIMEOUT")), 150000);
     });
 
     try {
@@ -1784,7 +1784,7 @@ function createConversationEngine(options = {}) {
     const _invokeRole = async function (roleId, roleInput, provider, model, scenId) {
       let timeoutHandle;
       const timeoutPromise = new Promise((_, reject) => {
-        timeoutHandle = setTimeout(() => reject(new Error("REVIEWER_TIMEOUT")), 30000);
+        timeoutHandle = setTimeout(() => reject(new Error("REVIEWER_TIMEOUT")), 150000);
       });
       try {
         const result = await Promise.race([
@@ -2051,7 +2051,7 @@ function createConversationEngine(options = {}) {
 
     let timeoutHandle;
     const timeoutPromise = new Promise((_, reject) => {
-      timeoutHandle = setTimeout(() => reject(new Error("DOCUMENTATION_TIMEOUT")), 30000);
+      timeoutHandle = setTimeout(() => reject(new Error("DOCUMENTATION_TIMEOUT")), 150000);
     });
 
     try {
@@ -2269,7 +2269,7 @@ function createConversationEngine(options = {}) {
     // ── Invoke quality_judge role (30s timeout, mirrors reportEnv) ─────────────
     let timeoutHandle;
     const timeoutPromise = new Promise((_, reject) => {
-      timeoutHandle = setTimeout(() => reject(new Error("QUALITY_JUDGE_TIMEOUT")), 30000);
+      timeoutHandle = setTimeout(() => reject(new Error("QUALITY_JUDGE_TIMEOUT")), 150000);
     });
 
     try {
@@ -2404,7 +2404,7 @@ function createConversationEngine(options = {}) {
     // 30s timeout, mirroring reviewSpec/buildProject
     let timeoutHandle;
     const timeoutPromise = new Promise((_, reject) => {
-      timeoutHandle = setTimeout(() => reject(new Error("COST_ESTIMATOR_TIMEOUT")), 30000);
+      timeoutHandle = setTimeout(() => reject(new Error("COST_ESTIMATOR_TIMEOUT")), 150000);
     });
 
     try {
@@ -2530,7 +2530,7 @@ function createConversationEngine(options = {}) {
     // 30s timeout, mirroring estimateCost/reportEnv
     let timeoutHandle;
     const timeoutPromise = new Promise((_, reject) => {
-      timeoutHandle = setTimeout(() => reject(new Error("TEST_DESIGNER_TIMEOUT")), 30000);
+      timeoutHandle = setTimeout(() => reject(new Error("TEST_DESIGNER_TIMEOUT")), 150000);
     });
 
     try {
@@ -2658,7 +2658,7 @@ function createConversationEngine(options = {}) {
 
     let timeoutHandle;
     const timeoutPromise = new Promise((_, reject) => {
-      timeoutHandle = setTimeout(() => reject(new Error("ENV_REPORT_TIMEOUT")), 30000);
+      timeoutHandle = setTimeout(() => reject(new Error("ENV_REPORT_TIMEOUT")), 150000);
     });
 
     try {
@@ -2820,7 +2820,7 @@ function createConversationEngine(options = {}) {
     // Invoke deployment role (30s timeout, mirrors reportEnv/judgeQuality)
     let timeoutHandle;
     const timeoutPromise = new Promise((_, reject) => {
-      timeoutHandle = setTimeout(() => reject(new Error("DEPLOYMENT_TIMEOUT")), 30000);
+      timeoutHandle = setTimeout(() => reject(new Error("DEPLOYMENT_TIMEOUT")), 150000);
     });
 
     try {

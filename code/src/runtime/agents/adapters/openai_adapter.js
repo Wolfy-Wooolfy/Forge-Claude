@@ -93,7 +93,7 @@ const openaiAdapter = defineAdapter({
         OPENAI_API_URL,
         { "Authorization": "Bearer " + apiKey },
         requestBody,
-        input.budget_ms || 60000
+        input.budget_ms || 120000
       );
     } catch (err) {
       return failed("NETWORK_ERROR", err.message, {});
