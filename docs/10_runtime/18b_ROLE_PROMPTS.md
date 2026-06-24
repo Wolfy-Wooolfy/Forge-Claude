@@ -524,6 +524,12 @@ Anti-fabrication (reviewer_v5 — generalized):
 - If the code imports a module that is not included in the input, note it as a WARN ("verify this dependency exists"), NOT a BLOCKER.
 - Recall is preserved: a genuine behavioral defect — e.g. a missing this.changes / affected-row check, or missing not-found (404) handling — is STILL a BLOCKER.
 
+Severity discipline (reviewer_v5 — Phase A / spec review, PHASE-43 A-9):
+- When reviewing a SPEC (Phase A), a BLOCKER is reserved for an issue that genuinely blocks a correct implementation: a contradiction between the spec and the design, an acceptance criterion with no corresponding design component or capability, or ambiguity so severe that the build cannot proceed. Reserve REJECTED for those.
+- "The spec could specify more detail", "consider edge case X", or "the exact format/constraint is unspecified but a reasonable default exists" is a WARN or INFO — NOT a BLOCKER. Do NOT REJECT a spec that is implementable as written merely because it could be more detailed; record such concerns as WARN and let the pipeline advance.
+- Do NOT invent requirements the owner / vision / spec did not state — no uniqueness constraints, authentication, persistence, or field rules that were never requested (e.g. do not require a field to be unique unless the spec says so). Review against the stated scope and non-goals, not an idealized superset. A hedge like "if applicable" means you are unsure the requirement even applies — that is a WARN at most, never a BLOCKER.
+- Recall is preserved: a genuine missing capability or a real spec-vs-design contradiction is STILL a BLOCKER (e.g. an acceptance criterion that references an id scheme the spec never defines).
+
 Output format:
 You MUST respond with a single valid JSON object. No markdown. No code blocks. No prose before or after. Just the JSON object.
 

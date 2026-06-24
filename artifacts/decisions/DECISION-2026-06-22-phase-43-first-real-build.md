@@ -221,3 +221,34 @@ architect/spec_writer SU mocks are prompt[0:500]-matched → appends are append-
 
 ### A-8.5 Sequencing + execution
 A-8 removes the reviewer-gate blocker so re-run #6 can reach BUILDER + RUN_TESTS with a reviewer-passing, complete spec. A-5 (test-failure loopback) is sequenced after re-run #6 so it is designed against real build-failure data from a complete-spec build. A-8 implementation + SU re-verify is $0. The next real re-run #6 (cap=1, single attempt — loopback still blind) requires a fresh explicit owner spend-approval (~$0.16). Run protocol unchanged.
+
+---
+
+## AMENDMENT A-9 — Reviewer (spec phase) calibration (owner-directed)
+
+> Owner directive: fix every issue properly. Authored by CTO after real re-run #6 + CTO verification that A-8 took effect yet the reviewer rejected on new/invented grounds. Appends to A-8. A-5 (loopback) remains sequenced after the first run that reaches BUILDER. Prior text preserved.
+
+### A-9.1 Real re-run #6 result (CTO-verified)
+Single-attempt real build (cap=1), $0.03701 (cumulative ≈ $0.879). Stopped at REVIEWER_SPEC, verdict REJECTED → ESCALATED (2nd consecutive). CTO-verified:
+- A-8 WORKED: the reviewer no longer raises the re-run-#5 BLOCKERs (ID scheme, tags, error-response existence) — the spec now carries AC-6 (server-assigned sequential IDs from 1) + tags + AC-7 (error responses).
+- The reviewer (phase A) found DIFFERENT BLOCKERs and rejected: (1) validation constraints for non-title fields "ambiguous" @ AC-1; (2) "duplicate validation for unique fields like title, if applicable" @ spec — an INVENTED requirement (the owner/vision never stated title is unique; the "if applicable" hedge confirms the reviewer is unsure it even applies); (3) exact error-JSON structure not specified @ AC-1/AC-7. Plus WARN (in-memory scalability).
+- Verdict is over-strict + non-deterministic: APPROVED_WITH_CONCERNS in re-run #2/#3/#4, REJECTED in #5/#6. Adding spec detail (the A-8 pattern) does not reliably satisfy it — it finds a new "BLOCKER" each pass, including requirements never requested.
+
+### A-9.2 Root cause
+Not a spec/architect deficiency curable by more detail (whack-a-mole). Root = the reviewer's severity calibration: it classifies "could be more detailed / unstated-but-plausible / reasonable-default unspecified" as BLOCKER (→ REJECTED → ESCALATED, which stops the pipeline) and invents requirements outside the stated scope. The reviewer_v5 prompt's severity/anti-fabrication discipline is scoped to Phase B (code review); the Phase A (spec review) responsibilities ("identify edge cases not covered", "security/scalability concerns not addressed") lack the same BLOCKER discipline. Known reviewer-strictness backlog item; now on the critical path (reviewer gate blocked two consecutive runs before BUILDER).
+
+### A-9.3 Remediation — surgical reviewer (spec phase) calibration (SU-safe; prompts-only)
+Append-to-tail (after the protected 500-char prefix, before "Output format:" — the reviewer_v5 convention) a Phase-A severity clause to reviewer_v5 in 18b:
+- BLOCKER is reserved for issues that genuinely block a correct implementation: an internal contradiction (spec vs design), an acceptance criterion with no corresponding design/capability, or ambiguity so severe the build cannot proceed.
+- "Would benefit from more detail," "consider edge case X," or "the exact format/constraint is unspecified but a reasonable default exists" → WARN/INFO → verdict APPROVED_WITH_CONCERNS (pipeline advances, concerns recorded), NOT BLOCKER.
+- The reviewer MUST NOT invent requirements the owner/vision/spec did not state (no uniqueness, auth, persistence, or field constraints never requested). Review against the stated scope and non-goals, not an idealized superset.
+- Real gap-detection preserved: genuine missing capabilities and contradictions remain BLOCKER (the ID-scheme gap from re-run #5 would still be a BLOCKER).
+
+### A-9.4 Why this is safe
+The calibration re-classifies severity; it does not blind the reviewer. The downstream RUN_TESTS gate (L5b harness) is the actual correctness gate — a build that does not meet the acceptance criteria fails the tests regardless of the reviewer verdict. An over-strict reviewer that REJECTs buildable specs is a worse failure mode for the goal than advancing with recorded concerns. Genuine contradictions/missing-capabilities still block.
+
+### A-9.5 SU-safety + Track A
+Reviewer SU mocks (S89/S90 prompt-prefix-matched; bridge S261–S266 TAG-matched) return canned verdicts → the calibration text cannot change a mock outcome; the append is after the protected 500-char prefix (prompt[0:500] byte-identical) — verified. NO live code file touched (prompts only, 18b) — Track A live surface unchanged. No new §ARC; §ARC=10. Guard: full SU suite green + forge-doctor 35/0.
+
+### A-9.6 Sequencing + execution
+A-9 unblocks the reviewer gate so re-run #7 can reach BUILDER + RUN_TESTS with a complete, reviewer-passing spec. A-5 (build loopback) is sequenced after re-run #7 (designed against the real build-failure data we will finally see). A-9 implementation + SU re-verify is $0. The next real re-run #7 (cap=1) requires a fresh explicit owner spend-approval (~$0.16). Run protocol unchanged.
