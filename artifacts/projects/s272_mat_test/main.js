@@ -1,0 +1,1 @@
+const{add}=require('./math');const{multiply}=require('./utils');console.log(add(2,3)+multiply(2,3));

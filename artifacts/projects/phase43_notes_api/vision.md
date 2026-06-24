@@ -4,7 +4,7 @@ project_name: notes_api
 domain: web_api
 vision_version: 1
 vision_locked: true
-vision_locked_at: 2026-06-23T09:41:30.861Z
+vision_locked_at: 2026-06-24T08:21:50.162Z
 locked_by_role: owner
 amendments_history: []
 goals:

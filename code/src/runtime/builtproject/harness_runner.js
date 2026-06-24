@@ -50,6 +50,14 @@ async function runScenario(scenario, projectRoot) {
   let serverProcess = null;
   let stdout = "";
 
+  // A-4 (ROOT-2 id-coherence): setup http_request responses are captured here so the
+  // execution can reference the id the create-first POST actually returned, via a
+  // {{created.<field>}} placeholder — instead of hardcoding /1 (which breaks against any
+  // non-sequential id scheme, e.g. the builder's Date.now() ids). `created` is the FIRST
+  // setup http_request whose response body is a JSON object. Backward-compatible: a
+  // scenario with no placeholder is resolved to itself, byte-identical to before.
+  const setupCtx = { created: null, setup_responses: [] };
+
   try {
     // Setup
     for (const action of (scenario.setup && scenario.setup.actions) || []) {
@@ -60,15 +68,25 @@ async function runScenario(scenario, projectRoot) {
       } else if (action.type === "http_request") {
         // Self-contained scenarios: seed pre-existing state (e.g. create-first
         // before update/delete/get-by-id) by issuing an HTTP request during setup.
-        // Reuses the same helper as execution; result is intentionally unused here.
-        await _httpRequest(action);
+        // Capture the response so the execution can template the created id.
+        const setupResp = await _httpRequest(action);
+        setupCtx.setup_responses.push(setupResp);
+        if (!setupCtx.created && setupResp && setupResp.body && typeof setupResp.body === "object") {
+          setupCtx.created = setupResp.body;
+        }
       }
     }
 
-    // Execute
+    // Execute (resolve {{created.<field>}} placeholders in url/body from the setup context)
     let response = null;
     if (scenario.execution && scenario.execution.type === "http_request") {
-      response = await _httpRequest(scenario.execution);
+      const exec = Object.assign({}, scenario.execution, {
+        url:  _resolvePlaceholders(scenario.execution.url, setupCtx),
+        body: scenario.execution.body !== undefined
+          ? _resolvePlaceholders(scenario.execution.body, setupCtx)
+          : scenario.execution.body,
+      });
+      response = await _httpRequest(exec);
     }
 
     // Build assertion context
@@ -124,6 +142,28 @@ async function runScenario(scenario, projectRoot) {
 // ---------------------------------------------------------------------------
 // Internal helpers
 // ---------------------------------------------------------------------------
+
+// A-4 (ROOT-2): resolve {{created.<field>}} placeholders in a string or (deeply) an
+// object, using the captured setup context. A placeholder whose field is absent is left
+// literal (so a malformed scenario fails visibly rather than hitting a wrong URL). Strings
+// with no placeholder, and non-string/non-object values, are returned UNCHANGED — making
+// the substitution a no-op for every pre-A-4 scenario (backward-compatible).
+function _resolvePlaceholders(value, ctx) {
+  if (typeof value === "string") {
+    if (value.indexOf("{{") === -1) return value;
+    return value.replace(/\{\{created\.([a-zA-Z0-9_]+)\}\}/g, (m, field) => {
+      const v = ctx && ctx.created ? ctx.created[field] : undefined;
+      return (v === undefined || v === null) ? m : String(v);
+    });
+  }
+  if (Array.isArray(value)) return value.map((v) => _resolvePlaceholders(v, ctx));
+  if (value && typeof value === "object") {
+    const out = {};
+    for (const k of Object.keys(value)) out[k] = _resolvePlaceholders(value[k], ctx);
+    return out;
+  }
+  return value;
+}
 
 function _startServer(action, projectRoot) {
   return new Promise((resolve, reject) => {

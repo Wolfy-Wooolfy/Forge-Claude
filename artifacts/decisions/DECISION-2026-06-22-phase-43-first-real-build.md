@@ -119,3 +119,28 @@ F2 was fixed via prompt (A-2), which relies on LLM discipline; the underlying fr
 
 ### A-3.5 Execution + closure
 A-3 implementation + SU re-verify is $0. The next real re-run (~$0.16, same A-1.3 envelope) requires a fresh explicit owner spend-approval. Closure gate A-1.5 unchanged.
+
+---
+
+## AMENDMENT A-4 — Build-quality root fix: materializer AC-starvation + id-coherence (owner-directed)
+
+> Owner directive (2026-06-22): "مش عايز نسيب اي حاجة فيها مشاكل — أعلى درجات الاحترافية" + "موافق". Authored by CTO after the §S probe + CTO verification of the build code. Appends to A-3; prior text preserved.
+
+### A-4.1 Findings (CTO-verified by reading code)
+Post-A-3 re-run reached RUN_TESTS with a full 9-scenario suite, FAIL 5/9. Two roots:
+- ROOT-1 (materializer AC-starvation): the code-writer is the MATERIALIZER (the builder is a planner only). _buildCodegenPrompt (materializerEngine.js) feeds the LLM only file paths + spec.scope (one sentence) + design.design_summary (one sentence) — NEVER spec.acceptance_criteria (CTO-verified: 0 occurrences in materializerEngine.js). So code is written blind to the 7 ACs → no GET /:id route (AC-4), no 404-on-missing for PUT/DELETE (AC-5/6). Supersedes A-3.4's architect-schema hypothesis: the real gap is the materializer's starved codegen prompt.
+- ROOT-2 (id-coherence): test_designer assumes /notes/1 (A-2's "first id=1") but the materializer emitted id: Date.now() → mismatch. The harness has no setup-response capture and no templating (CTO-verified) — a scenario cannot use the id its own create-first POST returned.
+Real spend re-run #2 $0.19965 (cumulative PHASE-43 ≈ $0.516; within ceiling).
+
+### A-4.2 Remediation (fixes all 4 at root; SU-safe)
+- §S.3 — Materializer codegen enrichment (materializerEngine.js _buildCodegenPrompt; runtime/** live, prompt-construction): ADD the FULL spec.acceptance_criteria (verbatim) + each file's plan description into the codegen prompt, with a directive to implement EVERY acceptance criterion completely — every route (incl. GET /:id), every status code (incl. 404 on missing for GET/PUT/DELETE), and a data layer that signals found/not-found so handlers can 404. Keep the existing scope/design_summary; ADD the ACs. SU-safe (materializer mocks TAG-matched).
+- §S.2 — id-coherence structural: (a) harness_runner.js (runtime/** live, additive, backward-compatible): capture each setup http_request response into a context; resolve placeholders (e.g. {{created.id}}) in the execution URL/body from that context; literal URLs without a placeholder behave exactly as before. (b) test_designer prompt (18b, append-to-tail, TAG-safe): mutation/get-by-id scenarios target the id returned by their create-first setup (via the placeholder), never a hardcoded /1.
+
+### A-4.3 SU-safety + Track A
+materializer + builder + test_designer SU mocks are TAG-matched → prompt/codegen edits SU-safe. Harness change additive + backward-compatible (templating fires only on a placeholder). Live files touched by A-4: materializerEngine.js + harness_runner.js (both runtime/**; prompt-construction/additive; no forbidden patterns). No new §ARC; §ARC=10. Guard: full SU suite green + forge-doctor 35/0.
+
+### A-4.4 Sequencing — §S.1 (loopback self-correction) → A-5
+buildProject re-invokes with identical inputs and never reads last_report.json/loopback_signal.json (CTO-verified: 0 occurrences) → the loopback rebuild re-rolls blind (why 6/9→5/9). This self-correction defect WILL be fixed as A-5 (feed failing assertions from last_report.json into the rebuild's codegen). Sequenced AFTER A-4 for risk isolation — the A-4 materializer enrichment likely makes the FIRST build correct (loopback may not fire for this demo); the blind-rebuild defect is fixed regardless in A-5.
+
+### A-4.5 Execution + closure
+A-4 implementation + SU re-verify is $0. The next real re-run (~$0.16, same A-1.3 envelope) requires a fresh explicit owner spend-approval. Closure gate A-1.5 unchanged.

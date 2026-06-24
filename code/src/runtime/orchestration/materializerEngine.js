@@ -30,14 +30,38 @@ function _buildCodegenPrompt(plan, spec, design, scenario_id) {
   const specSummary  = (spec  && (spec.scope   || spec.summary))       || "see design";
   const designSummary = (design && design.design_summary)              || "see spec";
 
+  // A-4 (ROOT-1 fix): feed the FULL acceptance criteria + each file's plan description
+  // into the codegen prompt. Previously the prompt carried only file paths + a one-line
+  // scope summary, so the LLM wrote code blind to the detailed contract (missing routes
+  // like GET /:id, missing 404-on-missing). These blocks are additive; scope/design and
+  // the scenarioTag are unchanged (the SU mock match keys off SCENARIO_TAG, not body).
+  const acs = (spec && Array.isArray(spec.acceptance_criteria)) ? spec.acceptance_criteria : [];
+  const acBlock = acs.length
+    ? "\nAcceptance criteria (implement EVERY one completely):\n" +
+      acs.map(function (a) {
+        return "- " + (a && a.id ? a.id + ": " : "") + ((a && (a.description || a.text)) || "");
+      }).join("\n")
+    : "";
+  const fileDescs = (plan || []).filter(function (p) { return p && p.path; })
+    .map(function (p) { return "- " + p.path + ": " + (p.description || p.purpose || "(no description)"); })
+    .join("\n");
+  const fileBlock = fileDescs ? "\nFile responsibilities:\n" + fileDescs : "";
+
   return (
     "You are a code generator. Return STRICT JSON only — no markdown, no code blocks, no prose before or after." +
     scenarioTag +
     "\nGenerate exactly the following files and return them as this exact JSON structure:" +
     "\n{ \"files\": [ { \"path\": \"<path>\", \"content\": \"<source code>\" }, ... ] }" +
     "\nFiles to generate: " + filePaths +
+    fileBlock +
     "\nSpec: " + specSummary +
     "\nDesign: " + designSummary +
+    acBlock +
+    "\nImplement EVERY acceptance criterion completely: every route (including GET /:id to " +
+    "fetch a single resource by id), every status code (including 404 when a resource id is " +
+    "not found — for GET, PUT, and DELETE), and all entity fields. The data layer must signal " +
+    "found vs not-found (e.g. return null/undefined for a missing id) so the route handlers can " +
+    "return 404 instead of silently succeeding." +
     "\nRESPOND WITH VALID JSON ONLY."
   );
 }

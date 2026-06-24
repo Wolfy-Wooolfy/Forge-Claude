@@ -1,13 +1,14 @@
 {
-  "id": "T-5",
-  "name": "fetch_non_existent_note_returns_404",
-  "description": "GET /notes/:id for nonexistent note returns 404",
+  "id": "T-1",
+  "name": "create_user_returns_201",
+  "description": "POST /users with valid credentials returns 201 and user id",
   "category": "http",
+  "fixture": "fresh_db",
   "setup": {
     "actions": [
       {
         "type": "start_server",
-        "command": "node src/server.js",
+        "command": "node app.js",
         "wait_for_port": 3000,
         "timeout_ms": 5000
       }
@@ -15,16 +16,24 @@
   },
   "execution": {
     "type": "http_request",
-    "method": "GET",
-    "url": "http://localhost:3000/notes/999",
+    "method": "POST",
+    "url": "http://localhost:3000/users",
     "headers": {
-      "Accept": "application/json"
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "username": "alice",
+      "password": "secure123"
     }
   },
   "assertions": [
     {
       "type": "http_status_equals",
-      "expected": 404
+      "expected": 201
+    },
+    {
+      "type": "response_body_contains_key",
+      "key": "id"
     }
   ],
   "teardown": {
@@ -36,7 +45,7 @@
   },
   "metadata": {
     "covers_ac": [
-      "AC-3"
+      "AC-1"
     ],
     "estimated_duration_ms": 500
   }

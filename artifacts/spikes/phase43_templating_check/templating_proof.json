@@ -1,0 +1,24 @@
+{
+  "verdict": "PROVEN",
+  "interpretation": "Fixture assigns non-sequential ids (first = '1001'). TPL passes ONLY because {{created.id}} resolved to the real created id; TPL-NEG (literal /notes/1) fails 404 — proving the placeholder targets the actual created id and is decisive against a non-/1 id scheme.",
+  "tpl": {
+    "status": "PASS",
+    "assertions": [
+      {
+        "type": "http_status_equals",
+        "pass": true,
+        "reason": null
+      }
+    ]
+  },
+  "tpl_neg": {
+    "status": "FAIL",
+    "assertions": [
+      {
+        "type": "http_status_equals",
+        "pass": false,
+        "reason": "Expected HTTP 200, got 404"
+      }
+    ]
+  }
+}
