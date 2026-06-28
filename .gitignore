@@ -180,6 +180,8 @@ artifacts/projects/live_smoke_retry/
 artifacts/projects/hr/
 artifacts/projects/default_project/
 artifacts/projects/active_project.json
+# PHASE-44 STEP B real-validation build output (contains node_modules; forensic copies live under artifacts/spikes/phase44_loopback_real/)
+artifacts/projects/phase44_loopback_real/
 
 
 # -- 10. PER-PROJECT (built by Forge) — node_modules and binary indexes ------

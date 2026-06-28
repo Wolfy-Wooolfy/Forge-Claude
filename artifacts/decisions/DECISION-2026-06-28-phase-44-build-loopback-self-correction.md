@@ -116,3 +116,35 @@ PHASE-44 is CLOSED only when **ALL** hold:
 ---
 
 **END — PHASE-44 PROPOSAL (A-5)**
+
+---
+
+## CLOSURE — PHASE-44 COMPLETE ✅
+
+> Closed 2026-06-28. Gate A (mock, deterministic) + Gate B (one real gpt-4o run) both MET and independently CTO-verified. LOCAL commit only pending "push GO".
+
+### What A-5 delivered
+The build loopback is no longer blind. On a RUN_TESTS failure that loops back to BUILDER (iteration_count > 0), buildProject reads the prior attempt's test report via the EXISTING builtproject.read_report tool and distils its failing assertions into repair_feedback, which the materializer appends to the codegen prompt as targeted repair instructions. First-build behaviour is byte-identical to pre-A-5 (no report / iteration_count === 0 ⇒ no feedback). Two live files touched (conversationEngine.js, materializerEngine.js — both already in the PHASE-43 cumulative set); no new §ARC; §ARC frozen at 10.
+
+### Gate A — mock, deterministic (CTO-verified)
+- S335 T-invariance: first-attempt codegen prompt byte-identical to pre-A-5 (CTO independently ran _buildCodegenPrompt pre vs post: POST(undefined)===PRE and POST([])===PRE).
+- S336 T-feedback-present: with a non-passing report + iteration_count>0, the codegen prompt carries the failing assertion type+reason and excludes passing assertions.
+- S337 T-convergence: a prompt-conditioned stub returns defective code without the repair marker and corrected code with it; driven through the real engine, attempt-1 FAIL → loop_back → attempt-2 PASS, with causation isolated (the stub conditions ONLY on the marker).
+- SU 330 pass / 0 fail / 5 skip (335); forge-doctor 35 checks / 0 FAIL; Track A clean in both files; §ARC=10.
+
+### Gate B — one real gpt-4o run (CTO forensic-verified)
+- Forced loopback (seeded defective attempt-1 missing GET /notes/:id + a realistic FAIL report; iteration_count=1). The ONE real call = the materializer codegen rebuild (provider openai, gpt-4o-2024-08-06).
+- Trace: the real codegen prompt carried the failing assertion verbatim ("PREVIOUS BUILD ATTEMPT FAILED… [FAIL] T-3 … http_status_equals: expected 200 but got 404").
+- Output: attempt-2 (real model) added router.get('/:id') + 404-on-missing (materially different from the seeded attempt-1); the corrected code traces to the raw model result.
+- Report: the previously-failing get-by-id scenario flipped FAIL → PASS through the real L5b harness (npm install express + server + HTTP).
+- Cost: $0.01627 (one call, 789→822 tokens) — far under the $1.50 soft-stop. Zero live-code changes in STEP B.
+
+### Honest scope of the claim
+Gate B confirms the real-provider path CARRIES the failing assertions and produces a corrected build — it does NOT, on its own, prove the feedback is the SOLE cause of the fix (the spec's AC-3 also requests GET /:id). Causal sufficiency is proven deterministically by S337 (mock). The two together close the "mock-green / real-loopback-blind" risk.
+
+### Evidence
+- Checkpoints: _phase_44_checkpoints/stage_a_mid.md, stage_b_real_validation.md.
+- STEP B bundle: artifacts/spikes/phase44_loopback_real/ (real prompt, raw result, attempt1_defective vs attempt2_corrected, both reports, summaries).
+- Cost ledger: artifacts/agent/cost_ledger.jsonl (the openai_traced gpt-4o row).
+
+PHASE-44 status: CLOSED (LOCAL). next_phase: PHASE-45-PENDING-DECISION.
