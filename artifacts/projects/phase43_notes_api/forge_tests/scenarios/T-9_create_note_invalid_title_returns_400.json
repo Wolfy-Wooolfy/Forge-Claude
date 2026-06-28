@@ -1,14 +1,14 @@
 {
-  "id": "T-3",
-  "name": "get_tasks_without_jwt_returns_401",
-  "description": "GET /tasks without Authorization header returns 401 Unauthorized",
+  "id": "T-9",
+  "name": "create_note_invalid_title_returns_400",
+  "description": "POST /notes with invalid title returns 400",
   "category": "http",
   "fixture": "fresh_db",
   "setup": {
     "actions": [
       {
         "type": "start_server",
-        "command": "node app.js",
+        "command": "node src/server.js",
         "wait_for_port": 3000,
         "timeout_ms": 5000
       }
@@ -16,15 +16,22 @@
   },
   "execution": {
     "type": "http_request",
-    "method": "GET",
-    "url": "http://localhost:3000/tasks",
-    "headers": {},
-    "body": null
+    "method": "POST",
+    "url": "http://localhost:3000/notes",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "title": "",
+      "body": "This note has no title",
+      "category": "Invalid",
+      "tags": []
+    }
   },
   "assertions": [
     {
       "type": "http_status_equals",
-      "expected": 401
+      "expected": 400
     }
   ],
   "teardown": {
@@ -36,7 +43,7 @@
   },
   "metadata": {
     "covers_ac": [
-      "AC-3"
+      "AC-6"
     ],
     "estimated_duration_ms": 500
   }

@@ -1,0 +1,64 @@
+{
+  "id": "T-3",
+  "name": "get_note_by_id_returns_200",
+  "description": "GET /notes/:id returns 200 with the note if found",
+  "category": "http",
+  "fixture": "fresh_db",
+  "setup": {
+    "actions": [
+      {
+        "type": "start_server",
+        "command": "node src/server.js",
+        "wait_for_port": 3000,
+        "timeout_ms": 5000
+      },
+      {
+        "type": "http_request",
+        "method": "POST",
+        "url": "http://localhost:3000/notes",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "title": "Meeting Notes",
+          "body": "Discuss project updates",
+          "category": "Work",
+          "tags": [
+            "meeting",
+            "updates"
+          ]
+        }
+      }
+    ]
+  },
+  "execution": {
+    "type": "http_request",
+    "method": "GET",
+    "url": "http://localhost:3000/notes/{{created.id}}",
+    "headers": {}
+  },
+  "assertions": [
+    {
+      "type": "http_status_equals",
+      "expected": 200
+    },
+    {
+      "type": "response_body_field_equals",
+      "field": "title",
+      "expected": "Meeting Notes"
+    }
+  ],
+  "teardown": {
+    "actions": [
+      {
+        "type": "stop_server"
+      }
+    ]
+  },
+  "metadata": {
+    "covers_ac": [
+      "AC-3"
+    ],
+    "estimated_duration_ms": 500
+  }
+}

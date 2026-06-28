@@ -1,14 +1,14 @@
 {
-  "id": "T-1",
-  "name": "create_user_returns_201",
-  "description": "POST /users with valid credentials returns 201 and user id",
+  "id": "T-6",
+  "name": "update_note_not_found_returns_404",
+  "description": "PUT /notes/:id returns 404 if the note to update is not found",
   "category": "http",
   "fixture": "fresh_db",
   "setup": {
     "actions": [
       {
         "type": "start_server",
-        "command": "node app.js",
+        "command": "node src/server.js",
         "wait_for_port": 3000,
         "timeout_ms": 5000
       }
@@ -16,24 +16,24 @@
   },
   "execution": {
     "type": "http_request",
-    "method": "POST",
-    "url": "http://localhost:3000/users",
+    "method": "PUT",
+    "url": "http://localhost:3000/notes/999999",
     "headers": {
       "Content-Type": "application/json"
     },
     "body": {
-      "username": "alice",
-      "password": "secure123"
+      "title": "Non-existent Note",
+      "body": "This note does not exist",
+      "category": "Missing",
+      "tags": [
+        "missing"
+      ]
     }
   },
   "assertions": [
     {
       "type": "http_status_equals",
-      "expected": 201
-    },
-    {
-      "type": "response_body_contains_key",
-      "key": "id"
+      "expected": 404
     }
   ],
   "teardown": {
@@ -45,7 +45,7 @@
   },
   "metadata": {
     "covers_ac": [
-      "AC-1"
+      "AC-4"
     ],
     "estimated_duration_ms": 500
   }
