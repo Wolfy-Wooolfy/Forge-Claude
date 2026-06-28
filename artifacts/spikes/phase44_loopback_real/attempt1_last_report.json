@@ -1,0 +1,24 @@
+{
+  "total": 1,
+  "pass": 0,
+  "fail": 1,
+  "error": 0,
+  "overall_status": "FAIL",
+  "ran_at": "2026-06-28T00:00:00.000Z",
+  "scenarios": [
+    {
+      "id": "T-3",
+      "name": "get_by_id_existing_returns_200",
+      "status": "FAIL",
+      "duration_ms": 120,
+      "assertions": [
+        {
+          "type": "http_status_equals",
+          "pass": false,
+          "reason": "expected 200 but got 404"
+        }
+      ],
+      "error": null
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "mode": "real",
+  "seeded_iteration_count": 1,
+  "build": {
+    "advanced": true,
+    "advanced_to": "RUN_TESTS",
+    "files_written": [
+      "src/server.js",
+      "src/routes/notes.js",
+      "src/store/notesStore.js"
+    ]
+  },
+  "prompt": {
+    "captured_len": 3290,
+    "has_repair_marker": true,
+    "has_assertion_type": true,
+    "has_assertion_reason": true
+  },
+  "plumbing_ok": true,
+  "real_cost_usd": 0.01627,
+  "attempt2_manifest": [
+    "src/server.js",
+    "src/routes/notes.js",
+    "src/store/notesStore.js"
+  ],
+  "attempt2_get_by_id_route_lines": [
+    "src/routes/notes.js: router.get('/:id', (req, res) => {"
+  ],
+  "attempt2_has_get_by_id": true,
+  "attempt1_has_get_by_id": false,
+  "runTests": {
+    "advanced": true,
+    "advanced_to": "REVIEWER_CODE_AND_SECURITY",
+    "report_summary": {
+      "overall_status": "PASS",
+      "total": 1,
+      "pass": 1,
+      "fail": 0,
+      "error": 0
+    }
+  },
+  "attempt2_report": {
+    "overall_status": "PASS",
+    "pass": 1,
+    "fail": 0,
+    "error": 0,
+    "scenarios": [
+      {
+        "id": "T-3",
+        "status": "PASS"
+      }
+    ]
+  },
+  "SUCCESS": true
+}

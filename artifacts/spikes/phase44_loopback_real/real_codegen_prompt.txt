@@ -1,0 +1,24 @@
+You are a code generator. Return STRICT JSON only — no markdown, no code blocks, no prose before or after.
+Generate exactly the following files and return them as this exact JSON structure:
+{ "files": [ { "path": "<path>", "content": "<source code>" }, ... ] }
+Files to generate: src/server.js, src/routes/notes.js, src/store/notesStore.js
+File responsibilities (from the spec):
+- src/server.js: Express app entry: mounts the notes router at root and listens on process.env.PORT||3000.
+- src/routes/notes.js: Express router implementing ALL /notes endpoints incl. GET /notes/:id with 404-on-missing.
+- src/store/notesStore.js: In-memory store: server-assigned sequential integer ids from 1; returns null for a missing id so handlers can 404.
+Spec: A minimal in-memory Notes REST API.
+Design: A small Express-based in-memory Notes REST API. The server mounts the notes router so paths are EXACTLY /notes and /notes/:id (no /api prefix). The in-memory store assigns sequential integer ids starting at 1 and returns null for a missing id so handlers return 404.
+Acceptance criteria (implement EVERY one completely):
+- AC-1: POST /notes creates a note with title and body; returns 201 with the created note including a server-assigned integer id.
+- AC-2: GET /notes returns 200 with an array of all notes.
+- AC-3: GET /notes/:id returns 200 with the note for an existing id, and 404 for a missing id.
+- AC-4: PUT /notes/:id updates an existing note (200) or returns 404 for a missing id.
+- AC-5: DELETE /notes/:id deletes an existing note (204) or returns 404 for a missing id.
+Implement EVERY acceptance criterion completely: every route (including GET /:id to fetch a single resource by id), every status code (including 404 when a resource id is not found — for GET, PUT, and DELETE), and all entity fields. The data layer must signal found vs not-found (e.g. return null/undefined for a missing id) so the route handlers can return 404 instead of silently succeeding.
+Runnability: if this is an HTTP API or web service, it MUST include a server/entry file that creates the app, mounts ALL routes, and calls app.listen(process.env.PORT || 3000) so it boots and accepts HTTP requests. Implement the entry file already in the list (e.g. src/server.js); if the list contains NO entry file (none of src/server.js, src/index.js, src/app.js, index.js, server.js, app.js), ALSO generate src/server.js with that bootstrap. Do not add persistence/backup or test files beyond the spec's declared scope.
+Endpoint paths: the served paths MUST exactly equal the paths the acceptance criteria declare. When you mount a router in the entry file, the mount path joined with the router's route paths MUST equal the AC-declared paths — do NOT introduce a base-path or version prefix (e.g. /api, /v1) unless the acceptance criteria explicitly include it. If the ACs say POST /notes, the app must serve POST /notes, NOT /api/notes (e.g. app.use(router) with router.post('/notes', ...), OR app.use('/notes', router) with router.post('/', ...) — but NEVER both prefixes).
+
+PREVIOUS BUILD ATTEMPT FAILED THESE CHECKS — fix exactly these without regressing the checks that already passed:
+- [FAIL] T-3 — get_by_id_existing_returns_200
+    • http_status_equals: expected 200 but got 404
+RESPOND WITH VALID JSON ONLY.

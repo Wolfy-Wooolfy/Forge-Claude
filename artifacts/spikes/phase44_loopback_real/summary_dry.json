@@ -1,0 +1,42 @@
+{
+  "mode": "dry",
+  "seeded_iteration_count": 1,
+  "build": {
+    "advanced": true,
+    "advanced_to": "RUN_TESTS",
+    "files_written": [
+      "src/server.js"
+    ]
+  },
+  "prompt": {
+    "captured_len": 3290,
+    "has_repair_marker": true,
+    "has_assertion_type": true,
+    "has_assertion_reason": true
+  },
+  "plumbing_ok": true,
+  "runTests": {
+    "advanced": true,
+    "advanced_to": "REVIEWER_CODE_AND_SECURITY",
+    "report_summary": {
+      "overall_status": "PASS",
+      "total": 1,
+      "pass": 1,
+      "fail": 0,
+      "error": 0
+    }
+  },
+  "attempt2_report": {
+    "overall_status": "PASS",
+    "pass": 1,
+    "fail": 0,
+    "error": 0,
+    "scenarios": [
+      {
+        "id": "T-DRY",
+        "status": "PASS"
+      }
+    ]
+  },
+  "SUCCESS": true
+}

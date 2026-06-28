@@ -1,0 +1,17 @@
+{
+  "status": "SUCCESS",
+  "output": {
+    "text": "{\n    \"files\": [\n        {\n            \"path\": \"src/server.js\",\n            \"content\": \"const express = require('express');\\nconst notesRouter = require('./routes/notes');\\n\\nconst app = express();\\napp.use(express.json());\\napp.use('/notes', notesRouter);\\n\\nconst PORT = process.env.PORT || 3000;\\napp.listen(PORT, () => {\\n    console.log(`Server is running on port ${PORT}`);\\n});\"\n        },\n        {\n            \"path\": \"src/routes/notes.js\",\n            \"content\": \"const express = require('express');\\nconst notesStore = require('../store/notesStore');\\n\\nconst router = express.Router();\\n\\nrouter.post('/', (req, res) => {\\n    const { title, body } = req.body;\\n    const newNote = notesStore.createNote({ title, body });\\n    res.status(201).json(newNote);\\n});\\n\\nrouter.get('/', (req, res) => {\\n    const notes = notesStore.getAllNotes();\\n    res.status(200).json(notes);\\n});\\n\\nrouter.get('/:id', (req, res) => {\\n    const id = parseInt(req.params.id, 10);\\n    const note = notesStore.getNoteById(id);\\n    if (note) {\\n        res.status(200).json(note);\\n    } else {\\n        res.status(404).send('Note not found');\\n    }\\n});\\n\\nrouter.put('/:id', (req, res) => {\\n    const id = parseInt(req.params.id, 10);\\n    const { title, body } = req.body;\\n    const updatedNote = notesStore.updateNoteById(id, { title, body });\\n    if (updatedNote) {\\n        res.status(200).json(updatedNote);\\n    } else {\\n        res.status(404).send('Note not found');\\n    }\\n});\\n\\nrouter.delete('/:id', (req, res) => {\\n    const id = parseInt(req.params.id, 10);\\n    const success = notesStore.deleteNoteById(id);\\n    if (success) {\\n        res.status(204).send();\\n    } else {\\n        res.status(404).send('Note not found');\\n    }\\n});\\n\\nmodule.exports = router;\"\n        },\n        {\n            \"path\": \"src/store/notesStore.js\",\n            \"content\": \"let notes = [];\\nlet nextId = 1;\\n\\nfunction createNote({ title, body }) {\\n    const note = { id: nextId++, title, body };\\n    notes.push(note);\\n    return note;\\n}\\n\\nfunction getAllNotes() {\\n    return notes;\\n}\\n\\nfunction getNoteById(id) {\\n    return notes.find(note => note.id === id) || null;\\n}\\n\\nfunction updateNoteById(id, { title, body }) {\\n    const noteIndex = notes.findIndex(note => note.id === id);\\n    if (noteIndex !== -1) {\\n        notes[noteIndex] = { id, title, body };\\n        return notes[noteIndex];\\n    }\\n    return null;\\n}\\n\\nfunction deleteNoteById(id) {\\n    const noteIndex = notes.findIndex(note => note.id === id);\\n    if (noteIndex !== -1) {\\n        notes.splice(noteIndex, 1);\\n        return true;\\n    }\\n    return false;\\n}\\n\\nmodule.exports = {\\n    createNote,\\n    getAllNotes,\\n    getNoteById,\\n    updateNoteById,\\n    deleteNoteById\\n};\"\n        }\n    ]\n}",
+    "tokens_in": 789,
+    "tokens_out": 822,
+    "latency_ms": 5170,
+    "cost_usd": 0.01627,
+    "provider": "openai",
+    "model": "gpt-4o-2024-08-06",
+    "finish_reason": "stop"
+  },
+  "metadata": {
+    "invocation_id": null,
+    "cached": false
+  }
+}

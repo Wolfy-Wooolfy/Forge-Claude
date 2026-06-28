@@ -1,0 +1,7 @@
+{
+  "name": "phase44_loopback_real",
+  "version": "1.0.0",
+  "dependencies": {
+    "express": "latest"
+  }
+}
