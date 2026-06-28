@@ -1,0 +1,25 @@
+{
+  "id": "S337",
+  "name": "A-5 build loopback — end-to-end convergence: defective→FAIL→loop_back→corrected→PASS, caused by feedback (PHASE-44)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/build_loopback_test_helper",
+  "method": "runTConvergence",
+  "args": [],
+  "cleanup_project": "s337_a5_convergence",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "attempt1_advanced_run_tests", "expected": true },
+    { "type": "state_field_equals", "field": "attempt1_no_repaired_file",   "expected": true },
+    { "type": "state_field_equals", "field": "rt1_overall_fail",            "expected": true },
+    { "type": "state_field_equals", "field": "rt1_looped_back",             "expected": true },
+    { "type": "state_field_equals", "field": "attempt2_advanced_run_tests", "expected": true },
+    { "type": "state_field_equals", "field": "attempt2_has_repaired_file",  "expected": true },
+    { "type": "state_field_equals", "field": "rt2_overall_pass",            "expected": true },
+    { "type": "state_field_equals", "field": "rt2_advanced_reviewer",       "expected": true },
+    { "type": "state_field_equals", "field": "final_state_reviewer",        "expected": true },
+    { "type": "state_field_equals", "field": "prompt1_no_repair_marker",    "expected": true },
+    { "type": "state_field_equals", "field": "prompt2_has_repair_marker",   "expected": true },
+    { "type": "state_field_equals", "field": "flip_fail_to_pass",           "expected": true }
+  ]
+}

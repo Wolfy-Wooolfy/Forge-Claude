@@ -1184,6 +1184,14 @@ function createConversationEngine(options = {}) {
       return { ok: true, loop_id: loopId, current_state: currentState, build_error: "WRONG_STATE", advanced: false };
     }
 
+    // A-5 (PHASE-44) loopback gate: iteration_count comes from the SAME get_status call above
+    // (no second call). 0 ⇒ first BUILDER pass of this loop ⇒ no repair feedback (byte-identical
+    // to the pre-A-5 first build). > 0 ⇒ a prior RUN_TESTS ran + looped back ⇒ feed its failures
+    // into the rebuild. The > 0 gate is also what prevents a stale report from a PREVIOUS loop
+    // (last_report.json lives per-project, not per-loop) from leaking into a NEW loop's first pass.
+    const iterationCount = (statusResult.output && typeof statusResult.output.iteration_count === "number")
+      ? statusResult.output.iteration_count : 0;
+
     // Read spec from disk
     const specRelPath = "artifacts/projects/" + normalizeProjectId(projectId) +
       "/orchestration/" + loopId + "/spec.json";
@@ -1257,6 +1265,39 @@ function createConversationEngine(options = {}) {
       // Smoke: driven by spec.smoke_entry (no smoke if not present)
       const smokeEntry = (spec && spec.smoke_entry) || null;
 
+      // A-5 (PHASE-44): on a loopback rebuild (iteration_count > 0) read the prior attempt's
+      // test report via the EXISTING read-only L2 tool and distil its failing assertions into
+      // repair_feedback. Fail-OPEN: REPORT_NOT_FOUND / any non-SUCCESS / iteration_count === 0
+      // ⇒ repair_feedback = [] (first-build behavior unchanged). project_root is re-derived the
+      // SAME way runTests does (path.resolve(root, "artifacts/projects/" + pid)) so both read the
+      // identical absolute forge_tests/last_report.json. NO direct fs read of the report.
+      let repairFeedback = [];
+      if (iterationCount > 0) {
+        const projectRoot = path.resolve(root, "artifacts/projects/" + normalizeProjectId(projectId));
+        let reportRead = null;
+        try {
+          reportRead = await reg.invoke("builtproject.read_report", { project_root: projectRoot }, { root });
+        } catch {
+          reportRead = null;
+        }
+        if (reportRead && reportRead.status === "SUCCESS" && reportRead.output &&
+            Array.isArray(reportRead.output.scenarios)) {
+          repairFeedback = reportRead.output.scenarios
+            .filter(function (s) { return s && s.status !== "PASS"; })
+            .map(function (s) {
+              return {
+                scenario_id:        s.id,
+                name:               s.name,
+                status:             s.status,
+                error:              s.error || null,
+                failing_assertions: (Array.isArray(s.assertions) ? s.assertions : [])
+                  .filter(function (a) { return a && a.pass === false; })
+                  .map(function (a) { return { type: a.type, reason: a.reason }; })
+              };
+            });
+        }
+      }
+
       const matResult = await reg.invoke("builder.materialize", Object.assign(
         {
           project_id: normalizeProjectId(projectId),
@@ -1268,7 +1309,9 @@ function createConversationEngine(options = {}) {
         },
         matModel    ? { model:       matModel    } : {},
         matScenId   ? { scenario_id: matScenId   } : {},
-        smokeEntry  ? { smoke_entry: smokeEntry  } : {}
+        smokeEntry  ? { smoke_entry: smokeEntry  } : {},
+        // Additive + optional: absent when empty ⇒ the materialize call is byte-identical to today.
+        repairFeedback.length ? { repair_feedback: repairFeedback } : {}
       ), buildCtx);
 
       const matOut = matResult && matResult.output;

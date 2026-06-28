@@ -1,0 +1,17 @@
+{
+  "id": "S335",
+  "name": "A-5 build loopback — first-attempt codegen prompt byte-identical to pre-A-5 (no feedback) (PHASE-44)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/build_loopback_test_helper",
+  "method": "runTInvariance",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "pre_equals_empty",       "expected": true },
+    { "type": "state_field_equals", "field": "pre_equals_undefined",   "expected": true },
+    { "type": "state_field_equals", "field": "empty_has_no_repair",    "expected": true },
+    { "type": "state_field_equals", "field": "nonempty_block_differs", "expected": true },
+    { "type": "state_field_equals", "field": "nonempty_has_repair",    "expected": true }
+  ]
+}

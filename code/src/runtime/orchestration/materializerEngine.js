@@ -24,7 +24,7 @@ function _isSafePath(p) {
   );
 }
 
-function _buildCodegenPrompt(plan, spec, design, scenario_id) {
+function _buildCodegenPrompt(plan, spec, design, scenario_id, repair_feedback) {
   const filePaths    = plan.map(function (f) { return f.path; }).join(", ");
   const scenarioTag  = scenario_id ? "\nSCENARIO_TAG: " + scenario_id + "\n" : "";
   const specSummary  = (spec  && (spec.scope   || spec.summary))       || "see design";
@@ -49,6 +49,35 @@ function _buildCodegenPrompt(plan, spec, design, scenario_id) {
     .map(function (f) { return "- " + f.path + ": " + ((f.purpose || f.description) || ""); })
     .join("\n");
   const fileBlock = fileDescs ? "\nFile responsibilities (from the spec):\n" + fileDescs : "";
+
+  // A-5 (PHASE-44, build loopback self-correction): on a loopback rebuild the engine passes
+  // the failing assertions from the PREVIOUS attempt's test report as repair_feedback. This
+  // block is emitted ONLY when repair_feedback is non-empty, so a first-attempt build (no
+  // prior report / iteration_count === 0 ⇒ repair_feedback empty/absent) yields a prompt that
+  // is BYTE-IDENTICAL to the pre-A-5 path. Rendered as the LAST conditional block so the
+  // targeted-repair directive is the most recent instruction the model sees. The assertion
+  // type/reason strings are emitted VERBATIM from the report; an ERROR scenario with no failing
+  // assertion carries its error message instead.
+  const repair = Array.isArray(repair_feedback) ? repair_feedback : [];
+  const repairBlock = repair.length
+    ? "\n\nPREVIOUS BUILD ATTEMPT FAILED THESE CHECKS — fix exactly these without " +
+      "regressing the checks that already passed:\n" +
+      repair.map(function (s) {
+        const sid    = (s && s.scenario_id) ? s.scenario_id : "(unknown)";
+        const nm     = (s && s.name) ? s.name : "";
+        const st     = (s && s.status) ? s.status : "FAIL";
+        const header = "- [" + st + "] " + sid + (nm ? " — " + nm : "");
+        const fas    = (s && Array.isArray(s.failing_assertions)) ? s.failing_assertions : [];
+        let lines    = fas.map(function (a) {
+          return "\n    • " + ((a && a.type) ? a.type : "(assertion)") + ": " +
+                 ((a && a.reason != null) ? a.reason : "");
+        }).join("");
+        if (fas.length === 0 && s && s.error) {
+          lines = "\n    • ERROR: " + s.error;
+        }
+        return header + lines;
+      }).join("\n")
+    : "";
 
   return (
     "You are a code generator. Return STRICT JSON only — no markdown, no code blocks, no prose before or after." +
@@ -77,6 +106,7 @@ function _buildCodegenPrompt(plan, spec, design, scenario_id) {
     "acceptance criteria explicitly include it. If the ACs say POST /notes, the app must serve POST /notes, " +
     "NOT /api/notes (e.g. app.use(router) with router.post('/notes', ...), OR app.use('/notes', router) with " +
     "router.post('/', ...) — but NEVER both prefixes)." +
+    repairBlock +
     "\nRESPOND WITH VALID JSON ONLY."
   );
 }
@@ -109,8 +139,11 @@ async function materialize(input, ctx) {
   const scenario_id = input.scenario_id || null;
   const smoke      = input.smoke       === true;
   const smoke_entry = input.smoke_entry || null;
+  // A-5 (PHASE-44): OPTIONAL repair feedback from the prior attempt's failing test report.
+  // undefined-safe (defaults to []) so a first build is unchanged.
+  const repairFeedback = Array.isArray(input.repair_feedback) ? input.repair_feedback : [];
 
-  const prompt = _buildCodegenPrompt(plan, spec, design, scenario_id);
+  const prompt = _buildCodegenPrompt(plan, spec, design, scenario_id, repairFeedback);
 
   let codegenResult;
   try {
@@ -231,4 +264,5 @@ async function materialize(input, ctx) {
   };
 }
 
-module.exports = { materialize };
+// _buildCodegenPrompt exported for the A-5 deterministic invariance test (PHASE-44 D3).
+module.exports = { materialize, _buildCodegenPrompt };
