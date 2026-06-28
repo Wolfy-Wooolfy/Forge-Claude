@@ -1,14 +1,14 @@
 {
-  "id": "T-3",
-  "name": "get_tasks_without_jwt_returns_401",
-  "description": "GET /tasks without Authorization header returns 401 Unauthorized",
+  "id": "T-5",
+  "name": "shorten_with_invalid_url",
+  "description": "POST /shorten with an invalid URL returns 400 + error message",
   "category": "http",
   "fixture": "fresh_db",
   "setup": {
     "actions": [
       {
         "type": "start_server",
-        "command": "node app.js",
+        "command": "node src/server.js",
         "wait_for_port": 3000,
         "timeout_ms": 5000
       }
@@ -16,15 +16,23 @@
   },
   "execution": {
     "type": "http_request",
-    "method": "GET",
-    "url": "http://localhost:3000/tasks",
-    "headers": {},
-    "body": null
+    "method": "POST",
+    "url": "http://localhost:3000/shorten",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "url": "invalid-url"
+    }
   },
   "assertions": [
     {
       "type": "http_status_equals",
-      "expected": 401
+      "expected": 400
+    },
+    {
+      "type": "response_body_contains_key",
+      "key": "error"
     }
   ],
   "teardown": {
@@ -36,7 +44,7 @@
   },
   "metadata": {
     "covers_ac": [
-      "AC-3"
+      "AC-5"
     ],
     "estimated_duration_ms": 500
   }
