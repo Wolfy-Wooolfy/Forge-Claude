@@ -274,3 +274,28 @@ The materializer SU mocks are tag-matched → the directive addition is SU-safe.
 
 ### A-10.5 Sequencing + execution
 A-10 targets the single remaining defect with high confidence. A-5 (build loopback self-correction) is now data-ready (this run produced the clean RUN_TESTS failure data) and is the committed next durable step. A-10 implementation + SU re-verify is $0. The next real re-run #8 (cap=1) requires a fresh explicit owner spend-approval (~$0.16). Run protocol unchanged.
+
+---
+
+## CLOSURE — PHASE-43 COMPLETE ✅
+
+> Closed 2026-06-28. The A-1.5 closure gate is met: a real idea→COMPLETE full-scope build with an owner-confirmed PASS report. CTO-verified + owner Gate #10 browser-confirmed.
+
+### Closure evidence (A-1.5)
+- Real idea→COMPLETE with openai/gpt-4o (re-run #8, loop 25c3cb10): OWNER_INTENT → ARCHITECT → SPEC_WRITER → reviewSpec APPROVED → COST → ENV (Gate 1 APPROVE) → TEST_DESIGN → BUILDER → RUN_TESTS PASS 9/9 → REVIEWER_CODE_AND_SECURITY → DOCUMENTATION → QUALITY_JUDGE (Gate 2 APPROVE_SHIP) → DEPLOYMENT (skipped, deployment_enabled=false) → LIVE_DELIVERABLE → COMPLETE.
+- Full scope: the generated Notes API implements CRUD + category filter (?category=) + keyword search (?q= on title/body) + title validation + server-assigned sequential IDs from 1 + 404-on-missing. Real code on disk (src/server.js, notesRouter.js, notesController.js, notesStorage.js), not stubs.
+- RUN_TESTS PASS 9/9 (T-1..T-9: create 201, list array, get-by-id 200, get/update/delete not-found 404, update 200, delete 204, invalid-title 400). Confirmed via the trace's embedded report + the report endpoint (http 200, PASS 9/9, per-scenario assertions).
+- Gate #10 (the only true closure gate): owner opened http://127.0.0.1:3100/test-report.html?project_id=phase43_notes_api and confirmed the green PASS 9/9 card (report ran_at 2026-06-28T08:28:13.806Z).
+- Cost: $0.29544 for the passing run; cumulative PHASE-43 real spend ≈ $1.382 (within the $3 ceiling).
+- Track A clean throughout (live surface = 4 cumulative files: conversationEngine.js, openai_adapter.js, harness_runner.js, materializerEngine.js); §ARC frozen at 10; SU 327/0/5.
+
+### The journey (8 real runs, 10 amendments — each real run surfaced one gate)
+A-1 (demo scope) · A-2 (self-containment F1 + scope-fidelity F2) · A-3 (JSON-mode reliability) · A-4 (materializer AC-enrichment: route quality + id-coherence) · A-6 (runnable server-entry + self-healing) · A-7 (per-role timeout tuning) · A-8 (spec completeness: ID scheme + tags + response formats) · A-9 (reviewer spec-phase calibration) · A-10 (endpoint-path coherence). Each fix is a durable improvement to Forge's real-build path.
+
+### Forward backlog (owner-gated; not blocking closure)
+- A-5 (build loopback self-correction) — committed durable-robustness item; deferred throughout PHASE-43 because the milestone was reached on the first passing attempt (the loopback never fired). Data-ready (clean RUN_TESTS failure data captured in re-runs #2/#7).
+- RUN_FORGE.bat does not start the server (owner runs INSTALL_FORGE.bat) — minor ops item to diagnose.
+- The build is LLM-generated (non-deterministic); A-2..A-10 harden the common path; a different idea/run may surface new coherence gaps — A-5 is the general convergence net.
+- Existing backlog: cross-project C2 coverage, Anthropic provider switch (pending key), reviewer/security prompt-tuning continuation.
+
+PHASE-43 status: CLOSED. next_phase: PHASE-44-PENDING-DECISION.
