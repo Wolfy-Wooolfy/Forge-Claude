@@ -1,0 +1,26 @@
+{
+  "project_name": "url_shortener",
+  "domain": "web_api",
+  "goal_primary": "URL shortener — a small REST backend that turns a long URL into a generated short code and redirects visitors of that code to the original URL; tracks how many times each code is visited; supports deleting a code and rejecting invalid URLs; in-memory storage (no external DB).",
+  "owner_intent": "I want a URL shortener: a small REST backend that takes a long URL and gives back a short code. When someone visits the short code, the service redirects them to the original long URL. Visiting an unknown code returns a not-found error. There is a stats endpoint that reports how many times a given code has been visited. A code can be deleted. If the submitted URL is missing or invalid, the request is rejected with a clear error. Every successful resolve increments that code's visit count. Keep storage simple and in-memory — no external database.",
+  "features": [
+    "Shorten a long URL: submit a URL and get back a server-generated short code plus the short link",
+    "Resolve a short code: visiting the code redirects the client to the original long URL",
+    "Unknown short codes return a not-found response",
+    "Stats: look up how many times a given short code has been visited",
+    "Delete a short code so it no longer resolves",
+    "Validation: a missing or invalid URL is rejected with a clear error",
+    "The visit count for a code increments on each successful resolve"
+  ],
+  "constraints": [
+    "Node.js + Express",
+    "In-memory storage — no external database"
+  ],
+  "non_goals": [
+    "Authentication",
+    "User accounts",
+    "Persistence across restarts",
+    "Custom vanity codes",
+    "Analytics dashboards"
+  ]
+}
