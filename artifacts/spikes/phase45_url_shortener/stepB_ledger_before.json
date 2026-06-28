@@ -1,7 +1,7 @@
 {
   "project_id": "phase45_url_shortener",
-  "ledger_before_usd": 0,
+  "ledger_before_usd": 0.2075,
   "soft_stop_usd": 1.5,
   "hard_kill_usd": 3,
-  "ts": "2026-06-28T14:00:49.150Z"
+  "ts": "2026-06-28T14:29:36.588Z"
 }

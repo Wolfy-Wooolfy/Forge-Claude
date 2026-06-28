@@ -1,7 +1,7 @@
 {
-  "id": "T-7",
-  "name": "delete_unknown_short_code",
-  "description": "DELETE /delete/:code with an unknown shortCode returns 404",
+  "id": "T-2",
+  "name": "shorten_invalid_url",
+  "description": "POST /shorten with an invalid 'longUrl' returns 400 and 'Invalid URL' error message.",
   "category": "http",
   "fixture": "fresh_db",
   "setup": {
@@ -16,14 +16,24 @@
   },
   "execution": {
     "type": "http_request",
-    "method": "DELETE",
-    "url": "http://localhost:3000/delete/unknownCode",
-    "headers": {}
+    "method": "POST",
+    "url": "http://localhost:3000/shorten",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "longUrl": "invalid-url"
+    }
   },
   "assertions": [
     {
       "type": "http_status_equals",
-      "expected": 404
+      "expected": 400
+    },
+    {
+      "type": "response_body_field_equals",
+      "field": "error.message",
+      "expected": "Invalid URL"
     }
   ],
   "teardown": {
@@ -35,7 +45,7 @@
   },
   "metadata": {
     "covers_ac": [
-      "AC-4"
+      "AC-2"
     ],
     "estimated_duration_ms": 500
   }

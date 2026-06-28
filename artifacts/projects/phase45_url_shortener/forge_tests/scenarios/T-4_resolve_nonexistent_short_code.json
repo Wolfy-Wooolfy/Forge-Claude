@@ -1,7 +1,7 @@
 {
-  "id": "T-6",
-  "name": "resolve_unknown_short_code",
-  "description": "GET /resolve/:code with an unknown shortCode returns 404",
+  "id": "T-4",
+  "name": "resolve_nonexistent_short_code",
+  "description": "GET /:shortCode for nonexistent code returns 404.",
   "category": "http",
   "fixture": "fresh_db",
   "setup": {
@@ -17,8 +17,9 @@
   "execution": {
     "type": "http_request",
     "method": "GET",
-    "url": "http://localhost:3000/resolve/unknownCode",
-    "headers": {}
+    "url": "http://localhost:3000/999999",
+    "headers": {},
+    "body": null
   },
   "assertions": [
     {
@@ -35,7 +36,7 @@
   },
   "metadata": {
     "covers_ac": [
-      "AC-2"
+      "AC-4"
     ],
     "estimated_duration_ms": 500
   }

@@ -1,0 +1,12 @@
+{
+  "emitted_at": "2026-06-28T14:31:38.048Z",
+  "overall_status": "FAIL",
+  "total": 8,
+  "pass": 6,
+  "fail": 2,
+  "error": 0,
+  "failed_ids": [
+    "T-2",
+    "T-3"
+  ]
+}

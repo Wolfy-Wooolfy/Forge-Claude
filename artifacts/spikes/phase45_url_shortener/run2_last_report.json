@@ -1,0 +1,147 @@
+{
+  "total": 8,
+  "pass": 6,
+  "fail": 2,
+  "error": 0,
+  "overall_status": "FAIL",
+  "ran_at": "2026-06-28T14:31:38.044Z",
+  "scenarios": [
+    {
+      "id": "T-1",
+      "name": "shorten_valid_url",
+      "status": "PASS",
+      "duration_ms": 2184,
+      "assertions": [
+        {
+          "type": "http_status_equals",
+          "pass": true,
+          "reason": null
+        },
+        {
+          "type": "response_body_contains_key",
+          "pass": true,
+          "reason": null
+        },
+        {
+          "type": "response_body_contains_key",
+          "pass": true,
+          "reason": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "T-2",
+      "name": "shorten_invalid_url",
+      "status": "FAIL",
+      "duration_ms": 1681,
+      "assertions": [
+        {
+          "type": "http_status_equals",
+          "pass": false,
+          "reason": "Expected HTTP 400, got 201"
+        },
+        {
+          "type": "response_body_field_equals",
+          "pass": false,
+          "reason": "Field \"error.message\" not found in response body"
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "T-3",
+      "name": "resolve_existing_short_code",
+      "status": "FAIL",
+      "duration_ms": 1705,
+      "assertions": [
+        {
+          "type": "http_status_equals",
+          "pass": true,
+          "reason": null
+        },
+        {
+          "type": "response_body_field_equals",
+          "pass": false,
+          "reason": "Response body is not a JSON object"
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "T-4",
+      "name": "resolve_nonexistent_short_code",
+      "status": "PASS",
+      "duration_ms": 1568,
+      "assertions": [
+        {
+          "type": "http_status_equals",
+          "pass": true,
+          "reason": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "T-5",
+      "name": "get_stats_for_existing_short_code",
+      "status": "PASS",
+      "duration_ms": 1005,
+      "assertions": [
+        {
+          "type": "http_status_equals",
+          "pass": true,
+          "reason": null
+        },
+        {
+          "type": "response_body_field_equals",
+          "pass": true,
+          "reason": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "T-6",
+      "name": "get_stats_for_nonexistent_short_code",
+      "status": "PASS",
+      "duration_ms": 1111,
+      "assertions": [
+        {
+          "type": "http_status_equals",
+          "pass": true,
+          "reason": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "T-7",
+      "name": "delete_existing_short_code",
+      "status": "PASS",
+      "duration_ms": 1535,
+      "assertions": [
+        {
+          "type": "http_status_equals",
+          "pass": true,
+          "reason": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "T-8",
+      "name": "delete_nonexistent_short_code",
+      "status": "PASS",
+      "duration_ms": 1617,
+      "assertions": [
+        {
+          "type": "http_status_equals",
+          "pass": true,
+          "reason": null
+        }
+      ],
+      "error": null
+    }
+  ]
+}

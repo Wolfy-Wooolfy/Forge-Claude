@@ -1,7 +1,7 @@
 {
-  "id": "T-5",
-  "name": "shorten_with_invalid_url",
-  "description": "POST /shorten with an invalid URL returns 400 + error message",
+  "id": "T-6",
+  "name": "get_stats_for_nonexistent_short_code",
+  "description": "GET /:shortCode/stats for nonexistent code returns 404.",
   "category": "http",
   "fixture": "fresh_db",
   "setup": {
@@ -16,23 +16,15 @@
   },
   "execution": {
     "type": "http_request",
-    "method": "POST",
-    "url": "http://localhost:3000/shorten",
-    "headers": {
-      "Content-Type": "application/json"
-    },
-    "body": {
-      "url": "invalid-url"
-    }
+    "method": "GET",
+    "url": "http://localhost:3000/999999/stats",
+    "headers": {},
+    "body": null
   },
   "assertions": [
     {
       "type": "http_status_equals",
-      "expected": 400
-    },
-    {
-      "type": "response_body_contains_key",
-      "key": "error"
+      "expected": 404
     }
   ],
   "teardown": {
@@ -44,7 +36,7 @@
   },
   "metadata": {
     "covers_ac": [
-      "AC-5"
+      "AC-6"
     ],
     "estimated_duration_ms": 500
   }

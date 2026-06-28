@@ -1,0 +1,59 @@
+{
+  "id": "T-3",
+  "name": "resolve_existing_short_code",
+  "description": "GET /:shortCode redirects to the 'longUrl' and increments 'visitCount'.",
+  "category": "http",
+  "fixture": "fresh_db",
+  "setup": {
+    "actions": [
+      {
+        "type": "start_server",
+        "command": "node src/server.js",
+        "wait_for_port": 3000,
+        "timeout_ms": 5000
+      },
+      {
+        "type": "http_request",
+        "method": "POST",
+        "url": "http://localhost:3000/shorten",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "longUrl": "http://example.org"
+        }
+      }
+    ]
+  },
+  "execution": {
+    "type": "http_request",
+    "method": "GET",
+    "url": "http://localhost:3000/{{created.shortCode}}",
+    "headers": {},
+    "body": null
+  },
+  "assertions": [
+    {
+      "type": "http_status_equals",
+      "expected": 302
+    },
+    {
+      "type": "response_body_field_equals",
+      "field": "Location",
+      "expected": "http://example.org"
+    }
+  ],
+  "teardown": {
+    "actions": [
+      {
+        "type": "stop_server"
+      }
+    ]
+  },
+  "metadata": {
+    "covers_ac": [
+      "AC-3"
+    ],
+    "estimated_duration_ms": 500
+  }
+}

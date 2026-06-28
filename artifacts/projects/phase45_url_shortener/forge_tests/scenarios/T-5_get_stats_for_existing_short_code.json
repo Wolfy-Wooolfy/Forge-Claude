@@ -1,7 +1,7 @@
 {
-  "id": "T-2",
-  "name": "resolve_short_code",
-  "description": "GET /resolve/:code with a known shortCode redirects to the long URL",
+  "id": "T-5",
+  "name": "get_stats_for_existing_short_code",
+  "description": "GET /:shortCode/stats returns 'visitCount' of an existing short code.",
   "category": "http",
   "fixture": "fresh_db",
   "setup": {
@@ -20,7 +20,7 @@
           "Content-Type": "application/json"
         },
         "body": {
-          "url": "http://www.example.com/path"
+          "longUrl": "http://example.net"
         }
       }
     ]
@@ -28,18 +28,19 @@
   "execution": {
     "type": "http_request",
     "method": "GET",
-    "url": "http://localhost:3000/resolve/{{created.shortCode}}",
-    "headers": {}
+    "url": "http://localhost:3000/{{created.shortCode}}/stats",
+    "headers": {},
+    "body": null
   },
   "assertions": [
     {
       "type": "http_status_equals",
-      "expected": 302
+      "expected": 200
     },
     {
       "type": "response_body_field_equals",
-      "field": "Location",
-      "expected": "http://www.example.com/path"
+      "field": "visitCount",
+      "expected": 0
     }
   ],
   "teardown": {
@@ -51,7 +52,7 @@
   },
   "metadata": {
     "covers_ac": [
-      "AC-2"
+      "AC-5"
     ],
     "estimated_duration_ms": 500
   }
