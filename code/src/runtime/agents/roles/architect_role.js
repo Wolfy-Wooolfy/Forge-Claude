@@ -7,7 +7,7 @@ const { emit: emitActivity }                  = require("../_activity_emitter");
 const { getIndicator }                        = require("../_activity_catalog");
 const { createLanguageDetectionCompliance }   = require("../../../ai_os/languageDetectionCompliance");
 
-const SYSTEM_PROMPT = loadPrompt("architect_v1");
+const SYSTEM_PROMPT = loadPrompt("architect_v2");
 const { detectLanguage: _detectLang } = createLanguageDetectionCompliance();
 
 const INPUT_SCHEMA = {
@@ -79,7 +79,7 @@ module.exports = defineRole({
   description:      "Converts owner intent into a structured system design document",
   default_provider: "anthropic",
   default_model:    "claude-opus-4-7",
-  system_prompt_id: "architect_v1",
+  system_prompt_id: "architect_v2",
   input_schema:     INPUT_SCHEMA,
   output_schema:    OUTPUT_SCHEMA,
   authority_level:  "ADVISORY",

@@ -1,0 +1,19 @@
+{
+  "id": "S341",
+  "name": "PHASE-46 W-2 meta-regression: architect + spec_writer wired to v2 (A-8 id-clause generalization)",
+  "description": "Stage W-2 meta-regression. Mirrors the S208/S340 pattern — file/loader inspection only, no LLM calls, no real OS APIs. Proves the architect role → _prompt_loader → architect_v2 AND spec_writer role → _prompt_loader → spec_writer_v2 wiring that PHASE-46 W-2 introduces: (a) each role's declared system_prompt_id === its v2; (b) each role source resolves its prompt via loadPrompt('<role>_v2'); (c) loadPrompt('<role>_v2') for BOTH contains the three STABLE anchor tokens of the generalized A-8 clause (a): 'sequential integer' (record/entity case — Notes-API regression-safe), 'short code' (shortener/slug case), and 'user-supplied' (the retained never-user-supplied default — NOT the escape-hatch 'user-provided'). Anchored on stable substrings, not free prose. W-2 is prompt + role-pointer only; §ARC frozen at 10.",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/role_prompt_v2_generalization_helper",
+  "method": "runS341RolePromptV2Generalization",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "architect_active_prompt_id_is_v2",   "expected": true },
+    { "type": "state_field_equals", "field": "architect_loads_v2_via_loader",      "expected": true },
+    { "type": "state_field_equals", "field": "architect_v2_has_anchor_tokens",     "expected": true },
+    { "type": "state_field_equals", "field": "spec_writer_active_prompt_id_is_v2", "expected": true },
+    { "type": "state_field_equals", "field": "spec_writer_loads_v2_via_loader",    "expected": true },
+    { "type": "state_field_equals", "field": "spec_writer_v2_has_anchor_tokens",   "expected": true }
+  ]
+}

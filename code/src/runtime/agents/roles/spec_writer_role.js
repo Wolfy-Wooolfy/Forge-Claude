@@ -6,7 +6,7 @@ const { loadPrompt }                      = require("../_prompt_loader");
 const { emit: emitActivity }             = require("../_activity_emitter");
 const { getIndicator }                   = require("../_activity_catalog");
 
-const SYSTEM_PROMPT = loadPrompt("spec_writer_v1");
+const SYSTEM_PROMPT = loadPrompt("spec_writer_v2");
 
 const INPUT_SCHEMA = {
   type: "object",
@@ -49,7 +49,7 @@ module.exports = defineRole({
   description:      "Converts an architect design into a formal implementation specification",
   default_provider: "anthropic",
   default_model:    "claude-opus-4-7",
-  system_prompt_id: "spec_writer_v1",
+  system_prompt_id: "spec_writer_v2",
   input_schema:     INPUT_SCHEMA,
   output_schema:    OUTPUT_SCHEMA,
   authority_level:  "ADVISORY",
