@@ -31,6 +31,7 @@ const ASSERTION_TYPES = {
   http_status_equals:        require("./assertion_types/http_status_equals"),
   response_body_contains_key: require("./assertion_types/response_body_contains_key"),
   response_body_field_equals: require("./assertion_types/response_body_field_equals"),
+  response_header_equals:    require("./assertion_types/response_header_equals"),
   response_body_is_array:    require("./assertion_types/response_body_is_array"),
   response_body_matches_schema: require("./assertion_types/response_body_matches_schema"),
   process_exit_code_equals:  require("./assertion_types/process_exit_code_equals"),

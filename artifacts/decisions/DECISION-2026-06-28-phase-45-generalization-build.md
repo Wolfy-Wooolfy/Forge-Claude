@@ -88,3 +88,24 @@ PHASE-45 is CLOSED only when ALL hold:
 ---
 
 **END — PHASE-45 PROPOSAL (Generalization Build — URL Shortener)**
+
+---
+
+## AMENDMENT A-1 — L5b harness: response_header_equals assertion (header/redirect testability)
+Status: ADOPTED (CTO-authored, owner-ratified direction 2026-06-28).
+
+Finding (surfaced by real run #2). The generalization build reached RUN_TESTS in two real runs; the real architect/spec/reviewer generated a correct URL shortener (generated short code, 302 redirect, hit counter) with ZERO prompt-over-fit amendments — the forecast A-8 "sequential integer" over-fit did NOT fire (3x confirmed). One genuine gap blocks closure: scenario T-3 (resolve → 302 redirect to the original URL, AC-2) FAILS even though the generated code is correct (res.redirect(longUrl) emits a proper 302 + Location).
+
+Root cause. harness_runner.js already captures response headers (line 251: resolve({ status, headers: res.headers, body, raw })) and does NOT auto-follow redirects (raw http.request), so the 302 + Location ARE available. But the assertion vocabulary (8 types: http_status_equals, response_body_contains_key, response_body_field_equals, response_body_is_array, response_body_matches_schema, process_exit_code_equals, file_exists, stdout_contains) has NO assertion that reads a response header. The test_designer therefore expressed "redirect target = original URL" as response_body_field_equals(field="Location"), which fails because a 302 has no JSON body. Redirect targets (and any header-carried behavior) are structurally untestable. Notes-API-era gap: the Notes API never used redirects/headers, so the capability was never needed.
+
+Fix (additive, root, zero-regression).
+1. New assertion type code/src/runtime/builtproject/assertion_types/response_header_equals.js — contract identical to existing types (async function assert(params, context) returning { pass:true } or { pass:false, reason }; module.exports = { assert }). params: { header: string, expected: string }. Reads context.response.headers with case-insensitive lookup (context.response.headers[String(params.header).toLowerCase()] — Node lowercases header names). Pass on exact value match; fail with a clear reason on missing header or value mismatch.
+2. Register response_header_equals in harness_runner.js ASSERTION_TYPES (one line).
+3. Append-to-tail (preserving the first 500 bytes for SU-mock matching) one line to the test_designer_v2 role prompt in docs/10_runtime/18b_ROLE_PROMPTS.md: for an endpoint returning an HTTP redirect (3xx), assert the redirect target via the Location response header using response_header_equals ({ header: "Location", expected: "<url>" }); NEVER assert a redirect target via response_body_field_equals (a redirect has no JSON body). Use response_header_equals for any response-header assertion.
+4. New SU coverage: a positive scenario (header present + matches → PASS) and a negative scenario (header absent or value mismatch → FAIL) for response_header_equals.
+
+§ARC. Unchanged — response_header_equals is a pure evaluator (no fs / network / child_process). §ARC stays frozen at 10.
+
+Scope boundary. A-1 fixes ONLY the harness header/redirect testability gap. It does NOT address the materializer single-quoted-regex codegen defect (T-2 — generic codegen quality, within A-5's scope); that is handled by the larger builder-loopback budget in the re-run, and if it persists, by a dedicated codegen-quality phase (PHASE-46).
+
+Closure criteria for A-1 (CTO-verified before the re-run). New assertion type present + registered; the two new SU scenarios PASS; the 330 baseline SU scenarios still PASS; test_designer line appended at tail (first 500 bytes intact); Track A grep clean; §ARC=10.

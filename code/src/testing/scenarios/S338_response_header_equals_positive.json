@@ -1,0 +1,15 @@
+{
+  "id": "S338",
+  "name": "A-1 response_header_equals — header present + value matches → PASS (case-insensitive) (PHASE-45)",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/response_header_equals_test_helper",
+  "method": "runHeaderMatchPass",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "pass_true",        "expected": true },
+    { "type": "state_field_equals", "field": "no_reason",        "expected": true },
+    { "type": "state_field_equals", "field": "case_insensitive", "expected": true }
+  ]
+}

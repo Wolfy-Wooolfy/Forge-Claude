@@ -1,0 +1,17 @@
+{
+  "id": "S339",
+  "name": "A-1 response_header_equals — header absent OR value mismatch OR no headers → FAIL (PHASE-45)",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/response_header_equals_test_helper",
+  "method": "runHeaderMissingOrMismatchFail",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "missing_fail",        "expected": true },
+    { "type": "state_field_equals", "field": "missing_has_reason",  "expected": true },
+    { "type": "state_field_equals", "field": "mismatch_fail",       "expected": true },
+    { "type": "state_field_equals", "field": "mismatch_has_reason", "expected": true },
+    { "type": "state_field_equals", "field": "no_headers_fail",     "expected": true }
+  ]
+}
