@@ -371,4 +371,208 @@ async function runTConvergence() {
   }
 }
 
-module.exports = { runTInvariance, runTFeedbackPresent, runTConvergence };
+// ── PHASE-46 W-3 helpers (S342 keep-best, S343 parse-reject) ────────────────────
+//
+//   S342 runS342KeepBest    — a worse rebuild (fewer passing scenarios, + an orphan file)
+//                             does NOT replace the best attempt; on ESCALATE the set-exact
+//                             restore makes disk == best exactly (best files written, orphan
+//                             deleted, manifest = best).
+//   S343 runS343ParseReject — a non-parsing REBUILD (iteration_count>0) is rejected with
+//                             REBUILD_PARSE_FAILED, does NOT advance, does NOT call loop_back
+//                             (iteration_count unchanged), and the best (parsing) attempt is
+//                             restored to disk.
+//
+// Both reuse the in-process buildProject+runTests driving pattern with a deterministic
+// SEQUENCE codegen stub (Nth materialize → Nth file set), _test_skip_npm_install, and a
+// forced run_scenarios verdict (so scores are exact and no server is spawned). Mock-only, $0.
+
+// Codegen stub whose output is the Nth file set on the Nth invocation (the materializer is the
+// only conv_stub caller — one invoke per build). Independent of the A-5 repair marker, so each
+// attempt's file set is fully controlled.
+function _makeSequenceStub(fileSets) {
+  let idx = 0;
+  return defineAdapter({
+    id:    "conv_stub",
+    label: "PHASE-46 W-3 sequence codegen stub (Nth invoke → Nth file set)",
+    available: function () { return Promise.resolve(true); },
+    invoke: function (input) {
+      const files = fileSets[Math.min(idx, fileSets.length - 1)];
+      idx++;
+      return Promise.resolve(success({
+        text:          JSON.stringify({ files: files }),
+        tokens_in:     10,
+        tokens_out:    20,
+        latency_ms:    0,
+        cost_usd:      0,
+        provider:      "conv_stub",
+        model:         (input && input.model) || "conv-stub",
+        finish_reason: "stop"
+      }, null, false));
+    }
+  });
+}
+
+function _w3TestPlan(probePath) {
+  return {
+    role_id: "test_designer",
+    scenarios: [{
+      id: "T-1", name: "w3_probe", description: "probe",
+      category: "file", setup: { actions: [] }, execution: {},
+      assertions: [{ type: "file_exists", path: probePath }],
+      teardown: { actions: [] }, metadata: { covers_ac: ["AC-1"], estimated_duration_ms: 10 }
+    }],
+    coverage_summary: { acs_total: 1, acs_covered: 1, gaps: [] }
+  };
+}
+
+function _w3BuildBody(pid, loopId) {
+  return {
+    project_id: pid, loop_id: loopId,
+    build_provider: "mock", build_model: "mock-bld-s270", build_scenario_id: "S270",
+    mat_provider: "conv_stub", mat_model: "conv-stub"
+  };
+}
+
+async function runS342KeepBest() {
+  const PID     = "s342_keep_best";
+  const LOOP_ID = "s342-loop-fixture";
+
+  // Attempt-1 {server,b,c} is the BEST; attempt-2 {server,b,d} is worse (3<6) and drops c / adds
+  // orphan d. src/server.js is the runnable entry (PHASE-30 entry-derivation needs a recognized
+  // entry name so runTests reaches the verdict); its content is a minimal listening server.
+  const ENTRY1 = "require('http').createServer(function(q,s){s.end('s1');}).listen(process.env.PORT||3000);\n";
+  const ENTRY2 = "require('http').createServer(function(q,s){s.end('s2');}).listen(process.env.PORT||3000);\n";
+  const SET1 = [
+    { path: "src/server.js", content: ENTRY1 },
+    { path: "src/b.js",      content: "module.exports = 'b';\n" },
+    { path: "src/c.js",      content: "module.exports = 'c';\n" }
+  ];
+  const SET2 = [
+    { path: "src/server.js", content: ENTRY2 },
+    { path: "src/b.js",      content: "module.exports = 'b2';\n" },
+    { path: "src/d.js",      content: "module.exports = 'd';\n" }
+  ];
+
+  const projectDir = _ensureProjectDir(PID);
+  _installConvStub(_makeSequenceStub([SET1, SET2]));
+
+  try {
+    _writeState(projectDir, {
+      project_id: PID, project_name: "S342 Test",
+      active_runtime_state: "IDEATION", conversation_mode: "PIPELINE",
+      loop_id: LOOP_ID, last_updated_at: "2026-06-28T00:00:00.000Z"
+    });
+    _writeLockedVision(PID, "S342 Keep-Best");
+    await _seedLoopAtBuilder(PID, LOOP_ID, true, _w3TestPlan("src/server.js"));
+
+    // Seed iteration_count = ITERATION_CAP-1 so: attempt-1 loop_back → CAP, attempt-2 loop_back → ESCALATE.
+    const ls = require("../../runtime/orchestration/loop_state");
+    const { ITERATION_CAP } = require("../../runtime/orchestration/conversation_graph");
+    const g0 = await ls.loadLoop(PID, LOOP_ID, { root: ROOT });
+    g0.iteration_count = ITERATION_CAP - 1;
+    await ls.saveLoop(PID, LOOP_ID, g0, { root: ROOT });
+
+    const engine   = _makeEngine();
+    const bestJson = path.join(projectDir, "orchestration", LOOP_ID, "best_attempt", "best_attempt.json");
+    const readF    = function (rel) { try { return fs.readFileSync(path.join(projectDir, rel), "utf8"); } catch (_) { return null; } };
+    const existsF  = function (rel) { return fs.existsSync(path.join(projectDir, rel)); };
+    const readJson = function (abs) { try { return JSON.parse(fs.readFileSync(abs, "utf8")); } catch (_) { return null; } };
+
+    // Attempt 1 → SET1 {a,b,c}; force verdict 6/7 (FAIL). NO scenarios[] ⇒ exercises the SCORE shape-guard.
+    const build1 = await engine.buildProject(_w3BuildBody(PID, LOOP_ID));
+    const rt1 = await engine.runTests({
+      project_id: PID, loop_id: LOOP_ID, _test_skip_npm_install: true,
+      _test_force_run_scenarios_result: { overall_status: "FAIL", total: 7, pass: 6, fail: 1, error: 0 }
+    });
+    const bestAfter1 = readJson(bestJson);
+
+    // Attempt 2 → SET2; force verdict 3/7 (worse). loop_back at CAP ⇒ ESCALATE ⇒ set-exact restore.
+    const build2 = await engine.buildProject(_w3BuildBody(PID, LOOP_ID));
+    const rt2 = await engine.runTests({
+      project_id: PID, loop_id: LOOP_ID, _test_skip_npm_install: true,
+      _test_force_run_scenarios_result: { overall_status: "FAIL", total: 7, pass: 3, fail: 4, error: 0 }
+    });
+
+    const bestFinal     = readJson(bestJson);
+    const manifest      = readJson(path.join(projectDir, "orchestration", LOOP_ID, "build_manifest.json"));
+    const manifestPaths = (manifest && Array.isArray(manifest.files))
+      ? manifest.files.map(function (f) { return f.path; }).sort().join(",") : "";
+
+    return {
+      attempt1_advanced:       build1.advanced === true && build1.advanced_to === "RUN_TESTS",
+      best_after1_score6:      !!(bestAfter1 && Array.isArray(bestAfter1.score) && bestAfter1.score[0] === 6),
+      attempt2_advanced:       build2.advanced === true && build2.advanced_to === "RUN_TESTS",
+      rt2_escalated:           rt2.advanced_to === "ESCALATED" && rt2.escalated === true,
+      best_kept_score6:        !!(bestFinal && Array.isArray(bestFinal.score) && bestFinal.score[0] === 6),
+      disk_server_is_best:     readF("src/server.js") === ENTRY1,                  // SET1 entry, NOT ENTRY2
+      disk_c_restored:         existsF("src/c.js"),
+      disk_d_orphan_deleted:   existsF("src/d.js") === false,                      // set-exact orphan removal
+      manifest_is_best:        manifestPaths === "src/b.js,src/c.js,src/server.js"
+    };
+  } finally {
+    _uninstallConvStub();
+    _cleanup(PID);
+  }
+}
+
+async function runS343ParseReject() {
+  const PID     = "s343_parse_reject";
+  const LOOP_ID = "s343-loop-fixture";
+
+  const GOOD = [{ path: "src/server.js",
+    content: "require('http').createServer(function(q,s){s.end('ok');}).listen(process.env.PORT||3000);\n" }];
+  const NONPARSING = [{ path: "src/server.js", content: "const x = ;\n" }]; // genuine SyntaxError
+
+  const projectDir = _ensureProjectDir(PID);
+  _installConvStub(_makeSequenceStub([GOOD, NONPARSING]));
+
+  try {
+    _writeState(projectDir, {
+      project_id: PID, project_name: "S343 Test",
+      active_runtime_state: "IDEATION", conversation_mode: "PIPELINE",
+      loop_id: LOOP_ID, last_updated_at: "2026-06-28T00:00:00.000Z"
+    });
+    _writeLockedVision(PID, "S343 Parse-Reject");
+    await _seedLoopAtBuilder(PID, LOOP_ID, true, _w3TestPlan("src/server.js"));
+
+    const engine = _makeEngine();
+    const ls     = require("../../runtime/orchestration/loop_state");
+
+    // Attempt 1 (it=0): GOOD build → RUN_TESTS; force FAIL ⇒ snapshot best = attempt-1, loop_back → it=1.
+    const build1 = await engine.buildProject(_w3BuildBody(PID, LOOP_ID));
+    const rt1 = await engine.runTests({
+      project_id: PID, loop_id: LOOP_ID, _test_skip_npm_install: true,
+      _test_force_run_scenarios_result: { overall_status: "FAIL", total: 1, pass: 0, fail: 1, error: 0 }
+    });
+    const g1 = await ls.loadLoop(PID, LOOP_ID, { root: ROOT });
+    const iterAfter1 = g1 ? g1.iteration_count : null;
+
+    // Attempt 2 (it=1): non-parsing REBUILD → parse-check REJECTS (no advance, no loop_back).
+    const build2 = await engine.buildProject(_w3BuildBody(PID, LOOP_ID));
+    const g2 = await ls.loadLoop(PID, LOOP_ID, { root: ROOT });
+    const iterAfter2 = g2 ? g2.iteration_count : null;
+
+    const diskServer = (function () { try { return fs.readFileSync(path.join(projectDir, "src/server.js"), "utf8"); } catch (_) { return null; } })();
+    let best = null;
+    try { best = JSON.parse(fs.readFileSync(path.join(projectDir, "orchestration", LOOP_ID, "best_attempt", "best_attempt.json"), "utf8")); } catch (_) {}
+
+    return {
+      attempt1_advanced:         build1.advanced === true && build1.advanced_to === "RUN_TESTS",
+      rt1_looped_back:           rt1.loop_back === true && rt1.advanced_to === "BUILDER",
+      reject_advanced_false:     build2.advanced === false,
+      reject_error_code:         build2.build_error === "REBUILD_PARSE_FAILED",
+      reject_has_parse_errors:   Array.isArray(build2.parse_errors) && build2.parse_errors.length > 0,
+      best_preserved:            !!(best && Array.isArray(best.score)),
+      disk_restored_parsing:     diskServer === GOOD[0].content,                  // best (parsing) restored
+      iteration_count_unchanged: iterAfter1 === 1 && iterAfter2 === 1             // reject did NOT loop_back
+    };
+  } finally {
+    _uninstallConvStub();
+    _cleanup(PID);
+  }
+}
+
+module.exports = {
+  runTInvariance, runTFeedbackPresent, runTConvergence,
+  runS342KeepBest, runS343ParseReject
+};

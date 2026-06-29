@@ -1123,6 +1123,153 @@ function createConversationEngine(options = {}) {
     } catch { return null; }
   }
 
+  // ── PHASE-46 W-3 (Mechanism A) — keep-best-attempt snapshot / restore ───────────
+  // Goal: when the build loop cannot reach all-green and ESCALATES, the deliverable on
+  // disk must be the BEST attempt (most passing scenarios), not the last (possibly worse)
+  // attempt — a rebuild with fewer passing scenarios (or a non-parsing one) must never
+  // replace a better prior attempt's build as the final artifact.
+  //
+  // ALL file ops go through the EXISTING L2 fs tools (fs.read_file / fs.write_file /
+  // fs.delete_file) into artifacts/projects/<pid>/orchestration/<loopId>/best_attempt/ —
+  // the SAME L2-writable subtree the build_manifest already uses. NO new §ARC; §ARC stays 10.
+  //
+  // BOTH helpers are BEST-EFFORT / fail-OPEN: any error is swallowed so the verdict /
+  // advance / escalate decision in runTests (which has NO outer try/catch) can NEVER be
+  // flipped by snapshot/restore I/O. Snapshot runs on the FAIL branch only (the PASS path
+  // is never touched: a PASS is the lexicographic max for the loop's fixed scenario set, so
+  // it is always best and already on disk).
+
+  function _bestAttemptDir(pid, loopId) {
+    return "artifacts/projects/" + pid + "/orchestration/" + loopId + "/best_attempt";
+  }
+
+  // Lexicographic score [pass_scenarios, -error_scenarios, pass_assertions]; higher is better.
+  // Shape-guarded: a forced runOutput WITHOUT a scenarios[] array scores pass_assertions = 0
+  // (the tertiary term goes inert) and never throws.
+  function _scoreRunOutput(runOutput) {
+    const passScen = (runOutput && typeof runOutput.pass  === "number") ? runOutput.pass  : 0;
+    const errScen  = (runOutput && typeof runOutput.error === "number") ? runOutput.error : 0;
+    const scn = (runOutput && Array.isArray(runOutput.scenarios)) ? runOutput.scenarios : [];
+    let passAssert = 0;
+    for (let i = 0; i < scn.length; i++) {
+      const as = (scn[i] && Array.isArray(scn[i].assertions)) ? scn[i].assertions : [];
+      for (let j = 0; j < as.length; j++) { if (as[j] && as[j].pass === true) passAssert++; }
+    }
+    return [passScen, -errScen, passAssert];
+  }
+
+  // Strict lexicographic "a > b". Equal ⇒ NOT greater (keep the FIRST attempt to reach a
+  // score — monotonic; a later equal attempt does not displace the earlier best).
+  function _scoreGreater(a, b) {
+    for (let i = 0; i < a.length; i++) {
+      if (a[i] > b[i]) return true;
+      if (a[i] < b[i]) return false;
+    }
+    return false;
+  }
+
+  // Snapshot the CURRENT build (its manifest files + manifest + score) as the new best IFF
+  // its score strictly beats best-so-far. Manifest-present only. Best-effort / fail-OPEN.
+  async function _snapshotBestAttempt(reg, pid, loopId, runOutput) {
+    try {
+      const orchDir = "artifacts/projects/" + pid + "/orchestration/" + loopId;
+      const manRead = await reg.invoke("fs.read_file", { path: orchDir + "/build_manifest.json" }, { root });
+      if (!manRead || manRead.status !== "SUCCESS") return; // no manifest ⇒ nothing to snapshot
+      let manifest; try { manifest = JSON.parse(manRead.output.content); } catch { return; }
+      const files = (manifest && Array.isArray(manifest.files)) ? manifest.files : [];
+      if (files.length === 0) return;
+
+      const score = _scoreRunOutput(runOutput);
+
+      const bestDir  = _bestAttemptDir(pid, loopId);
+      const bestRead = await reg.invoke("fs.read_file", { path: bestDir + "/best_attempt.json" }, { root });
+      if (bestRead && bestRead.status === "SUCCESS") {
+        let best; try { best = JSON.parse(bestRead.output.content); } catch { best = null; }
+        if (best && Array.isArray(best.score) && !_scoreGreater(score, best.score)) return; // not better ⇒ keep
+      }
+
+      // New best: copy each manifest file's content into best_attempt/files/<path>.
+      const projDir = "artifacts/projects/" + pid;
+      for (let i = 0; i < files.length; i++) {
+        const fpath = files[i] && files[i].path;
+        if (typeof fpath !== "string") continue;
+        const fr = await reg.invoke("fs.read_file", { path: projDir + "/" + fpath }, { root });
+        if (!fr || fr.status !== "SUCCESS") continue;
+        await reg.invoke("fs.write_file", { path: bestDir + "/files/" + fpath, content: fr.output.content }, { root });
+      }
+      // Persist the manifest copy + the best record (score + path list + per-file sha256 for verify).
+      await reg.invoke("fs.write_file", { path: bestDir + "/build_manifest.json", content: manRead.output.content }, { root });
+      await reg.invoke("fs.write_file", {
+        path: bestDir + "/best_attempt.json",
+        content: JSON.stringify({
+          score,
+          files:        files.map(function (f) { return f.path; }),
+          manifest_sha: files.map(function (f) { return { path: f.path, sha256: f.sha256 }; }),
+          ts:           new Date().toISOString()
+        }, null, 2)
+      }, { root });
+    } catch (_e) { /* fail-OPEN: snapshot must never break the loop */ }
+  }
+
+  // Restore the best snapshot so the project's MANIFEST-TRACKED tree == best exactly:
+  // delete current-manifest files not in best (set-exact over the manifest tree), write best's
+  // files back, restore best's manifest. Best-effort / fail-OPEN. Per-file sha256 is verified
+  // against best's recorded manifest sha — a corrupt snapshot file is SKIPPED (never written),
+  // rather than restoring known-bad content. NOTE: non-manifest orphans from non-consecutive
+  // attempts may remain on disk but are INERT — the pipeline (reviewProject / runTests entry +
+  // dep scan) is manifest-scoped, and best's entry only require()s best's files.
+  async function _restoreBestAttempt(reg, pid, loopId, ctxObj) {
+    try {
+      const bestDir  = _bestAttemptDir(pid, loopId);
+      const bestRead = await reg.invoke("fs.read_file", { path: bestDir + "/best_attempt.json" }, { root });
+      if (!bestRead || bestRead.status !== "SUCCESS") return; // no best ⇒ nothing to restore
+      let best; try { best = JSON.parse(bestRead.output.content); } catch { return; }
+      const bestFiles = (best && Array.isArray(best.files)) ? best.files : [];
+      if (bestFiles.length === 0) return;
+      const bestSet = {};
+      for (let i = 0; i < bestFiles.length; i++) bestSet[bestFiles[i]] = true;
+      const shaMap = {};
+      (Array.isArray(best.manifest_sha) ? best.manifest_sha : []).forEach(function (e) {
+        if (e && e.path) shaMap[e.path] = e.sha256;
+      });
+
+      const projDir = "artifacts/projects/" + pid;
+      const orchDir = "artifacts/projects/" + pid + "/orchestration/" + loopId;
+
+      // (1) Orphan removal over the CURRENT manifest tree: delete current files not in best.
+      const curManRead = await reg.invoke("fs.read_file", { path: orchDir + "/build_manifest.json" }, { root });
+      if (curManRead && curManRead.status === "SUCCESS") {
+        let curMan; try { curMan = JSON.parse(curManRead.output.content); } catch { curMan = null; }
+        const curFiles = (curMan && Array.isArray(curMan.files)) ? curMan.files : [];
+        for (let i = 0; i < curFiles.length; i++) {
+          const cpath = curFiles[i] && curFiles[i].path;
+          if (typeof cpath === "string" && !bestSet[cpath]) {
+            try { await reg.invoke("fs.delete_file", { path: projDir + "/" + cpath }, ctxObj || { root }); } catch (_d) { /* best-effort */ }
+          }
+        }
+      }
+
+      // (2) Write best's files back (sha256-verified; skip a corrupt snapshot file).
+      for (let i = 0; i < bestFiles.length; i++) {
+        const fpath    = bestFiles[i];
+        const snapRead = await reg.invoke("fs.read_file", { path: bestDir + "/files/" + fpath }, { root });
+        if (!snapRead || snapRead.status !== "SUCCESS") continue;
+        const want = shaMap[fpath];
+        if (want) {
+          const got = crypto.createHash("sha256").update(snapRead.output.content, "utf8").digest("hex");
+          if (got !== want) continue; // corrupt snapshot ⇒ do NOT write known-bad content
+        }
+        await reg.invoke("fs.write_file", { path: projDir + "/" + fpath, content: snapRead.output.content }, ctxObj || { root });
+      }
+
+      // (3) Restore best's manifest so the manifest-tracked tree on disk == best.
+      const bestManRead = await reg.invoke("fs.read_file", { path: bestDir + "/build_manifest.json" }, { root });
+      if (bestManRead && bestManRead.status === "SUCCESS") {
+        await reg.invoke("fs.write_file", { path: orchDir + "/build_manifest.json", content: bestManRead.output.content }, ctxObj || { root });
+      }
+    } catch (_e) { /* fail-OPEN: restore must never break escalate/return */ }
+  }
+
   // PHASE-40 entry-point seam: DECLARE this build's active project on the L3 policy (ambient
   // register) so cross-project writes are denied even on ctx-less write paths within the
   // build, paired with a finally-clear (no leak between operations). The real work stays in
@@ -1324,6 +1471,43 @@ function createConversationEngine(options = {}) {
           build_error:   errCode,
           files_written: matOut && matOut.files_written
         };
+      }
+
+      // PHASE-46 W-3 (Mechanism B) — pre-flight parse check on a REBUILD (iteration_count > 0).
+      // A non-parsing rebuild is REJECTED before it can advance to RUN_TESTS or overwrite the
+      // best-so-far artifact, so a SyntaxError cannot collapse a near-pass (the PHASE-45 run #3
+      // 'deleteUrl declared twice' collapse). GATED on iteration_count > 0: a first build
+      // (it === 0) never runs this check ⇒ first-build behavior is byte-identical to pre-W-3.
+      // Compile-only via the `vm` builtin (no execution, no child_process, no new §ARC).
+      // On reject: restore the best snapshot to disk (best-effort) and HALT fail-closed
+      // (advanced:false) WITHOUT calling loop_back — iteration_count / cap / escalation are
+      // untouched (CTO-confirmed; liveness is bounded by the W-4 driver). Consistent with the
+      // existing non-advancing build_error returns above (BUILDER_ROLE_FAILED, MATERIALIZER_FAILED).
+      if (iterationCount > 0) {
+        const { checkParses } = require("../runtime/builtproject/js_syntax_check");
+        const writtenFiles = Array.isArray(matOut.files_written) ? matOut.files_written : [];
+        const parseErrors  = [];
+        for (let fi = 0; fi < writtenFiles.length; fi++) {
+          const fpath = writtenFiles[fi] && writtenFiles[fi].path;
+          if (typeof fpath !== "string" || !fpath.endsWith(".js")) continue;
+          const fileRead = await reg.invoke("fs.read_file", {
+            path: "artifacts/projects/" + normalizeProjectId(projectId) + "/" + fpath
+          }, { root });
+          if (!fileRead || fileRead.status !== "SUCCESS") continue; // unreadable ⇒ skip (do not reject on read failure)
+          const parseRes = checkParses(fileRead.output.content, fpath);
+          if (!parseRes.ok) parseErrors.push({ path: fpath, error: parseRes.error });
+        }
+        if (parseErrors.length > 0) {
+          await _restoreBestAttempt(reg, normalizeProjectId(projectId), loopId, buildCtx);
+          return {
+            ok:            true,
+            loop_id:       loopId,
+            advanced:      false,
+            build_error:   "REBUILD_PARSE_FAILED",
+            parse_errors:  parseErrors,
+            files_written: matOut.files_written
+          };
+        }
       }
 
       // Persist the authoritative build record (PHASE-30 RULING-4) — fail-closed:
@@ -1653,6 +1837,11 @@ function createConversationEngine(options = {}) {
       };
     }
 
+    // PHASE-46 W-3 (Mechanism A) — snapshot this attempt as best IFF it strictly beats
+    // best-so-far (FAIL branch only; the PASS path above is never touched). Best-effort /
+    // fail-OPEN: must run BEFORE loop_back so best is captured before iteration_count++.
+    await _snapshotBestAttempt(reg, pid, loopId, runOutput);
+
     // FAIL → loop-back (cap-aware via orchestration.loop_back)
     const lbResult = await reg.invoke("orchestration.loop_back", {
       project_id: pid,
@@ -1667,6 +1856,11 @@ function createConversationEngine(options = {}) {
     const lbOut = lbResult.output;
 
     if (lbOut.escalated) {
+      // PHASE-46 W-3 (Mechanism A) — the build loop has ESCALATED (cap exhausted). Restore the
+      // best snapshot so the ESCALATED deliverable = best attempt, not the last (worse) one.
+      // Best-effort / fail-OPEN; the escalation decision + return shape are unchanged.
+      await _restoreBestAttempt(reg, pid, loopId, { root });
+
       return {
         ok:              true,
         loop_id:         loopId,

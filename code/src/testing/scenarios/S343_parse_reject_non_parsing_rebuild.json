@@ -1,0 +1,21 @@
+{
+  "id": "S343",
+  "name": "PHASE-46 W-3 pre-flight parse — a non-parsing rebuild is rejected (REBUILD_PARSE_FAILED, no advance, no loop_back), best restored",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/build_loopback_test_helper",
+  "method": "runS343ParseReject",
+  "args": [],
+  "cleanup_project": "s343_parse_reject",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "attempt1_advanced",         "expected": true },
+    { "type": "state_field_equals", "field": "rt1_looped_back",           "expected": true },
+    { "type": "state_field_equals", "field": "reject_advanced_false",     "expected": true },
+    { "type": "state_field_equals", "field": "reject_error_code",         "expected": true },
+    { "type": "state_field_equals", "field": "reject_has_parse_errors",   "expected": true },
+    { "type": "state_field_equals", "field": "best_preserved",            "expected": true },
+    { "type": "state_field_equals", "field": "disk_restored_parsing",     "expected": true },
+    { "type": "state_field_equals", "field": "iteration_count_unchanged", "expected": true }
+  ]
+}

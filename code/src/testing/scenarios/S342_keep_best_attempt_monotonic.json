@@ -1,0 +1,22 @@
+{
+  "id": "S342",
+  "name": "PHASE-46 W-3 keep-best — a worse rebuild does not replace best; ESCALATE set-exact restore makes disk == best (orphan deleted)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/build_loopback_test_helper",
+  "method": "runS342KeepBest",
+  "args": [],
+  "cleanup_project": "s342_keep_best",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "attempt1_advanced",     "expected": true },
+    { "type": "state_field_equals", "field": "best_after1_score6",    "expected": true },
+    { "type": "state_field_equals", "field": "attempt2_advanced",     "expected": true },
+    { "type": "state_field_equals", "field": "rt2_escalated",         "expected": true },
+    { "type": "state_field_equals", "field": "best_kept_score6",      "expected": true },
+    { "type": "state_field_equals", "field": "disk_server_is_best",   "expected": true },
+    { "type": "state_field_equals", "field": "disk_c_restored",       "expected": true },
+    { "type": "state_field_equals", "field": "disk_d_orphan_deleted", "expected": true },
+    { "type": "state_field_equals", "field": "manifest_is_best",      "expected": true }
+  ]
+}
