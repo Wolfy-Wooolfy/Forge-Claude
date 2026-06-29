@@ -45,6 +45,9 @@ explicitly requires a user-provided key"). Hyphenation harmonized to "short-code
 
 I implemented KEEP and surfaced this here for your call; trivially reversible if you prefer REVERT.
 
+### §2-bis — RESOLUTION (CTO, 2026-06-29): KEEP
+CTO ruling: **KEEP** the architect_v1 deprecation pointer. The "preserve first 500 bytes" constraint exists to protect (i) the mock-matching prompt prefix (`mock_adapter.js:23` keys on the PROMPT BODY's first 500, not the file's) and (ii) the document preamble — BOTH are preserved. The deprecation pointer is the standard convention (every other superseded v1 carries it) and §1 mandated it. Recorded resolution: **file-literal first-500 changed ONLY by the architect_v1 deprecation pointer at offset 455; preamble + v1 bodies + mock-matching prompt prefixes all byte-identical; zero runtime impact.** The literal file-first-500 reading was a proxy that only collides here because architect_v1 is the first prompt section.
+
 ---
 
 ## 3. architect_v2 — clause (a) diff vs architect_v1 (ONLY change)
