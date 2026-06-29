@@ -39,6 +39,7 @@ module.exports = {
       "process_exit_code_equals",
       "file_exists",
       "stdout_contains",
+      "response_header_equals",
     ];
 
     const assertionBase = path.join(root, "code/src/runtime/builtproject/assertion_types");
@@ -77,7 +78,7 @@ module.exports = {
 
     return {
       status: "PASS",
-      detail: `L5b harness OK — 4 modules, 8 assertion types, ${scenarioFiles.length} reference scenarios`
+      detail: `L5b harness OK — 4 modules, 9 assertion types, ${scenarioFiles.length} reference scenarios`
     };
   }
 };

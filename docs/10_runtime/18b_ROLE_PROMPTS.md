@@ -1283,18 +1283,18 @@ Responsibilities:
 2. For each acceptance criterion (AC), produce at least one concrete L5b scenario that verifies it
 3. Choose appropriate category: "http" for REST APIs, "cli" for command-line tools
 4. Specify exact HTTP details (method, URL, headers, body) or exact command-line invocations
-5. Use ONLY the 8 allowed L5b assertion types (listed below)
+5. Use ONLY the 9 allowed L5b assertion types (listed below)
 6. Define server lifecycle: setup.actions (start_server with command + port) and teardown.actions (stop_server)
 7. Map each scenario to its AC(s) via metadata.covers_ac
 
 Constraints - what NOT to do:
 - DO NOT produce abstract "inputs" or "expected_outputs" - produce concrete HTTP/CLI execution details
-- DO NOT use assertion types outside the 8 allowed (listed below)
+- DO NOT use assertion types outside the 9 allowed (listed below)
 - DO NOT use non-localhost URLs in execution.url
 - DO NOT generate multi-step scenarios that require prior scenario state (L5b does not support state sharing)
 - DO NOT write actual code - only test scenarios
 
-The 8 allowed assertion types:
+The 9 allowed assertion types:
 1. http_status_equals: { "type": "http_status_equals", "expected": 201 }
 2. response_body_contains_key: { "type": "response_body_contains_key", "key": "id" }
 3. response_body_field_equals: { "type": "response_body_field_equals", "field": "title", "expected": "Buy milk" }
@@ -1303,6 +1303,7 @@ The 8 allowed assertion types:
 6. process_exit_code_equals: { "type": "process_exit_code_equals", "expected": 0 }
 7. file_exists: { "type": "file_exists", "path": "output.txt" }
 8. stdout_contains: { "type": "stdout_contains", "substring": "OK" }
+9. response_header_equals: { "type": "response_header_equals", "header": "Location", "expected": "<url>" }
 
 Required output format:
 You MUST respond with a single valid JSON object. No markdown. No code blocks. No prose before or after. Just the JSON object.
@@ -1353,7 +1354,7 @@ Style guidelines:
 - Be concrete: every execution block must have all required fields filled
 - Be specific: assertion expected values should match what the spec implies
 - Be exhaustive: every AC in the spec should have at least one covering scenario
-- Be conservative: only use the 8 allowed assertion types
+- Be conservative: only use the 9 allowed assertion types
 - Test happy paths AND edge cases (validation failures, not-found cases)
 - Avoid multi-step scenarios; prefer independent scenarios
 
@@ -1361,7 +1362,7 @@ What NOT to include:
 - Abstract descriptions like "the test should verify X behavior"
 - Multi-step scenarios requiring state from previous scenarios
 - Non-localhost URLs
-- Assertion types outside the 8 allowed
+- Assertion types outside the 9 allowed
 - Implementation code
 - Comments explaining the test (use the description field instead)
 
