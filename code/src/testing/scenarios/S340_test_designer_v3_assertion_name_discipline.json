@@ -1,0 +1,17 @@
+{
+  "id": "S340",
+  "name": "PHASE-46 W-1 meta-regression: test_designer role wired to v3 (assertion-name discipline)",
+  "description": "Stage W-1 meta-regression. Mirrors the S208 pattern — file/loader inspection only, no LLM calls, no real OS APIs. Proves the test_designer role → _prompt_loader → test_designer_v3 wiring that PHASE-46 W-1 introduces: (a) the role's declared system_prompt_id === 'test_designer_v3'; (b) the role source resolves its prompt via loadPrompt('test_designer_v3') (the same resolution the role uses); (c) loadPrompt('test_designer_v3') returns text containing all 9 canonical L5b assertion-type names; (d) the resolved v3 text carries the forbidden-names prohibition, anchored on the stable tokens http_status_equals (canonical status type) AND response_status_equals (the invented name, present in v3 ONLY as a forbidden example) — not on free prose. W-1 is prompt + role-pointer only; §ARC frozen at 10.",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/test_designer_prompt_version_helper",
+  "method": "runS340TestDesignerPromptVersion",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "active_prompt_id_is_v3",          "expected": true },
+    { "type": "state_field_equals", "field": "role_loads_v3_via_loader",        "expected": true },
+    { "type": "state_field_equals", "field": "v3_has_all_9_canonical_names",    "expected": true },
+    { "type": "state_field_equals", "field": "v3_forbids_invented_status_name", "expected": true }
+  ]
+}
