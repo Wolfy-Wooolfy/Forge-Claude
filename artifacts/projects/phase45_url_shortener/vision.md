@@ -4,7 +4,7 @@ project_name: url_shortener
 domain: web_api
 vision_version: 1
 vision_locked: true
-vision_locked_at: 2026-06-28T14:29:36.681Z
+vision_locked_at: 2026-06-29T09:04:35.654Z
 locked_by_role: owner
 amendments_history: []
 goals:

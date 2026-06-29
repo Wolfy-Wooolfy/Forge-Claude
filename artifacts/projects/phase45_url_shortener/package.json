@@ -2,6 +2,8 @@
   "name": "phase45_url_shortener",
   "version": "1.0.0",
   "dependencies": {
-    "express": "latest"
+    "express": "latest",
+    "validator": "latest",
+    "shortid": "latest"
   }
 }

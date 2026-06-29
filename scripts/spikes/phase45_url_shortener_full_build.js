@@ -84,7 +84,7 @@ const { createConversationEngine } = require("../../code/src/ai_os/conversationE
 // ── Constants ───────────────────────────────────────────────────────────────
 const PROJECT_ID          = "phase45_url_shortener";
 const EVIDENCE_DIR        = "artifacts/spikes/phase45_url_shortener";
-const DRIVER_LOOPBACK_CAP = 2;
+const DRIVER_LOOPBACK_CAP = 4;
 const COST_SOFT_STOP_USD  = 1.50;   // STOP the run immediately if run_delta exceeds this
 const COST_HARD_KILL_USD  = 3.00;   // absolute backstop (phase kill-bar)
 

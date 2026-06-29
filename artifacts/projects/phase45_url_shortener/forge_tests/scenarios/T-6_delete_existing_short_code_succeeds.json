@@ -1,9 +1,8 @@
 {
-  "id": "T-3",
-  "name": "resolve_existing_short_code",
-  "description": "GET /:shortCode redirects to the 'longUrl' and increments 'visitCount'.",
+  "id": "T-6",
+  "name": "delete_existing_short_code_succeeds",
+  "description": "DELETE /:shortCode should delete the short code from memory",
   "category": "http",
-  "fixture": "fresh_db",
   "setup": {
     "actions": [
       {
@@ -20,27 +19,21 @@
           "Content-Type": "application/json"
         },
         "body": {
-          "longUrl": "http://example.org"
+          "url": "http://example.com"
         }
       }
     ]
   },
   "execution": {
     "type": "http_request",
-    "method": "GET",
+    "method": "DELETE",
     "url": "http://localhost:3000/{{created.shortCode}}",
-    "headers": {},
-    "body": null
+    "headers": {}
   },
   "assertions": [
     {
       "type": "http_status_equals",
-      "expected": 302
-    },
-    {
-      "type": "response_body_field_equals",
-      "field": "Location",
-      "expected": "http://example.org"
+      "expected": 204
     }
   ],
   "teardown": {
@@ -52,7 +45,7 @@
   },
   "metadata": {
     "covers_ac": [
-      "AC-3"
+      "AC-4"
     ],
     "estimated_duration_ms": 500
   }

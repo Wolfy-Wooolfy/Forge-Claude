@@ -1,0 +1,66 @@
+{
+  "total": 7,
+  "pass": 0,
+  "fail": 0,
+  "error": 7,
+  "overall_status": "FAIL",
+  "ran_at": "2026-06-29T09:08:48.311Z",
+  "scenarios": [
+    {
+      "id": "T-1",
+      "name": "shorten_url_with_valid_url_succeeds",
+      "status": "ERROR",
+      "duration_ms": 7203,
+      "assertions": [],
+      "error": "Server did not open port 3000 within 5000ms"
+    },
+    {
+      "id": "T-2",
+      "name": "shorten_url_with_invalid_url_fails",
+      "status": "ERROR",
+      "duration_ms": 7172,
+      "assertions": [],
+      "error": "Server did not open port 3000 within 5000ms"
+    },
+    {
+      "id": "T-3",
+      "name": "get_short_code_redirects_successfully",
+      "status": "ERROR",
+      "duration_ms": 7063,
+      "assertions": [],
+      "error": "Server did not open port 3000 within 5000ms"
+    },
+    {
+      "id": "T-4",
+      "name": "get_nonexistent_short_code_fails",
+      "status": "ERROR",
+      "duration_ms": 7165,
+      "assertions": [],
+      "error": "Server did not open port 3000 within 5000ms"
+    },
+    {
+      "id": "T-5",
+      "name": "get_stats_returns_visit_count",
+      "status": "ERROR",
+      "duration_ms": 7053,
+      "assertions": [],
+      "error": "Server did not open port 3000 within 5000ms"
+    },
+    {
+      "id": "T-6",
+      "name": "delete_existing_short_code_succeeds",
+      "status": "ERROR",
+      "duration_ms": 7081,
+      "assertions": [],
+      "error": "Server did not open port 3000 within 5000ms"
+    },
+    {
+      "id": "T-7",
+      "name": "delete_nonexistent_short_code_fails",
+      "status": "ERROR",
+      "duration_ms": 7275,
+      "assertions": [],
+      "error": "Server did not open port 3000 within 5000ms"
+    }
+  ]
+}

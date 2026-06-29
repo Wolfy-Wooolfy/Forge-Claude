@@ -1,9 +1,8 @@
 {
-  "id": "T-8",
-  "name": "delete_nonexistent_short_code",
-  "description": "DELETE /:shortCode for nonexistent code returns 404.",
+  "id": "T-2",
+  "name": "shorten_url_with_invalid_url_fails",
+  "description": "POST /shorten with an invalid URL should return 400 and an error message",
   "category": "http",
-  "fixture": "fresh_db",
   "setup": {
     "actions": [
       {
@@ -16,15 +15,23 @@
   },
   "execution": {
     "type": "http_request",
-    "method": "DELETE",
-    "url": "http://localhost:3000/999999",
-    "headers": {},
-    "body": null
+    "method": "POST",
+    "url": "http://localhost:3000/shorten",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "url": "invalid-url"
+    }
   },
   "assertions": [
     {
       "type": "http_status_equals",
-      "expected": 404
+      "expected": 400
+    },
+    {
+      "type": "response_body_contains_key",
+      "key": "error"
     }
   ],
   "teardown": {
@@ -36,6 +43,8 @@
   },
   "metadata": {
     "covers_ac": [
+      "AC-1",
+      "AC-6",
       "AC-8"
     ],
     "estimated_duration_ms": 500

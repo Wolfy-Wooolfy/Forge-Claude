@@ -1,9 +1,8 @@
 {
-  "id": "T-5",
-  "name": "get_stats_for_existing_short_code",
-  "description": "GET /:shortCode/stats returns 'visitCount' of an existing short code.",
+  "id": "T-3",
+  "name": "get_short_code_redirects_successfully",
+  "description": "GET /:shortCode should redirect to the original URL and increment visit count",
   "category": "http",
-  "fixture": "fresh_db",
   "setup": {
     "actions": [
       {
@@ -20,7 +19,7 @@
           "Content-Type": "application/json"
         },
         "body": {
-          "longUrl": "http://example.net"
+          "url": "http://example.com"
         }
       }
     ]
@@ -28,19 +27,18 @@
   "execution": {
     "type": "http_request",
     "method": "GET",
-    "url": "http://localhost:3000/{{created.shortCode}}/stats",
-    "headers": {},
-    "body": null
+    "url": "http://localhost:3000/{{created.shortCode}}",
+    "headers": {}
   },
   "assertions": [
     {
-      "type": "http_status_equals",
-      "expected": 200
+      "type": "response_status_equals",
+      "expected": 302
     },
     {
-      "type": "response_body_field_equals",
-      "field": "visitCount",
-      "expected": 0
+      "type": "response_header_equals",
+      "header": "Location",
+      "expected": "http://example.com"
     }
   ],
   "teardown": {
@@ -52,7 +50,7 @@
   },
   "metadata": {
     "covers_ac": [
-      "AC-5"
+      "AC-2"
     ],
     "estimated_duration_ms": 500
   }

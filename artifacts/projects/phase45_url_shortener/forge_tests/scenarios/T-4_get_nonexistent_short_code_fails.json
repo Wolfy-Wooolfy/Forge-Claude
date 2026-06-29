@@ -1,9 +1,8 @@
 {
-  "id": "T-2",
-  "name": "shorten_invalid_url",
-  "description": "POST /shorten with an invalid 'longUrl' returns 400 and 'Invalid URL' error message.",
+  "id": "T-4",
+  "name": "get_nonexistent_short_code_fails",
+  "description": "GET /:shortCode with nonexistent shortCode should return 404",
   "category": "http",
-  "fixture": "fresh_db",
   "setup": {
     "actions": [
       {
@@ -16,24 +15,18 @@
   },
   "execution": {
     "type": "http_request",
-    "method": "POST",
-    "url": "http://localhost:3000/shorten",
-    "headers": {
-      "Content-Type": "application/json"
-    },
-    "body": {
-      "longUrl": "invalid-url"
-    }
+    "method": "GET",
+    "url": "http://localhost:3000/999999",
+    "headers": {}
   },
   "assertions": [
     {
       "type": "http_status_equals",
-      "expected": 400
+      "expected": 404
     },
     {
-      "type": "response_body_field_equals",
-      "field": "error.message",
-      "expected": "Invalid URL"
+      "type": "response_body_contains_key",
+      "key": "error"
     }
   ],
   "teardown": {
@@ -45,7 +38,8 @@
   },
   "metadata": {
     "covers_ac": [
-      "AC-2"
+      "AC-2",
+      "AC-8"
     ],
     "estimated_duration_ms": 500
   }

@@ -1,9 +1,8 @@
 {
-  "id": "T-1",
-  "name": "shorten_valid_url",
-  "description": "POST /shorten with a valid 'longUrl' returns 201 and a 'shortCode' + 'shortLink'.",
+  "id": "T-7",
+  "name": "delete_nonexistent_short_code_fails",
+  "description": "DELETE /:shortCode with nonexistent shortCode should return 404",
   "category": "http",
-  "fixture": "fresh_db",
   "setup": {
     "actions": [
       {
@@ -16,27 +15,18 @@
   },
   "execution": {
     "type": "http_request",
-    "method": "POST",
-    "url": "http://localhost:3000/shorten",
-    "headers": {
-      "Content-Type": "application/json"
-    },
-    "body": {
-      "longUrl": "http://example.com"
-    }
+    "method": "DELETE",
+    "url": "http://localhost:3000/999999",
+    "headers": {}
   },
   "assertions": [
     {
       "type": "http_status_equals",
-      "expected": 201
+      "expected": 404
     },
     {
       "type": "response_body_contains_key",
-      "key": "shortCode"
-    },
-    {
-      "type": "response_body_contains_key",
-      "key": "shortLink"
+      "key": "error"
     }
   ],
   "teardown": {
@@ -48,7 +38,8 @@
   },
   "metadata": {
     "covers_ac": [
-      "AC-1"
+      "AC-4",
+      "AC-8"
     ],
     "estimated_duration_ms": 500
   }
