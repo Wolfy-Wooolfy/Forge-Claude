@@ -1,21 +1,21 @@
 You are a code generator. Return STRICT JSON only — no markdown, no code blocks, no prose before or after.
-SCENARIO_TAG: S327
-
 Generate exactly the following files and return them as this exact JSON structure:
 { "files": [ { "path": "<path>", "content": "<source code>" }, ... ] }
-Files to generate: app.js
+Files to generate: src/models/noteStore.js, src/utils/idGenerator.js, src/middleware/validation.js, src/routes/notes.js, src/server.js
 File responsibilities (from the spec):
-- src/index.js: Express app entry point + server bootstrap
-- src/routes/notes.js: Notes CRUD + list/filter/search route handlers
-- src/store.js: In-memory notes store
-- src/middleware/validate.js: Note payload validation -> 400 on invalid input
-Spec: Build an in-memory Notes REST API with Node.js/Express: CRUD for notes (title, body, category, tags), list with filter-by-category and keyword search, input validation, and clear JSON error responses. Single-server process; no external database.
-Design: An in-memory Notes REST API built with Node.js/Express. A single-process server exposes CRUD endpoints for notes plus list/filter/search; data lives in an in-memory store (no external database).
+- src/server.js: Initializes the Express server, mounts all API routes, and sets the app to listen on the specified port.
+- src/routes/notes.js: Defines the RESTful routes for note operations, including CRUD and list with filter/search capabilities.
+- src/middleware/validation.js: Contains middleware for validating incoming request data, particularly ensuring the title does not exceed a 200 character limit.
+- src/models/noteStore.js: Implements the in-memory data storage using a JavaScript Map for storing and retrieving notes.
+- src/utils/idGenerator.js: Contains the function for generating sequential integer IDs starting from 1 for new notes.
+Spec: The system is an in-memory Notes API designed to manage personal notes with capabilities for creating, updating, retrieving, and deleting notes. Each note includes a title, body, category, and tags. The API can list all notes, apply optional category filters, and perform keyword searches across the title and body fields.
+Design: The system is an in-memory Notes API for managing personal notes, with capabilities for creating, updating, retrieving, and deleting notes. Each note consists of a title, body, category, and tags, and the API supports listing notes with optional category filtering and keyword search across title and body.
 Acceptance criteria (implement EVERY one completely):
-- AC-1: POST /notes with a valid title returns 201 and the created note
-- AC-2: POST /notes without a title returns 400 with a clear error
-- AC-3: GET /notes returns an array; ?category= filters; ?q= searches title/body
-- AC-4: GET/PUT/DELETE /notes/:id returns 404 for an unknown id
+- AC-1: POST /notes creates a new note, assigning a sequential integer ID, validating title length (max 200 chars), and storing the note with title, body, category, and tags.
+- AC-2: GET /notes retrieves all notes, optionally filtered by ?category=<category> or searched with ?q=<keyword> against title and body.
+- AC-3: GET /notes/:id returns a single note by ID, or a 404 error if the note is not found.
+- AC-4: PUT /notes/:id updates an existing note by ID after validating input, or returns a 404 error if the note is not found.
+- AC-5: DELETE /notes/:id removes a note by ID, returns a 204 status on success, or a 404 error if the note is not found.
 Implement EVERY acceptance criterion completely: every route (including GET /:id to fetch a single resource by id), every status code (including 404 when a resource id is not found — for GET, PUT, and DELETE), and all entity fields. The data layer must signal found vs not-found (e.g. return null/undefined for a missing id) so the route handlers can return 404 instead of silently succeeding.
 Runnability: if this is an HTTP API or web service, it MUST include a server/entry file that creates the app, mounts ALL routes, and calls app.listen(process.env.PORT || 3000) so it boots and accepts HTTP requests. Implement the entry file already in the list (e.g. src/server.js); if the list contains NO entry file (none of src/server.js, src/index.js, src/app.js, index.js, server.js, app.js), ALSO generate src/server.js with that bootstrap. Do not add persistence/backup or test files beyond the spec's declared scope.
 Endpoint paths: the served paths MUST exactly equal the paths the acceptance criteria declare. When you mount a router in the entry file, the mount path joined with the router's route paths MUST equal the AC-declared paths — do NOT introduce a base-path or version prefix (e.g. /api, /v1) unless the acceptance criteria explicitly include it. If the ACs say POST /notes, the app must serve POST /notes, NOT /api/notes (e.g. app.use(router) with router.post('/notes', ...), OR app.use('/notes', router) with router.post('/', ...) — but NEVER both prefixes).

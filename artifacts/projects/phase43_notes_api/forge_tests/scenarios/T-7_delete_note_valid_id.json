@@ -1,9 +1,8 @@
 {
-  "id": "T-5",
-  "name": "update_note_returns_200",
-  "description": "PUT /notes/:id updates a note and returns 200 with the updated note",
+  "id": "T-7",
+  "name": "delete_note_valid_id",
+  "description": "DELETE /notes/:id removes the note when the ID is valid",
   "category": "http",
-  "fixture": "fresh_db",
   "setup": {
     "actions": [
       {
@@ -20,12 +19,11 @@
           "Content-Type": "application/json"
         },
         "body": {
-          "title": "Initial Note",
-          "body": "Original content",
-          "category": "Drafts",
+          "title": "Delete Me",
+          "body": "Delete Body",
+          "category": "delete",
           "tags": [
-            "edit",
-            "draft"
+            "delete1"
           ]
         }
       }
@@ -33,30 +31,14 @@
   },
   "execution": {
     "type": "http_request",
-    "method": "PUT",
+    "method": "DELETE",
     "url": "http://localhost:3000/notes/{{created.id}}",
-    "headers": {
-      "Content-Type": "application/json"
-    },
-    "body": {
-      "title": "Updated Note",
-      "body": "Updated content",
-      "category": "Final",
-      "tags": [
-        "edit",
-        "final"
-      ]
-    }
+    "headers": {}
   },
   "assertions": [
     {
       "type": "http_status_equals",
-      "expected": 200
-    },
-    {
-      "type": "response_body_field_equals",
-      "field": "title",
-      "expected": "Updated Note"
+      "expected": 204
     }
   ],
   "teardown": {
@@ -68,7 +50,7 @@
   },
   "metadata": {
     "covers_ac": [
-      "AC-4"
+      "AC-5"
     ],
     "estimated_duration_ms": 500
   }

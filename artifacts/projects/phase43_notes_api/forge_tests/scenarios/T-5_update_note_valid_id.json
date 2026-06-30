@@ -1,9 +1,8 @@
 {
-  "id": "T-7",
-  "name": "delete_note_returns_204",
-  "description": "DELETE /notes/:id deletes a note and returns 204",
+  "id": "T-5",
+  "name": "update_note_valid_id",
+  "description": "PUT /notes/:id updates the note when the ID is valid",
   "category": "http",
-  "fixture": "fresh_db",
   "setup": {
     "actions": [
       {
@@ -20,11 +19,11 @@
           "Content-Type": "application/json"
         },
         "body": {
-          "title": "Temporary Note",
-          "body": "This note will be deleted",
-          "category": "Temporary",
+          "title": "Old Title",
+          "body": "Old Body",
+          "category": "old",
           "tags": [
-            "delete"
+            "old1"
           ]
         }
       }
@@ -32,14 +31,29 @@
   },
   "execution": {
     "type": "http_request",
-    "method": "DELETE",
+    "method": "PUT",
     "url": "http://localhost:3000/notes/{{created.id}}",
-    "headers": {}
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "title": "Updated Title",
+      "body": "Updated Body",
+      "category": "updated",
+      "tags": [
+        "updated1"
+      ]
+    }
   },
   "assertions": [
     {
       "type": "http_status_equals",
-      "expected": 204
+      "expected": 200
+    },
+    {
+      "type": "response_body_field_equals",
+      "field": "title",
+      "expected": "Updated Title"
     }
   ],
   "teardown": {
@@ -51,7 +65,7 @@
   },
   "metadata": {
     "covers_ac": [
-      "AC-5"
+      "AC-4"
     ],
     "estimated_duration_ms": 500
   }

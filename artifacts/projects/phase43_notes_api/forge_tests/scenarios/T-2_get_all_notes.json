@@ -1,9 +1,8 @@
 {
-  "id": "T-3",
-  "name": "get_note_by_id_returns_200",
-  "description": "GET /notes/:id returns 200 with the note if found",
+  "id": "T-2",
+  "name": "get_all_notes",
+  "description": "GET /notes retrieves all notes",
   "category": "http",
-  "fixture": "fresh_db",
   "setup": {
     "actions": [
       {
@@ -20,12 +19,11 @@
           "Content-Type": "application/json"
         },
         "body": {
-          "title": "Meeting Notes",
-          "body": "Discuss project updates",
-          "category": "Work",
+          "title": "Test Note",
+          "body": "Test Body",
+          "category": "test",
           "tags": [
-            "meeting",
-            "updates"
+            "test1"
           ]
         }
       }
@@ -34,7 +32,7 @@
   "execution": {
     "type": "http_request",
     "method": "GET",
-    "url": "http://localhost:3000/notes/{{created.id}}",
+    "url": "http://localhost:3000/notes",
     "headers": {}
   },
   "assertions": [
@@ -43,9 +41,9 @@
       "expected": 200
     },
     {
-      "type": "response_body_field_equals",
-      "field": "title",
-      "expected": "Meeting Notes"
+      "type": "response_body_is_array",
+      "min_length": 1,
+      "max_length": 10
     }
   ],
   "teardown": {
@@ -57,7 +55,7 @@
   },
   "metadata": {
     "covers_ac": [
-      "AC-3"
+      "AC-2"
     ],
     "estimated_duration_ms": 500
   }

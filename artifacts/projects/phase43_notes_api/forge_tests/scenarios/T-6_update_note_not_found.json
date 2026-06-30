@@ -1,9 +1,8 @@
 {
   "id": "T-6",
-  "name": "update_note_not_found_returns_404",
-  "description": "PUT /notes/:id returns 404 if the note to update is not found",
+  "name": "update_note_not_found",
+  "description": "PUT /notes/:id returns 404 when the ID is not found",
   "category": "http",
-  "fixture": "fresh_db",
   "setup": {
     "actions": [
       {
@@ -22,11 +21,11 @@
       "Content-Type": "application/json"
     },
     "body": {
-      "title": "Non-existent Note",
-      "body": "This note does not exist",
-      "category": "Missing",
+      "title": "Nonexistent Note",
+      "body": "Nonexistent Body",
+      "category": "none",
       "tags": [
-        "missing"
+        "none1"
       ]
     }
   },

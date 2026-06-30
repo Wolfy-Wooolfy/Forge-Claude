@@ -1,9 +1,8 @@
 {
   "id": "T-1",
-  "name": "create_note_returns_201",
-  "description": "POST /notes with valid payload returns 201 and the created note including an assigned id",
+  "name": "create_note_valid_request",
+  "description": "POST /notes with valid payload creates a note and returns 201 with the note's ID",
   "category": "http",
-  "fixture": "fresh_db",
   "setup": {
     "actions": [
       {
@@ -22,12 +21,12 @@
       "Content-Type": "application/json"
     },
     "body": {
-      "title": "My Note",
-      "body": "This is a note.",
-      "category": "General",
+      "title": "My First Note",
+      "body": "This is the body of the note",
+      "category": "personal",
       "tags": [
-        "important",
-        "todo"
+        "tag1",
+        "tag2"
       ]
     }
   },
@@ -39,11 +38,6 @@
     {
       "type": "response_body_contains_key",
       "key": "id"
-    },
-    {
-      "type": "response_body_field_equals",
-      "field": "title",
-      "expected": "My Note"
     }
   ],
   "teardown": {

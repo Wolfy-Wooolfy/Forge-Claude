@@ -1,9 +1,8 @@
 {
-  "id": "T-9",
-  "name": "create_note_invalid_title_returns_400",
-  "description": "POST /notes with invalid title returns 400",
+  "id": "T-4",
+  "name": "get_note_by_id_not_found",
+  "description": "GET /notes/:id returns 404 when the ID is not found",
   "category": "http",
-  "fixture": "fresh_db",
   "setup": {
     "actions": [
       {
@@ -16,22 +15,14 @@
   },
   "execution": {
     "type": "http_request",
-    "method": "POST",
-    "url": "http://localhost:3000/notes",
-    "headers": {
-      "Content-Type": "application/json"
-    },
-    "body": {
-      "title": "",
-      "body": "This note has no title",
-      "category": "Invalid",
-      "tags": []
-    }
+    "method": "GET",
+    "url": "http://localhost:3000/notes/999999",
+    "headers": {}
   },
   "assertions": [
     {
       "type": "http_status_equals",
-      "expected": 400
+      "expected": 404
     }
   ],
   "teardown": {
@@ -43,7 +34,7 @@
   },
   "metadata": {
     "covers_ac": [
-      "AC-6"
+      "AC-3"
     ],
     "estimated_duration_ms": 500
   }

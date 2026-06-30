@@ -1,9 +1,8 @@
 {
-  "id": "T-2",
-  "name": "list_notes_returns_array",
-  "description": "GET /notes returns an array of notes",
+  "id": "T-3",
+  "name": "get_note_by_id_valid",
+  "description": "GET /notes/:id returns the note when the ID is valid",
   "category": "http",
-  "fixture": "fresh_db",
   "setup": {
     "actions": [
       {
@@ -20,11 +19,11 @@
           "Content-Type": "application/json"
         },
         "body": {
-          "title": "Shopping List",
-          "body": "Buy milk",
-          "category": "Personal",
+          "title": "Sample Note",
+          "body": "Sample Body",
+          "category": "sample",
           "tags": [
-            "groceries"
+            "sample1"
           ]
         }
       }
@@ -33,7 +32,7 @@
   "execution": {
     "type": "http_request",
     "method": "GET",
-    "url": "http://localhost:3000/notes",
+    "url": "http://localhost:3000/notes/{{created.id}}",
     "headers": {}
   },
   "assertions": [
@@ -42,9 +41,9 @@
       "expected": 200
     },
     {
-      "type": "response_body_is_array",
-      "min_length": 1,
-      "max_length": 10
+      "type": "response_body_field_equals",
+      "field": "title",
+      "expected": "Sample Note"
     }
   ],
   "teardown": {
@@ -56,7 +55,7 @@
   },
   "metadata": {
     "covers_ac": [
-      "AC-2"
+      "AC-3"
     ],
     "estimated_duration_ms": 500
   }

@@ -1,9 +1,8 @@
 {
   "id": "T-8",
-  "name": "delete_note_not_found_returns_404",
-  "description": "DELETE /notes/:id returns 404 if the note to delete is not found",
+  "name": "delete_note_not_found",
+  "description": "DELETE /notes/:id returns 404 when the ID is not found",
   "category": "http",
-  "fixture": "fresh_db",
   "setup": {
     "actions": [
       {
