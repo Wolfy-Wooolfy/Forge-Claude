@@ -1,0 +1,136 @@
+{
+  "phase": "PHASE-48",
+  "mode": "mock",
+  "provider_reverse_vision": "mock",
+  "model_reverse_vision": "mock-rv",
+  "scenario_id": "S167",
+  "fixture": "artifacts/test_fixtures/intake/fixture_nextjs",
+  "project_id": "phase48_intake_nextjs_mock",
+  "soft_stop_usd": 0.5,
+  "hard_kill_usd": 3,
+  "stub_real_split": {
+    "stubbed": [
+      "intent_classifier (deterministic AFFIRM)",
+      "reverse_vision (mock scenario S167 — dry pass only; $0 real spend)"
+    ],
+    "real": [
+      "project.intake_zip",
+      "project.analyze_source",
+      "vision.lock_vision",
+      "orchestration.start_loop"
+    ]
+  },
+  "steps": {
+    "step1_3_intake_start": {
+      "ok": true,
+      "stage": "AWAIT_VISION_APPROVAL",
+      "reason": null,
+      "message_excerpt": "## Inferred Vision\n\n**Project:** nextjs_tasks_demo\n**Domain:** web_application\n**Confidence:** HIGH\n\n**Primary Goal:** A Next.js web application that provides a task tracking interface with a REST API\n\n**Secondary Goals:**\n- Expose GET and "
+    },
+    "step1_intake_zip": {
+      "source_file_count": 9,
+      "source_files": [
+        "app/api/tasks/route.ts",
+        "app/layout.tsx",
+        "app/page.tsx",
+        "lib/storage.ts",
+        "lib/types.ts",
+        "next.config.mjs",
+        "package.json",
+        "README.md",
+        "tsconfig.json"
+      ]
+    },
+    "step2_analyze_source": {
+      "status": "SUCCESS",
+      "detected_languages": [
+        "javascript",
+        "typescript"
+      ],
+      "detected_framework": "next",
+      "file_count": 9,
+      "entry_points": [
+        "app/page.tsx"
+      ],
+      "manifest_keys": [
+        "next_config",
+        "package_json",
+        "readme_excerpt",
+        "tsconfig"
+      ],
+      "ast_sample_count": 6,
+      "note": "READ-ONLY re-run; identical to the SourceTreeAnalysis the role received (analyzed_at re-stamped)"
+    },
+    "step3_reverse_vision": {
+      "provider": "mock",
+      "model_returned": "mock-rv",
+      "parse_ok": true,
+      "missing_fields": [],
+      "inferred_vision": {
+        "role_id": "reverse_vision",
+        "project_name": "nextjs_tasks_demo",
+        "domain": "web_application",
+        "goals": {
+          "primary": "A Next.js web application that provides a task tracking interface with a REST API",
+          "secondary": [
+            "Expose GET and POST endpoints for task management via /api/tasks",
+            "Render a server-side task list on the home page"
+          ]
+        },
+        "constraints": [
+          "Requires Node.js 18+",
+          "Next.js 14 App Router",
+          "TypeScript strict mode"
+        ],
+        "non_goals": [
+          "No authentication layer",
+          "No database persistence (in-memory only)",
+          "No real-time updates"
+        ],
+        "detected_languages": [
+          "typescript",
+          "javascript"
+        ],
+        "source_summary": "A minimal Next.js 14 App Router project implementing an in-memory task tracker. Exposes a REST API at /api/tasks and renders tasks server-side on the home page. Written in TypeScript with React.",
+        "confidence": "HIGH"
+      },
+      "ledger_row": {
+        "tokens_in": 150,
+        "tokens_out": 180,
+        "latency_ms": 13,
+        "cost_usd_actual": 0.00174,
+        "outcome": "success"
+      },
+      "new_rv_ledger_rows": 1,
+      "raw_forensic_trace_note": "mock branch — no network; response from mock_responses.json key mock|mock-rv|scenario:S167"
+    },
+    "step4_5_approval": {
+      "ok": true,
+      "stage": "APPROVED",
+      "reason": null,
+      "loop_id": "8e1c89f1-61e9-4d5a-bc91-f11d2361dd98"
+    },
+    "step4_vision_lock": {
+      "vision_locked": "true",
+      "vision_locked_at": "2026-06-30T13:42:21.825Z",
+      "locked_by_role": "intake_owner"
+    },
+    "step5_pipeline_entry": {
+      "loop_id": "8e1c89f1-61e9-4d5a-bc91-f11d2361dd98",
+      "current_state": "ARCHITECT_DESIGN",
+      "iteration_count": 0,
+      "started_at": "2026-06-30T13:42:21.843Z"
+    }
+  },
+  "gates": {
+    "intake_started": true,
+    "reverse_vision_valid": true,
+    "single_reverse_vision_call": true,
+    "vision_locked": true,
+    "pipeline_entry": true
+  },
+  "all_pass": true,
+  "reverse_vision_cost_usd": 0.00174,
+  "reverse_vision_cost_kind": "NOTIONAL_MOCK_TOKENS (no real spend)",
+  "duration_ms": 2047
+}

@@ -183,6 +183,12 @@ artifacts/projects/active_project.json
 # PHASE-44 STEP B real-validation build output (contains node_modules; forensic copies live under artifacts/spikes/phase44_loopback_real/)
 artifacts/projects/phase44_loopback_real/
 
+# PHASE-48 W-4 — demo-dir hygiene: intake/build DRIVER scratch projects (churn-on-run).
+# Drivers under scripts/spikes/** clobber artifacts/projects/phase4*/ per run; they are NOT
+# deliverables. Forensic evidence lives under artifacts/spikes/** (stays tracked).
+# Covers phase43_*..phase48_* (e.g. phase48_intake_nextjs_*); _reference_todo_api is kept (leading _).
+artifacts/projects/phase4*/
+
 
 # -- 10. PER-PROJECT (built by Forge) — node_modules and binary indexes ------
 # For ANY project Forge builds, its node_modules and LanceDB binary indexes
