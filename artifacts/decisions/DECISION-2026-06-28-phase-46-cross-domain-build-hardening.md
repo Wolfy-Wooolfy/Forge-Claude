@@ -27,3 +27,28 @@ Mock/$0 for W-1..W-4. Real validation runs gated per-run (estimate first); phase
 
 ## Track A / §ARC
 W-1/W-2 (prompts) + W-4 (scripts) touch no engine code. W-3 touches the build/loopback runtime — §ARC frozen at 10 (new §ARC requires STOP + amendment + owner approval). No engine edits beyond the W-3 guard.
+
+---
+
+## CLOSURE — PHASE-46 (Cross-Domain Build Hardening)
+Status: **CLOSED 2026-06-30 (LOCAL)**. Owner-approved + CTO-verified from disk (both real legs). LOCAL until CTO closure-diff → push GO + annotated tag `phase-46-complete`.
+
+### Work items — all delivered ✓
+- **W-1 (test_designer assertion-name discipline)** ✓ — NEW `test_designer_v3` (FORBIDDEN ASSERTION NAMES + FINAL CHECK; v2 frozen, header deprecation pointer); role repointed; **S340**. The PHASE-45 invented `response_status_equals` is now forbidden against the 9 canonical names.
+- **W-2 (A-8 ID-clause generalization)** ✓ — NEW `architect_v2` + `spec_writer_v2`; clause (a) only: **sequential integer for record/entity resources / opaque short code for shortener-slug systems**, never user-supplied unless the spec requires a user-provided key; roles repointed; **S341**.
+- **W-3 (A-5 monotonic guard)** ✓ — the substantive runtime change in `conversationEngine.js`: **Mechanism A keep-best** (lexicographic score `[pass_scenarios, −error_scenarios, pass_assertions]`, shape-guarded; FAIL-branch-only snapshot + **set-exact restore on escalate** via L2 `fs.read/write/delete_file` + sha256; fully **fail-OPEN**) + **Mechanism B pre-flight parse** (new `js_syntax_check.js`, `vm` compile-only, gated `iteration_count>0`; reject→`REBUILD_PARSE_FAILED`, no `loop_back`). **S342/S343**. Design-first (8-agent map + 3-lens adversarial critique caught 3 BLOCKERs, all fixed pre-implementation). §ARC stayed 10.
+- **W-4 (per-attempt forensic instrumentation)** ✓ — shared `scripts/spikes/_w4_build_forensic.js` imported by **both** domain drivers (additive; in-place same-id codegen-capture wrapper filtered by the codegen marker); captures iteration_count / files / parse_result / verdict / keep-best record / codegen-prompt → `trace.forensics[]` + `forensic_log.md`. Scripts-only.
+
+### Gated real validation (both legs, owner spend-approved per leg)
+- **URL-shortener** (real gpt-4o, cap 4): idea→**COMPLETE**, **8/8 PASS** via the A-5 loopback (attempt-1 7/8 FAIL → real `last_report.json` → repair block in the rebuild prompt [`has_repair_block: true`] → attempt-2 **8/8**); **opaque short-code IDs**; **$0.34947**.
+- **Notes-API regression** (real gpt-4o, cap 2): **8/8 PASS on the first attempt**; **SEQUENTIAL-INTEGER IDs** (`idGenerator currentId+=1`; AC-1 "sequential integer ID") — **W-2 A-8 generalization regression GREEN** (the generalization works in both directions); in-memory build (no SQL anywhere); **$0.22626**. The pipeline halted at `reviewProject` on **confirmed false-positives** (security "SQL injection" on an in-memory build; reviewer "GET 404" while `routes/notes.js` returns 404 at 3 sites and the 404 tests PASS) — a **pre-existing reviewer/security prompt-tuning backlog** (PHASE-31), OUT of scope and NOT a build defect.
+
+### Goal — MET
+**A deterministic passing BUILD (8/8) on BOTH domains** (URL = opaque short code, Notes = sequential int). Cumulative real spend **$0.57573 / $3** ceiling.
+
+### State at closure
+SU **336/0/5 (341)**; forge-doctor **35 checks / 0 FAIL**; Track A clean — **live surface `code/src/**` byte-identical to W-3 across W-1..W-4 and both real legs**; **§ARC = 10** (§ARC-11 absent); L2 tools 80, agent roles 13, doctor checks 35 — all unchanged.
+
+### Forward backlog (NOT this phase → PHASE-47 candidates)
+- (a) **reviewer/security prompt-tuning** — false-positives on in-memory builds (SQLi) + over-eager BLOCKERs on already-tested behavior (404).
+- (b) the `artifacts/projects/phase4X` demo dirs **churn on every driver run** — consider gitignoring them or writing to a dedicated evidence dir.
