@@ -80,6 +80,7 @@ if (IS_REAL) {
 
 const { getDefaultRegistry }       = require("../../code/src/runtime/tools/_registry");
 const { createConversationEngine } = require("../../code/src/ai_os/conversationEngine");
+const { createForensic }           = require("./_w4_build_forensic");   // PHASE-46 W-4 per-attempt forensic
 
 // ── Constants ───────────────────────────────────────────────────────────────
 const PROJECT_ID          = "phase45_url_shortener";
@@ -235,6 +236,12 @@ const trace = { mode: MODE, force_test_fail: FORCE_TEST_FAIL, project_id: PROJEC
 let globalLoopId = null;
 let costBefore   = 0;   // project ledger USD total snapshotted before the run (real mode)
 
+// PHASE-46 W-4 — per-attempt forensic instrumentation (spike-only; captures the W-3 keep-best
+// guard behavior across attempts). trace.forensics shares this array reference, so the records
+// are included in EVERY trace save (incl. the cap-path stop()).
+const forensic  = createForensic({ root: ROOT, projectId: PROJECT_ID, evidenceDir: EVIDENCE_DIR });
+trace.forensics = forensic.records;
+
 async function saveJson(reg, relPath, data) {
   return reg.invoke("fs.write_file", { path: relPath, content: JSON.stringify(data, null, 2) }, { root: ROOT });
 }
@@ -302,6 +309,7 @@ async function runBuildTestLeg(reg, engine) {
     }
     trace.materialized_files = (b.files_written || []).map(f => ({ path: f.path, line_count: f.line_count }));
     await guardCost(reg, "buildProject#" + attempt);
+    await forensic.recordBuild(reg, { attempt: attempt, buildResult: b });   // W-4 forensic (build side)
 
     log("[RUN_TESTS attempt " + attempt + "] runTests ...");
     const runBody = Object.assign({ project_id: PROJECT_ID, loop_id: globalLoopId });
@@ -325,6 +333,7 @@ async function runBuildTestLeg(reg, engine) {
     log("    advanced=" + rt.advanced + " -> " + rt.advanced_to + " report=" +
         JSON.stringify(rt.report_summary || rt.test_error || null));
     await guardCost(reg, "runTests#" + attempt);
+    await forensic.recordTest(reg, { attempt: attempt, runResult: rt });   // W-4 forensic (test side + keep-best)
 
     if (rt.advanced_to === "REVIEWER_CODE_AND_SECURITY") return rt;             // PASS -> proceed
     if (rt.advanced_to === "ESCALATED") {
@@ -477,7 +486,15 @@ async function main() {
   await guardCost(reg, "designTests");
 
   // ── H8/H9: BUILDER -> RUN_TESTS (driver loopback cap) ────────────────────────
+  // W-4: wrap the materializer's provider adapter IN-PLACE (keeping its id) to capture ONLY the
+  // codegen prompt (filtered by the codegen marker). Provider id unchanged ⇒ mock fixture lookup +
+  // vision/budget gate unchanged; pass-through, no behavior change.
+  forensic.setLoopId(globalLoopId);
+  forensic.installCapture(HOP.buildProject.mat_provider);
+
   await runBuildTestLeg(reg, engine);
+  await forensic.finalize(reg);          // write forensic_log.md (PASS path; FAIL path writes per recordTest)
+  forensic.uninstallCapture();
   await recordState(reg, "after RUN_TESTS (PASS)");
 
   // ── H10: reviewProject -> DOCUMENTATION ──────────────────────────────────────

@@ -1,14 +1,14 @@
 {
-  "id": "T-8",
-  "name": "delete_note_not_found_returns_404",
-  "description": "DELETE /notes/:id returns 404 if the note to delete is not found",
+  "id": "T-3",
+  "name": "get_tasks_without_jwt_returns_401",
+  "description": "GET /tasks without Authorization header returns 401 Unauthorized",
   "category": "http",
   "fixture": "fresh_db",
   "setup": {
     "actions": [
       {
         "type": "start_server",
-        "command": "node src/server.js",
+        "command": "node app.js",
         "wait_for_port": 3000,
         "timeout_ms": 5000
       }
@@ -16,14 +16,15 @@
   },
   "execution": {
     "type": "http_request",
-    "method": "DELETE",
-    "url": "http://localhost:3000/notes/999999",
-    "headers": {}
+    "method": "GET",
+    "url": "http://localhost:3000/tasks",
+    "headers": {},
+    "body": null
   },
   "assertions": [
     {
       "type": "http_status_equals",
-      "expected": 404
+      "expected": 401
     }
   ],
   "teardown": {
@@ -35,7 +36,7 @@
   },
   "metadata": {
     "covers_ac": [
-      "AC-5"
+      "AC-3"
     ],
     "estimated_duration_ms": 500
   }

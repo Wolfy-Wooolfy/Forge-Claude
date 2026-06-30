@@ -1,24 +1,20 @@
 {
-  "mode": "real",
-  "force_test_fail": false,
+  "mode": "mock",
+  "force_test_fail": true,
   "project_id": "phase43_notes_api",
-  "started_at": "2026-06-28T08:26:50.535Z",
+  "started_at": "2026-06-30T08:28:47.270Z",
   "states": [
     {
       "label": "after confirmIdea",
+      "state": "ARCHITECT_DESIGN"
+    },
+    {
+      "label": "after architect (seeded)",
       "state": "SPEC_WRITER_FORMALIZE"
     },
     {
       "label": "before reviewSpec",
       "state": "REVIEWER_SPEC"
-    },
-    {
-      "label": "after RUN_TESTS (PASS)",
-      "state": "REVIEWER_CODE_AND_SECURITY"
-    },
-    {
-      "label": "after finalize",
-      "state": "COMPLETE"
     }
   ],
   "gates": [
@@ -27,32 +23,30 @@
       "response": "APPROVE",
       "advanced": true,
       "advanced_to": "TEST_DESIGN"
-    },
-    {
-      "gate": 2,
-      "response": "APPROVE_SHIP",
-      "advanced": true,
-      "advanced_to": "DEPLOYMENT_OR_END"
     }
   ],
   "steps": [
     {
       "hop": "confirmIdea",
       "ok": true,
-      "loop_id": "25c3cb10-47d9-4f57-bc46-826c992948a3",
+      "loop_id": "54b4b5f4-7c57-4fea-b41d-6ab8036ebcd4",
       "architect_error": null
     },
     {
-      "hop": "formalizeSpec",
-      "advanced": true,
-      "advanced_to": "REVIEWER_SPEC",
-      "spec_error": null
+      "hop": "architect",
+      "seeded": true,
+      "advanced_to": "SPEC_WRITER_FORMALIZE"
+    },
+    {
+      "hop": "spec_writer",
+      "seeded": true,
+      "advanced_to": "REVIEWER_SPEC"
     },
     {
       "hop": "reviewSpec",
       "advanced": true,
       "advanced_to": "COST_ESTIMATE",
-      "verdict": "APPROVED"
+      "verdict": "APPROVED_WITH_CONCERNS"
     },
     {
       "hop": "estimateCost",
@@ -75,129 +69,206 @@
       "advanced": true,
       "advanced_to": "RUN_TESTS",
       "build_error": null,
-      "files": 4
+      "files": 1
     },
     {
       "hop": "runTests",
       "attempt": 1,
       "advanced": true,
-      "advanced_to": "REVIEWER_CODE_AND_SECURITY",
+      "advanced_to": "BUILDER",
       "report_summary": {
-        "overall_status": "PASS",
-        "total": 9,
-        "pass": 9,
-        "fail": 0,
+        "overall_status": "FAIL",
+        "total": 4,
+        "pass": 1,
+        "fail": 3,
         "error": 0
       },
       "test_error": null
     },
     {
-      "hop": "reviewProject",
+      "hop": "buildProject",
+      "attempt": 2,
       "advanced": true,
-      "advanced_to": "DOCUMENTATION",
-      "review_error": null
+      "advanced_to": "RUN_TESTS",
+      "build_error": null,
+      "files": 1
     },
     {
-      "hop": "documentProject",
+      "hop": "runTests",
+      "attempt": 2,
       "advanced": true,
-      "advanced_to": "QUALITY_JUDGE",
-      "doc_error": null
-    },
-    {
-      "hop": "judgeQuality",
-      "advanced": false,
-      "gate_pending": 2
-    },
-    {
-      "hop": "deployProject",
-      "advanced": true,
-      "advanced_to": "LIVE_DELIVERABLE",
-      "skipped": true
-    },
-    {
-      "hop": "finalizeDeliverable",
-      "advanced": true,
-      "advanced_to": "COMPLETE"
+      "advanced_to": "BUILDER",
+      "report_summary": {
+        "overall_status": "FAIL",
+        "total": 4,
+        "pass": 1,
+        "fail": 3,
+        "error": 0
+      },
+      "test_error": null
     }
   ],
   "cost_by_hop": [
     {
       "hop": "confirmIdea(architect)",
-      "run_delta_usd": 0.01562
-    },
-    {
-      "hop": "formalizeSpec",
-      "run_delta_usd": 0.03432
+      "run_delta_usd": 0
     },
     {
       "hop": "reviewSpec",
-      "run_delta_usd": 0.05182
+      "run_delta_usd": 0
     },
     {
       "hop": "estimateCost",
-      "run_delta_usd": 0.07
+      "run_delta_usd": 0
     },
     {
       "hop": "reportEnv",
-      "run_delta_usd": 0.08671
+      "run_delta_usd": 0
     },
     {
       "hop": "designTests",
-      "run_delta_usd": 0.13973
+      "run_delta_usd": 0
     },
     {
       "hop": "buildProject#1",
-      "run_delta_usd": 0.17595
+      "run_delta_usd": 0
     },
     {
       "hop": "runTests#1",
-      "run_delta_usd": 0.17595
+      "run_delta_usd": 0
     },
     {
-      "hop": "reviewProject",
-      "run_delta_usd": 0.22067
+      "hop": "buildProject#2",
+      "run_delta_usd": 0
     },
     {
-      "hop": "documentProject",
-      "run_delta_usd": 0.25368
+      "hop": "runTests#2",
+      "run_delta_usd": 0
+    }
+  ],
+  "forensics": [
+    {
+      "attempt": 1,
+      "iteration_count": 0,
+      "advanced": true,
+      "advanced_to": "RUN_TESTS",
+      "files_written": [
+        "app.js"
+      ],
+      "parse_result": {
+        "rejected": false,
+        "build_error": null,
+        "parse_errors": null
+      },
+      "codegen_prompt": {
+        "captured": true,
+        "chars": 2888,
+        "path": "artifacts/spikes/phase43_notes_api/codegen_prompt_attempt1.txt",
+        "has_repair_block": false
+      },
+      "verdict": {
+        "advanced_to": "BUILDER",
+        "report_summary": {
+          "overall_status": "FAIL",
+          "total": 4,
+          "pass": 1,
+          "fail": 3,
+          "error": 0
+        },
+        "test_error": null
+      },
+      "score": [
+        1,
+        0
+      ],
+      "best_attempt": {
+        "score": [
+          1,
+          0,
+          0
+        ],
+        "files": [
+          "app.js"
+        ],
+        "ts": "2026-06-30T08:28:51.868Z"
+      }
     },
     {
-      "hop": "judgeQuality",
-      "run_delta_usd": 0.29544
-    },
-    {
-      "hop": "final",
-      "run_delta_usd": 0.29544
+      "attempt": 2,
+      "iteration_count": 1,
+      "advanced": true,
+      "advanced_to": "RUN_TESTS",
+      "files_written": [
+        "app.js"
+      ],
+      "parse_result": {
+        "rejected": false,
+        "build_error": null,
+        "parse_errors": null
+      },
+      "codegen_prompt": {
+        "captured": true,
+        "chars": 2888,
+        "path": "artifacts/spikes/phase43_notes_api/codegen_prompt_attempt2.txt",
+        "has_repair_block": false
+      },
+      "verdict": {
+        "advanced_to": "BUILDER",
+        "report_summary": {
+          "overall_status": "FAIL",
+          "total": 4,
+          "pass": 1,
+          "fail": 3,
+          "error": 0
+        },
+        "test_error": null
+      },
+      "score": [
+        1,
+        0
+      ],
+      "best_attempt": {
+        "score": [
+          1,
+          0,
+          0
+        ],
+        "files": [
+          "app.js"
+        ],
+        "ts": "2026-06-30T08:28:51.868Z"
+      }
     }
   ],
   "vision_locked": true,
   "cost": {
-    "before_usd": 1.08684,
+    "before_usd": 1.38228,
     "current_total_usd": 1.38228,
-    "run_delta_usd": 0.29544,
-    "last_hop": "final"
+    "run_delta_usd": 0,
+    "last_hop": "runTests#2"
   },
   "materialized_files": [
     {
-      "path": "src/notesStorage.js",
-      "line_count": 41
-    },
-    {
-      "path": "src/notesController.js",
-      "line_count": 64
-    },
-    {
-      "path": "src/notesRouter.js",
-      "line_count": 13
-    },
-    {
-      "path": "src/server.js",
-      "line_count": 13
+      "path": "app.js",
+      "line_count": 1
     }
   ],
-  "verdict": "COMPLETE",
-  "final_state": "COMPLETE",
-  "loop_id": "25c3cb10-47d9-4f57-bc46-826c992948a3",
-  "total_real_cost_usd": 0.29544,
-  "ended_at": "2026-06-28T08:28:45.666Z"
+  "verdict": "STOP_AND_REPORT",
+  "stop_code": "DRIVER_LOOPBACK_CAP_REACHED",
+  "stop_detail": "RUN_TESTS FAIL looped back to BUILDER; driver cap=2 reached",
+  "stop_extra": {
+    "ok": true,
+    "loop_id": "54b4b5f4-7c57-4fea-b41d-6ab8036ebcd4",
+    "advanced": true,
+    "advanced_to": "BUILDER",
+    "loop_back": true,
+    "report_summary": {
+      "overall_status": "FAIL",
+      "total": 4,
+      "pass": 1,
+      "fail": 3,
+      "error": 0
+    }
+  },
+  "ended_at": "2026-06-30T08:28:52.703Z"
 }
