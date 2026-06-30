@@ -1,0 +1,337 @@
+{
+  "meta": {
+    "phase": "PHASE-47",
+    "purpose": "Replay fixture for the two PHASE-46 reviewProject false positives (in-memory Notes API). Used by scripts/spikes/phase47_fp_replay.js to prove (real gpt-4o, owner-gated) that reviewer_v6 + security_auditor_v7 no longer emit the spurious BLOCKERs.",
+    "source_project": "artifacts/projects/phase43_notes_api",
+    "source_loop": "064710c0-db4a-4350-b28d-f1fc7e7285eb",
+    "captured_from_real_run": "PHASE-46 gated validation 2026-06-30 (Notes-API leg, real gpt-4o)",
+    "l5b_report_summary": null,
+    "ground_truth": "All 5 review BLOCKERs are false-positives / over-fires; the build is correct (8/8 L5b PASS; GET/:id, PUT, DELETE all return 404 on missing; DELETE checks the affected result; storage is an in-memory Map with NO SQL sink).",
+    "before_findings": {
+      "reviewer_verdict": "REJECTED",
+      "reviewer_blockers": [
+        "No check on DELETE to verify if a note was actually deleted.",
+        "GET /notes should return a 404 if a note is not found by id.",
+        "No validation of request query parameters"
+      ],
+      "security_threat_level": "HIGH",
+      "security_blockers": [
+        "SQL injection",
+        "Insecure ID handling"
+      ]
+    }
+  },
+  "project_id": "phase47_fp_replay",
+  "spec": {
+    "role_id": "spec_writer",
+    "scope": "The system is an in-memory Notes API designed to manage personal notes with capabilities for creating, updating, retrieving, and deleting notes. Each note includes a title, body, category, and tags. The API can list all notes, apply optional category filters, and perform keyword searches across the title and body fields.",
+    "decisions": [
+      {
+        "decision": "Use Express.js to create and manage the API routes.",
+        "rationale": "Express provides a straightforward and efficient way to create RESTful APIs."
+      },
+      {
+        "decision": "Store notes in a JavaScript Map object within the server's memory.",
+        "rationale": "A Map offers efficient key-value storage and is well-suited for the small data scale of this application."
+      },
+      {
+        "decision": "Generate unique note IDs as sequential integers starting from 1.",
+        "rationale": "Sequential integers provide a simple, efficient means of ID generation suitable for small-scale, in-memory datasets."
+      },
+      {
+        "decision": "Implement a validation middleware to ensure title length is no more than 200 characters.",
+        "rationale": "Validation of input ensures data integrity and prevents invalid data from being stored."
+      }
+    ],
+    "acceptance_criteria": [
+      {
+        "id": "AC-1",
+        "description": "POST /notes creates a new note, assigning a sequential integer ID, validating title length (max 200 chars), and storing the note with title, body, category, and tags."
+      },
+      {
+        "id": "AC-2",
+        "description": "GET /notes retrieves all notes, optionally filtered by ?category=<category> or searched with ?q=<keyword> against title and body."
+      },
+      {
+        "id": "AC-3",
+        "description": "GET /notes/:id returns a single note by ID, or a 404 error if the note is not found."
+      },
+      {
+        "id": "AC-4",
+        "description": "PUT /notes/:id updates an existing note by ID after validating input, or returns a 404 error if the note is not found."
+      },
+      {
+        "id": "AC-5",
+        "description": "DELETE /notes/:id removes a note by ID, returns a 204 status on success, or a 404 error if the note is not found."
+      }
+    ],
+    "files_to_create": [
+      {
+        "path": "src/server.js",
+        "purpose": "Initializes the Express server, mounts all API routes, and sets the app to listen on the specified port."
+      },
+      {
+        "path": "src/routes/notes.js",
+        "purpose": "Defines the RESTful routes for note operations, including CRUD and list with filter/search capabilities."
+      },
+      {
+        "path": "src/middleware/validation.js",
+        "purpose": "Contains middleware for validating incoming request data, particularly ensuring the title does not exceed a 200 character limit."
+      },
+      {
+        "path": "src/models/noteStore.js",
+        "purpose": "Implements the in-memory data storage using a JavaScript Map for storing and retrieving notes."
+      },
+      {
+        "path": "src/utils/idGenerator.js",
+        "purpose": "Contains the function for generating sequential integer IDs starting from 1 for new notes."
+      }
+    ],
+    "files_to_modify": [],
+    "out_of_scope": [
+      "Persistence beyond server runtime",
+      "Concurrency management or locking beyond basic in-memory operations"
+    ]
+  },
+  "design": {
+    "role_id": "architect",
+    "design_summary": "The system is an in-memory Notes API for managing personal notes, with capabilities for creating, updating, retrieving, and deleting notes. Each note consists of a title, body, category, and tags, and the API supports listing notes with optional category filtering and keyword search across title and body.",
+    "components": [
+      {
+        "name": "ServerEntry",
+        "tech": "Node.js (Express)",
+        "purpose": "Initializes the server, mounts all API routes, and listens on the specified port."
+      },
+      {
+        "name": "InMemoryDataStore",
+        "tech": "JavaScript Map",
+        "purpose": "Stores notes in-memory with fast access by note ID."
+      },
+      {
+        "name": "NotesRouter",
+        "tech": "Express Router",
+        "purpose": "Defines RESTful routes for handling note operations (CRUD and list with filter/search)."
+      },
+      {
+        "name": "IDGenerator",
+        "tech": "JavaScript Function",
+        "purpose": "Generates sequential integer IDs starting from 1 for new notes."
+      },
+      {
+        "name": "ValidationMiddleware",
+        "tech": "Express Middleware",
+        "purpose": "Validates incoming request data for notes, ensuring required constraints are met."
+      }
+    ],
+    "data_flow": "Clients interact with the Notes API through HTTP requests. POST /notes generates a new note ID, validates the title (max 200 chars), and stores the note in the InMemoryDataStore. GET /notes retrieves all notes, applying a ?category= filter or ?q= keyword search if specified. GET /notes/:id fetches a single note by ID, returning 404 if not found. PUT /notes/:id updates an existing note after validating input, with 404 if the note does not exist. DELETE /notes/:id removes a note by ID, returning 204 on success or 404 if not found.",
+    "technology_choices": [
+      {
+        "category": "Web Framework",
+        "choice": "Express",
+        "rationale": "Express provides a lightweight and flexible framework suitable for building RESTful APIs quickly."
+      },
+      {
+        "category": "Data Storage",
+        "choice": "JavaScript Map",
+        "rationale": "Maps offer efficient in-memory storage and retrieval by keys (note IDs), which is ideal for in-memory persistence."
+      },
+      {
+        "category": "ID Generation",
+        "choice": "Sequential Integer",
+        "rationale": "Sequential integers are simple and effective for uniquely identifying records in a small, in-memory system."
+      }
+    ],
+    "integration_points": [
+      {
+        "name": "Notes API",
+        "type": "API",
+        "notes": "REST endpoints for note manipulation: POST /notes, GET /notes, GET /notes/:id, PUT /notes/:id, DELETE /notes/:id."
+      }
+    ],
+    "identified_risks": [
+      {
+        "risk": "In-memory data loss on server restart",
+        "severity": "HIGH",
+        "mitigation": "Document the transient nature of data and consider options for persistence if future enhancements require it."
+      },
+      {
+        "risk": "Scalability limits due to in-memory storage",
+        "severity": "MEDIUM",
+        "mitigation": "Clearly specify usage limits and scale considerations; switch to a database in future iterations if necessary."
+      },
+      {
+        "risk": "Concurrent request handling leading to race conditions",
+        "severity": "LOW",
+        "mitigation": "Handle race conditions explicitly in JavaScript and use locking mechanisms if the application grows in complexity."
+      }
+    ]
+  },
+  "code": {
+    "files_written": [
+      {
+        "path": "src/models/noteStore.js",
+        "content": "class NoteStore {\n    constructor() {\n        this.notes = new Map();\n    }\n\n    create(note) {\n        this.notes.set(note.id, note);\n        return note;\n    }\n\n    retrieve(id) {\n        return this.notes.get(id) || null;\n    }\n\n    update(id, updatedNote) {\n        if (!this.notes.has(id)) {\n            return null;\n        }\n        this.notes.set(id, updatedNote);\n        return updatedNote;\n    }\n\n    delete(id) {\n        return this.notes.delete(id);\n    }\n\n    list(query, category) {\n        const notesArray = Array.from(this.notes.values());\n        return notesArray.filter(note => {\n            const matchesCategory = category ? note.category === category : true;\n            const matchesQuery = query ? (note.title.includes(query) || note.body.includes(query)) : true;\n            return matchesCategory && matchesQuery;\n        });\n    }\n}\n\nmodule.exports = new NoteStore();"
+      },
+      {
+        "path": "src/utils/idGenerator.js",
+        "content": "let currentId = 0;\n\nfunction generateId() {\n    currentId += 1;\n    return currentId;\n}\n\nmodule.exports = generateId;"
+      },
+      {
+        "path": "src/middleware/validation.js",
+        "content": "function validateNoteInput(req, res, next) {\n    const { title } = req.body;\n    if (typeof title !== 'string' || title.length > 200) {\n        return res.status(400).json({ error: 'Invalid title. It must be a string and no more than 200 characters long.' });\n    }\n    next();\n}\n\nmodule.exports = validateNoteInput;"
+      },
+      {
+        "path": "src/routes/notes.js",
+        "content": "const express = require('express');\nconst noteStore = require('../models/noteStore');\nconst generateId = require('../utils/idGenerator');\nconst validateNoteInput = require('../middleware/validation');\n\nconst router = express.Router();\n\nrouter.post('/notes', validateNoteInput, (req, res) => {\n    const { title, body, category, tags } = req.body;\n    const id = generateId();\n    const note = { id, title, body, category, tags };\n    noteStore.create(note);\n    res.status(201).json(note);\n});\n\nrouter.get('/notes', (req, res) => {\n    const { category, q } = req.query;\n    const notes = noteStore.list(q, category);\n    res.json(notes);\n});\n\nrouter.get('/notes/:id', (req, res) => {\n    const { id } = req.params;\n    const note = noteStore.retrieve(parseInt(id));\n    if (!note) {\n        return res.status(404).json({ error: 'Note not found' });\n    }\n    res.json(note);\n});\n\nrouter.put('/notes/:id', validateNoteInput, (req, res) => {\n    const { title, body, category, tags } = req.body;\n    const { id } = req.params;\n    const updatedNote = { id: parseInt(id), title, body, category, tags };\n    const result = noteStore.update(parseInt(id), updatedNote);\n    if (!result) {\n        return res.status(404).json({ error: 'Note not found' });\n    }\n    res.json(result);\n});\n\nrouter.delete('/notes/:id', (req, res) => {\n    const { id } = req.params;\n    const result = noteStore.delete(parseInt(id));\n    if (!result) {\n        return res.status(404).json({ error: 'Note not found' });\n    }\n    res.status(204).send();\n});\n\nmodule.exports = router;"
+      },
+      {
+        "path": "src/server.js",
+        "content": "const express = require('express');\nconst notesRoutes = require('./routes/notes');\n\nconst app = express();\n\napp.use(express.json());\napp.use('', notesRoutes);\n\nconst PORT = process.env.PORT || 3000;\napp.listen(PORT, () => {\n    console.log(`Server is running on port ${PORT}`);\n});"
+      }
+    ],
+    "summary": "Build under review: 5 file(s) from build_manifest.json (built_at 2026-06-30T09:28:58.999Z).",
+    "dependencies_added": []
+  },
+  "l5b_report": {
+    "total": 8,
+    "pass": 8,
+    "fail": 0,
+    "error": 0,
+    "overall_status": "PASS",
+    "ran_at": "2026-06-30T09:29:29.543Z",
+    "scenarios": [
+      {
+        "id": "T-1",
+        "name": "create_note_valid_request",
+        "status": "PASS",
+        "duration_ms": 2658,
+        "assertions": [
+          {
+            "type": "http_status_equals",
+            "pass": true,
+            "reason": null
+          },
+          {
+            "type": "response_body_contains_key",
+            "pass": true,
+            "reason": null
+          }
+        ],
+        "error": null
+      },
+      {
+        "id": "T-2",
+        "name": "get_all_notes",
+        "status": "PASS",
+        "duration_ms": 1703,
+        "assertions": [
+          {
+            "type": "http_status_equals",
+            "pass": true,
+            "reason": null
+          },
+          {
+            "type": "response_body_is_array",
+            "pass": true,
+            "reason": null
+          }
+        ],
+        "error": null
+      },
+      {
+        "id": "T-3",
+        "name": "get_note_by_id_valid",
+        "status": "PASS",
+        "duration_ms": 942,
+        "assertions": [
+          {
+            "type": "http_status_equals",
+            "pass": true,
+            "reason": null
+          },
+          {
+            "type": "response_body_field_equals",
+            "pass": true,
+            "reason": null
+          }
+        ],
+        "error": null
+      },
+      {
+        "id": "T-4",
+        "name": "get_note_by_id_not_found",
+        "status": "PASS",
+        "duration_ms": 894,
+        "assertions": [
+          {
+            "type": "http_status_equals",
+            "pass": true,
+            "reason": null
+          }
+        ],
+        "error": null
+      },
+      {
+        "id": "T-5",
+        "name": "update_note_valid_id",
+        "status": "PASS",
+        "duration_ms": 764,
+        "assertions": [
+          {
+            "type": "http_status_equals",
+            "pass": true,
+            "reason": null
+          },
+          {
+            "type": "response_body_field_equals",
+            "pass": true,
+            "reason": null
+          }
+        ],
+        "error": null
+      },
+      {
+        "id": "T-6",
+        "name": "update_note_not_found",
+        "status": "PASS",
+        "duration_ms": 961,
+        "assertions": [
+          {
+            "type": "http_status_equals",
+            "pass": true,
+            "reason": null
+          }
+        ],
+        "error": null
+      },
+      {
+        "id": "T-7",
+        "name": "delete_note_valid_id",
+        "status": "PASS",
+        "duration_ms": 1251,
+        "assertions": [
+          {
+            "type": "http_status_equals",
+            "pass": true,
+            "reason": null
+          }
+        ],
+        "error": null
+      },
+      {
+        "id": "T-8",
+        "name": "delete_note_not_found",
+        "status": "PASS",
+        "duration_ms": 897,
+        "assertions": [
+          {
+            "type": "http_status_equals",
+            "pass": true,
+            "reason": null
+          }
+        ],
+        "error": null
+      }
+    ]
+  }
+}

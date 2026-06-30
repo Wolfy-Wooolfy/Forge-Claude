@@ -1,0 +1,40 @@
+{
+  "mode": "real",
+  "provider": "openai",
+  "model": "gpt-4o",
+  "cost_delta_usd": 0.08386,
+  "soft_stop_usd": 0.6,
+  "hard_kill_usd": 3,
+  "cases": {
+    "case1_fp": {
+      "reviewer_verdict": "APPROVED",
+      "reviewer_blockers": [],
+      "security_threat_level": "LOW",
+      "security_blockers": [],
+      "named_fp_404_gone": true,
+      "named_fp_sqli_gone": true,
+      "security_threat_not_high": true,
+      "derived_verdict": "APPROVE",
+      "PASS_named_fps_fixed": true,
+      "FULL_APPROVE": true
+    },
+    "case2_recall_sqli": {
+      "security_threat_level": "HIGH",
+      "security_blockers": [
+        "SQL injection"
+      ],
+      "PASS_recall_sqli_fires": true
+    },
+    "case3_recall_404": {
+      "reviewer_verdict": "REJECTED",
+      "reviewer_blockers": [
+        "GET /items/:id should return 404 when the item does not exist, but currently, it returns undefined.",
+        "DELETE /items/:id should return 404 when the item does not exist, but currently, it always returns 204 without checking if the item was in the collection."
+      ],
+      "PASS_recall_404_fires": true
+    }
+  },
+  "GATE_4_1_named_fps_fixed": true,
+  "GATE_4_2_recall_retained": true,
+  "GATE_4_6_full_approve": true
+}

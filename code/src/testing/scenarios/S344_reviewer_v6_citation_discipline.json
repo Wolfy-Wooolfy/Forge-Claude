@@ -1,0 +1,18 @@
+{
+  "id": "S344",
+  "name": "PHASE-47 W-1 meta-regression: reviewer wired to v6 (Phase-B citation discipline)",
+  "description": "Stage W-1 meta-regression. Mirrors the S208/S340/S341 pattern — file/loader inspection only, no LLM calls, no real OS APIs. Proves the reviewer role -> _prompt_loader -> reviewer_v6 wiring that PHASE-47 W-1 introduces: (a) the role's declared system_prompt_id === 'reviewer_v6'; (b) the role source resolves its prompt via loadPrompt('reviewer_v6'); (c) reviewer_v6 carries the new citation-discipline anchors that target the PHASE-46 false-positive 404 BLOCKER (a Phase-B BLOCKER must cite the offending line; an absence-claim such as 'does not return 404' is invalid when the handler already returns 404 on the not-found path; a passing behavioral test is positive evidence); (d) RECALL is retained — the v5 missing-404 / this.changes BLOCKER discipline is still present (guard against deletion); (e) the protected first-500-char prefix is byte-identical to reviewer_v5 (preserves the S89/S90 mock prefix keys). HONEST SCOPE: this proves the intervention is installed + recall retained + prefix protected; it does NOT prove the real model's verdict is corrected (mock returns a fixed verdict) — that is the owner-gated real replay per the decision §4 item 6. W-1 is prompt + role-pointer only; §ARC frozen at 10.",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/reviewer_security_fp_prompt_helper",
+  "method": "runS344ReviewerV6CitationDiscipline",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "reviewer_active_prompt_id_is_v6",         "expected": true },
+    { "type": "state_field_equals", "field": "reviewer_loads_v6_via_loader",            "expected": true },
+    { "type": "state_field_equals", "field": "reviewer_v6_has_citation_anchors",        "expected": true },
+    { "type": "state_field_equals", "field": "reviewer_v6_preserves_recall",            "expected": true },
+    { "type": "state_field_equals", "field": "reviewer_v6_prefix_byte_identical_to_v5", "expected": true }
+  ]
+}

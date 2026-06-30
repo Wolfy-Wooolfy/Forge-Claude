@@ -1,0 +1,18 @@
+{
+  "id": "S345",
+  "name": "PHASE-47 W-2 meta-regression: security_auditor wired to v7 (no-sink clause + Example D)",
+  "description": "Stage W-2 meta-regression. Mirrors the S208/S340/S341 pattern — file/loader inspection only, no LLM calls, no real OS APIs. Proves the security_auditor role -> _prompt_loader -> security_auditor_v7 wiring that PHASE-47 W-2 introduces: (a) the role's declared system_prompt_id === 'security_auditor_v7'; (b) the role source resolves its prompt via loadPrompt('security_auditor_v7'); (c) security_auditor_v7 carries the new no-sink anchors that target the PHASE-46 false-positive SQL-injection BLOCKER on an in-memory build (worked Example D: in-memory array filter, no query sink -> threat_level NONE; an injection finding requires a present sink; speculative future-DB risk is out of scope); (d) RECALL + precision controls are retained — Example A parameterized-query code (=> WARN) and Example B concatenated-SQL code (=> BLOCKER) are both still present (guard against deletion); (e) the protected first-500-char prefix is byte-identical to security_auditor_v6 (preserves the S96-S99 mock prefix keys). HONEST SCOPE: this proves the intervention is installed + recall retained + prefix protected; it does NOT prove the real model's verdict is corrected (mock returns a fixed verdict) — that is the owner-gated real replay per the decision §4 item 6. W-2 is prompt + role-pointer only; §ARC frozen at 10.",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/reviewer_security_fp_prompt_helper",
+  "method": "runS345SecurityV7NoSinkClause",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "security_active_prompt_id_is_v7",          "expected": true },
+    { "type": "state_field_equals", "field": "security_loads_v7_via_loader",             "expected": true },
+    { "type": "state_field_equals", "field": "security_v7_has_no_sink_anchors",          "expected": true },
+    { "type": "state_field_equals", "field": "security_v7_preserves_recall",             "expected": true },
+    { "type": "state_field_equals", "field": "security_v7_prefix_byte_identical_to_v6",  "expected": true }
+  ]
+}
