@@ -18,10 +18,15 @@
 //                                  the adapter path, not provider.executeTask, so there is no L1
 //                                  codegen trace; the phase44-proven adapter-wrapper is the capture).
 //
-// The capture wrapper is registered under a DISTINCT adapter id and the driver points the
-// materializer's mat_provider at it, so ONLY the codegen call is captured (the planner + every
-// other hop keep their own provider). Pass-through (no behavior change); driver-local; the
-// process exits at the end of each spike run, so no global mutation leaks.
+// The capture wrapper is installed IN-PLACE under the materializer provider's OWN id (e.g.
+// "mock" | "openai") — the driver does NOT reroute mat_provider — so the mock fixture lookup
+// (mock_adapter.js keys on input.provider) AND the agent.invoke vision/budget bypass (keys on the
+// "mock" provider) stay unchanged. (An earlier distinct-id reroute broke the mock fixture lookup
+// with INVALID_CODEGEN — hence the in-place same-id wrap.) The wrapper delegates EVERY call to the
+// original adapter (pass-through, no behavior change) and CAPTURES only the codegen call — filtered
+// by the materializer prompt's CODEGEN_MARKER, so the planner + every other hop that shares this
+// provider are not captured. install/uninstall are paired; the spike process exits each run anyway,
+// so no global mutation leaks.
 
 const { getAdapters }   = require("../../code/src/runtime/agents/_adapter_registry");
 const { defineAdapter } = require("../../code/src/runtime/agents/_adapter_contract");
