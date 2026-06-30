@@ -1,8 +1,9 @@
 {
   "id": "T-3",
-  "name": "get_short_code_redirects_successfully",
-  "description": "GET /:shortCode should redirect to the original URL and increment visit count",
+  "name": "resolve_existing_code",
+  "description": "GET /:code for an existing short code redirects to the original URL",
   "category": "http",
+  "fixture": "fresh_db",
   "setup": {
     "actions": [
       {
@@ -32,7 +33,7 @@
   },
   "assertions": [
     {
-      "type": "response_status_equals",
+      "type": "http_status_equals",
       "expected": 302
     },
     {

@@ -1,8 +1,9 @@
 {
   "id": "T-2",
-  "name": "shorten_url_with_invalid_url_fails",
-  "description": "POST /shorten with an invalid URL should return 400 and an error message",
+  "name": "create_shorten_link_invalid_url",
+  "description": "POST /shorten with an invalid URL returns 400 and an error message",
   "category": "http",
+  "fixture": "fresh_db",
   "setup": {
     "actions": [
       {
@@ -30,8 +31,9 @@
       "expected": 400
     },
     {
-      "type": "response_body_contains_key",
-      "key": "error"
+      "type": "response_body_field_equals",
+      "field": "error.message",
+      "expected": "Invalid URL"
     }
   ],
   "teardown": {
@@ -43,9 +45,7 @@
   },
   "metadata": {
     "covers_ac": [
-      "AC-1",
-      "AC-6",
-      "AC-8"
+      "AC-1"
     ],
     "estimated_duration_ms": 500
   }

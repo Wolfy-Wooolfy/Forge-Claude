@@ -1,8 +1,9 @@
 {
-  "id": "T-1",
-  "name": "shorten_url_with_valid_url_succeeds",
-  "description": "POST /shorten with a valid URL should return 201 and a short code",
+  "id": "T-8",
+  "name": "retrieve_stats_nonexistent_code",
+  "description": "GET /stats/:code for a non-existent short code returns 404 and an error message",
   "category": "http",
+  "fixture": "fresh_db",
   "setup": {
     "actions": [
       {
@@ -15,23 +16,19 @@
   },
   "execution": {
     "type": "http_request",
-    "method": "POST",
-    "url": "http://localhost:3000/shorten",
-    "headers": {
-      "Content-Type": "application/json"
-    },
-    "body": {
-      "url": "http://example.com"
-    }
+    "method": "GET",
+    "url": "http://localhost:3000/stats/unknownCode",
+    "headers": {}
   },
   "assertions": [
     {
       "type": "http_status_equals",
-      "expected": 201
+      "expected": 404
     },
     {
-      "type": "response_body_contains_key",
-      "key": "shortCode"
+      "type": "response_body_field_equals",
+      "field": "error.message",
+      "expected": "Not found"
     }
   ],
   "teardown": {
@@ -43,9 +40,7 @@
   },
   "metadata": {
     "covers_ac": [
-      "AC-1",
-      "AC-6",
-      "AC-7"
+      "AC-4"
     ],
     "estimated_duration_ms": 500
   }

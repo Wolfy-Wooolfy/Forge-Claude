@@ -1,8 +1,9 @@
 {
-  "id": "T-6",
-  "name": "delete_existing_short_code_succeeds",
-  "description": "DELETE /:shortCode should delete the short code from memory",
+  "id": "T-5",
+  "name": "delete_existing_code",
+  "description": "DELETE /:code for an existing short code returns 200 and success message",
   "category": "http",
+  "fixture": "fresh_db",
   "setup": {
     "actions": [
       {
@@ -33,7 +34,12 @@
   "assertions": [
     {
       "type": "http_status_equals",
-      "expected": 204
+      "expected": 200
+    },
+    {
+      "type": "response_body_field_equals",
+      "field": "result",
+      "expected": "success"
     }
   ],
   "teardown": {
@@ -45,7 +51,7 @@
   },
   "metadata": {
     "covers_ac": [
-      "AC-4"
+      "AC-3"
     ],
     "estimated_duration_ms": 500
   }

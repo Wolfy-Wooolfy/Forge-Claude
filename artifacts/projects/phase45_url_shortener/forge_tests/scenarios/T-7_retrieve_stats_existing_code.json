@@ -1,8 +1,9 @@
 {
-  "id": "T-5",
-  "name": "get_stats_returns_visit_count",
-  "description": "GET /stats/:shortCode should return the visit count for the shortCode",
+  "id": "T-7",
+  "name": "retrieve_stats_existing_code",
+  "description": "GET /stats/:code for an existing short code returns 200 and visit count",
   "category": "http",
+  "fixture": "fresh_db",
   "setup": {
     "actions": [
       {
@@ -37,7 +38,7 @@
     },
     {
       "type": "response_body_contains_key",
-      "key": "visitCount"
+      "key": "visits"
     }
   ],
   "teardown": {
@@ -49,7 +50,7 @@
   },
   "metadata": {
     "covers_ac": [
-      "AC-3"
+      "AC-4"
     ],
     "estimated_duration_ms": 500
   }

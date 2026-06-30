@@ -1,8 +1,9 @@
 {
-  "id": "T-7",
-  "name": "delete_nonexistent_short_code_fails",
-  "description": "DELETE /:shortCode with nonexistent shortCode should return 404",
+  "id": "T-4",
+  "name": "resolve_nonexistent_code",
+  "description": "GET /:code for a non-existent short code returns 404 and an error message",
   "category": "http",
+  "fixture": "fresh_db",
   "setup": {
     "actions": [
       {
@@ -15,8 +16,8 @@
   },
   "execution": {
     "type": "http_request",
-    "method": "DELETE",
-    "url": "http://localhost:3000/999999",
+    "method": "GET",
+    "url": "http://localhost:3000/unknownCode",
     "headers": {}
   },
   "assertions": [
@@ -25,8 +26,9 @@
       "expected": 404
     },
     {
-      "type": "response_body_contains_key",
-      "key": "error"
+      "type": "response_body_field_equals",
+      "field": "error.message",
+      "expected": "Not found"
     }
   ],
   "teardown": {
@@ -38,8 +40,7 @@
   },
   "metadata": {
     "covers_ac": [
-      "AC-4",
-      "AC-8"
+      "AC-2"
     ],
     "estimated_duration_ms": 500
   }
