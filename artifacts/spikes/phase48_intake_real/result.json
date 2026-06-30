@@ -1,0 +1,133 @@
+{
+  "phase": "PHASE-48",
+  "mode": "real",
+  "provider_reverse_vision": "openai",
+  "model_reverse_vision": "gpt-4o",
+  "scenario_id": null,
+  "fixture": "artifacts/test_fixtures/intake/fixture_nextjs",
+  "project_id": "phase48_intake_nextjs_real",
+  "soft_stop_usd": 0.5,
+  "hard_kill_usd": 3,
+  "stub_real_split": {
+    "stubbed": [
+      "intent_classifier (deterministic AFFIRM)"
+    ],
+    "real": [
+      "project.intake_zip",
+      "project.analyze_source",
+      "reverse_vision (gpt-4o)",
+      "vision.lock_vision",
+      "orchestration.start_loop"
+    ]
+  },
+  "steps": {
+    "step1_3_intake_start": {
+      "ok": true,
+      "stage": "AWAIT_VISION_APPROVAL",
+      "reason": null,
+      "message_excerpt": "## Inferred Vision\n\n**Project:** nextjs_tasks_demo\n**Domain:** web_application\n**Confidence:** HIGH\n\n**Primary Goal:** A Next.js web application that tracks tasks using an in-memory store, with a frontend for displaying tasks and a backend "
+    },
+    "step1_intake_zip": {
+      "source_file_count": 9,
+      "source_files": [
+        "app/api/tasks/route.ts",
+        "app/layout.tsx",
+        "app/page.tsx",
+        "lib/storage.ts",
+        "lib/types.ts",
+        "next.config.mjs",
+        "package.json",
+        "README.md",
+        "tsconfig.json"
+      ]
+    },
+    "step2_analyze_source": {
+      "status": "SUCCESS",
+      "detected_languages": [
+        "javascript",
+        "typescript"
+      ],
+      "detected_framework": "next",
+      "file_count": 9,
+      "entry_points": [
+        "app/page.tsx"
+      ],
+      "manifest_keys": [
+        "next_config",
+        "package_json",
+        "readme_excerpt",
+        "tsconfig"
+      ],
+      "ast_sample_count": 6,
+      "note": "READ-ONLY re-run; identical to the SourceTreeAnalysis the role received (analyzed_at re-stamped)"
+    },
+    "step3_reverse_vision": {
+      "provider": "openai",
+      "model_returned": "gpt-4o-2024-08-06",
+      "parse_ok": true,
+      "missing_fields": [],
+      "inferred_vision": {
+        "role_id": "reverse_vision",
+        "project_name": "nextjs_tasks_demo",
+        "domain": "web_application",
+        "goals": {
+          "primary": "A Next.js web application that tracks tasks using an in-memory store, with a frontend for displaying tasks and a backend API for task management.",
+          "secondary": []
+        },
+        "constraints": [
+          "Requires Node.js environment",
+          "Uses Next.js 14",
+          "TypeScript throughout"
+        ],
+        "non_goals": [
+          "No external state management library",
+          "No database persistence",
+          "No authentication layer"
+        ],
+        "detected_languages": [
+          "javascript",
+          "typescript"
+        ],
+        "source_summary": "This project is a minimal task tracker built with Next.js 14, featuring a frontend that displays tasks and a backend API for managing them. Tasks are stored in-memory, meaning they reset on server restart. The application is implemented entirely in TypeScript and does not use any external state management libraries or databases.",
+        "confidence": "HIGH"
+      },
+      "ledger_row": {
+        "tokens_in": 1438,
+        "tokens_out": 165,
+        "latency_ms": 6926,
+        "cost_usd_actual": 0.009665,
+        "outcome": "success"
+      },
+      "new_rv_ledger_rows": 1,
+      "raw_forensic_trace_note": "real raw model response also persisted under artifacts/llm/responses/<task_id>.json (providerTrace File 3)"
+    },
+    "step4_5_approval": {
+      "ok": true,
+      "stage": "APPROVED",
+      "reason": null,
+      "loop_id": "2b078f53-0c12-47a6-8900-bcc4f22f0981"
+    },
+    "step4_vision_lock": {
+      "vision_locked": "true",
+      "vision_locked_at": "2026-06-30T14:01:42.640Z",
+      "locked_by_role": "intake_owner"
+    },
+    "step5_pipeline_entry": {
+      "loop_id": "2b078f53-0c12-47a6-8900-bcc4f22f0981",
+      "current_state": "ARCHITECT_DESIGN",
+      "iteration_count": 0,
+      "started_at": "2026-06-30T14:01:42.688Z"
+    }
+  },
+  "gates": {
+    "intake_started": true,
+    "reverse_vision_valid": true,
+    "single_reverse_vision_call": true,
+    "vision_locked": true,
+    "pipeline_entry": true
+  },
+  "all_pass": true,
+  "reverse_vision_cost_usd": 0.00967,
+  "reverse_vision_cost_kind": "REAL_SPEND",
+  "duration_ms": 10258
+}

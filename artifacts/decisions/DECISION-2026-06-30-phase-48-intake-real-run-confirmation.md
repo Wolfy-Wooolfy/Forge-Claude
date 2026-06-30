@@ -45,3 +45,68 @@ Mock/instrumentation: $0. Real run: estimate <= $0.50 (one gpt-4o reverse_vision
 
 ## 7. §ARC / Track A
 No new §ARC (frozen at 10). The intake handler is already reg.invoke-only. The spike driver lives under scripts/spikes/** (outside Track A by rule). .gitignore is config, not runtime code.
+
+---
+
+## 8. CLOSURE (2026-06-30) — owner-approved, CTO-verified
+
+**Status: CLOSED (LOCAL).** GOAL MET — capability #11 (existing-project intake → reverse-vision →
+vision lock → pipeline entry) confirmed end-to-end with ONE real gpt-4o call.
+
+### W-1 — Fixture recon
+`fixture_nextjs` selected (smallest by bytes: 5,517 B / 9 files; dedicated S166 reverse_vision + S167
+e2e mock backing). Inventory in the §0 Step-0 summary + mid checkpoint.
+
+### W-2 — Forensic driver (scripts-only, $0)
+`scripts/spikes/phase48_intake_real_run.js` drives the REAL handler `processIntakeRequest` end-to-end
+with per-step capture (intake_zip effect, analyze_source READ-ONLY re-run, reverse_vision InferredVision
++ ledger row, vision.md post-lock frontmatter, get_status pipeline-entry). Proven on a $0 mock dry pass:
+5/5 gates GREEN, exit 0. Evidence `artifacts/spikes/phase48_intake_real/result.mock.json`.
+
+### W-3 — Gated REAL validation (owner-approved spend)
+ONE real `gpt-4o-2024-08-06` reverse_vision. `PHASE48_MODE=real node scripts/spikes/phase48_intake_real_run.js`.
+
+| Step | Result |
+|---|---|
+| intake_zip | 9 files → `source/` (REAL) |
+| analyze_source | `[javascript,typescript]`, framework `next`, 9 files (REAL) |
+| reverse_vision | **REAL gpt-4o** → InferredVision `nextjs_tasks_demo` / `web_application` / `HIGH`, `parse_ok`, schema-valid; **1** ledger row, tokens 1438/165, 6926ms |
+| vision.lock_vision | **REAL** → `vision_locked:true`, `locked_by_role:intake_owner` |
+| start_loop | **REAL** → loop_id `2b078f53-0c12-47a6-8900-bcc4f22f0981`, `current_state: ARCHITECT_DESIGN` |
+
+5/5 gates PASS: `intake_started · reverse_vision_valid · single_reverse_vision_call · vision_locked · pipeline_entry`.
+**Cost: $0.009665** (≤ $0.014 est, ≤ $0.50 soft-stop). RULING 1 honored — sole stub = intent classifier
+(AFFIRM); intake_zip/analyze_source/reverse_vision/lock_vision/start_loop all real; pipeline-entry
+evidence = a real `loop_id` from a real `start_loop` read back via `orchestration.get_status`.
+Evidence `artifacts/spikes/phase48_intake_real/result.json`.
+
+reverse_vision vision-lock exemption verified IN CODE (`agent_budget_rule.js:64` — `role_id === "reverse_vision"`
+skips the lock check; reverse_vision runs before the vision exists). Anti-fabrication corroboration:
+`artifacts/agent/cost_ledger.jsonl` row (real tokens 1438/165, $0.009665, 6926ms) +
+`artifacts/llm/metadata/a20e97ab-…json` (model gpt-4o-2024-08-06, latency 6926ms, SUCCESS).
+
+**Honest note (forward backlog, NOT a defect):** `artifacts/llm/responses/<inv>.json` = `null` for the
+agent.invoke provider_id (function-calling) path — a PRE-EXISTING providerTrace fidelity gap (code/src
+byte-identical to PHASE-47). The intake chain itself worked end-to-end; the real-call proof is the ledger
+row + metadata trace + the output being DISTINCT from the mock (real `goals.secondary:[]` vs mock's 2).
+
+### W-4 — Demo-dir hygiene (config-only, $0)
+`.gitignore` now ignores `artifacts/projects/phase4*/` (driver scratch). Forensic evidence under
+`artifacts/spikes/**` stays tracked (verified `git add -n` would stage `result.json`). After a driver
+run, git status shows only intended deliverables — the project scratch no longer churns.
+
+### Closure gate — ALL MET
+- W-3 real evidence valid: real reverse_vision LOCKED + pipeline entered (ARCHITECT_DESIGN, real loop_id) ✓
+- Live surface `code/src/**` BYTE-IDENTICAL to PHASE-47 (`git diff phase-47-complete -- code/src` empty) ✓
+- SU suite 338 / 0 / 5 (343); no new SU; zero scenario add/remove (git diff scenarios empty) ✓
+- forge-doctor 35 checks / 0 FAIL (7 benign WARN) ✓
+- §ARC = 10 · L2 = 80 (`tools_registered`) · roles = 13 (`roles_runtime`) ✓
+- W-4: git status clean of project scratch after a driver run ✓
+- status.json value-only update (statusJsonValid REQUIRED_FIELDS preserved) + this CLOSURE block + final checkpoint ✓
+
+### Out-of-scope confirmed NOT actioned
+- KB/Research (#9) → PHASE-49 (resolve TAVILY vs offline-mode first).
+- reverse_vision_v2 goals.secondary tuning — forward observation only (CTO directed: do NOT action here).
+
+**Protocol:** LOCAL commit only. Push + annotated tag `phase-48-complete` await CTO closure-diff (fresh
+zip) + explicit GO. `next_phase → PHASE-49-PENDING-DECISION`.
