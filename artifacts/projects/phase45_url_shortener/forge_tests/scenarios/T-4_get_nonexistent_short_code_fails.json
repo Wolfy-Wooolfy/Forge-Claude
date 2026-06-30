@@ -1,0 +1,46 @@
+{
+  "id": "T-4",
+  "name": "get_nonexistent_short_code_fails",
+  "description": "GET /:shortCode with nonexistent shortCode should return 404",
+  "category": "http",
+  "setup": {
+    "actions": [
+      {
+        "type": "start_server",
+        "command": "node src/server.js",
+        "wait_for_port": 3000,
+        "timeout_ms": 5000
+      }
+    ]
+  },
+  "execution": {
+    "type": "http_request",
+    "method": "GET",
+    "url": "http://localhost:3000/999999",
+    "headers": {}
+  },
+  "assertions": [
+    {
+      "type": "http_status_equals",
+      "expected": 404
+    },
+    {
+      "type": "response_body_contains_key",
+      "key": "error"
+    }
+  ],
+  "teardown": {
+    "actions": [
+      {
+        "type": "stop_server"
+      }
+    ]
+  },
+  "metadata": {
+    "covers_ac": [
+      "AC-2",
+      "AC-8"
+    ],
+    "estimated_duration_ms": 500
+  }
+}

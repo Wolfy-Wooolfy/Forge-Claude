@@ -1,0 +1,52 @@
+{
+  "id": "T-1",
+  "name": "shorten_url_with_valid_url_succeeds",
+  "description": "POST /shorten with a valid URL should return 201 and a short code",
+  "category": "http",
+  "setup": {
+    "actions": [
+      {
+        "type": "start_server",
+        "command": "node src/server.js",
+        "wait_for_port": 3000,
+        "timeout_ms": 5000
+      }
+    ]
+  },
+  "execution": {
+    "type": "http_request",
+    "method": "POST",
+    "url": "http://localhost:3000/shorten",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "url": "http://example.com"
+    }
+  },
+  "assertions": [
+    {
+      "type": "http_status_equals",
+      "expected": 201
+    },
+    {
+      "type": "response_body_contains_key",
+      "key": "shortCode"
+    }
+  ],
+  "teardown": {
+    "actions": [
+      {
+        "type": "stop_server"
+      }
+    ]
+  },
+  "metadata": {
+    "covers_ac": [
+      "AC-1",
+      "AC-6",
+      "AC-7"
+    ],
+    "estimated_duration_ms": 500
+  }
+}

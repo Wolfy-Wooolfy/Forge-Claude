@@ -1,0 +1,56 @@
+{
+  "id": "T-5",
+  "name": "get_stats_returns_visit_count",
+  "description": "GET /stats/:shortCode should return the visit count for the shortCode",
+  "category": "http",
+  "setup": {
+    "actions": [
+      {
+        "type": "start_server",
+        "command": "node src/server.js",
+        "wait_for_port": 3000,
+        "timeout_ms": 5000
+      },
+      {
+        "type": "http_request",
+        "method": "POST",
+        "url": "http://localhost:3000/shorten",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "url": "http://example.com"
+        }
+      }
+    ]
+  },
+  "execution": {
+    "type": "http_request",
+    "method": "GET",
+    "url": "http://localhost:3000/stats/{{created.shortCode}}",
+    "headers": {}
+  },
+  "assertions": [
+    {
+      "type": "http_status_equals",
+      "expected": 200
+    },
+    {
+      "type": "response_body_contains_key",
+      "key": "visitCount"
+    }
+  ],
+  "teardown": {
+    "actions": [
+      {
+        "type": "stop_server"
+      }
+    ]
+  },
+  "metadata": {
+    "covers_ac": [
+      "AC-3"
+    ],
+    "estimated_duration_ms": 500
+  }
+}
