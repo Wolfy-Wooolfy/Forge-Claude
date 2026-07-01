@@ -4,6 +4,7 @@
   "type": "direct_tool",
   "permission": "READ_ONLY",
   "tool": "kb.retrieve",
+  "inject_mock_openai_client": true,
   "mock": {
     "content": {}
   },

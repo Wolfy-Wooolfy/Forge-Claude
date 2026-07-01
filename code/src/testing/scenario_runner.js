@@ -272,10 +272,21 @@ async function _runDirectTool(scenario, root) {
     // backward-compatible — existing scenarios have no `ctx` → ctx stays { root }).
     // Lets ctx-dependent permission scenarios (e.g. preview_only, active_project_id)
     // be expressed deterministically without mutating shared on-disk state.
+    const invokeCtx = Object.assign({ root }, scenario.ctx || {});
+    // W-F (PHASE-49): hermetic embeddings mock (test-infra only). When a scenario
+    // opts in, inject a fake OpenAI client so tools that embed (e.g. kb.retrieve ->
+    // retrieval.retrieve) use opts._client and NEVER reach getClient() — removing the
+    // process.env.OPENAI_API_KEY dependency + any real network call. Opt-in: scenarios
+    // without the flag get the exact prior ctx (byte-unchanged behavior).
+    if (scenario.inject_mock_openai_client) {
+      invokeCtx._client = { embeddings: { create: async () => ({
+        data: [{ embedding: new Array(512).fill(0) }], usage: { total_tokens: 5 }
+      }) } };
+    }
     raw = await registry.invoke(
       scenario.tool,
       scenario.input || {},
-      Object.assign({ root }, scenario.ctx || {})
+      invokeCtx
     );
   } finally {
     // PHASE-40: clear the ambient active project on this scenario's policy (belt-and-
