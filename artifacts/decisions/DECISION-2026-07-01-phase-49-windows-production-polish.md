@@ -48,3 +48,17 @@ providers_registered v2 migration (12 legacy) -> separate phase; disk_space arch
 - W-D is service scripts under scripts/service/** (OUTSIDE Track A) + deterministic OS tests.
 - W-E is a status.json value edit (config).
 - If ANY item tempts a new §ARC -> STOP, do not code, report to CTO.
+
+## 8. Amendment A-1 (2026-07-01) — FINDING A resolution (Step 0, CTO-approved)
+
+Step 0 surfaced FINDING A: code/src/runtime/doctor/checks/service_lifecycle.js detects only NSSM + Task Scheduler on Windows, not pm2. The owner's runtime is pm2 (PHASE-12 migration), so the W-D gate "service_lifecycle -> PASS (running)" is unachievable via pm2 unless the check is made pm2-aware.
+
+CTO resolution: Option (أ) APPROVED — make service_lifecycle.js pm2-aware. Option (ب) rejected (would break the owner's pm2 path — §4 "do not silently switch"); option (ج) rejected (PASS-via-absence does not prove "running"). Option (أ) aligns the doctor with the owner's actual, already-decided runtime.
+
+Sanctioned scope addition: W-D now includes a bounded edit to service_lifecycle.js to detect the pm2 "forge" app (online -> PASS "running via pm2"). APPROVED live-surface addition beyond the originally-scoped surface. Track A CLEAN: the check already routes shell calls through reg.invoke("shell.run_read_only", ...), so pm2 detection uses the same L2 seam — NO new §ARC, NO new syscall, NO direct child_process.
+
+Canonical service manager (W-D): pm2 (supervisor — crash-restart + daemon self-heal). Boot-start via the standard pm2-on-Windows pattern: pm2 save + a Task Scheduler "at logon" task running pm2 resurrect (the existing lingering ForgeAPI task may be repurposed). NSSM retired (abandoned since PHASE-12). Exact boot mechanism finalized at W-D GO.
+
+W-D gate (updated): service_lifecycle.js (pm2-aware) -> PASS "running via pm2"; boot-start + crash-restart proven by a deterministic OS test (logoff/logon or reboot -> forge responds on :3100; kill the process -> pm2 restarts it). The service_lifecycle.js edit must be Track A grep-clean; §ARC frozen at 10.
+
+FINDING B (noted, no scope change): W-C (stale D:\ForgeAI) + the lingering ForgeAPI Task Scheduler registration + pm2 consolidation form one interrelated cleanup — execute W-C and W-D together.
