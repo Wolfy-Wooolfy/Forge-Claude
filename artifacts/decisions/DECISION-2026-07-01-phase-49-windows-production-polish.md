@@ -62,3 +62,11 @@ Canonical service manager (W-D): pm2 (supervisor — crash-restart + daemon self
 W-D gate (updated): service_lifecycle.js (pm2-aware) -> PASS "running via pm2"; boot-start + crash-restart proven by a deterministic OS test (logoff/logon or reboot -> forge responds on :3100; kill the process -> pm2 restarts it). The service_lifecycle.js edit must be Track A grep-clean; §ARC frozen at 10.
 
 FINDING B (noted, no scope change): W-C (stale D:\ForgeAI) + the lingering ForgeAPI Task Scheduler registration + pm2 consolidation form one interrelated cleanup — execute W-C and W-D together.
+
+## 9. Amendment A-2 (2026-07-01) — W-A bug 2 (C# type/member name collision), CTO-approved
+
+W-A's newline fix (.join("; ") -> .join("\r\n")) is PROVEN correct — the PowerShell here-string parser error (bug 1) is eliminated. The fix revealed a SECOND, independent defect that bug 1 had masked: in get()'s Add-Type C# source, the class is named CredRead AND it contains a P/Invoke method also named CredRead. C# forbids a member sharing its enclosing type's name -> Add-Type compile error -> the keychain READ still fails. Conclusion: keychain get() never worked on Windows since PHASE-12 (bug 1 then bug 2); the capability-token read and the W-B key read were fully broken the entire time — both bugs must be fixed to restore the read path.
+
+CTO resolution: the bug 2 fix is APPROVED as part of W-A. The "newline delimiting only" constraint (§3 / W-A) predates knowledge of bug 2; W-A's actual goal ("prove a real keychain set->get->del round-trip") requires it. Approved fix: rename the colliding C# identifier (rename the class and its [Class]::ReadGeneric call site, OR rename the P/Invoke method and its internal call). String-literal only; the DllImport EntryPoint="CredReadW" mapping and the P/Invoke signature are UNCHANGED. Stays inside §ARC-5: NO new syscall, NO fs write, NO new §ARC. Sole live-surface file remains windows_credential_manager.js.
+
+Updated W-A gate: real set->get->del round-trip PASSES (get value matches; gone after del) + forge-doctor api_auth_token no longer shows a keychain_error (benign "token not found" acceptable if the server hasn't run to write the token).
