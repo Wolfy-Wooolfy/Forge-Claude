@@ -31,6 +31,24 @@ module.exports = {
     // ── Windows ───────────────────────────────────────────────────────────────
 
     if (platform === "win32") {
+      // W-D (PHASE-49): pm2 is the canonical Windows supervisor (Amendment A-1).
+      // Detect the "forge" app FIRST — via the SAME L2 shell.run_read_only seam used
+      // for nssm/schtasks below (no new syscall / §ARC). If it is online, that is the
+      // running service. Any failure (pm2 not in PATH, non-JSON, no "forge" match)
+      // falls through to the existing nssm / Task Scheduler logic, unchanged.
+      try {
+        const r = await runReadOnly(["pm2", "jlist"]);
+        if (r && r.stdout) {
+          const list = JSON.parse(r.stdout);
+          const forgeApp = Array.isArray(list)
+            ? list.find((p) => p && p.name === "forge")
+            : null;
+          if (forgeApp && forgeApp.pm2_env && forgeApp.pm2_env.status === "online") {
+            return { status: "PASS", detail: "forge-api running via pm2" };
+          }
+        }
+      } catch (_) { /* pm2 not installed / non-JSON / no forge app — fall through */ }
+
       let nssmRegistered = false;
       let nssmRunning    = false;
 
