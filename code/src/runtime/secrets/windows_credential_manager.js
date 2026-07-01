@@ -71,7 +71,7 @@ async function get(key) {
     "using System;",
     "using System.Runtime.InteropServices;",
     "using System.Text;",
-    "public class CredRead {",
+    "public class ForgeCredReader {",
     "  [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Unicode)]",
     "  public struct CREDENTIAL {",
     "    public uint Flags;",
@@ -106,7 +106,7 @@ async function get(key) {
     "  }",
     "}",
     "\"@",
-    "$result = [CredRead]::ReadGeneric($env:FORGE_TARGET)",
+    "$result = [ForgeCredReader]::ReadGeneric($env:FORGE_TARGET)",
     "if ($result -eq $null) { Write-Output 'NOT_FOUND' } else { Write-Output $result }"
   ].join("\r\n");
 
