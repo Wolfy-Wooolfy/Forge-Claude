@@ -121,5 +121,22 @@ The running server process holds OPENAI_API_KEY in process.env (hydrated from ke
 - progress/status.json: modified by the doctor runtime_health auto-patch (§ARC-9) — left uncommitted; W-E corrects current_task at closure.
 - .env: modified locally (key removed) but untracked/gitignored — not in git.
 
+---
+
+## W-F — S137 harness hermeticity (added post-mid-checkpoint)
+
+W-B (correct) surfaced a latent non-hermeticity: S137 (kb.retrieve) was never mock-only — `retrieval.retrieve()` embeds via `getClient()` BEFORE checking the store, and `_runDirectTool` injected no OpenAI mock, so S137 silently used the real `OPENAI_API_KEY` that `bin/forge-test.js` loads from `.env` (one real sub-cent embed per full run). W-B removed the `.env` key → `MissingApiKeyError` → S137 red (deterministic 4/4; blast radius S137 only). See Amendment A-4.
+
+Mechanism (Route (a), CTO-approved — test-infra ONLY, live surface byte-untouched):
+- `code/src/testing/scenario_runner.js` (`_runDirectTool`): when `scenario.inject_mock_openai_client` is truthy, set `invokeCtx._client = { embeddings: { create: async () => ({ data:[{embedding: new Array(512).fill(0)}], usage:{total_tokens:5} }) } }`. Opt-in + backward-compatible. The `_client` reaches `retrieve()` via the already-plumbed seam (kb_tools.js:167 forwards `ctx._client`; _registry.js:151 forwards ctx; retrieval.js:107 `opts._client || getClient()`), short-circuiting `getClient()` → no `OPENAI_API_KEY`, no network.
+- `code/src/testing/scenarios/S137_kb_retrieve_empty_kb.json`: `"inject_mock_openai_client": true`.
+
+Proof:
+- S137 RED→GREEN. Isolation (`--scenario S137`) with `OPENAI_API_KEY` unset in the harness env → GREEN (1595ms) — proves `getClient()` is never reached (would throw otherwise) → no key/keychain dependency.
+- Full SU suite (memory-safe) → 338 passed / 0 failed / 5 skipped (343). S120 (known load-flake) PASS this run.
+- Track A: `retrieval.js` / `kb_tools.js` / `openAiAdapter.js` / all `runtime/**` byte-untouched; edits confined to `code/src/testing/**`. §ARC=10. Cost $0.
+
+Commit provenance (owner interim "U" commits): W-B code = 2b98d98; W-F code = 05b9479 (both on origin). This checkpoint's W-F section = committed separately.
+
 ## STOP
-Code-touching half (W-A + W-B) complete and gate-proven. Awaiting CTO verification before W-C / W-D.
+Code-touching half (W-A + W-B + W-F) complete and gate-proven; suite honestly 338/0/5 with S137 truly hermetic. Awaiting CTO verification before W-C / W-D.
