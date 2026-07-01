@@ -1,0 +1,12 @@
+{
+  "step": "store_and_verify",
+  "key_present_in_env": true,
+  "key_length": 164,
+  "set_ok": true,
+  "get_ok": true,
+  "get_length": 164,
+  "value_matches": true,
+  "provider_type": "windows_credential_manager",
+  "verdict": "PASS",
+  "ran_at": "2026-07-01T11:04:54.158Z"
+}

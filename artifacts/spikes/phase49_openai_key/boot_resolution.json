@@ -1,0 +1,12 @@
+{
+  "step": "boot_resolution",
+  "A_keychain_path": {
+    "resolved": true,
+    "length": 164
+  },
+  "B_env_wins": {
+    "preserved": true
+  },
+  "verdict": "PASS",
+  "ran_at": "2026-07-01T11:06:57.146Z"
+}
