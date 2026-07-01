@@ -108,7 +108,7 @@ async function get(key) {
     "\"@",
     "$result = [CredRead]::ReadGeneric($env:FORGE_TARGET)",
     "if ($result -eq $null) { Write-Output 'NOT_FOUND' } else { Write-Output $result }"
-  ].join("; ");
+  ].join("\r\n");
 
   try {
     const output = execFileSync(
