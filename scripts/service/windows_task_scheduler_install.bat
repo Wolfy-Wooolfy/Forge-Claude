@@ -2,7 +2,11 @@
 setlocal enabledelayedexpansion
 
 :: ── Forge API Service Installer — Option B: Windows Task Scheduler ───────────
-:: Registers Forge as a scheduled task that runs on user logon.
+:: Registers Forge to boot on user logon via a SINGLE canonical path: `pm2 resurrect`
+:: (PHASE-49 W-D). pm2 is the supervisor (crash-restart + daemon self-heal); this task
+:: only triggers `pm2 resurrect` at logon to restore the saved pm2 process list (`forge`).
+:: (Previously this task ran `node start-api.js` directly — a second, un-supervised boot
+:: path that competed with pm2 for :3100; retired in PHASE-49 W-D.)
 :: No third-party software required (Task Scheduler is built into Windows).
 ::
 :: Usage (run as current user — no Administrator required):
@@ -12,7 +16,8 @@ setlocal enabledelayedexpansion
 ::   windows_task_scheduler_install.bat stop      — stop running task
 ::   windows_task_scheduler_install.bat status    — check task status
 ::
-:: Restart on failure: 3 attempts, 1-minute delay between attempts.
+:: Crash-restart of the running server is handled by pm2 (ecosystem autorestart,
+:: max_restarts 10); the task's RestartCount 3 covers the `pm2 resurrect` action itself.
 :: Task runs as current user via AtLogOn trigger (no S4U, no stored password).
 ::
 :: Idempotent: safe to re-run install on an existing task (removes and recreates).
@@ -43,6 +48,15 @@ call :require_node || exit /b 1
 for /f "delims=" %%N in ('where node 2^>nul') do set "NODE_EXE=%%N" & goto :node_found
 :node_found
 
+:: Locate the global pm2 CLI — PATH-independent invocation for the logon task context
+:: (a scheduled task's environment may lack the npm global bin on PATH).
+for /f "delims=" %%R in ('npm root -g 2^>nul') do set "NPM_GLOBAL_ROOT=%%R"
+set "PM2_CLI=%NPM_GLOBAL_ROOT%\pm2\bin\pm2"
+if not exist "%PM2_CLI%" (
+    echo [ERROR] pm2 CLI not found at "%PM2_CLI%" — run: npm install -g pm2
+    exit /b 1
+)
+
 :: Create log directory
 if not exist "%LOG_DIR%\" mkdir "%LOG_DIR%"
 
@@ -59,7 +73,7 @@ if not errorlevel 1 (
 echo [INFO] Creating ^"%TASK_NAME%^" via PowerShell Register-ScheduledTask...
 
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-  "$action   = New-ScheduledTaskAction -Execute '%NODE_EXE%' -Argument 'start-api.js' -WorkingDirectory '%FORGE_DIR%';" ^
+  "$action   = New-ScheduledTaskAction -Execute '%NODE_EXE%' -Argument ([char]34 + '%PM2_CLI%' + [char]34 + ' resurrect') -WorkingDirectory '%FORGE_DIR%';" ^
   "$trigger  = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME;" ^
   "$settings = New-ScheduledTaskSettingsSet -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1) -ExecutionTimeLimit ([TimeSpan]::Zero) -MultipleInstances IgnoreNew;" ^
   "Register-ScheduledTask -TaskName '%TASK_NAME%' -Action $action -Trigger $trigger -Settings $settings -Force | Out-Null;" ^
@@ -81,6 +95,7 @@ echo.
 echo [OK] ForgeAPI task installed.
 echo      Task name : %TASK_NAME%
 echo      Forge dir : %FORGE_DIR%
+echo      Action    : node "%PM2_CLI%" resurrect  (pm2 canonical boot path)
 echo      Trigger   : On logon (user: %USERNAME%), restart 3x on failure (1min delay)
 echo.
 echo To verify: schtasks /query /tn ForgeAPI /v /fo LIST

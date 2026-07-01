@@ -83,5 +83,42 @@ Only new call = `runReadOnly(["pm2","jlist"])` → `reg.invoke("shell.run_read_o
 - `progress/status.json`: doctor `runtime_health` auto-patch (§ARC-9) — uncommitted; W-E corrects `current_task` at closure.
 - forge is now RUNNING under pm2 (pid 6792) — this is a live process, not a committed artifact.
 
+---
+
+## W-D steps 3-4 (pm2 save + task repurpose + OS tests)
+
+### Step 3 — make pm2 the SINGLE boot path
+- **3a `pm2 save`:** dump `~/.pm2/dump.pm2` now **15,658 bytes** with 7 `forge` occurrences (was 2 bytes/empty) → `pm2 resurrect` will restore `forge`.
+- **3b pm2 invocation (PATH-independent, verified):** node = `C:\Program Files\nodejs\node.exe`; pm2 CLI = `<npm root -g>\pm2\bin\pm2`. Verified: `node "<pm2 CLI>" jlist` → forge online (so `… resurrect` is reliable from a minimal task env).
+- **3c edit `scripts/service/windows_task_scheduler_install.bat`** (ops script; scripts/service/** is OUTSIDE Track A):
+  - Derive `PM2_CLI` from `npm root -g` (+ existence guard).
+  - Action changed `New-ScheduledTaskAction -Argument 'start-api.js'` → `-Argument ([char]34 + '%PM2_CLI%' + [char]34 + ' resurrect')` (quoted path → `node "<pm2 CLI>" resurrect`). AtLogOn trigger + idempotent delete/recreate unchanged.
+  - Header comments updated: boot is now the single `pm2 resurrect` path; direct-node path retired.
+- **3d re-install + verify (`Get-ScheduledTask ForgeAPI`):**
+  - Execute = `C:\Program Files\nodejs\node.exe`
+  - Args = `"C:\Users\khaled.sayed\AppData\Roaming\npm\node_modules\pm2\bin\pm2" resurrect`
+  - WorkingDir = `D:\S\Halo\Tech\Forge-Claude`; Trigger = `MSFT_TaskLogonTrigger`; State Ready.
+  - ⇒ the direct-node competing :3100 binder is **retired**; one canonical boot path (pm2 resurrect at logon).
+
+### Step 4 — deterministic OS tests (both self-recovering; brief :3100 downtime)
+
+**TEST A — boot-start via resurrect → PASS**
+- pre-kill: `:3100` = 200.
+- `pm2 kill` → `:3100` = **0 (DOWN)**, pm2 empty (fresh-session simulation).
+- `schtasks /run /tn ForgeAPI` (runs `pm2 resurrect`) → forge back **online** (new pid 12140) + `:3100` = **HTTP 200**.
+
+**TEST B — crash-restart → PASS**
+- BEFORE: pid **12140**, restart_time 0, online, `:3100` = 200.
+- `Stop-Process -Id 12140 -Force` (direct process kill, NOT via pm2).
+- After ~2s: forge **online**, **new pid 16216**, **restart_time 1** (incremented), `:3100` = **HTTP 200**. pm2 autorestart proven.
+
+### Track A / §ARC
+- Only ops file edited: `scripts/service/windows_task_scheduler_install.bat` (scripts/service/** — outside the runtime live surface). The step-2 live-surface file `service_lifecycle.js` is Track-A-clean (see above). **§ARC = 10.** Cost $0.
+
+### Commit state
+- `windows_task_scheduler_install.bat` (step 3): UNCOMMITTED (report-then-verify).
+- `service_lifecycle.js` (step 2): committed by owner interim U-commit.
+- forge currently RUNNING under pm2 (pid 16216, online).
+
 ## STOP
-W-D steps 1-2 complete + gate-proven (service_lifecycle PASS via pm2). Awaiting CTO verification before steps 3-4 (pm2 save + task repurpose + OS tests).
+W-D steps 1-4 complete + OS-tested (service_lifecycle PASS via pm2; boot-start + crash-restart both PASS). Awaiting CTO verification before the closure sequence (W-C doctor confirm pending owner `rmdir`, then W-E + closure).
