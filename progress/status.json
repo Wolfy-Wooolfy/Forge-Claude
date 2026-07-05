@@ -5,7 +5,7 @@
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
   "next_phase": "PHASE-50-PENDING-DECISION",
-  "next_step": "PHASE-49 closed (keychain secret migration + pm2-canonical boot + S137 hermeticity). PHASE-50 (Knowledge Base & Research, capability #9) pending owner decision.",
+  "next_step": "W-1 gap-map verification",
   "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-22-phase-43-first-real-build.md",
   "phase_45": {
     "status": "CLOSED",
@@ -2224,7 +2224,7 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-49-WINDOWS-PRODUCTION-POLISH-COMPLETE",
+  "current_task": "PHASE-50-KB-RESEARCH-ACTIVATION",
   "last_updated": "2026-06-28T11:30:00.000Z",
   "phase_16": {
     "status": "ACTIVE",
