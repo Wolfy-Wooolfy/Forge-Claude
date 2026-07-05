@@ -82,3 +82,35 @@ Scope delta (CTO ruling under standing owner delegation):
   budget/retrieval); S136 needs NO flag (budget denial precedes retrieval) —
   supersedes the A-1-era CTO assumption.
 ---
+
+---
+## Amendment A-3 — 2026-07-05 — W-2 contract + hermeticity design (CC pre-inspection, CTO-verified)
+
+W-2 pre-inspection (mandated by the S348 directive) surfaced, CTO-verified:
+- API-type scenarios (S215 pattern) boot a real apiServer on a tempDir and hit
+  real HTTP — the direct_tool invokeCtx._client seam cannot traverse this path.
+- research_role defaults are anthropic/claude-opus-4-7 (research_role.js:92-93);
+  production holds no ANTHROPIC_API_KEY. Without a provider override the
+  /api/kb/research endpoint is broken in real use — a "scenario green / real
+  path broken" reproduction caught before it shipped.
+
+Scope delta (CTO ruling under standing owner delegation):
+- W-2 body contract EXTENDED: POST /api/kb/research accepts optional
+  `provider` and `model`, forwarded to role.invoke (production-motivated;
+  W-5 real run will pass openai/gpt-4o — D2/PHASE-22 precedent).
+- Server-level seam in the TWO NEW handlers only: invocations pass
+  `{ root, _client: options._client || undefined }`, and role.invoke input
+  gains `scenario_id: options._scenario_id || undefined`.
+  start-api.js passes { port } only → both undefined in production →
+  byte-equivalent. Test-infra fields kept OFF the public HTTP body by design.
+- Live-surface allowlist += code/src/runtime/agents/adapters/mock_responses.json,
+  bounded to ONE additive research entry (KNOWN + non-empty
+  supporting_citations; PHASE-24/25/26 data-entry precedent).
+- New test helper code/src/testing/helpers/kb_api_test_helper.js (covered by
+  the existing scenario/test-infra clause; listed for completeness).
+- S346 design ratified: dedup-before-fetch path (source_acquisition step 1
+  precedes http.get) — zero-network full-chain proof; real fetch+embed is W-5.
+- Backlog += reconcile role default_provider (anthropic/claude-opus-4-7) with
+  the fleet provider decision (openai/gpt-4o) at the Anthropic-switch phase;
+  interim: explicit provider passthrough (W-4 UI included).
+---
