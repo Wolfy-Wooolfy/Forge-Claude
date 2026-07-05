@@ -38,6 +38,27 @@ if errorlevel 1 (
     exit /b 1
 )
 
-timeout /t 3 /nobreak >nul
-start "" "http://127.0.0.1:3100"
-echo Forge is running.
+:: ── A-6: verified start — poll :3100 (up to ~30s) instead of a blind 3s wait ──
+set "FORGE_UP="
+for /l %%I in (1,1,30) do (
+    if not defined FORGE_UP (
+        powershell -NoProfile -Command "try { Invoke-WebRequest -Uri 'http://127.0.0.1:3100/' -UseBasicParsing -TimeoutSec 2 | Out-Null; exit 0 } catch { exit 1 }" >nul 2>&1
+        if not errorlevel 1 (
+            set "FORGE_UP=1"
+        ) else (
+            timeout /t 1 /nobreak >nul
+        )
+    )
+)
+if defined FORGE_UP (
+    echo.
+    echo Forge is running -^> http://127.0.0.1:3100
+    start "" "http://127.0.0.1:3100"
+    timeout /t 5 /nobreak >nul
+) else (
+    echo.
+    echo [ERROR] Forge did not respond on http://127.0.0.1:3100 within ~30 seconds.
+    echo         Check the logs with: pm2 logs forge
+    pause
+    exit /b 1
+)
