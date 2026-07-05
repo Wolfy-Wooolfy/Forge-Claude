@@ -57,6 +57,14 @@ if not exist "%PM2_CLI%" (
     exit /b 1
 )
 
+:: A-5: windowless launcher — wscript runs the resurrect with window style 0 (hidden),
+:: removing the console-close kill-vector that terminated the logon resurrect (0xC000013A).
+set "VBS_LAUNCHER=%SCRIPT_DIR%resurrect_hidden.vbs"
+if not exist "%VBS_LAUNCHER%" (
+    echo [ERROR] resurrect_hidden.vbs not found at "%VBS_LAUNCHER%".
+    exit /b 1
+)
+
 :: Create log directory
 if not exist "%LOG_DIR%\" mkdir "%LOG_DIR%"
 
@@ -73,7 +81,7 @@ if not errorlevel 1 (
 echo [INFO] Creating ^"%TASK_NAME%^" via PowerShell Register-ScheduledTask...
 
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-  "$action   = New-ScheduledTaskAction -Execute '%NODE_EXE%' -Argument ([char]34 + '%PM2_CLI%' + [char]34 + ' resurrect') -WorkingDirectory '%FORGE_DIR%';" ^
+  "$action   = New-ScheduledTaskAction -Execute 'wscript.exe' -Argument ([char]34 + '%VBS_LAUNCHER%' + [char]34 + ' ' + [char]34 + '%NODE_EXE%' + [char]34 + ' ' + [char]34 + '%PM2_CLI%' + [char]34) -WorkingDirectory '%FORGE_DIR%';" ^
   "$trigger  = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME;" ^
   "$settings = New-ScheduledTaskSettingsSet -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1) -ExecutionTimeLimit ([TimeSpan]::Zero) -MultipleInstances IgnoreNew;" ^
   "Register-ScheduledTask -TaskName '%TASK_NAME%' -Action $action -Trigger $trigger -Settings $settings -Force | Out-Null;" ^
@@ -95,7 +103,7 @@ echo.
 echo [OK] ForgeAPI task installed.
 echo      Task name : %TASK_NAME%
 echo      Forge dir : %FORGE_DIR%
-echo      Action    : node "%PM2_CLI%" resurrect  (pm2 canonical boot path)
+echo      Action    : wscript.exe resurrect_hidden.vbs (hidden pm2 resurrect — no console window)
 echo      Trigger   : On logon (user: %USERNAME%), restart 3x on failure (1min delay)
 echo.
 echo To verify: schtasks /query /tn ForgeAPI /v /fo LIST
