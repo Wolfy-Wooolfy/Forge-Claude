@@ -1,8 +1,56 @@
 {
   "project_id": "phase44_loopback_real",
   "project_name": "PHASE-44 A-5 Real",
+  "project_type": "REVIEW",
+  "project_mode": "EXTEND_EXISTING",
+  "project_status": "ACTIVE",
+  "primary_language": "MIXED",
+  "user_goal": "",
+  "business_goal": "",
+  "technical_goal": "",
+  "current_phase": "DISCOVERY",
   "active_runtime_state": "IDEATION",
+  "workspace_path": "D:\\S\\Halo\\Tech\\Forge-Claude",
+  "source_of_truth": "ZIP_SNAPSHOT",
+  "selected_strategy": "",
+  "accepted_options": [],
+  "rejected_options": [],
+  "open_questions": [],
+  "clarification_answers": {},
+  "requirement_domain": "",
+  "domain_locked": false,
+  "domain_history": [],
+  "requirement_completeness": false,
+  "requirement_model": {},
+  "requirement_reasoning_summary": "",
+  "provider_error": "",
+  "documentation_state": "EMPTY",
+  "execution_package_state": "NOT_READY",
+  "execution_state": "NOT_STARTED",
+  "verification_state": "NOT_READY",
+  "delivery_state": "NOT_READY",
+  "conversation_history": {
+    "proposal_count": 0,
+    "draft_count": 0
+  },
+  "decision_history": {
+    "has_decision_packet": false
+  },
+  "artifact_registry": {
+    "project_root": "artifacts/projects/phase44_loopback_real",
+    "project_state": "artifacts/projects/phase44_loopback_real/project_state.json",
+    "decision_packet": "",
+    "execution_package": ""
+  },
+  "review_cycles_count": 0,
+  "pending_decisions": [],
+  "memory_state": "EMPTY",
+  "version_registry": [],
+  "vision": null,
+  "vision_locked": false,
+  "vision_version": null,
+  "vision_history": [],
   "conversation_mode": "PIPELINE",
-  "loop_id": "phase44b-loop",
-  "last_updated_at": "2026-06-28T00:00:00.000Z"
+  "active_project_flag": false,
+  "last_updated_at": "2026-07-05T09:42:04.481Z"
 }
