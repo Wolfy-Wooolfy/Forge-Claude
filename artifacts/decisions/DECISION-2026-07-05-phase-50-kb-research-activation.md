@@ -30,3 +30,30 @@ backlog), §ARC changes (frozen at 10), citation_validator heuristic changes.
 
 ## 4. Closure gate — see PROMPT-STAGE-50.md §5 (binding copy).
 ## 5. Cost — mock-default; single approved live run ceiling $0.15; kill bar $3.00.
+
+---
+## Amendment A-1 — 2026-07-05 — G-6 adopted (research_role fail-open) + W-1.5
+
+W-1 verification CONFIRMED G-1..G-5 and surfaced one additional gap, adopted as:
+- G-6: research_role treats a kb.retrieve FAILURE envelope as empty evidence and
+  continues (fail-open chunks-guard). Since PHASE-49 W-B removed the .env key,
+  S134's retrieval genuinely fails every run yet stays green — "scenario green /
+  real path broken" inside the KB stack itself. Violates fail-closed (CLAUDE.md §3.5).
+
+Scope delta (CTO ruling under standing owner delegation):
+- NEW work item W-1.5 (before W-2): research_role fail-closed on retrieval failure.
+  Envelope status !== SUCCESS → FAILED/RETRIEVAL_FAILED. SUCCESS-with-zero-results
+  path unchanged (INSUFFICIENT_EVIDENCE). Scenario hermeticity: any research-role
+  scenario whose flow must pass retrieval opts into inject_mock_openai_client;
+  runner seam gains a deliberate-failure mock mode (test-infra-only, W-F precedent);
+  new S351_research_role_fails_closed_on_retrieval_failure.
+- Live-surface allowlist += code/src/runtime/agents/roles/research_role.js
+  (+ scenario/test-infra files). No §ARC change. Cost unchanged ($0, mock).
+- Closure gate SU math updated: 344 pass / 0 fail / 5 skip (349 total),
+  new scenarios S346–S351.
+
+Erratum (record only): §1 rationale "12 mock scenarios green" reads precisely as
+9 SU scenarios (S129–S137) + 3 KB doctor checks.
+Backlog (non-blocking): F-2 — S134 ledger rows ceased 2026-06-17 pre-W-B; cause
+undetermined (historical forensics).
+---
