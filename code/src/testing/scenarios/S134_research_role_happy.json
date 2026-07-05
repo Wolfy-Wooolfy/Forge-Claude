@@ -4,6 +4,7 @@
   "type": "direct_tool",
   "permission": "TEST",
   "tool": "role.invoke",
+  "inject_mock_openai_client": true,
   "input": {
     "role_id":     "research",
     "project_id":  "test_s134",

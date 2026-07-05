@@ -66,7 +66,8 @@ const tool_invoke = defineTool({
       provider:     input.provider    || undefined,
       model:        input.model       || undefined,
       scenario_id:  input.scenario_id || undefined,
-      invocation_id
+      invocation_id,
+      _client:      (ctx && ctx._client) || undefined
     };
 
     try {

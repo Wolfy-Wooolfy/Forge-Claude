@@ -278,10 +278,17 @@ async function _runDirectTool(scenario, root) {
     // retrieval.retrieve) use opts._client and NEVER reach getClient() — removing the
     // process.env.OPENAI_API_KEY dependency + any real network call. Opt-in: scenarios
     // without the flag get the exact prior ctx (byte-unchanged behavior).
+    // W-1.5 (PHASE-50): value "fail" → embeddings.create REJECTS deterministically
+    // (hermetic failure-path testing, no env-key/network coupling). Any other truthy
+    // value keeps the W-F success mock unchanged.
     if (scenario.inject_mock_openai_client) {
-      invokeCtx._client = { embeddings: { create: async () => ({
-        data: [{ embedding: new Array(512).fill(0) }], usage: { total_tokens: 5 }
-      }) } };
+      invokeCtx._client = scenario.inject_mock_openai_client === "fail"
+        ? { embeddings: { create: async () => {
+            throw new Error("MOCK_EMBEDDINGS_FAILURE (deliberate test-infra failure)");
+          } } }
+        : { embeddings: { create: async () => ({
+            data: [{ embedding: new Array(512).fill(0) }], usage: { total_tokens: 5 }
+          }) } };
     }
     raw = await registry.invoke(
       scenario.tool,

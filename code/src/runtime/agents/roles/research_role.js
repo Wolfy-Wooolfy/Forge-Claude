@@ -128,13 +128,22 @@ module.exports = defineRole({
         k:                 maxSearches * MAX_K_PER_SEARCH,
         credibility_floor: credFloor,
         scope
-      }, { root });
+      }, { root, _client: (ctx && ctx._client) || null });
     } catch (err) {
       return roleFailed("RETRIEVE_ERROR", err.message, ctx);
     }
 
-    const chunks = (retrieveEnv && retrieveEnv.status === "SUCCESS" &&
-                    retrieveEnv.output && retrieveEnv.output.results) || [];
+    // W-1.5 (PHASE-50 G-6): fail-closed — a non-SUCCESS kb.retrieve envelope is a
+    // retrieval FAILURE, not empty evidence (CLAUDE.md §3.5). Thrown errors above
+    // keep RETRIEVE_ERROR; SUCCESS with zero results still proceeds (empty KB).
+    if (!retrieveEnv || retrieveEnv.status !== "SUCCESS") {
+      const failDetail = (retrieveEnv && retrieveEnv.metadata &&
+                          (retrieveEnv.metadata.detail || retrieveEnv.metadata.reason)) ||
+                         "kb.retrieve returned non-SUCCESS envelope";
+      return roleFailed("RETRIEVAL_FAILED", failDetail, ctx);
+    }
+
+    const chunks = (retrieveEnv.output && retrieveEnv.output.results) || [];
 
     const rejectedLow = (retrieveEnv && retrieveEnv.metadata &&
                          retrieveEnv.metadata.rejected_low_credibility) || 0;
