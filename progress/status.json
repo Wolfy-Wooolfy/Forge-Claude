@@ -188,7 +188,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-07-05T09:50:11.181Z",
+    "last_doctor_run": "2026-07-05T10:48:24.795Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
