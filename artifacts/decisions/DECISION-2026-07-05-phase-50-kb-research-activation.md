@@ -57,3 +57,28 @@ Erratum (record only): §1 rationale "12 mock scenarios green" reads precisely a
 Backlog (non-blocking): F-2 — S134 ledger rows ceased 2026-06-17 pre-W-B; cause
 undetermined (historical forensics).
 ---
+
+---
+## Amendment A-2 — 2026-07-05 — W-1.5 seam plumbing (role-path _client hops)
+
+Pre-implementation review (CC STOP-AND-REPORT, CTO-verified) surfaced that the
+W-F mock seam does not traverse the role path: role_tools.js rebuilds innerCtx
+and drops ctx._client, and research_role.js passes { root } only to kb.retrieve.
+Without plumbing, hermetic S134 is unachievable (mock never reaches retrieval)
+and S351 would be environment-coupled (a real key in env → real embedding call —
+the W-F disease).
+
+Scope delta (CTO ruling under standing owner delegation):
+- Live-surface allowlist += code/src/runtime/tools/role_tools.js, bounded to ONE
+  additive innerCtx line: `_client: (ctx && ctx._client) || undefined`.
+- W-1.5 research_role.js wording widened from "chunks-guard only" to TWO named
+  edits: (i) fail-closed chunks-guard; (ii) `_client` passthrough on the internal
+  kb.retrieve invoke ctx (`{ root, _client: (ctx && ctx._client) || null }`).
+- Both hops mirror the existing kb_tools.js convention (:110, :167): optional,
+  undefined/null on all current paths (no scenario injects _client via
+  role.invoke today), production behavior byte-equivalent, Track A clean,
+  no §ARC change.
+- Flag corrections recorded: S135 needs NO flag (fails at INPUT_SCHEMA before
+  budget/retrieval); S136 needs NO flag (budget denial precedes retrieval) —
+  supersedes the A-1-era CTO assumption.
+---
