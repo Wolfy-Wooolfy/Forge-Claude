@@ -1,0 +1,18 @@
+{
+  "id": "S350",
+  "name": "role.invoke documentation — §8 owner override: citation_audit_override=true bypasses the block, recorded in completion metadata",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/doc_citation_audit_test_helper",
+  "method": "runS350CitationOverride",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "status_success",     "expected": true },
+    { "type": "state_field_equals", "field": "summary_present",    "expected": true },
+    { "type": "state_field_equals", "field": "override_recorded",  "expected": true },
+    { "type": "state_field_equals", "field": "audit_ran",          "expected": true },
+    { "type": "state_field_equals", "field": "audit_fail_uncited", "expected": true },
+    { "type": "state_field_equals", "field": "uncited_count_one",  "expected": true }
+  ]
+}

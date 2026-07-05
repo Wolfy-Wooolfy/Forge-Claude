@@ -191,6 +191,18 @@
     "tokens_out": 200,
     "finish_reason": "stop"
   },
+  "mock|mock-doc-s349|scenario:S349": {
+    "text": "{\"overview\":{\"title\":\"S349 Test Documentation\",\"purpose\":\"Minimal valid documentation output for citation-audit scenarios.\",\"key_capabilities\":[\"documentation generation\"]},\"components\":[],\"api_reference\":[],\"quickstart\":{\"prerequisites\":[],\"steps\":[\"Run the project entry point.\"]},\"operations\":{\"health_check\":\"GET /health returns 200.\",\"logging\":\"Logs to stdout.\",\"common_issues\":[]},\"known_limitations\":[],\"summary\":\"Minimal valid documentation package for citation-audit scenario testing.\"}",
+    "tokens_in": 220,
+    "tokens_out": 160,
+    "finish_reason": "stop"
+  },
+  "mock|mock-doc-s350|scenario:S350": {
+    "text": "{\"overview\":{\"title\":\"S350 Test Documentation\",\"purpose\":\"Minimal valid documentation output for citation-audit override scenarios.\",\"key_capabilities\":[\"documentation generation\"]},\"components\":[],\"api_reference\":[],\"quickstart\":{\"prerequisites\":[],\"steps\":[\"Run the project entry point.\"]},\"operations\":{\"health_check\":\"GET /health returns 200.\",\"logging\":\"Logs to stdout.\",\"common_issues\":[]},\"known_limitations\":[],\"summary\":\"Minimal valid documentation package for citation-audit override scenario testing.\"}",
+    "tokens_in": 220,
+    "tokens_out": 160,
+    "finish_reason": "stop"
+  },
   "mock|mock-research-s348|scenario:S348": {
     "text": "{\"schema_version\":\"1.0.0\",\"question\":\"What HTTP methods should the API support?\",\"findings\":[{\"id\":\"find_a1b2c3d4e5f6\",\"claim\":\"A REST API should support GET, POST, PUT/PATCH and DELETE with appropriate status codes.\",\"certainty\":\"KNOWN\",\"supporting_citations\":[\"cit_0a1b2c3d4e5f\"],\"contradicting_citations\":[]}],\"scenarios\":[{\"scenario\":\"API follows standard REST conventions.\",\"probability\":\"HIGH\",\"key_conditions\":[\"resource-oriented endpoint design\"]}],\"recommendation\":{\"conclusion\":\"Implement GET (200), POST (201), PUT/PATCH (200), DELETE (204).\",\"reasoning\":\"Standard REST method semantics per the cited design guide.\",\"alternatives\":[]},\"knowledge_gaps\":[],\"confidence_level\":\"HIGH\",\"metadata\":{\"searches_performed\":3,\"sources_consulted\":0,\"sources_rejected_low_credibility\":0,\"total_cost_usd\":0}}",
     "tokens_in": 300,

@@ -1,0 +1,31 @@
+{
+  "id": "S349",
+  "name": "role.invoke documentation — §8 citation audit: uncited claim in artifact returns BLOCKED/UNCITED_CLAIMS (fail-closed)",
+  "type": "direct_tool",
+  "permission": "TEST",
+  "tool": "role.invoke",
+  "fixture_files": [
+    {
+      "path": "artifacts/projects/test_s349/documentation_draft.md",
+      "content": "# Documentation\nThe system must persist all session tokens in encrypted storage.\nEnd of document.\n"
+    }
+  ],
+  "input": {
+    "role_id":     "documentation",
+    "project_id":  "test_s349",
+    "provider":    "mock",
+    "model":       "mock-doc-s349",
+    "scenario_id": "S349",
+    "input": {
+      "project_id":    "test_s349",
+      "spec":          { "title": "S349 spec" },
+      "design":        { "architecture": "S349 design" },
+      "artifact_path": "artifacts/projects/test_s349/documentation_draft.md"
+    }
+  },
+  "assertions": [
+    { "type": "status_equals",      "expected": "FAILED" },
+    { "type": "state_field_equals", "field": "reason",        "expected": "UNCITED_CLAIMS" },
+    { "type": "state_field_equals", "field": "detail.length", "expected": 1 }
+  ]
+}

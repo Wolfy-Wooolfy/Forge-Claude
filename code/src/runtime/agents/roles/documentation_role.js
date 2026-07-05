@@ -15,7 +15,9 @@ const INPUT_SCHEMA = {
     project_id: { type: "string", minLength: 1 },
     spec:       { type: "object" },
     design:     { type: "object" },
-    code:       { type: "object" }
+    code:       { type: "object" },
+    artifact_path:           { type: "string" },
+    citation_audit_override: { type: "boolean" }
   }
 };
 
@@ -80,6 +82,19 @@ const OUTPUT_SCHEMA = {
     summary:           { type: "string", minLength: 1 }
   }
 };
+
+// §8 (KB contract): BLOCKED completion envelope. Local helper — _role_contract
+// exports roleOk/roleFailed only; role_tools surfaces any non-SUCCESS role result
+// via failed(metadata.reason, metadata.detail), so uncited_claims ride metadata.detail.
+function roleBlocked(reason, uncited_claims, ctx) {
+  return {
+    status:   "BLOCKED",
+    output:   null,
+    reason,
+    uncited_claims,
+    metadata: { reason, detail: uncited_claims, context: ctx || null }
+  };
+}
 
 module.exports = defineRole({
   id:               "documentation",
@@ -155,6 +170,43 @@ module.exports = defineRole({
         state: "VALIDATING_SCHEMA", indicator: getIndicator(this.id, "VALIDATING_SCHEMA") }, { root });
     } catch (_e) { /* best-effort */ }
 
-    return roleOk(parsed, { role: this.id, model, provider });
+    // W-3 (PHASE-50 G-2): §8 citation audit on document completion. Runs only when
+    // the caller supplies artifact_path (the draft/persisted doc file); absent →
+    // prior behavior byte-unchanged. FAIL_UNCITED blocks completion unless the
+    // owner's decision-artifact-gated citation_audit_override is set (§7.3 res. 3).
+    // Audit infrastructure failure is fail-closed even under override.
+    const completionMeta = { role: this.id, model, provider };
+    if (input.artifact_path) {
+      const override = input.citation_audit_override === true;
+      let auditEnv;
+      try {
+        const reg = require("../../tools/_registry").getDefaultRegistry();
+        auditEnv = await reg.invoke("kb.validate_citations",
+          { artifact_path: input.artifact_path, project_id }, { root });
+      } catch (err) {
+        return roleFailed("CITATION_AUDIT_FAILED", err.message, ctx);
+      }
+      if (!auditEnv || auditEnv.status !== "SUCCESS") {
+        const auditDetail = (auditEnv && auditEnv.metadata &&
+                             (auditEnv.metadata.detail || auditEnv.metadata.reason)) ||
+                            "kb.validate_citations returned non-SUCCESS envelope";
+        return roleFailed("CITATION_AUDIT_FAILED", auditDetail, ctx);
+      }
+      const audit = auditEnv.output;
+      completionMeta.citation_audit = audit;
+      if (audit.status === "FAIL_UNCITED") {
+        try {
+          emitActivity({ invocation_id, project_id, role: this.id,
+            state: "AUDIT_FAIL_UNCITED_CLAIM",
+            indicator: getIndicator(this.id, "AUDIT_FAIL_UNCITED_CLAIM") }, { root });
+        } catch (_e) { /* best-effort */ }
+        if (!override) {
+          return roleBlocked("UNCITED_CLAIMS", audit.uncited_claims || [], ctx);
+        }
+        completionMeta.citation_audit_override = true;
+      }
+    }
+
+    return roleOk(parsed, completionMeta);
   }
 });
