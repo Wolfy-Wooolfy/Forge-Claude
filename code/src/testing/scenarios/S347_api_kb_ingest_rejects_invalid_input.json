@@ -1,0 +1,16 @@
+{
+  "id": "S347",
+  "name": "api kb/ingest+research — invalid or missing input rejected fail-closed with 400",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/kb_api_test_helper",
+  "method": "runS347IngestRejects",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "missing_url_400",      "expected": true },
+    { "type": "state_field_equals", "field": "invalid_url_400",      "expected": true },
+    { "type": "state_field_equals", "field": "blank_url_400",        "expected": true },
+    { "type": "state_field_equals", "field": "missing_question_400", "expected": true }
+  ]
+}

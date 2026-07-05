@@ -2261,6 +2261,96 @@ function createWorkspaceApiServer(options = {}) {
         return;
       }
 
+      // ── PHASE-50 W-2: KB write/research endpoints ────────────────────────────
+      // POST /api/kb/ingest — ingest a URL into the project KB (wraps kb.ingest_url)
+      if (req.method === "POST" && pathname === "/api/kb/ingest") {
+        const body      = await readBody(req);
+        const url       = (body && typeof body.url === "string" && body.url.trim() !== "") ? body.url.trim() : null;
+        const projectId = (body && typeof body.project_id === "string" && body.project_id.trim() !== "")
+          ? body.project_id.trim()
+          : readActiveProjectId();
+        const scope     = (body && body.scope) || "project";
+        if (!url) {
+          sendJson(res, 400, { ok: false, error: "URL_REQUIRED" });
+          return;
+        }
+        if (!projectId) {
+          sendJson(res, 400, { ok: false, error: "PROJECT_ID_REQUIRED" });
+          return;
+        }
+        try {
+          const reg    = getDefaultRegistry();
+          // A-3 seam: options._client is undefined in production (start-api.js passes { port } only).
+          const result = await reg.invoke("kb.ingest_url",
+            { url, project_id: projectId, scope },
+            { root, _client: options._client || undefined });
+          if (result.status !== "SUCCESS") {
+            sendJson(res, 500, { ok: false, error: (result.metadata && result.metadata.reason) || "KB_INGEST_FAILED" });
+            return;
+          }
+          sendJson(res, 200, {
+            ok:             true,
+            project_id:     projectId,
+            scope,
+            status:         result.output.status,
+            src_id:         result.output.src_id,
+            chunks_created: result.output.chunks_created || 0,
+            deduped:        result.output.deduped
+          });
+        } catch (err) {
+          sendJson(res, 500, { ok: false, error: err && err.message ? err.message : "KB_INGEST_FAILED" });
+        }
+        return;
+      }
+
+      // POST /api/kb/research — research over the project KB (wraps role.invoke, role_id=research)
+      if (req.method === "POST" && pathname === "/api/kb/research") {
+        const body      = await readBody(req);
+        const question  = (body && typeof body.question === "string" && body.question.trim() !== "") ? body.question.trim() : null;
+        const projectId = (body && typeof body.project_id === "string" && body.project_id.trim() !== "")
+          ? body.project_id.trim()
+          : readActiveProjectId();
+        if (!question) {
+          sendJson(res, 400, { ok: false, error: "QUESTION_REQUIRED" });
+          return;
+        }
+        if (!projectId) {
+          sendJson(res, 400, { ok: false, error: "PROJECT_ID_REQUIRED" });
+          return;
+        }
+        try {
+          const roleInput = {
+            schema_version: "1.0.0",
+            project_id:     projectId,
+            question
+          };
+          if (body.scope)                roleInput.scope             = body.scope;
+          if (body.max_searches != null) roleInput.max_searches      = body.max_searches;
+          if (body.credibility_floor)    roleInput.credibility_floor = body.credibility_floor;
+
+          // A-3: optional provider/model passthrough (production-motivated — the
+          // role default is anthropic and production holds no ANTHROPIC_API_KEY;
+          // D2/PHASE-22 precedent). scenario_id + _client ride the server options
+          // seam only — both undefined in production.
+          const invokeInput = { role_id: "research", project_id: projectId, input: roleInput };
+          if (body && typeof body.provider === "string") invokeInput.provider = body.provider;
+          if (body && typeof body.model === "string")    invokeInput.model    = body.model;
+          if (options._scenario_id)                      invokeInput.scenario_id = options._scenario_id;
+
+          const reg    = getDefaultRegistry();
+          const result = await reg.invoke("role.invoke", invokeInput,
+            { root, _client: options._client || undefined });
+          if (result.status !== "SUCCESS") {
+            sendJson(res, 500, { ok: false, error: (result.metadata && result.metadata.reason) || "KB_RESEARCH_FAILED" });
+            return;
+          }
+          sendJson(res, 200, { ok: true, project_id: projectId, research: result.output });
+        } catch (err) {
+          sendJson(res, 500, { ok: false, error: err && err.message ? err.message : "KB_RESEARCH_FAILED" });
+        }
+        return;
+      }
+
       // §ARC-8: binary ZIP upload — fs.writeFileSync exempt (text tool cannot handle raw Buffer)
       if (req.method === "POST" && pathname === "/api/intake/upload") {
         const projectId  = requestUrl.searchParams.get("project_id") || "unknown";

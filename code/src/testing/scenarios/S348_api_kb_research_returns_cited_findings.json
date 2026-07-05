@@ -1,0 +1,18 @@
+{
+  "id": "S348",
+  "name": "api kb/research — POST /api/kb/research returns cited findings (KNOWN + non-empty citations) via mock",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/kb_api_test_helper",
+  "method": "runS348ResearchCited",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "http_status",         "expected": 200 },
+    { "type": "state_field_equals", "field": "ok",                  "expected": true },
+    { "type": "state_field_equals", "field": "role_id_research",    "expected": true },
+    { "type": "state_field_equals", "field": "has_findings",        "expected": true },
+    { "type": "state_field_equals", "field": "known_cited_finding", "expected": true },
+    { "type": "state_field_equals", "field": "confidence_high",     "expected": true }
+  ]
+}

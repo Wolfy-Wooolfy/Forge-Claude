@@ -1,0 +1,17 @@
+{
+  "id": "S346",
+  "name": "api kb/ingest — POST /api/kb/ingest dedup-path happy returns SourceRecord summary (zero network)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/kb_api_test_helper",
+  "method": "runS346IngestDedup",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "http_status",      "expected": 200 },
+    { "type": "state_field_equals", "field": "ok",               "expected": true },
+    { "type": "state_field_equals", "field": "status_duplicate", "expected": true },
+    { "type": "state_field_equals", "field": "deduped",          "expected": true },
+    { "type": "state_field_equals", "field": "src_id_match",     "expected": true }
+  ]
+}

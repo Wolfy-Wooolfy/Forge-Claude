@@ -191,6 +191,12 @@
     "tokens_out": 200,
     "finish_reason": "stop"
   },
+  "mock|mock-research-s348|scenario:S348": {
+    "text": "{\"schema_version\":\"1.0.0\",\"question\":\"What HTTP methods should the API support?\",\"findings\":[{\"id\":\"find_a1b2c3d4e5f6\",\"claim\":\"A REST API should support GET, POST, PUT/PATCH and DELETE with appropriate status codes.\",\"certainty\":\"KNOWN\",\"supporting_citations\":[\"cit_0a1b2c3d4e5f\"],\"contradicting_citations\":[]}],\"scenarios\":[{\"scenario\":\"API follows standard REST conventions.\",\"probability\":\"HIGH\",\"key_conditions\":[\"resource-oriented endpoint design\"]}],\"recommendation\":{\"conclusion\":\"Implement GET (200), POST (201), PUT/PATCH (200), DELETE (204).\",\"reasoning\":\"Standard REST method semantics per the cited design guide.\",\"alternatives\":[]},\"knowledge_gaps\":[],\"confidence_level\":\"HIGH\",\"metadata\":{\"searches_performed\":3,\"sources_consulted\":0,\"sources_rejected_low_credibility\":0,\"total_cost_usd\":0}}",
+    "tokens_in": 300,
+    "tokens_out": 220,
+    "finish_reason": "stop"
+  },
   "mock|mock-rv|scenario:S160": {
     "text": "{\"project_name\":\"todo_cli\",\"domain\":\"cli_tool\",\"goals\":{\"primary\":\"Provide a minimal command-line TODO list manager\",\"secondary\":[\"Persist items to local JSON file\",\"Support add/list/complete/delete operations\"]},\"constraints\":[\"No external runtime dependencies\",\"Python 3.10+\"],\"non_goals\":[\"Web UI\",\"Multi-user support\",\"Cloud sync\"],\"detected_languages\":[\"python\"],\"source_summary\":\"5-file Python CLI package using argparse and json. Includes pytest tests.\",\"confidence\":\"HIGH\"}",
     "tokens_in": 100,
