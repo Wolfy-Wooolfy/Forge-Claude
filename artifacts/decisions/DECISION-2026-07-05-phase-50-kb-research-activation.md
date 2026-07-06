@@ -206,3 +206,26 @@ Scope delta (CTO ruling under standing owner delegation):
   test-report route (no new fs pattern, no §ARC change).
 - Full React /kb integration remains PHASE-13 (Conversational UX Polish).
 ---
+
+---
+## Amendment A-6 — 2026-07-05 — W-4.1: active-project key-mismatch fix (blocks Gate #10)
+
+CC surfaced and CTO reproduced from origin: readActiveProjectId() reads only
+`project_id`, but activeProjectManager.setActiveProject writes `active_project_id`
+(activeProjectManager.js:59) and apiServer.writeActiveProject writes `project_id`
+(apiServer.js:613). A project activated via the manager path is therefore invisible
+to the KB endpoints, which silently fall back to default_project — a wrong-target
+write/research on the owner's real W-5 path.
+
+Scope delta (CTO ruling under standing owner delegation):
+- NEW work item W-4.1: make readActiveProjectId tolerant — accept BOTH
+  `project_id` and `active_project_id` (prefer project_id when both exist),
+  so either writer resolves correctly. Minimal, backward-compatible.
+- Live-surface allowlist += (already-allowlisted apiServer.js) readActiveProjectId
+  only. No §ARC change. Cost $0 (mock).
+- NEW scenario S353_active_project_key_compat: an active_project.json written with
+  active_project_id resolves to that id (not default_project) through the KB
+  sources endpoint; regression: project_id form still resolves.
+- Closure gate SU math updated: 346 pass / 0 fail / 5 skip (351 total).
+- Backlog: unify the two writers on a single schema (broader cleanup, own phase).
+---
