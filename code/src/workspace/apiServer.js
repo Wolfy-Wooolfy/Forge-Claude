@@ -1690,6 +1690,24 @@ function createWorkspaceApiServer(options = {}) {
         return;
       }
 
+      // PHASE-50 W-4 (A-5) — standalone owner-facing KB panel. Explicit route
+      // BEFORE the SPA fallback (Handler C), same static mechanism + token
+      // injection as the PHASE-42 test-report route above.
+      if (req.method === "GET" && pathname === "/kb.html") {
+        const reg = getDefaultRegistry();
+        const r   = await reg.invoke("fs.read_file", { path: "web/kb.html" }, { root });
+        if (r.status === "SUCCESS") {
+          const html = _activeToken !== null
+            ? _injectForgeToken(r.output.content, _activeToken)
+            : r.output.content;
+          res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+          res.end(html);
+        } else {
+          sendJson(res, 404, { error: "Not found" });
+        }
+        return;
+      }
+
       if (req.method === "GET" && pathname === "/health") {
         sendJson(res, 200, { ok: true, service: "forge-workspace-api" });
         return;

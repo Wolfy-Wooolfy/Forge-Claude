@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<!--
+  PHASE-50 W-4 — Owner-facing Knowledge Base panel (capability #9).
+  Standalone, vanilla HTML/CSS/JS. No framework, no build step (PHASE-42
+  test-report.html precedent; full React /kb integration remains PHASE-13).
+  Served by apiServer at GET /kb.html (token injected into <head>).
+  Endpoints: GET /api/ai-os/active-project · POST /api/kb/ingest ·
+             GET /api/kb/sources · POST /api/kb/research.
+  Contract: docs/12_ai_os/22_KNOWLEDGE_BASE_CONTRACT.md.
+-->
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>قاعدة المعرفة والبحث</title>
+  <style>
+    :root { --green: #1a7f37; --red: #b91c1c; --amber: #9a6700; --ink: #1f2328; --muted: #656d76; --line: #d0d7de; --bg: #f6f8fa; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "Segoe UI", Tahoma, Arial, sans-serif; color: var(--ink); background: var(--bg); }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 24px 16px 48px; }
+    h1 { font-size: 20px; margin: 8px 0 4px; }
+    h2 { font-size: 16px; margin: 26px 0 10px; }
+    .proj { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; font-size: 15px; margin: 14px 0 6px; }
+    .proj .warn { color: var(--amber); font-size: 13px; display: block; margin-top: 4px; }
+    .controls { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+    .controls input, .controls textarea { flex: 1 1 220px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 15px; font-family: inherit; }
+    .controls button { padding: 10px 18px; border: 0; border-radius: 8px; background: #0969da; color: #fff; font-size: 15px; cursor: pointer; }
+    .controls button:hover { background: #0a5fc2; }
+    .controls button:disabled { background: var(--muted); cursor: wait; }
+    table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+    th, td { text-align: right; padding: 10px 14px; border-bottom: 1px solid var(--line); font-size: 14px; }
+    th { background: #f6f8fa; color: var(--muted); font-weight: 600; }
+    tr:last-child td { border-bottom: 0; }
+    .empty, .error, .okbox { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 16px; color: var(--muted); font-size: 15px; margin-bottom: 10px; }
+    .error { color: var(--red); border-color: #f1a9a9; }
+    .okbox { color: var(--green); border-color: #b7e0c0; }
+    .finding { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; font-size: 15px; }
+    .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; color: #fff; margin-inline-start: 8px; }
+    .badge.known { background: var(--green); }
+    .badge.estimated { background: var(--amber); }
+    .badge.uncertain { background: var(--muted); }
+    .cites, .small { color: var(--muted); font-size: 13px; margin-top: 6px; }
+    .rec { background: #fff; border: 1px solid var(--line); border-right: 4px solid #0969da; border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; font-size: 15px; }
+    a.back { color: #0969da; text-decoration: none; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>قاعدة المعرفة والبحث</h1>
+    <a class="back" href="/">&rarr; الرجوع للواجهة الرئيسية</a>
+
+    <div class="proj" id="proj-line">جارٍ تحديد المشروع…</div>
+
+    <h2>١ — إضافة مصدر (رابط صفحة أو مستند)</h2>
+    <div class="controls">
+      <input id="url-in" type="text" placeholder="الصق الرابط هنا، مثال: https://example.com/docs" />
+      <button id="ingest-btn">أضِف للمعرفة</button>
+    </div>
+    <div id="ingest-out"></div>
+
+    <h2>٢ — المصادر المخزّنة <button id="refresh-btn" style="font-size:12px;padding:4px 10px;border:0;border-radius:6px;background:#eaeef2;color:var(--ink);cursor:pointer;">تحديث</button></h2>
+    <div id="sources-out" class="empty">جارٍ التحميل…</div>
+
+    <h2>٣ — اسأل سؤالاً بحثياً</h2>
+    <div class="controls">
+      <textarea id="q-in" rows="2" placeholder="اكتب سؤالك، مثال: ما طرق المصادقة المناسبة لواجهة REST؟"></textarea>
+      <button id="research-btn">ابحث في المعرفة</button>
+    </div>
+    <div id="research-out"></div>
+  </div>
+
+  <script>
+    "use strict";
+
+    var project = "default_project";
+    var isDefaultFallback = true;
+    var sourcesById = {};
+
+    function esc(s) {
+      return String(s == null ? "" : s)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+    function box(id, html) { document.getElementById(id).innerHTML = html; }
+
+    async function api(pathname, method, bodyObj) {
+      var headers = { "Content-Type": "application/json" };
+      if (window.__FORGE_TOKEN__) headers["Authorization"] = "Bearer " + window.__FORGE_TOKEN__;
+      var opts = { method: method || "GET", headers: headers };
+      if (bodyObj) opts.body = JSON.stringify(bodyObj);
+      var resp = await fetch(pathname, opts);
+      var data = null;
+      try { data = await resp.json(); } catch (_e) {}
+      return { status: resp.status, data: data };
+    }
+
+    // Target-project line — mirrors the SERVER's readActiveProjectId() semantics
+    // exactly (payload.project_id else "default_project") and every call below
+    // sends project_id EXPLICITLY, so nothing can route silently elsewhere.
+    async function loadProject() {
+      try {
+        var r = await api("/api/ai-os/active-project");
+        var p = r.data && typeof r.data.project_id === "string" && r.data.project_id.trim()
+          ? r.data.project_id.trim() : null;
+        project = p || "default_project";
+        isDefaultFallback = !p;
+      } catch (_e) {
+        project = "default_project";
+        isDefaultFallback = true;
+      }
+      var line = "كل العمليات في هذه الصفحة ستُنفَّذ على مشروع: <strong>" + esc(project) + "</strong>";
+      if (isDefaultFallback) {
+        line += '<span class="warn">⚠ لا يوجد مشروع نشط محدد — سيتم استخدام مساحة العمل الافتراضية (default_project).</span>';
+      }
+      box("proj-line", line);
+    }
+
+    // ── Sources ────────────────────────────────────────────────────────────────
+    async function loadSources() {
+      box("sources-out", '<div class="empty">جارٍ التحميل…</div>');
+      try {
+        var r = await api("/api/kb/sources?project_id=" + encodeURIComponent(project));
+        if (!r.data || r.data.ok !== true) {
+          box("sources-out", '<div class="error">تعذّر تحميل المصادر' +
+            (r.data && r.data.error ? " (" + esc(r.data.error) + ")" : "") + "</div>");
+          return;
+        }
+        sourcesById = {};
+        var list = Array.isArray(r.data.sources) ? r.data.sources : [];
+        for (var i = 0; i < list.length; i++) sourcesById[list[i].id] = list[i];
+        if (list.length === 0) {
+          box("sources-out", '<div class="empty">لا توجد مصادر بعد — أضِف رابطاً من القسم الأول.</div>');
+          return;
+        }
+        var rows = "";
+        for (var j = 0; j < list.length; j++) {
+          var s = list[j];
+          rows += "<tr><td><strong>" + esc(s.title || "(بلا عنوان)") + "</strong>"
+            + '<div class="small">' + esc(s.url || "") + "</div></td>"
+            + "<td>" + esc((s.credibility && s.credibility.tier) || "؟") + "</td>"
+            + '<td class="small">' + esc(s.id) + "</td></tr>";
+        }
+        box("sources-out",
+          "<table><thead><tr><th>المصدر</th><th>الموثوقية</th><th>المعرّف</th></tr></thead><tbody>"
+          + rows + "</tbody></table>");
+      } catch (err) {
+        box("sources-out", '<div class="error">تعذّر الاتصال بالخادم: ' + esc(err && err.message) + "</div>");
+      }
+    }
+
+    // ── Ingest ─────────────────────────────────────────────────────────────────
+    async function ingest() {
+      var url = document.getElementById("url-in").value.trim();
+      if (!url) { box("ingest-out", '<div class="error">من فضلك الصق رابطاً أولاً.</div>'); return; }
+      var btn = document.getElementById("ingest-btn");
+      btn.disabled = true;
+      box("ingest-out", '<div class="empty">جارٍ جلب المصدر وفهرسته…</div>');
+      try {
+        var r = await api("/api/kb/ingest", "POST", { url: url, project_id: project });
+        if (r.data && r.data.ok === true) {
+          var msg = r.data.deduped === true
+            ? "هذا الرابط موجود في المعرفة من قبل (لم تتم إضافته مرتين)."
+            : "تمت الإضافة بنجاح — عدد المقاطع المفهرسة: " + esc(r.data.chunks_created);
+          box("ingest-out", '<div class="okbox">✓ ' + msg +
+            ' <span class="small">معرّف المصدر: ' + esc(r.data.src_id) + "</span></div>");
+          await loadSources();
+        } else {
+          var why = (r.data && r.data.error) ? r.data.error : ("HTTP " + r.status);
+          box("ingest-out", '<div class="error">تعذّرت الإضافة: ' + esc(why) + "</div>");
+        }
+      } catch (err) {
+        box("ingest-out", '<div class="error">تعذّر الاتصال بالخادم: ' + esc(err && err.message) + "</div>");
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // ── Research ───────────────────────────────────────────────────────────────
+    function certaintyBadge(c) {
+      var cls = c === "KNOWN" ? "known" : (c === "ESTIMATED" ? "estimated" : "uncertain");
+      var label = c === "KNOWN" ? "مؤكَّد بمصدر" : (c === "ESTIMATED" ? "استنتاج" : "غير مؤكد");
+      return '<span class="badge ' + cls + '">' + label + "</span>";
+    }
+
+    function citesLine(ids) {
+      if (!Array.isArray(ids) || ids.length === 0) return "";
+      // Citation ids are cit_* records; source titles are resolvable only via the
+      // sources table when the backend attaches them — show ids plainly otherwise.
+      var parts = [];
+      for (var i = 0; i < ids.length; i++) {
+        var sid = sourcesById[ids[i]];
+        parts.push(sid && sid.title ? esc(sid.title) : esc(ids[i]));
+      }
+      return '<div class="cites">الاستشهادات: ' + parts.join(" · ") + "</div>";
+    }
+
+    async function research() {
+      var q = document.getElementById("q-in").value.trim();
+      if (!q) { box("research-out", '<div class="error">من فضلك اكتب سؤالاً أولاً.</div>'); return; }
+      var btn = document.getElementById("research-btn");
+      btn.disabled = true;
+      box("research-out", '<div class="empty">جارٍ البحث في قاعدة المعرفة وتحليل النتائج…</div>');
+      try {
+        // provider/model hardcoded per Amendment A-3: the role default is
+        // anthropic and production holds no ANTHROPIC_API_KEY; reconciliation is
+        // a named backlog item (Anthropic-switch phase).
+        var r = await api("/api/kb/research", "POST", {
+          question: q, project_id: project, provider: "openai", model: "gpt-4o"
+        });
+        if (!r.data || r.data.ok !== true || !r.data.research) {
+          var why = (r.data && r.data.error) ? r.data.error : ("HTTP " + r.status);
+          box("research-out", '<div class="error">تعذّر البحث: ' + esc(why) + "</div>");
+          return;
+        }
+        var res = r.data.research;
+        var html = "";
+        var findings = Array.isArray(res.findings) ? res.findings : [];
+        if (findings.length === 0) {
+          html += '<div class="empty">لا توجد نتائج مدعومة بالمعرفة الحالية.</div>';
+        }
+        for (var i = 0; i < findings.length; i++) {
+          var f = findings[i];
+          html += '<div class="finding">' + esc(f.claim) + certaintyBadge(f.certainty)
+            + citesLine(f.supporting_citations) + "</div>";
+        }
+        if (res.recommendation && res.recommendation.conclusion) {
+          html += '<div class="rec"><strong>التوصية:</strong> ' + esc(res.recommendation.conclusion)
+            + (res.recommendation.reasoning ? '<div class="small">' + esc(res.recommendation.reasoning) + "</div>" : "")
+            + "</div>";
+        }
+        if (Array.isArray(res.knowledge_gaps) && res.knowledge_gaps.length > 0) {
+          html += '<div class="empty"><strong>أسئلة لم تُجب منها المعرفة الحالية:</strong><br/>'
+            + res.knowledge_gaps.map(function (g) { return "• " + esc(g); }).join("<br/>") + "</div>";
+        }
+        var conf = res.confidence_level === "HIGH" ? "عالية"
+          : (res.confidence_level === "MEDIUM" ? "متوسطة" : "منخفضة");
+        var meta = res.metadata || {};
+        html += '<div class="small">درجة الثقة الإجمالية: ' + conf
+          + " · مقاطع تمت مراجعتها: " + esc(meta.sources_consulted != null ? meta.sources_consulted : "؟")
+          + " · مصادر مرفوضة لضعف الموثوقية: " + esc(meta.sources_rejected_low_credibility != null ? meta.sources_rejected_low_credibility : "؟")
+          + "</div>";
+        box("research-out", html);
+      } catch (err) {
+        box("research-out", '<div class="error">تعذّر الاتصال بالخادم: ' + esc(err && err.message) + "</div>");
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    document.getElementById("ingest-btn").addEventListener("click", ingest);
+    document.getElementById("refresh-btn").addEventListener("click", loadSources);
+    document.getElementById("research-btn").addEventListener("click", research);
+    document.getElementById("q-in").addEventListener("keydown", function (e) {
+      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); research(); }
+    });
+    document.getElementById("url-in").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") ingest();
+    });
+
+    loadProject().then(loadSources);
+  </script>
+</body>
+</html>
