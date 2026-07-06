@@ -184,3 +184,25 @@ mock|mock-doc-s305 under the same remedy (pattern-clean rephrase, meaning
 preserved, assertions untouched — both scenarios green post-edit). No further
 existing-key edits are authorized without a new ruling.
 ---
+
+---
+## Amendment A-5 — 2026-07-05 — W-4 surface correction (standalone vanilla page)
+
+W-4 assumed web/index.html was an editable vanilla UI. CTO-verified from origin:
+it is a 487-byte built Vite/React shell (hashed asset bundle); manual edits are
+erased on rebuild and intrude on React-owned DOM. Per the PHASE-42 precedent
+(explicit web/test-report.html + a route BEFORE the SPA fallback), W-4 delivers
+the owner KB surface as a standalone vanilla page instead.
+
+Scope delta (CTO ruling under standing owner delegation):
+- Live-surface allowlist for W-4: web/kb.html (NEW vanilla page) + ONE explicit
+  route `GET /kb.html` in apiServer.js, inserted beside the /test-report.html
+  route (before the SPA fallback). Supersedes the "web/index.html" target named
+  in the original PROMPT-STAGE-50 §1/W-4.
+- All five W-4 requirements unchanged (target-project line incl. default_project
+  visibility · ingest · sources · research with provider openai/gpt-4o hardcoded ·
+  findings + citations rendering).
+- Route serves the page via reg.invoke("fs.read_file", …) exactly like the
+  test-report route (no new fs pattern, no §ARC change).
+- Full React /kb integration remains PHASE-13 (Conversational UX Polish).
+---
