@@ -4,8 +4,8 @@
   "current_stage": "A",
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
-  "next_phase": "PHASE-50-PENDING-DECISION",
-  "next_step": "W-4 owner UI panel",
+  "next_phase": "PHASE-51-PENDING-DECISION",
+  "next_step": "PHASE-50 closed (KB & Research activated: real ingest -> retrieval -> cited findings, owner-verified Gate #10). PHASE-51 pending owner decision (fresh decision artifact required).",
   "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-22-phase-43-first-real-build.md",
   "phase_45": {
     "status": "CLOSED",
@@ -188,7 +188,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-07-05T14:41:38.103Z",
+    "last_doctor_run": "2026-07-06T13:53:15.312Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
@@ -2224,7 +2224,7 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-50-KB-RESEARCH-ACTIVATION",
+  "current_task": "PHASE-50-KB-RESEARCH-ACTIVATION-COMPLETE",
   "last_updated": "2026-06-28T11:30:00.000Z",
   "phase_16": {
     "status": "ACTIVE",

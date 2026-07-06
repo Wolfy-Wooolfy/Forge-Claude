@@ -1,0 +1,57 @@
+{
+  "gate": "PHASE-50 Gate #10 — owner-run real research from /kb.html",
+  "date": "2026-07-06",
+  "verdict": "PASSED (owner-observed; CTO-verified screenshot)",
+  "operator": "OWNER (Khaled) — single browser call from http://127.0.0.1:3100/kb.html",
+  "question": "How do you install Express and create a basic web application?",
+  "target_project_line_observed": "phase48_intake_nextjs_real (NOT default_project) — W-4.2 wrapped-shape read confirmed live by the owner",
+  "sources_listed_observed": "3 sources, all REPUTABLE",
+  "agent_cost_ledger_row": {
+    "ts": "2026-07-06T13:39:55.637Z",
+    "invocation_id": "b97627b6-62c7-47cf-879e-8a2a9ea0656b",
+    "project_id": "phase48_intake_nextjs_real",
+    "provider": "openai",
+    "model": "gpt-4o-2024-08-06",
+    "role": "research",
+    "tokens_in": 4891,
+    "tokens_out": 596,
+    "latency_ms": 6397,
+    "cost_usd_actual": 0.0334
+  },
+  "kb_cost_ledger_row": {
+    "ts": "2026-07-06T13:39:49.199Z",
+    "operation": "embedding",
+    "tool": "kb.retrieve",
+    "detail": "query_embedding",
+    "tokens_in": 12,
+    "cost_usd": 2.4e-7
+  },
+  "tool_audit_chain": "2026-07-06T13:39:47 role.invoke -> kb.retrieve SUCCESS (13:39:49) -> role.invoke SUCCESS (13:39:55)",
+  "owner_observed_rendering": {
+    "findings": [
+      { "certainty": "KNOWN (مؤكَّد بمصدر, green badge)", "claim_topic": "Install Express via npm install express", "citations": "chk_8a148165_*" },
+      { "certainty": "KNOWN (مؤكَّد بمصدر, green badge)", "claim_topic": "Create a basic Hello World app listening on port 3000", "citations": "chk_8a148165_*" },
+      { "certainty": "KNOWN (مؤكَّد بمصدر, green badge)", "claim_topic": "Scaffold quickly with the Express generator", "citations": "chk_8a148165_*" }
+    ],
+    "recommendation_shown": true,
+    "confidence_line_observed": "درجة الثقة الإجمالية: عالية (HIGH) · مقاطع تمت مراجعتها: 11 · مصادر مرفوضة لضعف الموثوقية: 0",
+    "knowledge_gaps_shown": "honestly listed the un-answerable items"
+  },
+  "citations_to_src_trace": {
+    "rule": "chunk id format chk_<src_id_first_8_hex>_<ordinal> (kb _id_minting)",
+    "observed_citations_prefix": "chk_8a148165_*",
+    "resolves_to_src": "src_8a148165135d",
+    "src_url": "https://raw.githubusercontent.com/expressjs/express/master/Readme.md",
+    "src_ingested_in": "W-5 pre-flight ingest #1 (8 chunks, REPUTABLE)",
+    "sources_consulted": 11,
+    "rejected_low_credibility": 0
+  },
+  "crux": "MET AND PERSISTED: real ingest -> real embeddings -> non-empty retrieval (11 chunks) -> KNOWN findings citing a real ingested source (src_8a148165135d) -> HIGH confidence -> observed by the OWNER on the real /kb.html path. Not an empty-KB fallback, not synthetic evidence.",
+  "cumulative_phase_spend_usd": {
+    "gpt4o_calls": [0.036, 0.03571, 0.0334],
+    "kb_embeddings_total": 0.0000875,
+    "total": 0.10520,
+    "ceiling": 0.15,
+    "kill_bar": 3.00
+  }
+}

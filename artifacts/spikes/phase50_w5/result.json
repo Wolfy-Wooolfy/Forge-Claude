@@ -45,5 +45,10 @@
   },
   "audit_trail": "artifacts/audit/tool_audit.jsonl 2026-07-06T13:01-13:07 — kb.ingest_url SUCCESS x3, kb.list_sources SUCCESS, role.invoke->kb.retrieve SUCCESS x2, role.invoke SUCCESS x2; agent ledger rows 6400b86d + 0a189f1a",
   "contract_gap_noted": "research_role logs no research_synthesis row into the KB cost_ledger (contract 22 section 9.2 lists it); real LLM cost lives in the agent ledger (ARC-1). Pre-existing; backlog candidate.",
-  "gate_10": "PENDING owner run from /kb.html"
+  "gate_10": {
+    "verdict": "PASSED — owner-observed, crux MET AND PERSISTED",
+    "detail": "see gate10_owner_research.json (this dir): owner ran the approved question from /kb.html; 3 KNOWN findings citing chk_8a148165_* -> src_8a148165135d (Express Readme); confidence HIGH; sources_consulted 11; agent ledger row b97627b6-62c7-47cf-879e-8a2a9ea0656b ($0.0334 actual)",
+    "cumulative_phase_spend_usd": 0.10520,
+    "ceiling_usd": 0.15
+  }
 }
