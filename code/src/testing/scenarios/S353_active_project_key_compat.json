@@ -1,0 +1,15 @@
+{
+  "id": "S353",
+  "name": "api kb/sources — active_project.json key-compat: active_project_id form resolves (not default_project), project_id form still resolves, project_id wins when both exist (PHASE-50 W-4.1)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/kb_api_test_helper",
+  "method": "runS353ActiveProjectKeyCompat",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "manager_form_resolves", "expected": true },
+    { "type": "state_field_equals", "field": "server_form_resolves",  "expected": true },
+    { "type": "state_field_equals", "field": "prefer_project_id",     "expected": true }
+  ]
+}

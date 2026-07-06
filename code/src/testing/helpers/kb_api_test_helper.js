@@ -47,6 +47,24 @@ function _httpPost(host, port, reqPath, bodyObj) {
   });
 }
 
+function _httpGet(host, port, reqPath) {
+  return new Promise((resolve, reject) => {
+    const req = http.request({
+      hostname: host, port, path: reqPath, method: "GET", agent: false
+    }, (res) => {
+      let body = "";
+      res.on("data", (chunk) => { body += chunk; });
+      res.on("end", () => {
+        let parsed = null;
+        try { parsed = JSON.parse(body); } catch (_) {}
+        resolve({ status: res.statusCode, body: parsed });
+      });
+    });
+    req.on("error", reject);
+    req.end();
+  });
+}
+
 // ── Boot helper (no start() — _activeToken stays null → no auth) ─────────────
 
 async function _bootNoAuth(tempDir, serverOpts) {
@@ -186,4 +204,58 @@ async function runS348ResearchCited() {
   }
 }
 
-module.exports = { runS346IngestDedup, runS347IngestRejects, runS348ResearchCited };
+// ── S353: readActiveProjectId key-compat (PHASE-50 A-6 / W-4.1) ───────────────
+// Two writers serialize active_project.json differently: apiServer.
+// writeActiveProject → { project_id }, activeProjectManager.setActiveProject →
+// { active_project_id }. The KB endpoints' fallback must resolve BOTH (prefer
+// project_id). Observable via GET /api/kb/sources with no query param — the
+// response echoes the resolved project_id.
+
+async function runS353ActiveProjectKeyCompat() {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "forge-s353-"));
+  let instance  = null;
+  try {
+    const projectsDir = path.join(tempDir, "artifacts", "projects");
+    fs.mkdirSync(projectsDir, { recursive: true });
+    const apPath = path.join(projectsDir, "active_project.json");
+
+    instance = await _bootNoAuth(tempDir);
+    const port = instance.server.address().port;
+
+    // Leg A — manager schema ({ active_project_id }) must resolve to the id.
+    fs.writeFileSync(apPath, JSON.stringify({
+      active_project_id: "s353_manager_form", activated_at: "2026-07-05T00:00:00.000Z"
+    }), "utf8");
+    const a = await _httpGet("127.0.0.1", port, "/api/kb/sources");
+    const manager_form_resolves = !!(a.body && a.body.ok === true &&
+      a.body.project_id === "s353_manager_form");
+
+    // Leg B — apiServer schema ({ project_id }) regression: still resolves.
+    fs.writeFileSync(apPath, JSON.stringify({
+      project_id: "s353_server_form", updated_at: "2026-07-05T00:00:00.000Z"
+    }), "utf8");
+    const b = await _httpGet("127.0.0.1", port, "/api/kb/sources");
+    const server_form_resolves = !!(b.body && b.body.ok === true &&
+      b.body.project_id === "s353_server_form");
+
+    // Leg C — precedence: when both keys exist, project_id wins.
+    fs.writeFileSync(apPath, JSON.stringify({
+      project_id: "s353_prefer", active_project_id: "s353_loser"
+    }), "utf8");
+    const c = await _httpGet("127.0.0.1", port, "/api/kb/sources");
+    const prefer_project_id = !!(c.body && c.body.ok === true &&
+      c.body.project_id === "s353_prefer");
+
+    return { manager_form_resolves, server_form_resolves, prefer_project_id };
+  } finally {
+    await _teardown(instance);
+    try { fs.rmSync(tempDir, { recursive: true, force: true }); } catch (_) {}
+  }
+}
+
+module.exports = {
+  runS346IngestDedup,
+  runS347IngestRejects,
+  runS348ResearchCited,
+  runS353ActiveProjectKeyCompat
+};

@@ -600,8 +600,15 @@ function createWorkspaceApiServer(options = {}) {
   function readActiveProjectId() {
     const payload = readJsonSafe(activeProjectPath, null);
 
+    // W-4.1 (PHASE-50 A-6): two writers serialize this file differently —
+    // writeActiveProject() → `project_id`, activeProjectManager.setActiveProject
+    // → `active_project_id`. Accept BOTH (project_id wins when both exist) so a
+    // project activated via either path resolves; schema unification is backlog.
     if (payload && typeof payload.project_id === "string" && payload.project_id.trim() !== "") {
       return payload.project_id.trim();
+    }
+    if (payload && typeof payload.active_project_id === "string" && payload.active_project_id.trim() !== "") {
+      return payload.active_project_id.trim();
     }
 
     return "default_project";
