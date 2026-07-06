@@ -2324,6 +2324,51 @@ function createConversationEngine(options = {}) {
           return { ok: true, loop_id: loopId, advanced: false, doc_error: "DOC_WRITE_FAILED" };
         }
 
+        // W-3.5 (PHASE-50 A-4/A-4-bis): §8 citation audit gates advancement — the
+        // PERSISTED documentation.json is audited post-persist, pre-advance.
+        // FAIL_UNCITED blocks (fail-closed, contract §7 "hard gate") unless the
+        // owner's decision-artifact-gated citation_audit_override rides the body;
+        // audit infrastructure failure is fail-closed even under override (§3.5).
+        let auditEnv = null;
+        try {
+          auditEnv = await reg.invoke("kb.validate_citations", {
+            artifact_path: orchRelDir + "/documentation.json",
+            project_id:    pid
+          }, { root });
+        } catch {
+          auditEnv = null;
+        }
+        if (!auditEnv || auditEnv.status !== "SUCCESS") {
+          return { ok: true, loop_id: loopId, advanced: false, doc_error: "CITATION_AUDIT_FAILED" };
+        }
+
+        const citationAudit = auditEnv.output;
+        const auditOverride = body.citation_audit_override === true;
+
+        if (citationAudit.status === "FAIL_UNCITED") {
+          // Durable record via the activity emitter (A-4-bis ruling 3; best-effort).
+          try {
+            const { emit: emitAuditActivity } = require("../runtime/agents/_activity_emitter");
+            const { getIndicator: getAuditIndicator } = require("../runtime/agents/_activity_catalog");
+            const auditState = auditOverride ? "CITATION_AUDIT_OVERRIDDEN" : "AUDIT_FAIL_UNCITED_CLAIM";
+            emitAuditActivity({
+              invocation_id: null, project_id: pid, role: "documentation",
+              state: auditState, indicator: getAuditIndicator("documentation", auditState)
+            }, { root });
+          } catch { /* best-effort */ }
+
+          if (!auditOverride) {
+            return {
+              ok:             true,
+              loop_id:        loopId,
+              advanced:       false,
+              doc_error:      "UNCITED_CLAIMS",
+              uncited_claims: citationAudit.uncited_claims || [],
+              citation_audit: citationAudit
+            };
+          }
+        }
+
         await reg.invoke("orchestration.advance_state", {
           project_id:      pid,
           loop_id:         loopId,
@@ -2332,14 +2377,19 @@ function createConversationEngine(options = {}) {
           role_invoked:    "documentation"
         }, { root });
 
-        return {
-          ok:          true,
-          loop_id:     loopId,
-          advanced:    true,
-          advanced_to: "QUALITY_JUDGE",
+        const successPayload = {
+          ok:             true,
+          loop_id:        loopId,
+          advanced:       true,
+          advanced_to:    "QUALITY_JUDGE",
           documentation,
-          model_used:  docModel
+          model_used:     docModel,
+          citation_audit: citationAudit
         };
+        if (auditOverride && citationAudit.status === "FAIL_UNCITED") {
+          successPayload.citation_audit_override = true;
+        }
+        return successPayload;
       }
 
       // Role non-SUCCESS → fail-closed (no write, no advance). A schema-invalid role

@@ -5,7 +5,7 @@
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
   "next_phase": "PHASE-50-PENDING-DECISION",
-  "next_step": "W-1 gap-map verification",
+  "next_step": "W-4 owner UI panel",
   "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-22-phase-43-first-real-build.md",
   "phase_45": {
     "status": "CLOSED",

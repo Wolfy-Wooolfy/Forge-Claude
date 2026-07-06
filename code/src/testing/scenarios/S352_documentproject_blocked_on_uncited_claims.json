@@ -1,0 +1,21 @@
+{
+  "id": "S352",
+  "name": "documentProject §8 gate — uncited claim in persisted documentation.json BLOCKS advancement (fail-closed) + override outlet advances with durable record (PHASE-50 W-3.5)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/document_project_test_helper",
+  "method": "runS352DocBlockedUncited",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "blocked_no_advance",           "expected": true },
+    { "type": "state_field_equals", "field": "doc_error_uncited",            "expected": true },
+    { "type": "state_field_equals", "field": "uncited_present",              "expected": true },
+    { "type": "state_field_equals", "field": "state_still_documentation",    "expected": true },
+    { "type": "state_field_equals", "field": "doc_persisted_not_complete",   "expected": true },
+    { "type": "state_field_equals", "field": "override_advances",            "expected": true },
+    { "type": "state_field_equals", "field": "override_recorded",            "expected": true },
+    { "type": "state_field_equals", "field": "override_audit_attached",      "expected": true },
+    { "type": "state_field_equals", "field": "override_state_quality_judge", "expected": true }
+  ]
+}

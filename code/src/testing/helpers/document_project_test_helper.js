@@ -476,10 +476,79 @@ async function runS306DocManifestCorruptFailClosed() {
   }
 }
 
+// ── S352 — §8 citation audit gates advancement (PHASE-50 W-3.5) ────────────────
+// Claim-bearing doc (mock-doc-s352, "must persist" → Pattern 1) → persisted →
+// kb.validate_citations FAIL_UNCITED → BLOCK: no advance, state stays
+// DOCUMENTATION, documentation.json persisted-but-not-complete (persist-then-
+// audit by design, A-4-bis ruling 1). Folded override leg (S302 GO §3
+// precedent): fresh loop, body.citation_audit_override:true → advance proceeds,
+// override + audit recorded on the payload.
+
+async function runS352DocBlockedUncited() {
+  const PID     = "s352_document_uncited";
+  const LOOP_ID = "s352-loop-blocked";
+  const LOOP_OV = "s352-loop-override";
+  const projectDir = _ensureProjectDir(PID);
+
+  try {
+    _writeState(projectDir, {
+      project_id: PID, project_name: "S352 Test",
+      active_runtime_state: "IDEATION", conversation_mode: "PIPELINE",
+      loop_id: LOOP_ID, last_updated_at: new Date().toISOString()
+    });
+
+    await _seedLoopAtDocumentation(PID, LOOP_ID, {});
+
+    const engine = _makeEngine();
+    const result = await engine.documentProject({
+      project_id:      PID,
+      loop_id:         LOOP_ID,
+      doc_provider:    "mock",
+      doc_model:       "mock-doc-s352",
+      doc_scenario_id: "S352"
+    });
+
+    const blocked_no_advance        = result.advanced !== true;
+    const doc_error_uncited         = result.doc_error === "UNCITED_CLAIMS";
+    const uncited_present           = Array.isArray(result.uncited_claims) &&
+                                      result.uncited_claims.length >= 1;
+    const state_still_documentation = (await _currentState(PID, LOOP_ID)) === "DOCUMENTATION";
+    const doc_persisted_not_complete = _documentationExists(PID, LOOP_ID);
+
+    // ── Folded override leg — engine-level §7.3(3) outlet ──────────────────────
+    await _seedLoopAtDocumentation(PID, LOOP_OV, {});
+    const ovResult = await engine.documentProject({
+      project_id:              PID,
+      loop_id:                 LOOP_OV,
+      doc_provider:            "mock",
+      doc_model:               "mock-doc-s352",
+      doc_scenario_id:         "S352",
+      citation_audit_override: true
+    });
+
+    const override_advances       = ovResult.advanced === true &&
+                                    ovResult.advanced_to === "QUALITY_JUDGE";
+    const override_recorded       = ovResult.citation_audit_override === true;
+    const override_audit_attached = !!(ovResult.citation_audit &&
+                                       ovResult.citation_audit.status === "FAIL_UNCITED");
+    const override_state_quality_judge = (await _currentState(PID, LOOP_OV)) === "QUALITY_JUDGE";
+
+    return {
+      blocked_no_advance, doc_error_uncited, uncited_present,
+      state_still_documentation, doc_persisted_not_complete,
+      override_advances, override_recorded, override_audit_attached,
+      override_state_quality_judge
+    };
+  } finally {
+    _cleanup(PID);
+  }
+}
+
 module.exports = {
   runS302DocHappyPath,
   runS303DocWrongState,
   runS304DocInputNotFound,
   runS305DocManifestAbsentGraceful,
-  runS306DocManifestCorruptFailClosed
+  runS306DocManifestCorruptFailClosed,
+  runS352DocBlockedUncited
 };
