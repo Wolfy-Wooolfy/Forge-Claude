@@ -1,0 +1,49 @@
+{
+  "phase": "PHASE-50 W-5 pre-flight (real E2E, live pm2 server)",
+  "date": "2026-07-06",
+  "target_project": "phase48_intake_nextjs_real",
+  "target_proof": "GET /api/kb/sources (no param) echoed phase48_intake_nextjs_real via the W-4.1 dual-key read; active_project.json was in manager form (active_project_id) — the fix demonstrably fired on the real path",
+  "server": "live pm2 forge @127.0.0.1:3100 (restarted this session to load PHASE-50 code; was serving pre-PHASE-50 build)",
+  "ingests": [
+    { "url": "https://raw.githubusercontent.com/expressjs/express/master/Readme.md", "src_id": "src_8a148165135d", "tier": "REPUTABLE", "chunks_created": 8, "embedding_cost_usd": 0.00007036 },
+    { "url": "https://raw.githubusercontent.com/nodejs/node/main/doc/api/synopsis.md", "src_id": "src_077b63da2362", "tier": "REPUTABLE", "chunks_created": 2, "embedding_cost_usd": 0.0000121 },
+    { "url": "https://raw.githubusercontent.com/microsoft/api-guidelines/vNext/Guidelines.md", "src_id": "src_bbeeb0d86101", "tier": "REPUTABLE", "chunks_created": 1, "embedding_cost_usd": 0.00000412, "note": "upstream file now a relocation notice ('NOTICE TO READERS') — source effectively near-empty; weakened evidence relevance for the ratified question" }
+  ],
+  "research_calls": [
+    {
+      "call": 1,
+      "invocation_id": "6400b86d-8e7f-4200-a2c7-6fdc78d31a6e",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 4869, "tokens_out": 777, "latency_ms": 9073,
+      "cost_usd_actual": 0.036,
+      "sources_consulted": 11, "rejected_low_credibility": 0,
+      "confidence": "LOW",
+      "findings_summary": "5 findings: 3 KNOWN citing chk_8a148165_1/_2/_3 (trace to src_8a148165135d = Express Readme), 1 ESTIMATED citing chk_8a148165_0, 1 UNCERTAIN (PATCH) with empty citations",
+      "crux": "RETRIEVAL NON-EMPTY PROVEN: sources_consulted=11 (server-computed from retrieval results) AND KNOWN citations resolve chunk->src_8a148165135d->ingested URL",
+      "payload_archived": false,
+      "note": "payload save failed (missing dir); full payload captured on call 2"
+    },
+    {
+      "call": 2,
+      "invocation_id": "0a189f1a-606f-42e2-9983-e27d9fb98970",
+      "model": "gpt-4o-2024-08-06",
+      "tokens_in": 4869, "tokens_out": 758, "latency_ms": 11103,
+      "cost_usd_actual": 0.03571,
+      "sources_consulted": 11, "rejected_low_credibility": 0,
+      "confidence": "MEDIUM",
+      "findings_summary": "5 findings all ESTIMATED with empty citations; knowledge_gaps populated",
+      "payload_archived": "research_response.json (7189 bytes)",
+      "note": "archival re-call after the save failure. Model declined KNOWN this time — honest §6.3 calibration: with Guidelines.md reduced to a relocation notice, the remaining evidence (Express Readme/Node synopsis) is weakly relevant to the ratified HTTP-methods question. KNOWN-gate + deterministic confidence recompute behaved per contract on both calls."
+    }
+  ],
+  "cost": {
+    "ceiling_usd": 0.15,
+    "estimate_usd": 0.041,
+    "actual_usd_total": 0.0718,
+    "breakdown": { "gpt4o_call1": 0.036, "gpt4o_call2": 0.03571, "kb_embeddings_total": 0.0000872 },
+    "remaining_for_gate10_usd": 0.078
+  },
+  "audit_trail": "artifacts/audit/tool_audit.jsonl 2026-07-06T13:01-13:07 — kb.ingest_url SUCCESS x3, kb.list_sources SUCCESS, role.invoke->kb.retrieve SUCCESS x2, role.invoke SUCCESS x2; agent ledger rows 6400b86d + 0a189f1a",
+  "contract_gap_noted": "research_role logs no research_synthesis row into the KB cost_ledger (contract 22 section 9.2 lists it); real LLM cost lives in the agent ledger (ARC-1). Pre-existing; backlog candidate.",
+  "gate_10": "PENDING owner run from /kb.html"
+}
