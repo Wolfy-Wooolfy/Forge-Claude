@@ -114,3 +114,28 @@ Scope delta (CTO ruling under standing owner delegation):
   the fleet provider decision (openai/gpt-4o) at the Anthropic-switch phase;
   interim: explicit provider passthrough (W-4 UI included).
 ---
+
+---
+## Amendment A-4 — 2026-07-05 — W-3.5: wire §8 audit into the real documentProject path
+
+W-3 delivered role-level §8 enforcement, but conversationEngine.documentProject
+invokes the documentation role WITHOUT artifact_path, so the citation audit is
+inert on the owner's real path (CC pre-inspection Q4, CTO-verified). A guard that
+never fires in production reproduces the phase's core failure mode.
+
+Scope delta (CTO ruling under standing owner delegation):
+- NEW work item W-3.5: after documentProject persists documentation.json, invoke
+  the documentation role's audit against that persisted artifact_path so a
+  FAIL_UNCITED result BLOCKS advancement to QUALITY_JUDGE (fail-closed), honoring
+  citation_audit_override only via the existing decision-artifact-gated flag.
+- Minimal-diff: reuse the W-3 role path; do NOT duplicate audit logic in the engine.
+- Live-surface allowlist += code/src/ai_os/conversationEngine.js, bounded to the
+  documentProject audit-wiring only. No §ARC change. Cost $0 (mock).
+- NEW scenario S352_documentproject_blocked_on_uncited_claims (real documentProject
+  path; asserts no advance + no persisted advancement on FAIL_UNCITED).
+- Supersedes A-3's "ONE research entry" ceiling on mock_responses: the doc-synthesis
+  entries added in W-3 (S349/S350) and any S352 entry are ratified additive test
+  fixtures. (CTO erratum: the A-3 ceiling contradicted the W-3 instruction that
+  required doc mocks.)
+- Closure gate SU math updated: 345 pass / 0 fail / 5 skip (350 total).
+---
