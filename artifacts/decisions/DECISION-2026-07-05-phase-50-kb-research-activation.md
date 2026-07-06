@@ -173,3 +173,14 @@ KB-less projects; C rejected — violates fail-closed §3.5 and contract §7):
 5. Claim-detector patterns remain untouched (phase non-goal).
 Gate math unchanged: 345 pass / 0 fail / 5 skip (350 total); scenarios S346–S352.
 ---
+
+---
+## Amendment A-4-ter — 2026-07-05 — S305 mock-key edit ratified
+
+W-3.5 execution surfaced that S305 (documentProject GRACEFUL happy-advance)
+carries the same Pattern-1 defect as S302 (CTO-reproduced from baseline:
+FAIL_UNCITED, 4 lines). The A-4-bis(2) single-key authorization is EXTENDED to
+mock|mock-doc-s305 under the same remedy (pattern-clean rephrase, meaning
+preserved, assertions untouched — both scenarios green post-edit). No further
+existing-key edits are authorized without a new ruling.
+---
