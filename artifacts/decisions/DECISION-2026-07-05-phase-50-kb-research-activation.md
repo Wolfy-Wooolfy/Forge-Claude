@@ -139,3 +139,37 @@ Scope delta (CTO ruling under standing owner delegation):
   required doc mocks.)
 - Closure gate SU math updated: 345 pass / 0 fail / 5 skip (350 total).
 ---
+
+---
+## Amendment A-4-bis — 2026-07-05 — W-3.5 execution rulings (probe-driven, CTO-reproduced)
+
+CC's pre-inspection probe (real citation_validator vs canned docs, offline)
+proved — and the CTO independently reproduced — that unconditional §8 wiring
+blocks S302's own happy-path doc (3 Pattern-1 hits), and that on the real path
+any natural-language gpt-4o doc will FAIL_UNCITED since no pipeline caller
+produces citations today.
+
+CTO rulings (Option A adopted; B rejected — invented policy, guard dark for
+KB-less projects; C rejected — violates fail-closed §3.5 and contract §7):
+1. Wiring is UNCONDITIONAL per §7 ("hard gate, not advisory"). Placement
+   clarified: documentProject invokes kb.validate_citations DIRECTLY on the
+   persisted documentation.json (post-persist, pre-advance); thin engine-level
+   FAIL_UNCITED→block + override + durable-record logic is authorized. A-4's
+   "reuse the W-3 role path" reads as "reuse the tool + envelope semantics" —
+   persist-after-role ordering makes same-invocation role-input reuse
+   impossible (CTO wording, corrected).
+2. ONE existing mock-key edit AUTHORIZED: mock|mock-doc-s302 — rephrase the
+   three flagged sentences pattern-clean; S302 thereby proves happy-path
+   advance WITH a passing audit. Verify S302's assertions are unaffected
+   before editing; re-run the probe post-edit (expect PASS) as evidence.
+3. Override outlet: body.citation_audit_override passthrough on documentProject
+   (doc_provider/doc_model precedent), honored at the engine gate; audit
+   outcome and any override durably recorded via the activity emitter
+   (§ARC-legal) and attached to the returned payload.
+4. RECORDED CONSEQUENCE (acknowledged under standing owner delegation): until
+   citation generation exists in the pipeline, real uncited builds BLOCK at
+   DOCUMENTATION per §7; escape valve = per-build override. Named backlog:
+   wire kb.cite into documentation generation (candidate next phase).
+5. Claim-detector patterns remain untouched (phase non-goal).
+Gate math unchanged: 345 pass / 0 fail / 5 skip (350 total); scenarios S346–S352.
+---
