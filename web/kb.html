@@ -99,8 +99,14 @@
     async function loadProject() {
       try {
         var r = await api("/api/ai-os/active-project");
-        var p = r.data && typeof r.data.project_id === "string" && r.data.project_id.trim()
-          ? r.data.project_id.trim() : null;
+        // W-4.2 (A-6-bis): the endpoint WRAPS the value — {ok, active_project:{...}}
+        // — and two writer schemas exist (project_id / active_project_id). Dual-key
+        // read of the wrapped shape, same philosophy as the W-4.1 server-side fix.
+        var raw = r.data && r.data.active_project;
+        var p = raw && typeof raw.project_id === "string" && raw.project_id.trim()
+          ? raw.project_id.trim()
+          : (raw && typeof raw.active_project_id === "string" && raw.active_project_id.trim()
+            ? raw.active_project_id.trim() : null);
         project = p || "default_project";
         isDefaultFallback = !p;
       } catch (_e) {
