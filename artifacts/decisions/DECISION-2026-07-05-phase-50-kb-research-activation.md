@@ -229,3 +229,27 @@ Scope delta (CTO ruling under standing owner delegation):
 - Closure gate SU math updated: 346 pass / 0 fail / 5 skip (351 total).
 - Backlog: unify the two writers on a single schema (broader cleanup, own phase).
 ---
+
+---
+## Amendment A-6-bis — 2026-07-06 — W-4.2: kb.html active-project parse fix (Gate #10 catch)
+
+Gate #10 (owner) surfaced /kb.html showing default_project + 0 sources while the
+backend correctly targeted phase48_intake_nextjs_real with 3 sources. Root cause
+(CTO-verified byte-level): loadProject() read r.data.project_id from the root, but
+GET /api/ai-os/active-project wraps the value as
+{ok:true, active_project:{active_project_id:...}} → always null → cosmetic
+fall to default_project. Real backend, real active-project, real sources were all
+correct; only the page's parse of the wrapped shape was wrong. W-4's verification
+was DOM/parse-level without a live server (spend guard), so only Gate #10 caught it.
+
+Scope delta (CTO ruling under standing owner delegation):
+- Live-surface fix in web/kb.html only (already A-5-allowlisted), ~4 lines:
+  loadProject reads active_project.project_id OR active_project.active_project_id
+  (same dual-key philosophy as W-4.1, applied to the wrapped shape).
+- No scenario (UI outside harness until PHASE-13); documentation-only amendment.
+- No §ARC change, no cost.
+- Closure note: W-4 UI verification is parse-level only; a live-server DOM check
+  is not possible under the spend guard, so owner Gate #10 is the effective UI
+  gate this phase. Backlog: light UI smoke under PHASE-13 (Playwright) to catch
+  endpoint-shape parse bugs pre-owner.
+---
