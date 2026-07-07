@@ -5,7 +5,7 @@
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
   "next_phase": "PHASE-51-PENDING-DECISION",
-  "next_step": "PHASE-50 closed (KB & Research activated: real ingest -> retrieval -> cited findings, owner-verified Gate #10). PHASE-51 pending owner decision (fresh decision artifact required).",
+  "next_step": "PHASE-51-KB-CITE IN PROGRESS (documentation-time citation generation): post-generation citation pass in documentProject (post-persist, pre-§8-audit) that emits CitationRecords so real builds pass the §8 audit. W-0 opened (decision artifact + status flip). Next: W-1 citation pass + S-D/S-E, then mid-checkpoint.",
   "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-22-phase-43-first-real-build.md",
   "phase_45": {
     "status": "CLOSED",
@@ -2224,8 +2224,8 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-50-KB-RESEARCH-ACTIVATION-COMPLETE",
-  "last_updated": "2026-06-28T11:30:00.000Z",
+  "current_task": "PHASE-51-KB-CITE-IN-PROGRESS",
+  "last_updated": "2026-07-07T00:00:00.000Z",
   "phase_16": {
     "status": "ACTIVE",
     "started_at": "2026-05-24T16:00:00.000Z",
