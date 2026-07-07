@@ -1,0 +1,16 @@
+{
+  "id": "S355",
+  "name": "PHASE-51 W-1 S-E — citation pass is non-mutating: over a claim-bearing documentation.json it detects >=1 claim, writes citations.jsonl only, and leaves documentation.json byte-identical; hermetic run (no API key) yields 0 cited",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/citation_pass_test_helper",
+  "method": "runSENonMutation",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "claims_detected_ge_1", "expected": true },
+    { "type": "state_field_equals", "field": "cited_zero_hermetic",  "expected": true },
+    { "type": "state_field_equals", "field": "bytes_identical",      "expected": true },
+    { "type": "state_field_equals", "field": "doc_still_exists",     "expected": true }
+  ]
+}

@@ -8,6 +8,7 @@ const IntentClassificationProvider   = require("../providers/intentClassificatio
 const ideaSynthesisProvider          = require("../providers/ideaSynthesisProvider");
 const { getDefaultRegistry } = require("../runtime/tools/_registry");
 const { serializeFrontmatter, validateFrontmatter, parseFrontmatter } = require("./schemas/visionSchema");
+const { validateCitations } = require("../runtime/kb/citation_validator");
 
 const STATE_TRANSITION_THRESHOLDS = {
   DISCUSSION: ["DISCOVERY_REQUIRED"],
@@ -29,6 +30,89 @@ const CONFIRMATION_REQUIRED_TRANSITIONS = new Set([
   "DOCUMENTATION_REVIEW->EXECUTION_HANDOFF_READY",
   "EXECUTION_HANDOFF_READY->EXECUTION_HANDOFF_CREATED"
 ]);
+
+// ── PHASE-51 (W-1) — Documentation-time citation generation ────────────────────
+// Post-generation citation pass: runs inside documentProject AFTER documentation.json is
+// persisted and BEFORE the §8 citation audit. For each factual claim the §7.1 detector
+// flags, it retrieves supporting chunks from the active project KB and, if kb.cite emits a
+// record (≥1 eligible/non-LOW chunk), the claim becomes cited; otherwise the claim stays
+// uncited (NEVER fabricated — §5 hard rule) and the §8 audit blocks the build (fail-closed
+// AT THE GATE). The pass READS documentation.json + WRITES citations.jsonl only; it never
+// mutates documentation.json (S-E).
+//
+// Parity (C-1): the caller passes the EXACT bytes the §8 audit will read (read-back after
+// persist), and claims are enumerated by the SAME detector the audit uses —
+// validateCitations(content, ∅).uncited_claims — so the set attempted == the set audited,
+// and claim_location.line_range = [line, line] uses that reported 1-indexed line verbatim.
+// C-2: "leave uncited" is decided from the kb.cite RESULT (record emitted vs skip), NOT
+// from whether kb.retrieve returned chunks — a claim whose only chunks are LOW-credibility
+// makes kb.cite skip, and the claim correctly stays uncited.
+// Track A: all retrieval/embedding via reg.invoke("kb.retrieve"/"kb.cite"); no direct fs.
+async function runDocumentationCitationPass(reg, projectId, artifactRelPath, content, root) {
+  const summary = {
+    claims_detected: 0, cited: 0, uncited: 0,
+    retrieve_failed: 0, zero_chunks: 0, cite_blocked: 0
+  };
+
+  let claims;
+  try {
+    claims = (validateCitations(content, new Set()).uncited_claims) || [];
+  } catch (_) {
+    claims = [];
+  }
+  summary.claims_detected = claims.length;
+
+  for (const claim of claims) {
+    const line = claim.line;
+    const text = String((claim && claim.text) || "");
+
+    // A claim shorter than the §5 claim_text minLength cannot form a valid CitationRecord.
+    if (text.length < 10) { summary.uncited++; continue; }
+
+    // 1. Retrieve supporting chunks. credibility_floor COMMUNITY: non-LOW chunks are
+    //    eligible for a CitationRecord (synthesizeCitation still filters LOW as
+    //    defense-in-depth). A retrieve failure (e.g. no API key in a hermetic run) leaves
+    //    the claim uncited — the §8 audit below is the fail-closed gate.
+    let retrieveEnv = null;
+    try {
+      retrieveEnv = await reg.invoke("kb.retrieve", {
+        query:             text,
+        project_id:        projectId,
+        credibility_floor: "COMMUNITY"
+      }, { root });
+    } catch (_) {
+      retrieveEnv = null;
+    }
+    if (!retrieveEnv || retrieveEnv.status !== "SUCCESS") {
+      summary.retrieve_failed++; summary.uncited++; continue;
+    }
+
+    const chunks = (retrieveEnv.output && retrieveEnv.output.results) || [];
+    if (chunks.length === 0) { summary.zero_chunks++; summary.uncited++; continue; }
+
+    // 2. Cite — decide "cited vs uncited" from the kb.cite RESULT (C-2), never fabricate.
+    let citeEnv = null;
+    try {
+      citeEnv = await reg.invoke("kb.cite", {
+        claim_text:     text,
+        claim_location: { artifact_path: artifactRelPath, line_range: [line, line] },
+        chunks:         chunks,
+        synthesized_by: "documentation",
+        project_id:     projectId
+      }, { root });
+    } catch (_) {
+      citeEnv = null;
+    }
+
+    if (citeEnv && citeEnv.status === "SUCCESS") {
+      summary.cited++;
+    } else {
+      summary.cite_blocked++; summary.uncited++;
+    }
+  }
+
+  return summary;
+}
 
 function createConversationEngine(options = {}) {
   const root = path.resolve(options.root || process.cwd());
@@ -2324,6 +2408,26 @@ function createConversationEngine(options = {}) {
           return { ok: true, loop_id: loopId, advanced: false, doc_error: "DOC_WRITE_FAILED" };
         }
 
+        // PHASE-51 (W-1): documentation-time citation pass. Read BACK the persisted
+        // documentation.json (C-1: the IDENTICAL bytes the §8 audit reads) → enumerate
+        // claims via the SAME §7.1 detector → per claim kb.retrieve + kb.cite → append
+        // CitationRecords to citations.jsonl. Runs post-persist, pre-§8-audit; never
+        // mutates documentation.json (only citations.jsonl is written). Best-effort: a
+        // read-back/pass failure leaves claims uncited and the §8 audit below is the
+        // fail-closed gate.
+        let citationPass = null;
+        try {
+          const docReadBack = await reg.invoke("fs.read_file",
+            { path: orchRelDir + "/documentation.json" }, { root });
+          if (docReadBack && docReadBack.status === "SUCCESS") {
+            citationPass = await runDocumentationCitationPass(
+              reg, pid, orchRelDir + "/documentation.json",
+              docReadBack.output.content, root);
+          }
+        } catch {
+          citationPass = null;
+        }
+
         // W-3.5 (PHASE-50 A-4/A-4-bis): §8 citation audit gates advancement — the
         // PERSISTED documentation.json is audited post-persist, pre-advance.
         // FAIL_UNCITED blocks (fail-closed, contract §7 "hard gate") unless the
@@ -2364,7 +2468,8 @@ function createConversationEngine(options = {}) {
               advanced:       false,
               doc_error:      "UNCITED_CLAIMS",
               uncited_claims: citationAudit.uncited_claims || [],
-              citation_audit: citationAudit
+              citation_audit: citationAudit,
+              citation_pass:  citationPass
             };
           }
         }
@@ -2384,7 +2489,8 @@ function createConversationEngine(options = {}) {
           advanced_to:    "QUALITY_JUDGE",
           documentation,
           model_used:     docModel,
-          citation_audit: citationAudit
+          citation_audit: citationAudit,
+          citation_pass:  citationPass
         };
         if (auditOverride && citationAudit.status === "FAIL_UNCITED") {
           successPayload.citation_audit_override = true;
@@ -3408,4 +3514,4 @@ function _hasTransitionIntent(message) {
   return _TRANSITION_KEYWORDS_AR.some(kw => lower.includes(kw));
 }
 
-module.exports = { createConversationEngine, _hasTransitionIntent, _TRANSITION_HINT_AR };
+module.exports = { createConversationEngine, _hasTransitionIntent, _TRANSITION_HINT_AR, runDocumentationCitationPass };
