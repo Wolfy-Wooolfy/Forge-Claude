@@ -102,3 +102,17 @@ LanceDB path, a mock embedding client is injected via `opts._client` threading t
 - Test fixture: fixed unit embedding vector (query ≡ chunk → LanceDB distance 0 →
   relevance ≈ 1.0) + a seeded REPUTABLE SourceRecord + one chunk in real LanceDB.
 CTO-ratified 2026-07-07. Committed with W-2.
+
+---
+## Amendment A-2 — 2026-07-07 — Citation-relevance fix (investigation opened)
+Gate #10 (W-3) exposed that all 8 real CitationRecords scored relevance_score
+0.000 with non-supporting chunks. CTO root-cause hypothesis: distance-metric
+mismatch in storage_lance (`max(0,1-_distance)` assumes cosine distance; LanceDB
+default is L2, so cosine<0.5 clamps to 0). storage_lance is byte-identical to
+PHASE-50 (pre-existing defect, first exposed here). Scope of A-2: (1) diagnose
+the actual metric + embedding normalization + correct formula; (2) fix the
+relevance scoring so citation relevance/confidence is meaningful; (3) re-run
+Gate #10 with a topically-strong source to prove real (non-zero) citations. This
+is KB-wide (all kb.retrieve consumers, incl. PHASE-50 research) → full-suite
+re-verify is mandatory. Investigation-first: fix approach ratified by CTO after
+the diagnosis (W-A2-1) before any storage_lance change. CTO-ratified 2026-07-07.
