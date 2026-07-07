@@ -1,0 +1,102 @@
+{
+  "request_body": {
+    "project_id": "phase51_w3_gate10",
+    "loop_id": "w3-956cad0f"
+  },
+  "http_status": 200,
+  "latency_ms": 13958,
+  "response": {
+    "ok": true,
+    "loop_id": "w3-956cad0f",
+    "advanced": true,
+    "advanced_to": "QUALITY_JUDGE",
+    "documentation": {
+      "role_id": "documentation",
+      "overview": {
+        "title": "Task Management REST API",
+        "purpose": "This project provides a RESTful API for managing tasks. It is designed for developers needing task organization capabilities in their applications.",
+        "key_capabilities": [
+          "CRUD operations on tasks",
+          "Validation of input data"
+        ]
+      },
+      "components": [
+        {
+          "name": "API Server",
+          "description": "Handles HTTP requests and routes them appropriately.",
+          "interface_summary": "Interacts with clients via HTTP using the Express framework to manage tasks."
+        }
+      ],
+      "api_reference": [
+        {
+          "endpoint": "/todos",
+          "method": "POST",
+          "description": "Creates a new task.",
+          "inputs": "JSON body with a required 'title' field of type string.",
+          "outputs": "201 Created with the created task in the response body.",
+          "errors": [
+            "400 Bad Request if 'title' is missing or not a string."
+          ]
+        },
+        {
+          "endpoint": "/todos/:id",
+          "method": "PUT",
+          "description": "Updates an existing task by ID.",
+          "inputs": "URL parameter 'id' for task identifier and JSON body with 'title'.",
+          "outputs": "200 OK with the updated task data in the response body.",
+          "errors": [
+            "404 Not Found if task ID does not exist.",
+            "400 Bad Request if 'title' is missing or not a string."
+          ]
+        }
+      ],
+      "quickstart": {
+        "prerequisites": [
+          "Node.js installed",
+          "SQLite3 installed"
+        ],
+        "steps": [
+          "Clone the repository.",
+          "Install dependencies using npm install.",
+          "Run the database migrations.",
+          "Start the server with npm start."
+        ]
+      },
+      "operations": {
+        "health_check": "Verify the server is running by sending a GET request to the root endpoint and checking for a 200 OK response.",
+        "logging": "HTTP requests and errors are logged to console at info level. Database errors are logged as error level.",
+        "common_issues": [
+          {
+            "symptom": "Server fails to start",
+            "cause": "Port already in use",
+            "fix": "Change the port in the environment or free the port."
+          },
+          {
+            "symptom": "400 Bad Request on valid input",
+            "cause": "Incorrect or missing content-type header",
+            "fix": "Ensure the request is sent with 'Content-Type: application/json'."
+          }
+        ]
+      },
+      "known_limitations": [
+        "Real-time sync of tasks is out of scope."
+      ],
+      "summary": "This documentation provides detailed information for the Task Management REST API, including its purpose, components, API endpoints, and operational guidelines. It is intended for developers and system operators responsible for integrating and maintaining this system. Known limitations are addressed."
+    },
+    "model_used": "gpt-4o",
+    "citation_audit": {
+      "status": "PASS",
+      "uncited_claims_count": 0,
+      "cited_claims_count": 8,
+      "uncited_claims": []
+    },
+    "citation_pass": {
+      "claims_detected": 8,
+      "cited": 8,
+      "uncited": 0,
+      "retrieve_failed": 0,
+      "zero_chunks": 0,
+      "cite_blocked": 0
+    }
+  }
+}

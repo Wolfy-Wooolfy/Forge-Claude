@@ -1,0 +1,17 @@
+{
+  "before": {
+    "agent_usd": 0,
+    "kb_usd": 0,
+    "total_usd": 0,
+    "agent_rows": 1,
+    "kb_rows": 0
+  },
+  "after": {
+    "agent_usd": 0.01563,
+    "kb_usd": 0.00007413999999999996,
+    "total_usd": 0.015704140000000002,
+    "agent_rows": 2,
+    "kb_rows": 9
+  },
+  "delta_usd": 0.0157
+}

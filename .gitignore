@@ -188,6 +188,9 @@ artifacts/projects/phase44_loopback_real/
 # deliverables. Forensic evidence lives under artifacts/spikes/** (stays tracked).
 # Covers phase43_*..phase48_* (e.g. phase48_intake_nextjs_*); _reference_todo_api is kept (leading _).
 artifacts/projects/phase4*/
+# PHASE-51 W-3 Gate #10 driver clobbers artifacts/projects/phase51_w3_gate10/ per run (same
+# rationale). Forensic evidence lives under artifacts/spikes/phase51_w3/ (stays tracked).
+artifacts/projects/phase5*/
 
 
 # -- 10. PER-PROJECT (built by Forge) — node_modules and binary indexes ------

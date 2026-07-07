@@ -1,0 +1,539 @@
+{
+  "verdict": "GATE_PASS",
+  "mode": "REAL_GPT4O",
+  "project_id": "phase51_w3_gate10",
+  "loop_id": "w3-956cad0f",
+  "port": 58263,
+  "request_body": {
+    "project_id": "phase51_w3_gate10",
+    "loop_id": "w3-956cad0f"
+  },
+  "ingest": {
+    "skipped": false,
+    "url": "https://raw.githubusercontent.com/expressjs/express/master/Readme.md",
+    "src_id": "src_8a148165135d",
+    "tier": "REPUTABLE",
+    "chunks_created": 8,
+    "deduped": false
+  },
+  "documentProject_result": {
+    "ok": true,
+    "loop_id": "w3-956cad0f",
+    "advanced": true,
+    "advanced_to": "QUALITY_JUDGE",
+    "documentation": {
+      "role_id": "documentation",
+      "overview": {
+        "title": "Task Management REST API",
+        "purpose": "This project provides a RESTful API for managing tasks. It is designed for developers needing task organization capabilities in their applications.",
+        "key_capabilities": [
+          "CRUD operations on tasks",
+          "Validation of input data"
+        ]
+      },
+      "components": [
+        {
+          "name": "API Server",
+          "description": "Handles HTTP requests and routes them appropriately.",
+          "interface_summary": "Interacts with clients via HTTP using the Express framework to manage tasks."
+        }
+      ],
+      "api_reference": [
+        {
+          "endpoint": "/todos",
+          "method": "POST",
+          "description": "Creates a new task.",
+          "inputs": "JSON body with a required 'title' field of type string.",
+          "outputs": "201 Created with the created task in the response body.",
+          "errors": [
+            "400 Bad Request if 'title' is missing or not a string."
+          ]
+        },
+        {
+          "endpoint": "/todos/:id",
+          "method": "PUT",
+          "description": "Updates an existing task by ID.",
+          "inputs": "URL parameter 'id' for task identifier and JSON body with 'title'.",
+          "outputs": "200 OK with the updated task data in the response body.",
+          "errors": [
+            "404 Not Found if task ID does not exist.",
+            "400 Bad Request if 'title' is missing or not a string."
+          ]
+        }
+      ],
+      "quickstart": {
+        "prerequisites": [
+          "Node.js installed",
+          "SQLite3 installed"
+        ],
+        "steps": [
+          "Clone the repository.",
+          "Install dependencies using npm install.",
+          "Run the database migrations.",
+          "Start the server with npm start."
+        ]
+      },
+      "operations": {
+        "health_check": "Verify the server is running by sending a GET request to the root endpoint and checking for a 200 OK response.",
+        "logging": "HTTP requests and errors are logged to console at info level. Database errors are logged as error level.",
+        "common_issues": [
+          {
+            "symptom": "Server fails to start",
+            "cause": "Port already in use",
+            "fix": "Change the port in the environment or free the port."
+          },
+          {
+            "symptom": "400 Bad Request on valid input",
+            "cause": "Incorrect or missing content-type header",
+            "fix": "Ensure the request is sent with 'Content-Type: application/json'."
+          }
+        ]
+      },
+      "known_limitations": [
+        "Real-time sync of tasks is out of scope."
+      ],
+      "summary": "This documentation provides detailed information for the Task Management REST API, including its purpose, components, API endpoints, and operational guidelines. It is intended for developers and system operators responsible for integrating and maintaining this system. Known limitations are addressed."
+    },
+    "model_used": "gpt-4o",
+    "citation_audit": {
+      "status": "PASS",
+      "uncited_claims_count": 0,
+      "cited_claims_count": 8,
+      "uncited_claims": []
+    },
+    "citation_pass": {
+      "claims_detected": 8,
+      "cited": 8,
+      "uncited": 0,
+      "retrieve_failed": 0,
+      "zero_chunks": 0,
+      "cite_blocked": 0
+    }
+  },
+  "citation_pass": {
+    "claims_detected": 8,
+    "cited": 8,
+    "uncited": 0,
+    "retrieve_failed": 0,
+    "zero_chunks": 0,
+    "cite_blocked": 0
+  },
+  "citation_audit": {
+    "status": "PASS",
+    "uncited_claims_count": 0,
+    "cited_claims_count": 8,
+    "uncited_claims": []
+  },
+  "claims_detected_N": 8,
+  "citations_jsonl": [
+    {
+      "schema_version": "1.0.0",
+      "id": "cit_ab89124cd128",
+      "claim_text": "\"purpose\": \"This project provides a RESTful API for managing tasks. It is designed for developers needing task organization capabilities in their applications.\",",
+      "claim_location": {
+        "artifact_path": "artifacts/projects/phase51_w3_gate10/orchestration/w3-956cad0f/documentation.json",
+        "line_range": [
+          5,
+          5
+        ]
+      },
+      "supporting_chunks": [
+        {
+          "chunk_id": "chk_8a148165_2",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "dleware & Modules\n  * [Github Discussions](https://github.com/expressjs/discussions) for discussion on the development and usage of Express\n\n**PROTIP** Be sure to read the [migration guide to v5](http"
+        },
+        {
+          "chunk_id": "chk_8a148165_7",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "altin) - **Mert Can Altin**\n  * [dpopp07](https://github.com/dpopp07) - **Dustin Popp**\n  * [Sushmeet](https://github.com/Sushmeet) - **Sushmeet Sunger**\n  * [3imed-jaberi](https://github.com/3imed-ja"
+        },
+        {
+          "chunk_id": "chk_8a148165_0",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "<a href=\"https://expressjs.com/\">\n  <picture>\n    <source media=\"(prefers-color-scheme: dark)\" srcset=\"https://expressjs.com/images/logos/logo-express-white.svg\">\n    <img alt=\"Express Logo\" src=\"http"
+        },
+        {
+          "chunk_id": "chk_8a148165_3",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "ssjs/express.git --depth 1 && cd express\n```\n\n  Then install the dependencies:\n\n```bash\nnpm install\n```\n\n  Then run whichever example you want:\n\n```bash\nnode examples/content-negotiation\n```\n\n## Contr"
+        },
+        {
+          "chunk_id": "chk_8a148165_6",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "s://github.com/ghinks) - **Glenn**\n  * [ghousemohamed](https://github.com/ghousemohamed) - **Ghouse Mohamed**\n  * [gireeshpunathil](https://github.com/gireeshpunathil) - **Gireesh Punathil**\n  * [jake"
+        }
+      ],
+      "confidence": "LOW",
+      "synthesized_by": "documentation",
+      "synthesized_at": "2026-07-07T11:19:11.839Z"
+    },
+    {
+      "schema_version": "1.0.0",
+      "id": "cit_327ab3ef827f",
+      "claim_text": "\"400 Bad Request if 'title' is missing or not a string.\"",
+      "claim_location": {
+        "artifact_path": "artifacts/projects/phase51_w3_gate10/orchestration/w3-956cad0f/documentation.json",
+        "line_range": [
+          26,
+          26
+        ]
+      },
+      "supporting_chunks": [
+        {
+          "chunk_id": "chk_8a148165_0",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "<a href=\"https://expressjs.com/\">\n  <picture>\n    <source media=\"(prefers-color-scheme: dark)\" srcset=\"https://expressjs.com/images/logos/logo-express-white.svg\">\n    <img alt=\"Express Logo\" src=\"http"
+        },
+        {
+          "chunk_id": "chk_8a148165_1",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "s()\n\napp.get('/', (req, res) => {\n  res.send('Hello World')\n})\n\napp.listen(3000, () => {\n  console.log('Server is running on http://localhost:3000')\n})\n```\n\n## Installation\n\nThis is a [Node.js](https:"
+        },
+        {
+          "chunk_id": "chk_8a148165_7",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "altin) - **Mert Can Altin**\n  * [dpopp07](https://github.com/dpopp07) - **Dustin Popp**\n  * [Sushmeet](https://github.com/Sushmeet) - **Sushmeet Sunger**\n  * [3imed-jaberi](https://github.com/3imed-ja"
+        },
+        {
+          "chunk_id": "chk_8a148165_3",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "ssjs/express.git --depth 1 && cd express\n```\n\n  Then install the dependencies:\n\n```bash\nnpm install\n```\n\n  Then run whichever example you want:\n\n```bash\nnode examples/content-negotiation\n```\n\n## Contr"
+        },
+        {
+          "chunk_id": "chk_8a148165_6",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "s://github.com/ghinks) - **Glenn**\n  * [ghousemohamed](https://github.com/ghousemohamed) - **Ghouse Mohamed**\n  * [gireeshpunathil](https://github.com/gireeshpunathil) - **Gireesh Punathil**\n  * [jake"
+        }
+      ],
+      "confidence": "LOW",
+      "synthesized_by": "documentation",
+      "synthesized_at": "2026-07-07T11:19:12.218Z"
+    },
+    {
+      "schema_version": "1.0.0",
+      "id": "cit_327ab3ef827f",
+      "claim_text": "\"400 Bad Request if 'title' is missing or not a string.\"",
+      "claim_location": {
+        "artifact_path": "artifacts/projects/phase51_w3_gate10/orchestration/w3-956cad0f/documentation.json",
+        "line_range": [
+          37,
+          37
+        ]
+      },
+      "supporting_chunks": [
+        {
+          "chunk_id": "chk_8a148165_0",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "<a href=\"https://expressjs.com/\">\n  <picture>\n    <source media=\"(prefers-color-scheme: dark)\" srcset=\"https://expressjs.com/images/logos/logo-express-white.svg\">\n    <img alt=\"Express Logo\" src=\"http"
+        },
+        {
+          "chunk_id": "chk_8a148165_1",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "s()\n\napp.get('/', (req, res) => {\n  res.send('Hello World')\n})\n\napp.listen(3000, () => {\n  console.log('Server is running on http://localhost:3000')\n})\n```\n\n## Installation\n\nThis is a [Node.js](https:"
+        },
+        {
+          "chunk_id": "chk_8a148165_7",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "altin) - **Mert Can Altin**\n  * [dpopp07](https://github.com/dpopp07) - **Dustin Popp**\n  * [Sushmeet](https://github.com/Sushmeet) - **Sushmeet Sunger**\n  * [3imed-jaberi](https://github.com/3imed-ja"
+        },
+        {
+          "chunk_id": "chk_8a148165_3",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "ssjs/express.git --depth 1 && cd express\n```\n\n  Then install the dependencies:\n\n```bash\nnpm install\n```\n\n  Then run whichever example you want:\n\n```bash\nnode examples/content-negotiation\n```\n\n## Contr"
+        },
+        {
+          "chunk_id": "chk_8a148165_6",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "s://github.com/ghinks) - **Glenn**\n  * [ghousemohamed](https://github.com/ghousemohamed) - **Ghouse Mohamed**\n  * [gireeshpunathil](https://github.com/gireeshpunathil) - **Gireesh Punathil**\n  * [jake"
+        }
+      ],
+      "confidence": "LOW",
+      "synthesized_by": "documentation",
+      "synthesized_at": "2026-07-07T11:19:13.032Z"
+    },
+    {
+      "schema_version": "1.0.0",
+      "id": "cit_0e354eb84310",
+      "claim_text": "\"health_check\": \"Verify the server is running by sending a GET request to the root endpoint and checking for a 200 OK response.\",",
+      "claim_location": {
+        "artifact_path": "artifacts/projects/phase51_w3_gate10/orchestration/w3-956cad0f/documentation.json",
+        "line_range": [
+          54,
+          54
+        ]
+      },
+      "supporting_chunks": [
+        {
+          "chunk_id": "chk_8a148165_1",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "s()\n\napp.get('/', (req, res) => {\n  res.send('Hello World')\n})\n\napp.listen(3000, () => {\n  console.log('Server is running on http://localhost:3000')\n})\n```\n\n## Installation\n\nThis is a [Node.js](https:"
+        },
+        {
+          "chunk_id": "chk_8a148165_0",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "<a href=\"https://expressjs.com/\">\n  <picture>\n    <source media=\"(prefers-color-scheme: dark)\" srcset=\"https://expressjs.com/images/logos/logo-express-white.svg\">\n    <img alt=\"Express Logo\" src=\"http"
+        },
+        {
+          "chunk_id": "chk_8a148165_3",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "ssjs/express.git --depth 1 && cd express\n```\n\n  Then install the dependencies:\n\n```bash\nnpm install\n```\n\n  Then run whichever example you want:\n\n```bash\nnode examples/content-negotiation\n```\n\n## Contr"
+        },
+        {
+          "chunk_id": "chk_8a148165_2",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "dleware & Modules\n  * [Github Discussions](https://github.com/expressjs/discussions) for discussion on the development and usage of Express\n\n**PROTIP** Be sure to read the [migration guide to v5](http"
+        },
+        {
+          "chunk_id": "chk_8a148165_7",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "altin) - **Mert Can Altin**\n  * [dpopp07](https://github.com/dpopp07) - **Dustin Popp**\n  * [Sushmeet](https://github.com/Sushmeet) - **Sushmeet Sunger**\n  * [3imed-jaberi](https://github.com/3imed-ja"
+        }
+      ],
+      "confidence": "LOW",
+      "synthesized_by": "documentation",
+      "synthesized_at": "2026-07-07T11:19:13.306Z"
+    },
+    {
+      "schema_version": "1.0.0",
+      "id": "cit_f7dd29ac8cf2",
+      "claim_text": "\"logging\": \"HTTP requests and errors are logged to console at info level. Database errors are logged as error level.\",",
+      "claim_location": {
+        "artifact_path": "artifacts/projects/phase51_w3_gate10/orchestration/w3-956cad0f/documentation.json",
+        "line_range": [
+          55,
+          55
+        ]
+      },
+      "supporting_chunks": [
+        {
+          "chunk_id": "chk_8a148165_1",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "s()\n\napp.get('/', (req, res) => {\n  res.send('Hello World')\n})\n\napp.listen(3000, () => {\n  console.log('Server is running on http://localhost:3000')\n})\n```\n\n## Installation\n\nThis is a [Node.js](https:"
+        },
+        {
+          "chunk_id": "chk_8a148165_2",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "dleware & Modules\n  * [Github Discussions](https://github.com/expressjs/discussions) for discussion on the development and usage of Express\n\n**PROTIP** Be sure to read the [migration guide to v5](http"
+        },
+        {
+          "chunk_id": "chk_8a148165_0",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "<a href=\"https://expressjs.com/\">\n  <picture>\n    <source media=\"(prefers-color-scheme: dark)\" srcset=\"https://expressjs.com/images/logos/logo-express-white.svg\">\n    <img alt=\"Express Logo\" src=\"http"
+        },
+        {
+          "chunk_id": "chk_8a148165_3",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "ssjs/express.git --depth 1 && cd express\n```\n\n  Then install the dependencies:\n\n```bash\nnpm install\n```\n\n  Then run whichever example you want:\n\n```bash\nnode examples/content-negotiation\n```\n\n## Contr"
+        },
+        {
+          "chunk_id": "chk_8a148165_6",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "s://github.com/ghinks) - **Glenn**\n  * [ghousemohamed](https://github.com/ghousemohamed) - **Ghouse Mohamed**\n  * [gireeshpunathil](https://github.com/gireeshpunathil) - **Gireesh Punathil**\n  * [jake"
+        }
+      ],
+      "confidence": "LOW",
+      "synthesized_by": "documentation",
+      "synthesized_at": "2026-07-07T11:19:13.597Z"
+    },
+    {
+      "schema_version": "1.0.0",
+      "id": "cit_2faefdaa63d4",
+      "claim_text": "\"fix\": \"Ensure the request is sent with 'Content-Type: application/json'.\"",
+      "claim_location": {
+        "artifact_path": "artifacts/projects/phase51_w3_gate10/orchestration/w3-956cad0f/documentation.json",
+        "line_range": [
+          65,
+          65
+        ]
+      },
+      "supporting_chunks": [
+        {
+          "chunk_id": "chk_8a148165_3",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "ssjs/express.git --depth 1 && cd express\n```\n\n  Then install the dependencies:\n\n```bash\nnpm install\n```\n\n  Then run whichever example you want:\n\n```bash\nnode examples/content-negotiation\n```\n\n## Contr"
+        },
+        {
+          "chunk_id": "chk_8a148165_1",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "s()\n\napp.get('/', (req, res) => {\n  res.send('Hello World')\n})\n\napp.listen(3000, () => {\n  console.log('Server is running on http://localhost:3000')\n})\n```\n\n## Installation\n\nThis is a [Node.js](https:"
+        },
+        {
+          "chunk_id": "chk_8a148165_0",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "<a href=\"https://expressjs.com/\">\n  <picture>\n    <source media=\"(prefers-color-scheme: dark)\" srcset=\"https://expressjs.com/images/logos/logo-express-white.svg\">\n    <img alt=\"Express Logo\" src=\"http"
+        },
+        {
+          "chunk_id": "chk_8a148165_2",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "dleware & Modules\n  * [Github Discussions](https://github.com/expressjs/discussions) for discussion on the development and usage of Express\n\n**PROTIP** Be sure to read the [migration guide to v5](http"
+        },
+        {
+          "chunk_id": "chk_8a148165_7",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "altin) - **Mert Can Altin**\n  * [dpopp07](https://github.com/dpopp07) - **Dustin Popp**\n  * [Sushmeet](https://github.com/Sushmeet) - **Sushmeet Sunger**\n  * [3imed-jaberi](https://github.com/3imed-ja"
+        }
+      ],
+      "confidence": "LOW",
+      "synthesized_by": "documentation",
+      "synthesized_at": "2026-07-07T11:19:13.913Z"
+    },
+    {
+      "schema_version": "1.0.0",
+      "id": "cit_6fff0928645f",
+      "claim_text": "\"Real-time sync of tasks is out of scope.\"",
+      "claim_location": {
+        "artifact_path": "artifacts/projects/phase51_w3_gate10/orchestration/w3-956cad0f/documentation.json",
+        "line_range": [
+          70,
+          70
+        ]
+      },
+      "supporting_chunks": [
+        {
+          "chunk_id": "chk_8a148165_4",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "### TC (Technical Committee)\n\n* [UlisesGascon](https://github.com/UlisesGascon) - **Ulises Gascón** (he/him)\n* [jonchurch](https://github.com/jonchurch) - **Jon Church**\n* [wesleytodd](https://github."
+        },
+        {
+          "chunk_id": "chk_8a148165_5",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "Ulises Gascón** (he/him)\n* [IamLizu](https://github.com/IamLizu) - **S M Mahmudul Hasan** (he/him)\n* [Phillip9587](https://github.com/Phillip9587) - **Phillip Barta**\n* [efekrskl](https://github.com/e"
+        },
+        {
+          "chunk_id": "chk_8a148165_6",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "s://github.com/ghinks) - **Glenn**\n  * [ghousemohamed](https://github.com/ghousemohamed) - **Ghouse Mohamed**\n  * [gireeshpunathil](https://github.com/gireeshpunathil) - **Gireesh Punathil**\n  * [jake"
+        },
+        {
+          "chunk_id": "chk_8a148165_7",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "altin) - **Mert Can Altin**\n  * [dpopp07](https://github.com/dpopp07) - **Dustin Popp**\n  * [Sushmeet](https://github.com/Sushmeet) - **Sushmeet Sunger**\n  * [3imed-jaberi](https://github.com/3imed-ja"
+        },
+        {
+          "chunk_id": "chk_8a148165_3",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "ssjs/express.git --depth 1 && cd express\n```\n\n  Then install the dependencies:\n\n```bash\nnpm install\n```\n\n  Then run whichever example you want:\n\n```bash\nnode examples/content-negotiation\n```\n\n## Contr"
+        }
+      ],
+      "confidence": "LOW",
+      "synthesized_by": "documentation",
+      "synthesized_at": "2026-07-07T11:19:14.844Z"
+    },
+    {
+      "schema_version": "1.0.0",
+      "id": "cit_f083e62fe80e",
+      "claim_text": "\"summary\": \"This documentation provides detailed information for the Task Management REST API, including its purpose, components, API endpoints, and operational guidelines. It is intended for developers and system operators responsible for integrating and maintaining this system. Known limitations are addressed.\"",
+      "claim_location": {
+        "artifact_path": "artifacts/projects/phase51_w3_gate10/orchestration/w3-956cad0f/documentation.json",
+        "line_range": [
+          72,
+          72
+        ]
+      },
+      "supporting_chunks": [
+        {
+          "chunk_id": "chk_8a148165_0",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "<a href=\"https://expressjs.com/\">\n  <picture>\n    <source media=\"(prefers-color-scheme: dark)\" srcset=\"https://expressjs.com/images/logos/logo-express-white.svg\">\n    <img alt=\"Express Logo\" src=\"http"
+        },
+        {
+          "chunk_id": "chk_8a148165_3",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "ssjs/express.git --depth 1 && cd express\n```\n\n  Then install the dependencies:\n\n```bash\nnpm install\n```\n\n  Then run whichever example you want:\n\n```bash\nnode examples/content-negotiation\n```\n\n## Contr"
+        },
+        {
+          "chunk_id": "chk_8a148165_2",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "dleware & Modules\n  * [Github Discussions](https://github.com/expressjs/discussions) for discussion on the development and usage of Express\n\n**PROTIP** Be sure to read the [migration guide to v5](http"
+        },
+        {
+          "chunk_id": "chk_8a148165_7",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "altin) - **Mert Can Altin**\n  * [dpopp07](https://github.com/dpopp07) - **Dustin Popp**\n  * [Sushmeet](https://github.com/Sushmeet) - **Sushmeet Sunger**\n  * [3imed-jaberi](https://github.com/3imed-ja"
+        },
+        {
+          "chunk_id": "chk_8a148165_1",
+          "source_id": "src_8a148165135d",
+          "relevance_score": 0,
+          "excerpt": "s()\n\napp.get('/', (req, res) => {\n  res.send('Hello World')\n})\n\napp.listen(3000, () => {\n  console.log('Server is running on http://localhost:3000')\n})\n```\n\n## Installation\n\nThis is a [Node.js](https:"
+        }
+      ],
+      "confidence": "LOW",
+      "synthesized_by": "documentation",
+      "synthesized_at": "2026-07-07T11:19:15.498Z"
+    }
+  ],
+  "citations_jsonl_count": 8,
+  "assertions": {
+    "audit_pass": true,
+    "advanced_true": true,
+    "advanced_to_qj": true,
+    "graph_qj": true,
+    "citation_pass_cited": true,
+    "citations_written": true
+  },
+  "spend": {
+    "before": {
+      "agent_usd": 0,
+      "kb_usd": 0,
+      "total_usd": 0,
+      "agent_rows": 1,
+      "kb_rows": 0
+    },
+    "after": {
+      "agent_usd": 0.01563,
+      "kb_usd": 0.00007413999999999996,
+      "total_usd": 0.015704140000000002,
+      "agent_rows": 2,
+      "kb_rows": 9
+    },
+    "delta_usd": 0.0157,
+    "cap_usd": 0.15,
+    "kill_bar_usd": 3
+  },
+  "documentation_on_disk": "artifacts\\projects\\phase51_w3_gate10\\orchestration\\w3-956cad0f\\documentation.json",
+  "latency_ms": {
+    "http_round_trip": 13958
+  },
+  "timestamp": "2026-07-07T11:19:15.793Z"
+}

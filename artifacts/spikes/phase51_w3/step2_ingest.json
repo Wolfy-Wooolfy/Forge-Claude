@@ -1,0 +1,31 @@
+{
+  "ingest": {
+    "status": "OK",
+    "src_id": "src_8a148165135d",
+    "chunks_created": 8,
+    "deduped": false
+  },
+  "resolved_source": {
+    "schema_version": "1.0.0",
+    "id": "src_8a148165135d",
+    "url": "https://raw.githubusercontent.com/expressjs/express/master/Readme.md",
+    "title": "<a href=\"https://expressjs.com/\">",
+    "fetched_at": "2026-07-07T11:18:53.562Z",
+    "content_type": "text/plain",
+    "raw_byte_size": 10371,
+    "extracted_text_size": 10368,
+    "language": "en",
+    "credibility": {
+      "score": 0.55,
+      "tier": "REPUTABLE",
+      "signals": [
+        "https"
+      ],
+      "scored_by": "heuristic_v1",
+      "scored_at": "2026-07-07T11:18:53.567Z"
+    },
+    "scope": "project",
+    "project_id": "phase51_w3_gate10",
+    "ingestion_decision": null
+  }
+}
