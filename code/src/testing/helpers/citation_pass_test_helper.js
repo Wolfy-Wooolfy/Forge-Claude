@@ -350,10 +350,83 @@ async function runSCDetectorCoverage() {
   }
 }
 
+// ── S359 — cosine relevance regression (PHASE-51 A-2; the test that CATCHES the bug) ──
+// Non-identical query vs chunk (cosine 1/sqrt2 = 0.7071) through REAL LanceDB _toResult.
+// Under the OLD squared-L2 formula this surfaced 0.414 (and 0.000 for any cos<0.5); under
+// the cosine-metric fix it surfaces ~0.7071 → confidence MEDIUM. S356 uses IDENTICAL
+// vectors (distance 0) so it can never exercise this range — which is exactly why the bug
+// slipped through. The query embeds to [1,0,..] via the mock; the chunk is seeded with
+// normalize([1,1,0,..]) directly into LanceDB.
+
+async function runS359CosineRelevance() {
+  const PID = "s359_cosine_relevance";
+  _cleanup(PID);
+  _ensureProjectDir(PID);
+  const storage = _lanceStore();
+  const reg     = getDefaultRegistry();
+
+  try {
+    const srcId = "src_8a148165135d";
+    manifests.appendSource({
+      schema_version: "1.0.0", id: srcId, url: "https://example.com/fixture-s359",
+      title: "S-359 Fixture", fetched_at: "2026-07-07T00:00:00.000Z",
+      content_type: "text/html", raw_byte_size: 512, extracted_text_size: 80, language: "en",
+      credibility: { score: 0.72, tier: "REPUTABLE", signals: ["https"],
+        scored_by: "heuristic_v1", scored_at: "2026-07-07T00:00:00.000Z" },
+      scope: "project", project_id: PID, ingestion_decision: null
+    }, PID, "project", { root: ROOT });
+
+    // chunk vector = normalize([1,1,0,...]) → cosine vs query [1,0,...] = 1/sqrt2 = 0.7071
+    const cv = new Array(512).fill(0); cv[0] = 1; cv[1] = 1;
+    const nrm = Math.sqrt(2);
+    const chunkVec = cv.map(x => x / nrm);
+
+    const store = await storage.openStore(PID, "project", { root: ROOT });
+    await storage.insertChunks(store, [{
+      id: "chk_8a148165_0", source_id: srcId, ordinal: 0,
+      text: "The service persists tasks across restarts using durable storage.",
+      char_start: 0, char_end: 64, overlap_with_prev: 0,
+      embedding: chunkVec, embedding_model: "text-embedding-3-small@512",
+      section_heading: null, metadata: { chunk_strategy: "fixed_v1", page: null }
+    }]);
+
+    // retrieve with query vector [1,0,...] (mock embed) → cosine 0.7071 via real _toResult
+    const rEnv = await reg.invoke("kb.retrieve", {
+      query: "tasks persistence across restarts", project_id: PID, credibility_floor: "COMMUNITY"
+    }, { root: ROOT, _client: _mockEmbedClient() });
+    const results  = (rEnv && rEnv.output && rEnv.output.results) || [];
+    const top      = results[0] || {};
+    const observed = typeof top.relevance_score === "number" ? top.relevance_score : -1;
+
+    const retrieved          = results.length >= 1;
+    const relevance_in_range = observed >= 0.700 && observed <= 0.715;   // ≈ 0.7071
+    const relevance_not_zero = observed > 0.1;                            // guards old buggy 0.000
+
+    // cite → the corrected 0.7071 must flow to confidence MEDIUM (0.60 ≤ 0.7071 < 0.80)
+    const cEnv = await reg.invoke("kb.cite", {
+      claim_text:     "The service persists tasks across restarts using durable storage.",
+      claim_location: { artifact_path: "artifacts/projects/" + PID + "/orchestration/l/documentation.json", line_range: [3, 3] },
+      chunks:         results,
+      synthesized_by: "documentation",
+      project_id:     PID
+    }, { root: ROOT });
+    const cite_ok = !!(cEnv && cEnv.status === "SUCCESS");
+    const recs = manifests.readCitations(PID, "project", { root: ROOT });
+    const rec  = recs[0] || null;
+    const confidence_medium = !!rec && rec.confidence === "MEDIUM";
+
+    return { retrieved, relevance_in_range, relevance_not_zero, cite_ok, confidence_medium };
+  } finally {
+    try { await storage.closeAll(); } catch (_) {}
+    _cleanup(PID);
+  }
+}
+
 module.exports = {
   runSDCitationRecordSchema,
   runSENonMutation,
   runSACitedPath,
   runSBUncitedFailClosed,
-  runSCDetectorCoverage
+  runSCDetectorCoverage,
+  runS359CosineRelevance
 };

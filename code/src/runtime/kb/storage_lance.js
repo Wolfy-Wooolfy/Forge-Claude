@@ -3,6 +3,12 @@
 // LanceDB vector store wrapper for Forge KB Layer (L-KB-3).
 // Track-A-clean: LanceDB owns its own disk I/O. No direct fs from our code.
 // @see docs/12_ai_os/22_KNOWLEDGE_BASE_CONTRACT.md §2 (Storage Layout)
+//
+// Distance metric (PHASE-51 A-2): searchVector queries LanceDB with an EXPLICIT cosine
+// distanceType, so row._distance is the COSINE DISTANCE (1 - cos_sim, ∈ [0,2]) and
+// relevance_score = 1 - _distance is the true cosine similarity. (LanceDB's no-metric
+// default is squared-L2, under which the prior `1 - _distance` clamped every cos<0.5 chunk
+// to 0.000 — see DECISION-2026-07-07-phase-51-kb-cite.md Amendment A-2.)
 
 const path = require("path");
 const ldb  = require("@lancedb/lancedb");
@@ -92,13 +98,19 @@ async function searchVector(store, queryEmbedding, k, filters) {
   if (!store.table) return [];
 
   const opts = filters || {};
-  let q = store.table.vectorSearch(queryEmbedding).limit(k || 5);
 
   // Apply credibility_floor filter via post-filter (LanceDB doesn't filter on
   // fields not indexed — we filter in JS after retrieval using a larger limit)
   const rawLimit = opts.credibility_floor ? k * 4 : k;
 
+  // PHASE-51 A-2 (cosine metric fix): query with EXPLICIT cosine distanceType. Without it
+  // LanceDB defaults to squared-L2 (_distance = 2(1-cos) for unit vectors), and the old
+  // _toResult (1 - _distance) collapsed every cos<0.5 chunk to relevance 0.000. With cosine
+  // distanceType, _distance = cosine distance = 1 - cos_sim, so relevance_score = 1 -
+  // _distance is the true cosine similarity — robust to non-unit vectors (cosine
+  // self-normalizes), so a future embedder swap cannot silently reintroduce the bug.
   const raw = await store.table.vectorSearch(queryEmbedding)
+    .distanceType("cosine")
     .limit(rawLimit)
     .toArray();
 
@@ -124,7 +136,8 @@ function _toResult(row) {
     embedding_model: row.embedding_model,
     section_heading: row.section_heading || null,
     chunk_strategy:  row.chunk_strategy,
-    relevance_score: row._distance != null ? Math.max(0, 1 - row._distance) : null
+    // cosine distance ∈ [0,2]; relevance = cosine similarity = 1 - _distance (clamped [0,1])
+    relevance_score: row._distance != null ? Math.max(0, Math.min(1, 1 - row._distance)) : null
   };
 }
 

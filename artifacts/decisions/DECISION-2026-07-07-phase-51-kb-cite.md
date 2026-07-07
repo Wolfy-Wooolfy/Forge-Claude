@@ -116,3 +116,34 @@ Gate #10 with a topically-strong source to prove real (non-zero) citations. This
 is KB-wide (all kb.retrieve consumers, incl. PHASE-50 research) → full-suite
 re-verify is mandatory. Investigation-first: fix approach ratified by CTO after
 the diagnosis (W-A2-1) before any storage_lance change. CTO-ratified 2026-07-07.
+
+### A-2 diagnosis outcome (W-A2-1) — triple-verified ($0)
+Three independent probes (CC + a 4-agent parallel workflow + an adversarial verify-probe)
+agree to the digit: LanceDB's no-metric default is **L2**, and `_distance` is the **SQUARED**
+L2 distance (orthogonal unit pair → 2.0, moderate cos0.7071 → 0.5858, low cos0.3162 →
+1.3675). Embeddings are unit-normalized (real text-embedding-3-small@512 norm 0.99978;
+`embedding_engine.js` does NOT normalize in code — the property comes from OpenAI). Under
+the old `max(0, 1 - _distance)`, any cosine < 0.5 → squared-L2 > 1 → clamped 0.000 (exactly
+Gate #10's all-8-zeros). **Blast radius = 0** in the active suite: the only retrieval-coupled
+scenario (S356) uses IDENTICAL vectors (distance 0 → relevance 1.0, invariant under any
+formula); all other relevance/confidence assertions use canned relevance → `_scoreToConfidence`,
+research `confidence_level` (from certainty distribution, not relevance), or presence checks;
+staging `SU*.js` are not in the suite. **PHASE-50 unaffected**: its "HIGH" was the research
+finding `confidence_level`, not citation `relevance_score` (its research path wrote zero
+CitationRecords). No STOP-trigger fired.
+
+### A-2 ratified fix (W-A2-2, Option B) — applied
+- `code/src/runtime/kb/storage_lance.js searchVector`: query with EXPLICIT
+  `.distanceType("cosine")` (LanceDB 0.21.3 supported — confirmed by a $0 probe). Removed a
+  DEAD `let q = vectorSearch(...).limit(k||5)` line (assigned, never used — the real search
+  is the `raw` assignment). `_toResult`: `relevance_score = Math.max(0, Math.min(1, 1 -
+  _distance))` (cosine distance ∈ [0,2] → cosine similarity). Module comment updated. Robust
+  to a future embedder swap (cosine self-normalizes; decoupled from the unit-norm assumption).
+- NEW regression scenario **S359** (`runS359CosineRelevance`): a non-identical query/chunk
+  pair (cosine 1/√2 = 0.7071) through REAL LanceDB `_toResult` → relevance ≈ 0.7071 (NOT the
+  old 0.000) → CitationRecord confidence MEDIUM. This exercises the formula's non-trivial
+  range that S356 (identical vectors) cannot — the test that would have caught the bug.
+- Track A CLEAN on storage_lance (metric+arithmetic only; no fetch/fs.*Sync/OpenAI/child_process).
+  §ARC unchanged (10). Full suite **352/0/5 (357)** on Windows; S356 still PASSES (invariance);
+  DRY Gate #10 still GATE_PASS at $0. A REAL Gate #10 re-run (to prove non-zero real citations)
+  awaits a SEPARATE owner spend approval. CTO-ratified 2026-07-07.

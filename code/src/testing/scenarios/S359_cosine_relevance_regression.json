@@ -1,0 +1,17 @@
+{
+  "id": "S359",
+  "name": "PHASE-51 A-2 S-359 — cosine relevance regression: a non-identical query/chunk pair (cosine 1/sqrt2 = 0.7071) through REAL LanceDB _toResult surfaces relevance ~0.7071 (NOT the old squared-L2 buggy 0.000) and the CitationRecord confidence is MEDIUM. Catches the bug S356 (identical vectors) cannot.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/citation_pass_test_helper",
+  "method": "runS359CosineRelevance",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "retrieved",          "expected": true },
+    { "type": "state_field_equals", "field": "relevance_in_range", "expected": true },
+    { "type": "state_field_equals", "field": "relevance_not_zero", "expected": true },
+    { "type": "state_field_equals", "field": "cite_ok",            "expected": true },
+    { "type": "state_field_equals", "field": "confidence_medium",  "expected": true }
+  ]
+}
