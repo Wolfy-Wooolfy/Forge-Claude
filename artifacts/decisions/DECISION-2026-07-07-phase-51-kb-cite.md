@@ -78,3 +78,27 @@ decision artifact + owner approval before any code.
 
 ## 9. Next
 On closure → PHASE-52-PENDING-DECISION.
+
+---
+## Amendment A-1 — 2026-07-07 — W-2 hermeticity seam (CTO-ratified)
+
+To make the retrieval-coupled scenarios S-A/S-B/S-C hermetic ($0) yet exercise the REAL
+LanceDB path, a mock embedding client is injected via `opts._client` threading through
+`runDocumentationCitationPass` → the `kb.retrieve` ctx. Per CTO guardrails:
+- G-1 (off the public body): `documentProject` IS HTTP-exposed
+  (POST /api/ai-os/project/document-project → `documentProject(await readBody(req))`), so the
+  seam does NOT ride the request body. It rides the ENGINE-CONSTRUCTION channel —
+  `createConversationEngine(options._client)` — captured as `_kbEmbedClient`. Production
+  builds the engine at boot (apiServer.js:82) WITHOUT `_client` → the seam is `undefined`;
+  it never appears in any public input schema.
+- G-2 (additive-optional): the pass gains an OPTIONAL trailing `_client`; when absent the
+  `kb.retrieve` ctx is exactly `{ root }` and behavior is byte-identical to the seam-absent
+  (mid-verified) path. Diff is purely additive (a trailing param + a conditional ctx const +
+  a factory capture line + the call-site arg).
+- Mechanism precedent: extends the SINGLE established mock-embed injection point
+  (`retrieval.js` `opts._client || getClient()`; PHASE-50 A-2/A-3 threading). Option 2
+  (a global `_setClientForTests`) was rejected — invocation-scoped `opts._client` has zero
+  cross-scenario leak. No §ARC change; live surface stays within conversationEngine.js.
+- Test fixture: fixed unit embedding vector (query ≡ chunk → LanceDB distance 0 →
+  relevance ≈ 1.0) + a seeded REPUTABLE SourceRecord + one chunk in real LanceDB.
+CTO-ratified 2026-07-07. Committed with W-2.

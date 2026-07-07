@@ -1,0 +1,19 @@
+{
+  "id": "S356",
+  "name": "PHASE-51 W-2 S-A — cited path (retrieval-coupled, real LanceDB + mock embeddings): a doc claim WITH a supporting REPUTABLE KB chunk → CitationRecord emitted (synthesized_by=documentation) → §8 audit PASS → documentProject advances to QUALITY_JUDGE",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/citation_pass_test_helper",
+  "method": "runSACitedPath",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "audit_pass",                "expected": true },
+    { "type": "state_field_equals", "field": "advanced_true",             "expected": true },
+    { "type": "state_field_equals", "field": "advanced_to_qj",            "expected": true },
+    { "type": "state_field_equals", "field": "citation_pass_cited",       "expected": true },
+    { "type": "state_field_equals", "field": "citations_written",         "expected": true },
+    { "type": "state_field_equals", "field": "record_role_documentation", "expected": true },
+    { "type": "state_field_equals", "field": "state_quality_judge",       "expected": true }
+  ]
+}

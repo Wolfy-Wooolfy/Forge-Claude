@@ -31,8 +31,30 @@ const PROJECTS_ROOT = path.resolve(ROOT, "artifacts", "projects");
 
 const { citId }              = require("../../runtime/kb/_id_minting");
 const manifests              = require("../../runtime/kb/manifests");
+const storage                = require("../../runtime/kb/storage_lance");
 const { getDefaultRegistry } = require("../../runtime/tools/_registry");
-const { runDocumentationCitationPass } = require("../../ai_os/conversationEngine");
+const { runDocumentationCitationPass, createConversationEngine } =
+  require("../../ai_os/conversationEngine");
+// Reuse the DOCUMENTATION loop seed + state read from the PHASE-32 helper (test infra).
+const {
+  _seedLoopAtDocumentation,
+  _currentState,
+  _ensureProjectDir,
+  _writeState
+} = require("./document_project_test_helper");
+
+// Fixed unit embedding vector: every input embeds identically → query ≡ chunk →
+// LanceDB distance 0 → relevance ≈ 1.0. Deterministic, zero network, zero cost.
+function _fixedVector() {
+  const v = new Array(512).fill(0);
+  v[0] = 1;
+  return v;
+}
+function _mockEmbedClient() {
+  return { embeddings: { create: async () => ({
+    data: [{ embedding: _fixedVector() }], usage: { total_tokens: 5 }
+  }) } };
+}
 
 function _cleanup(projectId) {
   try {
@@ -173,7 +195,158 @@ async function runSENonMutation() {
   }
 }
 
+// ── S-A — cited path (retrieval-coupled; real LanceDB, mock embeddings) ────────
+// A REPUTABLE source + one chunk seeded into real LanceDB; the fixed-vector mock makes
+// every claim retrieve that chunk → all cited → §8 PASS → advance to QUALITY_JUDGE.
+
+async function runSACitedPath() {
+  const PID     = "sa_cited_path";
+  const LOOP_ID = "loop_sa";
+  _cleanup(PID);
+  const projectDir = _ensureProjectDir(PID);
+  let store = null;
+  try {
+    _writeState(projectDir, {
+      project_id: PID, project_name: "S-A Test",
+      active_runtime_state: "IDEATION", conversation_mode: "PIPELINE",
+      loop_id: LOOP_ID, last_updated_at: new Date().toISOString()
+    });
+    await _seedLoopAtDocumentation(PID, LOOP_ID, {});
+
+    // Seed a REPUTABLE source + one chunk (identical fixed vector) into real LanceDB.
+    const srcId = "src_8a148165135d";
+    manifests.appendSource({
+      schema_version: "1.0.0", id: srcId, url: "https://example.com/fixture",
+      title: "S-A Fixture Source", fetched_at: "2026-07-07T00:00:00.000Z",
+      content_type: "text/html", raw_byte_size: 512, extracted_text_size: 80, language: "en",
+      credibility: { score: 0.72, tier: "REPUTABLE", signals: ["https"],
+        scored_by: "heuristic_v1", scored_at: "2026-07-07T00:00:00.000Z" },
+      scope: "project", project_id: PID, ingestion_decision: null
+    }, PID, "project", { root: ROOT });
+
+    store = await storage.openStore(PID, "project", { root: ROOT });
+    await storage.insertChunks(store, [{
+      id: "chk_8a148165_0", source_id: srcId, ordinal: 0,
+      text: "The service persists tasks across restarts using durable storage.",
+      char_start: 0, char_end: 64, overlap_with_prev: 0,
+      embedding: _fixedVector(), embedding_model: "text-embedding-3-small@512",
+      section_heading: null, metadata: { chunk_strategy: "fixed_v1", page: null }
+    }]);
+
+    const engine = createConversationEngine({ root: ROOT, _client: _mockEmbedClient() });
+    const result = await engine.documentProject({
+      project_id: PID, loop_id: LOOP_ID,
+      doc_provider: "mock", doc_model: "mock-doc-s352", doc_scenario_id: "S352"
+    });
+
+    const records = manifests.readCitations(PID, "project", { root: ROOT });
+
+    const audit_pass          = !!(result.citation_audit && result.citation_audit.status === "PASS");
+    const advanced_true       = result.advanced === true;
+    const advanced_to_qj      = result.advanced_to === "QUALITY_JUDGE";
+    const citation_pass_cited = !!(result.citation_pass && result.citation_pass.cited >= 1);
+    const citations_written   = records.length >= 1;
+    const record_role_documentation = records.length >= 1 &&
+                                       records.every(r => r.synthesized_by === "documentation");
+    const state_quality_judge = (await _currentState(PID, LOOP_ID)) === "QUALITY_JUDGE";
+
+    return {
+      audit_pass, advanced_true, advanced_to_qj, citation_pass_cited,
+      citations_written, record_role_documentation, state_quality_judge
+    };
+  } finally {
+    try { await storage.closeAll(); } catch (_) {}
+    _cleanup(PID);
+  }
+}
+
+// ── S-B — uncited fail-closed (retrieval-coupled; empty LanceDB store) ─────────
+// No chunk ingested → mock embed succeeds, LanceDB search returns [] → no cite →
+// §8 FAIL_UNCITED → build HALTS. End-to-end complement to S-D leg 2.
+
+async function runSBUncitedFailClosed() {
+  const PID     = "sb_uncited_failclosed";
+  const LOOP_ID = "loop_sb";
+  _cleanup(PID);
+  const projectDir = _ensureProjectDir(PID);
+  try {
+    _writeState(projectDir, {
+      project_id: PID, project_name: "S-B Test",
+      active_runtime_state: "IDEATION", conversation_mode: "PIPELINE",
+      loop_id: LOOP_ID, last_updated_at: new Date().toISOString()
+    });
+    await _seedLoopAtDocumentation(PID, LOOP_ID, {});
+    // No source, no chunk → the active project KB is empty.
+
+    const engine = createConversationEngine({ root: ROOT, _client: _mockEmbedClient() });
+    const result = await engine.documentProject({
+      project_id: PID, loop_id: LOOP_ID,
+      doc_provider: "mock", doc_model: "mock-doc-s352", doc_scenario_id: "S352"
+    });
+
+    const audit_fail_uncited  = !!(result.citation_audit && result.citation_audit.status === "FAIL_UNCITED");
+    const advanced_false      = result.advanced !== true;
+    const doc_error_uncited   = result.doc_error === "UNCITED_CLAIMS";
+    const citation_pass_zero  = !!(result.citation_pass && result.citation_pass.cited === 0);
+    const claims_detected     = !!(result.citation_pass && result.citation_pass.claims_detected >= 1);
+    const no_citations_written = manifests.readCitations(PID, "project", { root: ROOT }).length === 0;
+    const state_documentation = (await _currentState(PID, LOOP_ID)) === "DOCUMENTATION";
+
+    return {
+      audit_fail_uncited, advanced_false, doc_error_uncited,
+      citation_pass_zero, claims_detected, no_citations_written, state_documentation
+    };
+  } finally {
+    try { await storage.closeAll(); } catch (_) {}
+    _cleanup(PID);
+  }
+}
+
+// ── S-C — detector-coverage invariant (pass attempts == audit flags) ──────────
+// The set of claims the pass enumerates == the set §7.1 flags for the §8 audit
+// (guaranteed by C-1; made explicit here). Empty store → all uncited → the equality
+// claims_detected === cited_claims_count + uncited_claims_count must hold.
+
+async function runSCDetectorCoverage() {
+  const PID     = "sc_detector_coverage";
+  const LOOP_ID = "loop_sc";
+  _cleanup(PID);
+  const projectDir = _ensureProjectDir(PID);
+  try {
+    _writeState(projectDir, {
+      project_id: PID, project_name: "S-C Test",
+      active_runtime_state: "IDEATION", conversation_mode: "PIPELINE",
+      loop_id: LOOP_ID, last_updated_at: new Date().toISOString()
+    });
+    await _seedLoopAtDocumentation(PID, LOOP_ID, {});
+
+    const engine = createConversationEngine({ root: ROOT, _client: _mockEmbedClient() });
+    const result = await engine.documentProject({
+      project_id: PID, loop_id: LOOP_ID,
+      doc_provider: "mock", doc_model: "mock-doc-s352", doc_scenario_id: "S352"
+    });
+
+    const cp = result.citation_pass || {};
+    const ca = result.citation_audit || {};
+    const passAttempted = typeof cp.claims_detected === "number" ? cp.claims_detected : -1;
+    const auditTotal =
+      (typeof ca.cited_claims_count === "number" ? ca.cited_claims_count : 0) +
+      (typeof ca.uncited_claims_count === "number" ? ca.uncited_claims_count : 0);
+
+    const both_present    = !!result.citation_pass && !!result.citation_audit;
+    const invariant_holds = passAttempted >= 1 && passAttempted === auditTotal;
+
+    return { both_present, invariant_holds };
+  } finally {
+    try { await storage.closeAll(); } catch (_) {}
+    _cleanup(PID);
+  }
+}
+
 module.exports = {
   runSDCitationRecordSchema,
-  runSENonMutation
+  runSENonMutation,
+  runSACitedPath,
+  runSBUncitedFailClosed,
+  runSCDetectorCoverage
 };

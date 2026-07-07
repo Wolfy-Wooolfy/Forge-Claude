@@ -1,0 +1,14 @@
+{
+  "id": "S358",
+  "name": "PHASE-51 W-2 S-C — detector-coverage invariant: the set of claims the pass attempts == the set §7.1 flags for the §8 audit (citation_pass.claims_detected === citation_audit.cited_claims_count + uncited_claims_count)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/citation_pass_test_helper",
+  "method": "runSCDetectorCoverage",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "both_present",    "expected": true },
+    { "type": "state_field_equals", "field": "invariant_holds", "expected": true }
+  ]
+}

@@ -550,5 +550,10 @@ module.exports = {
   runS304DocInputNotFound,
   runS305DocManifestAbsentGraceful,
   runS306DocManifestCorruptFailClosed,
-  runS352DocBlockedUncited
+  runS352DocBlockedUncited,
+  // Reusable seed helpers (test infra) — PHASE-51 S-A/S-B/S-C reuse the DOCUMENTATION seed.
+  _seedLoopAtDocumentation,
+  _currentState,
+  _ensureProjectDir,
+  _writeState
 };

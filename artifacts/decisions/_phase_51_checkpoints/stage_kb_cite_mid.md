@@ -123,3 +123,55 @@ persist documentation.json → **[PHASE-51 pass: read-back + `runDocumentationCi
 
 W-0 + W-1 complete and gate-proven (SU 348/0/5, Track A clean on added lines, §ARC=10, $0).
 Awaiting CTO independent verification on a FRESH LOCAL zip before W-2 GO.
+
+---
+
+# W-2 ADDENDUM — 2026-07-07 (after CTO mid-GO; retrieval-coupled scenarios + full suite)
+
+CTO mid-verification PASSED (fresh zip, sha256-authentic to `9cffb0c`); W-2 GO with Option-1
+seam ruling + guardrails G-1/G-2/G-3.
+
+## W-2.1 — Hermeticity seam (Amendment A-1, CTO-ratified)
+`opts._client` threading (mock embed client) through `runDocumentationCitationPass` →
+`kb.retrieve` ctx, injected at ENGINE CONSTRUCTION (`createConversationEngine(options._client)`),
+NOT the HTTP body (G-1: documentProject IS HTTP-exposed via POST /api/ai-os/project/document-project).
+Additive-optional (G-2): seam-absent ctx is exactly `{ root }`, byte-identical to the
+mid-verified path — proven by the diff. Amendment A-1 appended to the decision artifact (G-3).
+
+## W-2.2 — Scenarios S-A / S-B / S-C (S356 / S357 / S358), retrieval-coupled, real LanceDB
+- Fixture (hermetic, $0): fixed unit embedding vector (query ≡ chunk → LanceDB distance 0 →
+  relevance ≈ 1.0). S-A seeds a REPUTABLE SourceRecord + one chunk into REAL LanceDB
+  (`storage_lance.openStore`/`insertChunks`). Reuses the existing `mock-doc-s352` claim-bearing
+  doc (no new `mock_responses` entry) + the exported `_seedLoopAtDocumentation` seed.
+- **S-A (S356) cited path — the load-bearing full-path proof:** REPUTABLE chunk present →
+  every claim retrieves it → all cited → `citation_audit.status==="PASS"` → `advanced===true`,
+  `advanced_to==="QUALITY_JUDGE"`, ≥1 record in citations.jsonl (synthesized_by=documentation),
+  graph state QUALITY_JUDGE. This is the real retrieve → cite → §8 PASS → advance chain,
+  hermetic on Windows.
+- **S-B (S357) uncited fail-closed:** empty LanceDB store → retrieve `[]` → no cite →
+  `FAIL_UNCITED` → `advanced:false`, `doc_error:"UNCITED_CLAIMS"`, no citations written,
+  state stays DOCUMENTATION (end-to-end complement to S-D leg 2).
+- **S-C (S358) detector-coverage invariant:** `citation_pass.claims_detected ===
+  citation_audit.cited_claims_count + citation_audit.uncited_claims_count` (the set the pass
+  attempts == the set §8 flags; C-1 made explicit).
+- These three need LanceDB → GREEN on Windows, env-fail in the CTO sandbox (no lancedb) —
+  expected per the prompt.
+
+## W-2.3 — Gates
+- **Full SU suite (Windows): 351 pass / 0 fail / 5 skip (356 total)**, exit 0, duration 262423ms.
+  (348 → 351: S356 + S357 + S358.) Matches the closure-gate target exactly.
+- Regression: S352 still BLOCKS (no seam client → retrieve fast-fails → uncited → §8 FAIL);
+  S302/S305 still advance (claim-free). Full-suite reproduced GREEN.
+- Track A: the seam diff (`git diff 6042834 -- conversationEngine.js | grep '^+'`) has ZERO
+  forbidden additions; helper is test infra (0 new OpenAI/child_process/fetch).
+- §ARC = 10 unchanged. Cost = $0 (mock embeddings; no API key in harness env).
+
+## W-2 commits (LOCAL only)
+| Item | Commit | Content |
+|---|---|---|
+| W-2 | (this) | A-1 seam + S-A/S-B/S-C (S356/357/358) + `_seedLoopAtDocumentation` export + amendment + this addendum |
+
+## STOP → W-3 readiness (HARD STOP — no spend)
+W-3 Gate #10 requires a real build whose project KB is ingested with sources supporting its
+claims. NO real/paid call will be made until a SEPARATE explicit owner "أيوه" with the cost
+estimate shown first. Reporting Gate #10 readiness + estimate next.

@@ -48,7 +48,11 @@ const CONFIRMATION_REQUIRED_TRANSITIONS = new Set([
 // from whether kb.retrieve returned chunks — a claim whose only chunks are LOW-credibility
 // makes kb.cite skip, and the claim correctly stays uncited.
 // Track A: all retrieval/embedding via reg.invoke("kb.retrieve"/"kb.cite"); no direct fs.
-async function runDocumentationCitationPass(reg, projectId, artifactRelPath, content, root) {
+//
+// `_client` (PHASE-51 A-1, W-2 seam) is an OPTIONAL trailing test seam — a mock embedding
+// client for hermetic retrieval-coupled scenarios. When absent (production), the kb.retrieve
+// ctx is exactly { root } and the path is byte-identical to the seam-absent behavior.
+async function runDocumentationCitationPass(reg, projectId, artifactRelPath, content, root, _client) {
   const summary = {
     claims_detected: 0, cited: 0, uncited: 0,
     retrieve_failed: 0, zero_chunks: 0, cite_blocked: 0
@@ -61,6 +65,9 @@ async function runDocumentationCitationPass(reg, projectId, artifactRelPath, con
     claims = [];
   }
   summary.claims_detected = claims.length;
+
+  // Additive-optional: exactly { root } unless the test seam supplies a mock client.
+  const retrieveCtx = _client ? { root, _client } : { root };
 
   for (const claim of claims) {
     const line = claim.line;
@@ -79,7 +86,7 @@ async function runDocumentationCitationPass(reg, projectId, artifactRelPath, con
         query:             text,
         project_id:        projectId,
         credibility_floor: "COMMUNITY"
-      }, { root });
+      }, retrieveCtx);
     } catch (_) {
       retrieveEnv = null;
     }
@@ -118,6 +125,12 @@ function createConversationEngine(options = {}) {
   const root = path.resolve(options.root || process.cwd());
   const projectsRoot = path.resolve(root, "artifacts/projects");
   const ideationEngine = options.ideationEngine || null;
+  // PHASE-51 A-1 (W-2 hermeticity seam, CTO-ratified): optional mock embedding client,
+  // injected at ENGINE CONSTRUCTION (off the public HTTP body, per G-1) so the citation
+  // pass's kb.retrieve can run with deterministic embeddings + real LanceDB in tests.
+  // undefined in production (start-api.js / apiServer.js:82 never pass it) → kb.retrieve
+  // falls back to getClient() and behavior is byte-identical to the seam-absent path.
+  const _kbEmbedClient = options._client || undefined;
 
   let _memoryManager = options.conversationMemoryManager || null;
   function getMemoryManager() {
@@ -2422,7 +2435,7 @@ function createConversationEngine(options = {}) {
           if (docReadBack && docReadBack.status === "SUCCESS") {
             citationPass = await runDocumentationCitationPass(
               reg, pid, orchRelDir + "/documentation.json",
-              docReadBack.output.content, root);
+              docReadBack.output.content, root, _kbEmbedClient);
           }
         } catch {
           citationPass = null;
