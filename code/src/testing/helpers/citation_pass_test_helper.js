@@ -31,8 +31,12 @@ const PROJECTS_ROOT = path.resolve(ROOT, "artifacts", "projects");
 
 const { citId }              = require("../../runtime/kb/_id_minting");
 const manifests              = require("../../runtime/kb/manifests");
-const storage                = require("../../runtime/kb/storage_lance");
 const { getDefaultRegistry } = require("../../runtime/tools/_registry");
+
+// storage_lance pulls in @lancedb/lancedb at load — lazy-require it INSIDE the S-A/B/C
+// methods only, so S-D/S-E (which need no vector store) stay lancedb-independent and load
+// in a lancedb-less env (W-2.1).
+function _lanceStore() { return require("../../runtime/kb/storage_lance"); }
 const { runDocumentationCitationPass, createConversationEngine } =
   require("../../ai_os/conversationEngine");
 // Reuse the DOCUMENTATION loop seed + state read from the PHASE-32 helper (test infra).
@@ -204,6 +208,7 @@ async function runSACitedPath() {
   const LOOP_ID = "loop_sa";
   _cleanup(PID);
   const projectDir = _ensureProjectDir(PID);
+  const storage    = _lanceStore();
   let store = null;
   try {
     _writeState(projectDir, {
@@ -269,6 +274,7 @@ async function runSBUncitedFailClosed() {
   const LOOP_ID = "loop_sb";
   _cleanup(PID);
   const projectDir = _ensureProjectDir(PID);
+  const storage    = _lanceStore();
   try {
     _writeState(projectDir, {
       project_id: PID, project_name: "S-B Test",
@@ -312,6 +318,7 @@ async function runSCDetectorCoverage() {
   const LOOP_ID = "loop_sc";
   _cleanup(PID);
   const projectDir = _ensureProjectDir(PID);
+  const storage    = _lanceStore();
   try {
     _writeState(projectDir, {
       project_id: PID, project_name: "S-C Test",
