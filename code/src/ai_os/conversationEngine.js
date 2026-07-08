@@ -230,8 +230,13 @@ async function runDocumentationCitationPass(reg, projectId, artifactRelPath, con
     }
     if (citeEnv && citeEnv.status === "SUCCESS") { summary.cited++; continue; }
 
-    // (b) cite_blocked — chunks exist but support is LOW-only (the PHASE-51 L-2 limit). Try
-    //     discovery for a claim-targeted, non-LOW source.
+    // (b) cite_blocked — chunks exist but kb.cite skipped (all-LOW support). Try discovery.
+    // NOTE (PHASE-52, CTO erratum #3): under the current COMMUNITY retrieve floor, kb.retrieve
+    // filters LOW-credibility chunks before kb.cite, so kb.cite never receives an all-LOW set on
+    // this path — this branch is UNREACHABLE in production. Retained as a correct defense-in-depth
+    // branch: it fires only if the retrieve credibility_floor is lowered. The DEFERRED relevance
+    // floor (DECISION §5/§10) is a SEPARATE future branch, not this one. (Verified $0: a LOW-tier
+    // source → kb.retrieve returns 0 chunks → zero_chunks branch, not this one.)
     summary.cite_blocked++;
     if (await _attemptDiscovery(text, line)) { summary.cited++; summary.discovery_cited++; }
     else { summary.uncited++; }

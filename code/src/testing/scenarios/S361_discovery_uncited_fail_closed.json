@@ -1,0 +1,24 @@
+{
+  "id": "S361",
+  "name": "PHASE-52 D3 S361 — discovery yields nothing / LOW-only → claim stays UNCITED (fail-closed, no fabrication). Leg A: search returns empty → UNCITED → §8 FAIL_UNCITED → HALT. Leg B: ingest seeds a LOW source → real re-retrieve (COMMUNITY floor) filters it → re-cite never succeeds → UNCITED (no fabricated LOW cite). Leg C (RULING 2): retrieve_failed → discovery is NEVER attempted (search spy has 0 calls).",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/citation_pass_test_helper",
+  "method": "runS361DiscoveryUncited",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "a_searched",        "expected": true },
+    { "type": "state_field_equals", "field": "a_uncited",         "expected": true },
+    { "type": "state_field_equals", "field": "a_no_citations",    "expected": true },
+    { "type": "state_field_equals", "field": "a_state_doc",       "expected": true },
+    { "type": "state_field_equals", "field": "b_searched",        "expected": true },
+    { "type": "state_field_equals", "field": "b_ingested",        "expected": true },
+    { "type": "state_field_equals", "field": "b_not_cited",       "expected": true },
+    { "type": "state_field_equals", "field": "b_uncited",         "expected": true },
+    { "type": "state_field_equals", "field": "b_no_citations",    "expected": true },
+    { "type": "state_field_equals", "field": "c_retrieve_failed", "expected": true },
+    { "type": "state_field_equals", "field": "c_no_search",       "expected": true },
+    { "type": "state_field_equals", "field": "c_uncited",         "expected": true }
+  ]
+}

@@ -422,11 +422,287 @@ async function runS359CosineRelevance() {
   }
 }
 
+// ── PHASE-52 D3 — auto web-discovery scenarios (S360–S363) ─────────────────────
+//
+// These exercise the discovery loop wired into runDocumentationCitationPass via the
+// OPTIONAL `_discovery = { search, ingest }` seam (the A-1 `_client` analog). The mock
+// search returns canned result URLs (no network); the mock ingest SEEDS a chunk into the
+// SAME real LanceDB store the pass re-retrieves from (in-process cached store — a mid-pass
+// insert is visible to the next kb.retrieve). retrieve + cite stay REAL. $0 (no keys).
+//
+// Mechanics ruling (CTO erratum #3): kb.retrieve's COMMUNITY floor filters LOW-credibility
+// chunks BEFORE kb.cite, and kb.cite skips only on all-LOW — disjoint sets. So on the real
+// path discovery triggers only on zero_chunks, and a LOW ingested source manifests as
+// "re-retrieve returns empty" (not cite-rejection). S361 proves the no-fabrication guarantee
+// via that reachable mechanism.
+
+// Spy-able mock `_discovery` seam. opts:
+//   searchMode: "url" (default) | "empty" | "failed"
+//   url:        result URL (default a fixed example.com URL; same url across calls → dedup)
+//   ingestTier: "REPUTABLE" (default, lift) | "LOW" (filtered by retrieve → stays uncited)
+//   maxTotalSearches: optional per-run cap override (test-only)
+function _mockDiscovery(opts) {
+  const o     = opts || {};
+  const url   = o.url || "https://example.com/discovered-source";
+  const state = { searchQueries: [], ingestUrls: [] };
+
+  const disc = {
+    async search(input) {
+      state.searchQueries.push(input.query);
+      if (o.searchMode === "empty")  return { status: "SUCCESS", output: { results: [] } };
+      if (o.searchMode === "failed") return { status: "FAILED",  metadata: { reason: "BOTH_PROVIDERS_FAILED" } };
+      return { status: "SUCCESS", output: { results: [
+        { url, title: "Discovered Source", snippet: "supporting passage" }
+      ] } };
+    },
+    async ingest(input, ctx) {
+      state.ingestUrls.push(input.url);
+      const pid  = input.project_id;
+      const root = (ctx && ctx.root) || ROOT;
+      const tier = o.ingestTier || "REPUTABLE";
+      const n    = state.ingestUrls.length;
+      // §5 schema-valid IDs: src_[a-f0-9]{12}, chk_[a-f0-9]{8}_N.
+      const srcId = "src_" + n.toString(16).padStart(12, "0");
+      const chkId = "chk_" + n.toString(16).padStart(8, "0") + "_0";
+      manifests.appendSource({
+        schema_version: "1.0.0", id: srcId, url: input.url,
+        title: "Discovered " + n, fetched_at: "2026-07-08T00:00:00.000Z",
+        content_type: "text/html", raw_byte_size: 256, extracted_text_size: 64, language: "en",
+        credibility: { score: tier === "LOW" ? 0.2 : 0.72, tier, signals: ["https"],
+          scored_by: "heuristic_v1", scored_at: "2026-07-08T00:00:00.000Z" },
+        scope: "project", project_id: pid, ingestion_decision: null
+      }, pid, "project", { root });
+      const store = await _lanceStore().openStore(pid, "project", { root });
+      await _lanceStore().insertChunks(store, [{
+        id: chkId, source_id: srcId, ordinal: 0,
+        text: "Discovered supporting passage for the claim under documentation.",
+        char_start: 0, char_end: 60, overlap_with_prev: 0,
+        embedding: _fixedVector(), embedding_model: "text-embedding-3-small@512",
+        section_heading: null, metadata: { chunk_strategy: "fixed_v1", page: null }
+      }]);
+      return { status: "SUCCESS", output: { status: "OK", src_id: srcId, chunks_created: 1, deduped: false } };
+    }
+  };
+  if (Number.isInteger(o.maxTotalSearches)) disc.maxTotalSearches = o.maxTotalSearches;
+  return { disc, state };
+}
+
+// Drive documentProject at DOCUMENTATION over the claim-bearing mock-doc-s352 with an
+// injected _discovery seam, from an EMPTY LanceDB store. Returns { result, state }.
+async function _runDocumentProjectWithDiscovery(pid, loopId, disc, preSeedTier) {
+  const projectDir = _ensureProjectDir(pid);
+  _writeState(projectDir, {
+    project_id: pid, project_name: "S-disc",
+    active_runtime_state: "IDEATION", conversation_mode: "PIPELINE",
+    loop_id: loopId, last_updated_at: new Date().toISOString()
+  });
+  await _seedLoopAtDocumentation(pid, loopId, {});
+
+  if (preSeedTier) {
+    // Pre-seed a matching chunk so EVERY claim is citable from the base KB (no discovery).
+    // §5 schema-valid IDs: src_[a-f0-9]{12}, chk_[a-f0-9]{8}_N.
+    const srcId = "src_0000000000aa";
+    manifests.appendSource({
+      schema_version: "1.0.0", id: srcId, url: "https://example.com/preseed",
+      title: "Preseed", fetched_at: "2026-07-08T00:00:00.000Z",
+      content_type: "text/html", raw_byte_size: 256, extracted_text_size: 64, language: "en",
+      credibility: { score: 0.72, tier: preSeedTier, signals: ["https"],
+        scored_by: "heuristic_v1", scored_at: "2026-07-08T00:00:00.000Z" },
+      scope: "project", project_id: pid, ingestion_decision: null
+    }, pid, "project", { root: ROOT });
+    const store = await _lanceStore().openStore(pid, "project", { root: ROOT });
+    await _lanceStore().insertChunks(store, [{
+      id: "chk_000000aa_0", source_id: srcId, ordinal: 0,
+      text: "The service persists tasks across restarts using durable storage.",
+      char_start: 0, char_end: 64, overlap_with_prev: 0,
+      embedding: _fixedVector(), embedding_model: "text-embedding-3-small@512",
+      section_heading: null, metadata: { chunk_strategy: "fixed_v1", page: null }
+    }]);
+  }
+
+  const engine = createConversationEngine({ root: ROOT, _client: _mockEmbedClient(), _discovery: disc });
+  const result = await engine.documentProject({
+    project_id: pid, loop_id: loopId,
+    doc_provider: "mock", doc_model: "mock-doc-s352", doc_scenario_id: "S352"
+  });
+  return result;
+}
+
+// ── S360 — discovery lifts a zero-chunk claim to CITED (+ additive-only proof) ──
+async function runS360DiscoveryLift() {
+  const storage = _lanceStore();
+
+  // Sub-run 1 (additive-only): pre-seeded REPUTABLE chunk → all claims cited via the BASE
+  // path → discovery is NEVER attempted (search spy has 0 calls).
+  const PID1 = "s360_additive_no_search";
+  _cleanup(PID1);
+  let base_all_cited = false, base_no_search = false, base_advanced = false;
+  const d1 = _mockDiscovery({});
+  try {
+    const r = await _runDocumentProjectWithDiscovery(PID1, "loop_s360a", d1.disc, "REPUTABLE");
+    const cp = r.citation_pass || {};
+    base_advanced   = r.advanced === true;
+    base_all_cited  = cp.cited >= 1 && cp.zero_chunks === 0;
+    base_no_search  = cp.discovery_searches === 0 && d1.state.searchQueries.length === 0;
+  } finally { try { await storage.closeAll(); } catch (_) {} _cleanup(PID1); }
+
+  // Sub-run 2 (lift): empty store → every claim zero_chunks → discovery search + ingest a
+  // REPUTABLE source → re-retrieve → re-cite SUCCESS → CITED → §8 PASS → advance QUALITY_JUDGE.
+  const PID2 = "s360_discovery_lift";
+  _cleanup(PID2);
+  let lift_advanced = false, lift_to_qj = false, lift_searched = false,
+      lift_discovery_cited = false, lift_citations_written = false;
+  const d2 = _mockDiscovery({ ingestTier: "REPUTABLE" });
+  try {
+    const r = await _runDocumentProjectWithDiscovery(PID2, "loop_s360b", d2.disc, null);
+    const cp = r.citation_pass || {};
+    lift_advanced          = r.advanced === true;
+    lift_to_qj             = r.advanced_to === "QUALITY_JUDGE";
+    lift_searched          = cp.discovery_searches >= 1 && d2.state.searchQueries.length >= 1;
+    lift_discovery_cited   = cp.discovery_cited >= 1;
+    lift_citations_written = manifests.readCitations(PID2, "project", { root: ROOT }).length >= 1;
+  } finally { try { await storage.closeAll(); } catch (_) {} _cleanup(PID2); }
+
+  return {
+    base_advanced, base_all_cited, base_no_search,
+    lift_advanced, lift_to_qj, lift_searched, lift_discovery_cited, lift_citations_written
+  };
+}
+
+// ── S361 — discovery yields nothing / LOW-only → UNCITED (fail-closed, no fabrication) ──
+async function runS361DiscoveryUncited() {
+  const storage = _lanceStore();
+  const reg     = getDefaultRegistry();
+
+  // Leg A: empty store → zero_chunks → discovery search returns EMPTY → claim stays UNCITED →
+  // §8 FAIL_UNCITED → build HALTS.
+  const PIDA = "s361_search_empty";
+  _cleanup(PIDA);
+  let a_searched = false, a_uncited = false, a_no_citations = false, a_state_doc = false;
+  const dA = _mockDiscovery({ searchMode: "empty" });
+  try {
+    const r = await _runDocumentProjectWithDiscovery(PIDA, "loop_s361a", dA.disc, null);
+    const cp = r.citation_pass || {};
+    a_searched     = cp.discovery_searches >= 1 && dA.state.searchQueries.length >= 1;
+    a_uncited      = r.advanced !== true && r.doc_error === "UNCITED_CLAIMS" && cp.discovery_cited === 0;
+    a_no_citations = manifests.readCitations(PIDA, "project", { root: ROOT }).length === 0;
+    a_state_doc    = (await _currentState(PIDA, "loop_s361a")) === "DOCUMENTATION";
+  } finally { try { await storage.closeAll(); } catch (_) {} _cleanup(PIDA); }
+
+  // Leg B (no-fabrication, the CTO-refinement proof via the REACHABLE mechanism): search
+  // returns a URL → ingest seeds a LOW-credibility source → real re-retrieve (COMMUNITY floor)
+  // FILTERS it → reChunks empty → discovery returns false → claim STAYS UNCITED. Ingest ran,
+  // but no fabricated "cited".
+  const PIDB = "s361_low_ingest";
+  _cleanup(PIDB);
+  let b_searched = false, b_ingested = false, b_not_cited = false, b_uncited = false, b_no_citations = false;
+  const dB = _mockDiscovery({ ingestTier: "LOW" });
+  try {
+    const r = await _runDocumentProjectWithDiscovery(PIDB, "loop_s361b", dB.disc, null);
+    const cp = r.citation_pass || {};
+    b_searched     = cp.discovery_searches >= 1;
+    b_ingested     = cp.discovery_ingests >= 1 && dB.state.ingestUrls.length >= 1;
+    b_not_cited    = cp.discovery_cited === 0;
+    b_uncited      = r.advanced !== true && r.doc_error === "UNCITED_CLAIMS";
+    b_no_citations = manifests.readCitations(PIDB, "project", { root: ROOT }).length === 0;
+  } finally { try { await storage.closeAll(); } catch (_) {} _cleanup(PIDB); }
+
+  // Leg C (RULING 2 exclusion): retrieve_failed (hermetic, NO _client → kb.retrieve fast-fails)
+  // with a _discovery spy present → discovery is NEVER attempted (search spy has 0 calls).
+  // Sandbox-class (no LanceDB touched — retrieve fails at the embed step).
+  const PIDC = "s361_retrieve_failed_excl";
+  _cleanup(PIDC);
+  _ensureProjectDir(PIDC);
+  let c_retrieve_failed = false, c_no_search = false, c_uncited = false;
+  const dC = _mockDiscovery({});
+  try {
+    const content = [
+      "The service provides durable task persistence across restarts.",
+      "The API requires bearer authentication on every request."
+    ].join("\n");
+    const rel = "artifacts/projects/" + PIDC + "/orchestration/loop_s361c/documentation.json";
+    const summary = await runDocumentationCitationPass(reg, PIDC, rel, content, ROOT, undefined, dC.disc);
+    c_retrieve_failed = summary.retrieve_failed >= 1;
+    c_no_search       = summary.discovery_searches === 0 && dC.state.searchQueries.length === 0;
+    c_uncited         = summary.cited === 0 && summary.uncited === summary.claims_detected;
+  } finally { _cleanup(PIDC); }
+
+  return {
+    a_searched, a_uncited, a_no_citations, a_state_doc,
+    b_searched, b_ingested, b_not_cited, b_uncited, b_no_citations,
+    c_retrieve_failed, c_no_search, c_uncited
+  };
+}
+
+// ── S362 — per-run total-search cap enforced ──────────────────────────────────
+// Direct pass over a 4-claim doc, empty store (all zero_chunks), search returns EMPTY (no
+// ingest → all claims remain zero_chunks and reach discovery), maxTotalSearches = 2 →
+// exactly 2 searches fire; the 3rd/4th claims short-circuit before searching.
+async function runS362SearchCap() {
+  const storage = _lanceStore();
+  const reg     = getDefaultRegistry();
+  const PID     = "s362_search_cap";
+  _cleanup(PID);
+  _ensureProjectDir(PID);
+  const d = _mockDiscovery({ searchMode: "empty", maxTotalSearches: 2 });
+  try {
+    const content = [
+      "The service provides durable task persistence across restarts.",
+      "The API requires bearer authentication on every request.",
+      "The system must validate all request payloads before processing.",
+      "The gateway supports rate limiting per client key."
+    ].join("\n");
+    const rel = "artifacts/projects/" + PID + "/orchestration/loop_s362/documentation.json";
+    const summary = await runDocumentationCitationPass(
+      reg, PID, rel, content, ROOT, _mockEmbedClient(), d.disc);
+
+    const enough_claims   = summary.claims_detected >= 3;
+    const all_zero_chunks = summary.zero_chunks >= 3;
+    const cap_enforced    = summary.discovery_searches === 2 && d.state.searchQueries.length === 2;
+    const cap_not_exceeded = summary.discovery_searches <= 2;
+    const all_uncited     = summary.cited === 0;
+    return { enough_claims, all_zero_chunks, cap_enforced, cap_not_exceeded, all_uncited };
+  } finally { try { await storage.closeAll(); } catch (_) {} _cleanup(PID); }
+}
+
+// ── S363 — in-run URL dedup (never ingest the same URL twice per run) ──────────
+// Direct pass over a 2-claim doc, empty store, search returns the SAME url for both claims,
+// ingest seeds a LOW chunk (filtered by retrieve → both claims stay zero_chunks and BOTH reach
+// discovery). Claim-1 ingests; claim-2 hits the in-run dedup guard and does NOT ingest again.
+async function runS363UrlDedup() {
+  const storage = _lanceStore();
+  const reg     = getDefaultRegistry();
+  const PID     = "s363_url_dedup";
+  _cleanup(PID);
+  _ensureProjectDir(PID);
+  const d = _mockDiscovery({ url: "https://example.com/same-source", ingestTier: "LOW" });
+  try {
+    const content = [
+      "The service provides durable task persistence across restarts.",
+      "The API requires bearer authentication on every request."
+    ].join("\n");
+    const rel = "artifacts/projects/" + PID + "/orchestration/loop_s363/documentation.json";
+    const summary = await runDocumentationCitationPass(
+      reg, PID, rel, content, ROOT, _mockEmbedClient(), d.disc);
+
+    const two_claims        = summary.claims_detected === 2;
+    const both_searched     = summary.discovery_searches === 2 && d.state.searchQueries.length === 2;
+    const ingested_once     = d.state.ingestUrls.length === 1 && summary.discovery_ingests === 1;
+    const dedup_same_url    = d.state.ingestUrls.length >= 1 && d.state.ingestUrls[0] === "https://example.com/same-source";
+    const both_uncited      = summary.cited === 0;
+    return { two_claims, both_searched, ingested_once, dedup_same_url, both_uncited };
+  } finally { try { await storage.closeAll(); } catch (_) {} _cleanup(PID); }
+}
+
 module.exports = {
   runSDCitationRecordSchema,
   runSENonMutation,
   runSACitedPath,
   runSBUncitedFailClosed,
   runSCDetectorCoverage,
-  runS359CosineRelevance
+  runS359CosineRelevance,
+  runS360DiscoveryLift,
+  runS361DiscoveryUncited,
+  runS362SearchCap,
+  runS363UrlDedup
 };

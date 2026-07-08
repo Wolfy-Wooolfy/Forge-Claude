@@ -1,0 +1,17 @@
+{
+  "id": "S363",
+  "name": "PHASE-52 D3 S363 — in-run URL dedup: two would-be-uncited claims whose discovery search both resolve to the SAME url → kb.ingest_url is invoked ONCE (the second claim hits the in-run dedup guard), despite both claims triggering discovery. Complements kb.ingest_url's persistent hash dedup.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/citation_pass_test_helper",
+  "method": "runS363UrlDedup",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "two_claims",     "expected": true },
+    { "type": "state_field_equals", "field": "both_searched",  "expected": true },
+    { "type": "state_field_equals", "field": "ingested_once",  "expected": true },
+    { "type": "state_field_equals", "field": "dedup_same_url", "expected": true },
+    { "type": "state_field_equals", "field": "both_uncited",   "expected": true }
+  ]
+}

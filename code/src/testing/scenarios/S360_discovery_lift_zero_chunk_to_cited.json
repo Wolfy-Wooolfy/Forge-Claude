@@ -1,0 +1,20 @@
+{
+  "id": "S360",
+  "name": "PHASE-52 D3 S360 — auto web-discovery lifts a zero-chunk claim to CITED: empty KB → every claim zero_chunks → _discovery.search returns a URL → _discovery.ingest seeds a REPUTABLE chunk → re-retrieve → re-cite SUCCESS → §8 PASS → advance QUALITY_JUDGE. Additive-only proof: a doc whose claims are already citable from the base KB triggers NO discovery search.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/citation_pass_test_helper",
+  "method": "runS360DiscoveryLift",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "base_advanced",          "expected": true },
+    { "type": "state_field_equals", "field": "base_all_cited",         "expected": true },
+    { "type": "state_field_equals", "field": "base_no_search",         "expected": true },
+    { "type": "state_field_equals", "field": "lift_advanced",          "expected": true },
+    { "type": "state_field_equals", "field": "lift_to_qj",             "expected": true },
+    { "type": "state_field_equals", "field": "lift_searched",          "expected": true },
+    { "type": "state_field_equals", "field": "lift_discovery_cited",   "expected": true },
+    { "type": "state_field_equals", "field": "lift_citations_written", "expected": true }
+  ]
+}

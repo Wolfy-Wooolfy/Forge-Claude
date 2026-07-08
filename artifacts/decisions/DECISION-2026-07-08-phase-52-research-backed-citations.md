@@ -32,6 +32,15 @@ D4 — Real Gate #10 (gated): real Tavily search → real ingest → real cite; 
 - Discovery trigger: would-be-uncited for ANY reason (zero chunks OR LOW-only cite-skip). Rationale: LOW-only is exactly what produced PHASE-51's weak citations.
 - Relevance floor: DEFERRED. Ship discovery first; measure at Gate #10 whether it alone lifts citations above LOW; revisit a floor only if data shows it's needed.
 
+### §5 Correction — CTO erratum #3 (2026-07-08, recorded per bidirectional Trust+Verify; original bullets preserved above)
+The turn-1 scope, this §4/§5, and the Step 2 GO S361-Leg-B all framed the `cite_blocked` branch as "the PHASE-51-LOW-citation fix." That framing was WRONG — CC caught it with a $0 hermetic probe BEFORE building D3; the CTO independently re-verified it by reading the modules:
+- `kb.retrieve` runs with `credibility_floor:"COMMUNITY"` and filters LOW-credibility chunks (`TIER_RANK`, retrieval.js:160) BEFORE `kb.cite`; `kb.cite` skips only on an all-LOW set (citation_engine.js:52-58). The two sets are **disjoint** → any chunk that passes retrieve passes cite. So on the real path `cite_blocked` (and thus the `discovery_blocked_low` counter) is **UNREACHABLE**; discovery effectively triggers **only on `zero_chunks`**.
+- PHASE-51's weak citations were LOW-**confidence** but **SUCCESSFUL** cites (they were written; §8 PASSED; the build advanced) → they hit the `cited` branch → discovery does NOT touch them. Lifting them requires the **DEFERRED relevance floor** (§5/§10), not discovery.
+
+**Corrected value statement.** Discovery's REACHABLE value is the **L-1 auto-discovery fix**: a §7.1 claim with NO KB source (`zero_chunks`) → auto search + ingest → the build no longer halts for manual KB seeding. For the fresh-KB workflow (empty KB → every claim `zero_chunks`), discovery may ALSO improve citation **CONFIDENCE** by finding claim-**targeted** sources (higher relevance than PHASE-51's manually-ingested general sources) — **TO BE MEASURED at Gate #10** (this measurement is the data-driven input to whether the deferred floor is even needed). The `cite_blocked` branch is RETAINED as documented, forward-compatible defense-in-depth (unreachable under the COMMUNITY floor; fires only if the floor is lowered) — see the in-code NOTE at that branch. Option B (ship the floor now) REJECTED as a mid-phase scope expansion needing a fresh decision; Option C (lower the retrieve floor) REJECTED (changes retrieval behavior, adds no value).
+
+D3 consequence: **S361 proves the no-fabrication guarantee via the REACHABLE mechanism** — a LOW ingested source → real re-retrieve filters it → re-cite never succeeds → claim stays UNCITED (Leg B asserts the OUTCOME + `discovery_ingests≥1 ∧ discovery_cited===0`, not the unreachable `discovery_blocked_low`).
+
 ## 6. Track A / §ARC ruling
 All discovery/ingest/retrieve/cite calls via reg.invoke (already the case). §ARC FROZEN AT 10 — cost_ledger + manifests writes are already covered by §ARC-4; no new write path, no new exception. No new fetch()/fs.*Sync/child_process/new OpenAI() outside §ARC-bounded modules.
 

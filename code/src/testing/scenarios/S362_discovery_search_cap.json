@@ -1,0 +1,17 @@
+{
+  "id": "S362",
+  "name": "PHASE-52 D3 S362 — per-run total-search cap enforced: a 4-claim doc over an empty KB with maxTotalSearches=2 fires EXACTLY 2 discovery searches; the 3rd/4th would-be-uncited claims short-circuit before searching (cost ceiling for Gate #10).",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/citation_pass_test_helper",
+  "method": "runS362SearchCap",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "enough_claims",    "expected": true },
+    { "type": "state_field_equals", "field": "all_zero_chunks",  "expected": true },
+    { "type": "state_field_equals", "field": "cap_enforced",     "expected": true },
+    { "type": "state_field_equals", "field": "cap_not_exceeded", "expected": true },
+    { "type": "state_field_equals", "field": "all_uncited",      "expected": true }
+  ]
+}
