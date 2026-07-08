@@ -42,12 +42,19 @@ const crypto = require("crypto");
 }());
 
 const ROOT       = path.resolve(__dirname, "..", "..");
-const EVIDENCE   = path.join(ROOT, "artifacts", "spikes", "phase51_w3");
+// W-A2-3 (post-fix): distinct evidence dir — keep the committed pre-fix run intact.
+const EVIDENCE   = path.join(ROOT, "artifacts", "spikes", "phase51_w3_postfix");
 const PROJECT_ID = "phase51_w3_gate10";
 const LOOP_ID    = "w3-" + crypto.randomBytes(4).toString("hex");
 const PROVIDER   = "openai";
 const MODEL      = "gpt-4o";
-const SOURCE_URL = "https://raw.githubusercontent.com/expressjs/express/master/Readme.md";
+// W-A2-3 (post-fix): topically-STRONG source (HTTP methods, 400s, Content-Type, REST design)
+// that genuinely supports the task-API doc's claims — replaces the Express README so the
+// cosine fix can surface MEANINGFUL non-zero relevance. REPUTABLE + allow-listed.
+// NOTE: the CTO-named .../vNext/Guidelines.md is now a 1039-char DEPRECATION STUB ("moved
+// to ..."); the actual Microsoft REST API Guidelines content lives at azure/Guidelines.md
+// (108 KB). Using that (CTO-confirmation pending before the paid run).
+const SOURCE_URL = "https://raw.githubusercontent.com/microsoft/api-guidelines/vNext/azure/Guidelines.md";
 
 const SPEND_CAP  = 0.15;
 const KILL_BAR   = 3.00;
@@ -142,7 +149,7 @@ function restoreSession() {
 }
 function stopAndReport(code, detail, extra) {
   console.error("\n⛔  STOP-AND-REPORT:", code, "—", detail);
-  writeEvidence("gate10_owner.json", Object.assign({
+  writeEvidence("gate10_owner_postfix.json", Object.assign({
     verdict: "STOP_AND_REPORT", stop_code: code, detail, project_id: PROJECT_ID, loop_id: LOOP_ID
   }, extra || {}));
   restoreSession();
@@ -333,6 +340,25 @@ async function main() {
       typeof c.claim_location.artifact_path === "string" &&
       c.claim_location.artifact_path.indexOf(LOOP_ID) !== -1);
 
+    // W-A2-3: per-claim relevance distribution — the KEY post-fix proof (non-zero cosine
+    // relevance vs the pre-fix run's all-8-zeros). Copy citations.jsonl standalone too.
+    const relevanceDist = citedForThisDoc.map(c => ({
+      claim:         (c.claim_text || "").slice(0, 70),
+      max_relevance: (c.supporting_chunks && c.supporting_chunks.length)
+        ? Math.round(Math.max(...c.supporting_chunks.map(sc => sc.relevance_score || 0)) * 10000) / 10000 : null,
+      confidence:    c.confidence,
+      chunks:        (c.supporting_chunks || []).length
+    }));
+    const postFixRelevance = relevanceDist.map(x => x.max_relevance);
+    try {
+      const srcCit = path.join(PROJECTS_ROOT, PROJECT_ID, "kb", "exports", "citations.jsonl");
+      if (fs.existsSync(srcCit)) {
+        fs.mkdirSync(EVIDENCE, { recursive: true });
+        fs.copyFileSync(srcCit, path.join(EVIDENCE, "citations_postfix.jsonl"));
+        console.log("  [evidence] copied citations_postfix.jsonl");
+      }
+    } catch (_) {}
+
     const cp = r.citation_pass || {};
     const ca = r.citation_audit || {};
 
@@ -373,13 +399,16 @@ async function main() {
       claims_detected_N: N,
       citations_jsonl: citedForThisDoc,
       citations_jsonl_count: citedForThisDoc.length,
+      relevance_distribution: relevanceDist,
+      pre_fix_relevance:  "[0,0,0,0,0,0,0,0] — Express README, pre-fix squared-L2 bug (all clamped to 0.000)",
+      post_fix_relevance: postFixRelevance,
       assertions: { audit_pass, advanced_true, advanced_to_qj, graph_qj, citation_pass_cited, citations_written },
       spend: { before: spendBefore, after: spendAfter, delta_usd: costDelta, cap_usd: SPEND_CAP, kill_bar_usd: KILL_BAR },
       documentation_on_disk: fs.existsSync(DOC_PATH) ? path.relative(ROOT, DOC_PATH) : null,
       latency_ms: { http_round_trip: docMs },
       timestamp: new Date().toISOString()
     };
-    writeEvidence("gate10_owner.json", gateResult);
+    writeEvidence("gate10_owner_postfix.json", gateResult);
 
     // ── Witness summary ───────────────────────────────────────────────────────
     console.log("\n══ WITNESS SUMMARY ═══════════════════════════════════════════════");
@@ -388,8 +417,13 @@ async function main() {
     console.log("  advanced:", r.advanced, "→", r.advanced_to, " | graph:", graphAfter.current_state);
     console.log("  citations.jsonl records (this doc):", citedForThisDoc.length);
     if (!DRY && ingestInfo && !ingestInfo.skipped) console.log("  source:", ingestInfo.tier, ingestInfo.url, "(" + ingestInfo.chunks_created + " chunks)");
+    if (!DRY) {
+      console.log("  BEFORE (pre-fix, Express, squared-L2 bug): relevance = [0,0,0,0,0,0,0,0] (all clamped)");
+      console.log("  AFTER  (post-fix, api-guidelines, cosine):  relevance =", JSON.stringify(postFixRelevance));
+      console.log("  per-claim confidence:", JSON.stringify(relevanceDist.map(x => x.confidence)));
+    }
     console.log("  ACTUAL spend: $" + costDelta.toFixed(5) + "  (agent $" + spendAfter.agent_usd.toFixed(5) + " + kb $" + spendAfter.kb_usd.toFixed(6) + ")  cap $" + SPEND_CAP);
-    console.log("  evidence:", path.relative(ROOT, path.join(EVIDENCE, "gate10_owner.json")));
+    console.log("  evidence:", path.relative(ROOT, path.join(EVIDENCE, "gate10_owner_postfix.json")));
     console.log("══════════════════════════════════════════════════════════════════\n");
 
     if (!DRY && !gatePass) {
@@ -408,6 +442,6 @@ async function main() {
 
 main().catch(err => {
   console.error("\n⛔  GATE SCRIPT ERROR:", err && err.message);
-  try { writeEvidence("gate10_owner.json", { verdict: "STOP_AND_REPORT", stop_code: "SCRIPT_ERROR", detail: err && err.message }); } catch (_) {}
+  try { writeEvidence("gate10_owner_postfix.json", { verdict: "STOP_AND_REPORT", stop_code: "SCRIPT_ERROR", detail: err && err.message }); } catch (_) {}
   process.exit(1);
 });
