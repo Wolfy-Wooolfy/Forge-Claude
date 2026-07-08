@@ -67,8 +67,9 @@ const DISCOVERY_SEARCH_MAX_RESULTS     = 5;   // ask for a few; take the first u
 // When a §7.1 claim would otherwise stay UNCITED for one of exactly TWO reasons —
 //   (a) zero_chunks : retrieve OK but the active KB holds NO source for this claim, or
 //   (b) cite_blocked: chunks exist but kb.cite skipped (LOW-only support, the PHASE-51-LOW
-//       limit) — the pass runs web discovery: research.search_web(claim) → kb.ingest_url(top
-//   result) into the ACTIVE PROJECT KB → kb.retrieve(claim) again → kb.cite. Discovery is
+//       limit) — the pass runs web discovery: research.search_web(claim) → kb.ingest_content
+//   (the top result's Tavily content) into the ACTIVE PROJECT KB → kb.retrieve(claim) again →
+//   kb.cite. (A-1: content comes from Tavily; Forge never fetches the arbitrary host.) Discovery is
 //   STRICTLY ADDITIVE: it fires ONLY on those two branches. An already-citable claim reaches
 //   `summary.cited++` on the first cite and NEVER enters discovery (untouched vs PHASE-51).
 //   The retrieve_failed branch is DELIBERATELY EXCLUDED (RULING 2): the retrieve envelope
@@ -82,7 +83,7 @@ const DISCOVERY_SEARCH_MAX_RESULTS     = 5;   // ask for a few; take the first u
 // `_discovery` (PHASE-52 seam, Option-1 A-1 analog) is an OPTIONAL trailing test seam —
 //   { search, ingest } function overrides (+ an optional test-only `maxTotalSearches`) for
 //   hermetic $0 scenarios. When absent (production), search/ingest go through
-//   reg.invoke("research.search_web"/"kb.ingest_url") directly; the ctx is exactly { root }
+//   reg.invoke("research.search_web"/"kb.ingest_content") directly; the ctx is exactly { root }
 //   (or { root, _client } when the embed seam is present) — byte-identical to the seam-absent path.
 async function runDocumentationCitationPass(reg, projectId, artifactRelPath, content, root, _client, _discovery) {
   const summary = {
@@ -119,7 +120,8 @@ async function runDocumentationCitationPass(reg, projectId, artifactRelPath, con
   }
   async function _ingest(input) {
     if (_discovery && typeof _discovery.ingest === "function") return _discovery.ingest(input, ingestCtx);
-    return reg.invoke("kb.ingest_url", input, ingestCtx);
+    // A-1: ingest the Tavily-returned CONTENT directly — Forge never fetches the arbitrary host.
+    return reg.invoke("kb.ingest_content", input, ingestCtx);
   }
   async function _retrieve(text) {
     return reg.invoke("kb.retrieve", {
@@ -158,18 +160,23 @@ async function runDocumentationCitationPass(reg, projectId, artifactRelPath, con
       if (!searchEnv || searchEnv.status !== "SUCCESS") continue;
 
       const found = (searchEnv.output && searchEnv.output.results) || [];
-      const urls  = [];
+      const picks = [];
       for (const r of found) {
-        if (r && typeof r.url === "string" && r.url) urls.push(r.url);
-        if (urls.length >= DISCOVERY_MAX_URLS_PER_CLAIM) break;
+        if (r && typeof r.url === "string" && r.url) {
+          picks.push({ url: r.url, content: (r && r.content) || "", title: (r && r.title) || "" });
+        }
+        if (picks.length >= DISCOVERY_MAX_URLS_PER_CLAIM) break;
       }
-      if (urls.length === 0) continue;                   // SUCCESS but nothing usable
+      if (picks.length === 0) continue;                  // SUCCESS but nothing usable
 
-      for (const url of urls) {
-        if (ingestedUrls.has(url)) continue;             // in-run URL dedup — skip a repeat ingest
-        ingestedUrls.add(url);
+      for (const pick of picks) {
+        if (ingestedUrls.has(pick.url)) continue;        // in-run URL dedup — skip a repeat ingest
+        ingestedUrls.add(pick.url);
+        // A-1: ingest the Tavily-returned CONTENT directly (kb.ingest_content) — no fetch of the
+        // arbitrary host. No content → skip (fail-closed; never fetch to recover it).
+        if (!pick.content) continue;
         let ingestEnv;
-        try { ingestEnv = await _ingest({ url, project_id: projectId }); }
+        try { ingestEnv = await _ingest({ url: pick.url, content: pick.content, title: pick.title, project_id: projectId }); }
         catch (_) { ingestEnv = null; }
         if (ingestEnv && ingestEnv.status === "SUCCESS") summary.discovery_ingests++;
       }

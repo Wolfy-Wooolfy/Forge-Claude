@@ -98,13 +98,18 @@ function _normalizeBrave(parsed) {
   }));
 }
 
-// Normalize Tavily results array to [{url, title, snippet}]
+// Normalize Tavily results array to [{url, title, snippet, content}]
+// PHASE-52 A-1: `content` carries Tavily's raw page text (include_raw_content) so the
+// discovery loop can ingest it DIRECTLY (kb.ingest_content) without fetching the arbitrary
+// host. Additive — falls back to the snippet when raw_content is absent; empty content →
+// the downstream ingest is simply skipped (fail-closed, no fetch).
 function _normalizeTavily(parsed) {
   const results = (parsed && parsed.results) || [];
   return results.map(r => ({
     url:     r.url     || "",
     title:   r.title   || "",
-    snippet: r.content || ""
+    snippet: r.content || "",
+    content: r.raw_content || r.content || ""
   }));
 }
 
@@ -179,7 +184,9 @@ const search_web = defineTool({
     if (!results) {
       const tavilyKey = process.env.TAVILY_API_KEY;
       if (tavilyKey) {
-        const tavilyBody = JSON.stringify({ api_key: tavilyKey, query: input.query, max_results: maxResults });
+        // PHASE-52 A-1: include_raw_content → Tavily returns the page text so discovery can
+        // ingest it directly (kb.ingest_content), never fetching the arbitrary host.
+        const tavilyBody = JSON.stringify({ api_key: tavilyKey, query: input.query, max_results: maxResults, include_raw_content: true });
         const tavilyEnv  = await reg.invoke("http.post", {
           url:        TAVILY_API_BASE,
           body:       tavilyBody,

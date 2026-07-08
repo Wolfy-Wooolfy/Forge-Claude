@@ -451,8 +451,11 @@ function _mockDiscovery(opts) {
       state.searchQueries.push(input.query);
       if (o.searchMode === "empty")  return { status: "SUCCESS", output: { results: [] } };
       if (o.searchMode === "failed") return { status: "FAILED",  metadata: { reason: "BOTH_PROVIDERS_FAILED" } };
+      // A-1: results carry `content` (Tavily raw_content) — the discovery loop ingests it
+      // directly via kb.ingest_content (no fetch). Empty content → the loop skips the ingest.
       return { status: "SUCCESS", output: { results: [
-        { url, title: "Discovered Source", snippet: "supporting passage" }
+        { url, title: "Discovered Source", snippet: "supporting passage",
+          content: "Discovered supporting passage for the claim under documentation." }
       ] } };
     },
     async ingest(input, ctx) {

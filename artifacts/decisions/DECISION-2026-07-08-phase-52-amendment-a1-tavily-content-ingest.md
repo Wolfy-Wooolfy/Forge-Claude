@@ -26,7 +26,16 @@ D-A1.5 REAL Gate #10 re-run (gated on a separate owner spend approval).
 All via reg.invoke. §ARC FROZEN AT 10 (ingest_content manifests/cost via the existing §ARC-4 path). The allow-list and SSRF guard are UNCHANGED — this amendment AVOIDS the arbitrary fetch, it does not relax any control. kb.ingest_url is UNCHANGED (still fetches, still allow-list-bound, for explicit manual ingestion). Net security posture is IMPROVED vs Approach A. L2 80→81.
 
 ## 6. Closure gate
-SU 359/0/5 (364) [356 + S364–S366, exact set locked at Step 0]; Track A clean; §ARC=10; L2=81; this artifact committed; main PHASE-52 decision §5/§9 updated to reference A-1 as the ingest mechanism; mid-checkpoint written; REAL Gate #10 re-run PASS (empty KB → auto-discovered content → cited → §8 PASS → advance) with permanent evidence + relevance measurement vs [0.475..0.478]; status.json flip to PHASE-52 CLOSED / next PHASE-53 as part of closure after CTO verification.
+SU 359/0/5 (364) [356 + S364–S366, exact set locked at Step 0]; Track A clean; §ARC=10; L2=81; this artifact committed; main PHASE-52 decision §5/§9 updated to reference A-1 as the ingest mechanism; mid-checkpoint written; REAL Gate #10 re-run per the PRIMARY/SECONDARY split below; status.json flip to PHASE-52 CLOSED / next PHASE-53 as part of closure after CTO verification.
+
+### 6.1 Gate #10 re-run criteria (A-1 Step 1 GO refinement — PRIMARY/SECONDARY split)
+Because §8 halts if ANY claim is uncited and real Tavily source quality varies per claim, the re-run separates the mechanism proof from the source-quality outcome (mirrors erratum #3):
+- **PRIMARY (the A-1 gap-closed proof — the pass bar):** `discovery_ingests > 0` AND `discovery_cited > 0` AND `provider_used = "tavily"` — discovered Tavily CONTENT was ingested into the KB (NO fetch of the arbitrary host) and lifted ≥1 previously-zero_chunks claim to a real citation. Proves the allow-list gap is CLOSED.
+- **SECONDARY (expected, measured — NOT the pass bar):** §8 PASS → advance to QUALITY_JUDGE (full happy path, achievable when EVERY claim gets a cite-eligible source) + per-claim relevance vs [0.475..0.478]. If §8 HALTS because one claim's top Tavily result is LOW-credibility/irrelevant, that is a DOCUMENTED source-quality result, NOT an A-1 mechanism failure.
+- Re-run vision: choose a well-covered technical topic (e.g. a simple REST API) to maximize the chance every claim gets a good source. Gated on a SEPARATE owner spend "yes" + estimate.
+
+### 6.2 Erratum #4 (bidirectional Trust+Verify)
+PROMPT-STAGE-52-A1 §0.3 cited sed-window-relative line numbers as absolute. Corrected: the `kb.ingest_url` network fetch is `source_acquisition.js:152` (not :33-37, which is `_detectContentType`); the record-build region is `source_acquisition.js:205-234` (not :33-95). CC caught this in Step 0; CTO logged it as erratum #4.
 
 ## 7. Cost
 $0 dev; real Gate #10 re-run ~$0.03 (separate owner "yes" + estimate). Kill bar $3/phase.

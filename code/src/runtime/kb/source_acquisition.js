@@ -248,4 +248,94 @@ async function acquireSource(url, options) {
   return { status: "OK", source: record, deduped: false, extracted_text: extractedText };
 }
 
-module.exports = { acquireSource };
+// ── acquireSourceFromContent (PHASE-52 A-1) ───────────────────────────────────
+//
+// SIBLING of acquireSource that ingests ALREADY-FETCHED text (e.g. Tavily raw_content):
+// same record-build / credibility-by-URL / validate / persist pipeline, MINUS the network
+// fetch and the content-type gate. Forge never contacts the arbitrary host — the ONLY
+// external calls in the discovery path stay api.tavily.com (search, allow-listed) + the
+// embeddings provider. acquireSource above is UNCHANGED (kb.ingest_url is byte-identical).
+//
+// Credibility is scored from the URL/domain only (credibility_scorer needs no body), so the
+// SourceRecord's tier is faithful. Content is capped (truncate) to bound embed cost/latency.
+
+const MAX_CONTENT_CHARS = 100000;   // ~100 KB of cleaned text; virtually all pages are well under
+
+async function acquireSourceFromContent(url, content, options) {
+  const opts       = options || {};
+  const project_id = opts.project_id || "";
+  const scope      = opts.scope || "project";
+  const root       = opts.root || process.cwd();
+  const ctx        = { root };
+
+  const { getDefaultRegistry } = require("../tools/_registry");
+  const reg = opts._reg || getDefaultRegistry();
+
+  // Global scope is gated by DANGER_FULL_ACCESS + decision artifact (KB Contract §10).
+  if (scope === "global") {
+    return { status: "REJECTED", reason: "GLOBAL_SCOPE_REQUIRES_DECISION_ARTIFACT", source: null, deduped: false, extracted_text: null };
+  }
+
+  // Guard: empty/whitespace content → REJECTED (no ingest, no fetch).
+  const rawText = typeof content === "string" ? content : "";
+  if (!rawText.trim()) {
+    return { status: "REJECTED", reason: "EMPTY_CONTENT", source: null, deduped: false, extracted_text: null };
+  }
+  // Cap (truncate) — bound embed cost/latency on pathological pages.
+  let text      = rawText;
+  let truncated = false;
+  if (text.length > MAX_CONTENT_CHARS) { text = text.slice(0, MAX_CONTENT_CHARS); truncated = true; }
+
+  const src_id = srcId(url);
+
+  // Dedup (persistent, by URL hash) — same as acquireSource.
+  const existingSources = manifests.readSources(project_id, scope, { root });
+  const dup = existingSources.find(s => s.id === src_id);
+  if (dup) {
+    return { status: "DUPLICATE", source: dup, deduped: true, extracted_text: null };
+  }
+
+  // Build the record — content is ALREADY-extracted text (content_type text/plain).
+  const content_type = "text/plain";
+  const title    = (opts.title && String(opts.title).trim()) || _extractTitle(text, content_type) || null;
+  const language = _detectLanguage(text);
+  const now      = new Date().toISOString();
+
+  const record = {
+    schema_version:      "1.0.0",
+    id:                  src_id,
+    url,
+    title,
+    fetched_at:          now,
+    content_type,
+    raw_byte_size:       Buffer.byteLength(text, "utf8"),
+    extracted_text_size: text.length,
+    language,
+    credibility:         null,
+    scope,
+    project_id:          scope === "global" ? null : project_id,
+    ingestion_decision:  null,
+    truncated                             // additive; the schema validator ignores extra fields
+  };
+
+  // Credibility by URL/domain only (use_llm=false) — no body needed.
+  record.credibility = await scoreSource(record, { use_llm: false, project_id, root });
+
+  const validation = validateSourceRecord(record);
+  if (!validation.valid) {
+    throw new Error("SourceRecord schema validation failed: " + validation.errors.join("; "));
+  }
+
+  // Persist — JSONL manifest (§ARC-4) + individual JSON via L2 fs.write_file (Track A).
+  manifests.appendSource(record, { root });
+  const relPath  = _sourceJsonRelPath(src_id, project_id, scope);
+  const writeEnv = await reg.invoke("fs.write_file", { path: relPath, content: JSON.stringify(record, null, 2) }, ctx);
+  if (!writeEnv || writeEnv.status !== "SUCCESS") {
+    const reason = (writeEnv && writeEnv.metadata && writeEnv.metadata.reason) || "WRITE_FAILED";
+    throw new Error("Failed to persist source JSON (" + relPath + "): " + reason);
+  }
+
+  return { status: "OK", source: record, deduped: false, extracted_text: text };
+}
+
+module.exports = { acquireSource, acquireSourceFromContent };

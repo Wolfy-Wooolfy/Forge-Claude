@@ -8,6 +8,7 @@
 //
 // Tools implemented here (6 total, first 3 in Stage 9.5 Step G):
 //   kb.ingest_url       — fetch + chunk + embed + store in vector DB
+//   kb.ingest_content   — (A-1) ingest already-fetched text (Tavily raw_content) — no fetch
 //   kb.retrieve         — embed query + vector search + credibility post-filter
 //   kb.cite             — synthesize CitationRecord from retrieval chunks
 //   kb.list_sources     — list source manifests for a project (Step H)
@@ -120,6 +121,98 @@ const ingest_url = defineTool({
     }
 
     // Warn if budget now at 70%+
+    try { _bg().logWarnIfNeeded(project_id, { root }); } catch (_) {}
+
+    return ok({ status: "OK", src_id: sourceRecord.id, chunks_created: skeletons.length, deduped: false });
+  }
+});
+
+// ── 1b. kb.ingest_content (PHASE-52 A-1) ─────────────────────────────────────
+
+const ingest_content = defineTool({
+  name:          "kb.ingest_content",
+  description:   "Ingest ALREADY-FETCHED text content (e.g. Tavily raw_content) into the project vector KB WITHOUT fetching the URL. Credibility is scored by URL/domain. Deduplicates by URL hash. Same pipeline as kb.ingest_url minus the network fetch.",
+  required_mode: "WORKSPACE_WRITE",
+
+  input_schema: {
+    type: "object",
+    properties: {
+      url:        { type: "string",  description: "Source URL — used for id/dedup + credibility scoring; NOT fetched" },
+      content:    { type: "string",  description: "Already-extracted text content to ingest" },
+      title:      { type: "string",  description: "Optional source title" },
+      project_id: { type: "string",  description: "Project ID for KB storage" },
+      scope:      { type: "string",  description: "\"project\" (default) or \"global\"" }
+    },
+    required: ["url", "content", "project_id"]
+  },
+  output_schema: {
+    type: "object",
+    properties: {
+      status:         { type: "string",  description: "OK | DUPLICATE | REJECTED" },
+      src_id:         { type: "string",  description: "SourceRecord ID" },
+      chunks_created: { type: "number",  description: "Number of chunks embedded and stored" },
+      deduped:        { type: "boolean", description: "true if URL was already in KB" }
+    },
+    required: ["status", "src_id", "deduped"]
+  },
+
+  preview(input) {
+    const { srcId } = require("../kb/_id_minting");
+    return Promise.resolve({
+      status:  "PREVIEWED",
+      output:  { would_ingest_content_for: input.url, would_dedup_if_exists: srcId(input.url) },
+      metadata: {}
+    });
+  },
+
+  async execute(input, ctx) {
+    const root       = (ctx && ctx.root) || process.cwd();
+    const project_id = input.project_id;
+    const scope      = input.scope || "project";
+
+    // Budget check before any embedding calls.
+    try {
+      _bg().enforceBudget(project_id, { root });
+    } catch (budgetErr) {
+      return failed("BUDGET_EXCEEDED", budgetErr.message);
+    }
+
+    // Acquire source FROM CONTENT (no http.get on the discovered host).
+    const acqResult = await _acq().acquireSourceFromContent(input.url, input.content, {
+      title:      input.title,
+      project_id,
+      scope,
+      root,
+      _reg: (ctx && ctx._reg) || null
+    });
+
+    if (acqResult.status === "DUPLICATE") {
+      return ok({ status: "DUPLICATE", src_id: acqResult.source.id, chunks_created: 0, deduped: true });
+    }
+    if (acqResult.status === "REJECTED") {
+      return failed(acqResult.reason || "INGEST_CONTENT_REJECTED", null, {
+        status: "REJECTED",
+        src_id: require("../kb/_id_minting").srcId(input.url),
+        chunks_created: 0,
+        deduped: false
+      });
+    }
+
+    const sourceRecord  = acqResult.source;
+    const extractedText = acqResult.extracted_text || "";
+
+    // Chunk → embed → store → manifests — IDENTICAL to kb.ingest_url's tail.
+    const skeletons = _chunk().chunkSource(sourceRecord, extractedText);
+    if (skeletons.length === 0) {
+      return ok({ status: "OK", src_id: sourceRecord.id, chunks_created: 0, deduped: false });
+    }
+    const embOpts = { project_id, root, _client: (ctx && ctx._client) || null };
+    await _emb().embedChunks(skeletons, embOpts);
+    const store = await _store().openStore(project_id, scope, { root });
+    await _store().insertChunks(store, skeletons);
+    for (const chk of skeletons) {
+      _man().appendChunk(chk, project_id, scope, { root });
+    }
     try { _bg().logWarnIfNeeded(project_id, { root }); } catch (_) {}
 
     return ok({ status: "OK", src_id: sourceRecord.id, chunks_created: skeletons.length, deduped: false });
@@ -424,5 +517,5 @@ const validate_citations = defineTool({
 // ── Export ────────────────────────────────────────────────────────────────────
 
 module.exports = {
-  tools: [ingest_url, retrieve, cite, list_sources, delete_source, validate_citations]
+  tools: [ingest_url, ingest_content, retrieve, cite, list_sources, delete_source, validate_citations]
 };
