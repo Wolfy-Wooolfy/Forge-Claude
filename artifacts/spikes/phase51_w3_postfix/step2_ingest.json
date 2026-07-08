@@ -1,0 +1,31 @@
+{
+  "ingest": {
+    "status": "OK",
+    "src_id": "src_4dee6bb36334",
+    "chunks_created": 84,
+    "deduped": false
+  },
+  "resolved_source": {
+    "schema_version": "1.0.0",
+    "id": "src_4dee6bb36334",
+    "url": "https://raw.githubusercontent.com/microsoft/api-guidelines/vNext/azure/Guidelines.md",
+    "title": "Microsoft Azure REST API Guidelines",
+    "fetched_at": "2026-07-08T09:56:06.906Z",
+    "content_type": "text/plain",
+    "raw_byte_size": 108399,
+    "extracted_text_size": 108386,
+    "language": "en",
+    "credibility": {
+      "score": 0.55,
+      "tier": "REPUTABLE",
+      "signals": [
+        "https"
+      ],
+      "scored_by": "heuristic_v1",
+      "scored_at": "2026-07-08T09:56:06.910Z"
+    },
+    "scope": "project",
+    "project_id": "phase51_w3_gate10",
+    "ingestion_decision": null
+  }
+}

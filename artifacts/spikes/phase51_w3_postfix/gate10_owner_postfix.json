@@ -1,0 +1,602 @@
+{
+  "verdict": "GATE_PASS",
+  "mode": "REAL_GPT4O",
+  "project_id": "phase51_w3_gate10",
+  "loop_id": "w3-6b69b623",
+  "port": 58376,
+  "request_body": {
+    "project_id": "phase51_w3_gate10",
+    "loop_id": "w3-6b69b623"
+  },
+  "ingest": {
+    "skipped": false,
+    "url": "https://raw.githubusercontent.com/microsoft/api-guidelines/vNext/azure/Guidelines.md",
+    "src_id": "src_4dee6bb36334",
+    "tier": "REPUTABLE",
+    "chunks_created": 84,
+    "deduped": false
+  },
+  "documentProject_result": {
+    "ok": true,
+    "loop_id": "w3-6b69b623",
+    "advanced": true,
+    "advanced_to": "QUALITY_JUDGE",
+    "documentation": {
+      "role_id": "documentation",
+      "overview": {
+        "title": "Task Management REST API",
+        "purpose": "This project provides a REST API for task management, designed for users who require CRUD operations on tasks using HTTP requests.",
+        "key_capabilities": [
+          "Create, read, update, and delete tasks",
+          "Input validation for integrity and security"
+        ]
+      },
+      "components": [
+        {
+          "name": "API Server",
+          "description": "Handles incoming HTTP requests and processes them to manage task data stored in an SQLite database.",
+          "interface_summary": "Clients interact with it via RESTful JSON endpoints over HTTP."
+        }
+      ],
+      "api_reference": [
+        {
+          "endpoint": "/todos",
+          "method": "POST",
+          "description": "Creates a new task with the provided details.",
+          "inputs": "Body parameters: 'title' (string, required)",
+          "outputs": "{ 'id': <string>, 'title': <string> } upon success",
+          "errors": [
+            "Returns 400 if 'title' is missing or not a string",
+            "Returns 500 for server errors"
+          ]
+        },
+        {
+          "endpoint": "/todos/:id",
+          "method": "PUT",
+          "description": "Updates an existing task identified by its ID.",
+          "inputs": "Params: 'id' (string, required); Body: 'title' (string, required)",
+          "outputs": "{ 'id': <string>, 'title': <string> } upon success",
+          "errors": [
+            "Returns 400 if 'title' is missing or not a string",
+            "Returns 404 if the task ID does not exist",
+            "Returns 500 for server errors"
+          ]
+        }
+      ],
+      "quickstart": {
+        "prerequisites": [
+          "Node.js and npm installed",
+          "SQLite3 installed"
+        ],
+        "steps": [
+          "Clone the repository to your local machine.",
+          "Run 'npm install' to install dependencies.",
+          "Set up your environment variables as needed.",
+          "Run 'npm start' to launch the API server."
+        ]
+      },
+      "operations": {
+        "health_check": "Send a GET request to the root endpoint '/' to check if the server responds.",
+        "logging": "Logs are written to the console with details on requests, responses, and errors.",
+        "common_issues": [
+          {
+            "symptom": "API server does not start.",
+            "cause": "Potential missing dependencies or incorrect environment variables.",
+            "fix": "Ensure Node.js and SQLite are installed and revisit configuration settings."
+          },
+          {
+            "symptom": "Receiving 404 for existing task updates.",
+            "cause": "Task ID specified may not exist.",
+            "fix": "Verify that the task ID used is correct and present in the database."
+          }
+        ]
+      },
+      "known_limitations": [
+        "Real-time synchronization of tasks is out of scope"
+      ],
+      "summary": "This documentation provides an overview of a task management REST API project, including its components, API endpoints, and operations guide for operators and maintainers, ensuring they can deploy and troubleshoot effectively."
+    },
+    "model_used": "gpt-4o",
+    "citation_audit": {
+      "status": "PASS",
+      "uncited_claims_count": 0,
+      "cited_claims_count": 8,
+      "uncited_claims": []
+    },
+    "citation_pass": {
+      "claims_detected": 8,
+      "cited": 8,
+      "uncited": 0,
+      "retrieve_failed": 0,
+      "zero_chunks": 0,
+      "cite_blocked": 0
+    }
+  },
+  "citation_pass": {
+    "claims_detected": 8,
+    "cited": 8,
+    "uncited": 0,
+    "retrieve_failed": 0,
+    "zero_chunks": 0,
+    "cite_blocked": 0
+  },
+  "citation_audit": {
+    "status": "PASS",
+    "uncited_claims_count": 0,
+    "cited_claims_count": 8,
+    "uncited_claims": []
+  },
+  "claims_detected_N": 8,
+  "citations_jsonl": [
+    {
+      "schema_version": "1.0.0",
+      "id": "cit_4f2762125e31",
+      "claim_text": "\"purpose\": \"This project provides a REST API for task management, designed for users who require CRUD operations on tasks using HTTP requests.\",",
+      "claim_location": {
+        "artifact_path": "artifacts/projects/phase51_w3_gate10/orchestration/w3-6b69b623/documentation.json",
+        "line_range": [
+          5,
+          5
+        ]
+      },
+      "supporting_chunks": [
+        {
+          "chunk_id": "chk_4dee6bb3_16",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.4749402403831482,
+          "excerpt": "er already exists in production [[RFC 6648](https://datatracker.ietf.org/doc/html/rfc6648)].\n\n**Additional References**\n- [StackOverflow - Difference between http parameters and http headers](https://"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_7",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.4391627311706543,
+          "excerpt": "direct-endpoints\">:heavy_check_mark:</a> **YOU MAY** support a direct endpoint URL for performance/routing:\n```text\nhttps://<tenant>-<service-root>.<service>.<cloud>/...\n```\n\nExamples:\n- Request URL: "
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_17",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.4140368103981018,
+          "excerpt": "ps://docs.microsoft.com/azure/architecture/best-practices/api-design) for a more detailed discussion of REST API design patterns.\n\nWhen designing your service, it is important to optimize for the deve"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_35",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.40839487314224243,
+          "excerpt": "d\">:no_entry:</a> **DO NOT** use an action operation when the operation behavior could reasonably be defined as one of the standard REST Create, Read, Update, Delete, or List operations.\n\n<a href=\"#co"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_18",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.3969513177871704,
+          "excerpt": "nse, GET response, and POST request/response on a given URL path. The PATCH request schema should contain all the same fields with no required fields. This allows one SDK type for input/output operati"
+        }
+      ],
+      "confidence": "LOW",
+      "synthesized_by": "documentation",
+      "synthesized_at": "2026-07-08T09:56:24.889Z"
+    },
+    {
+      "schema_version": "1.0.0",
+      "id": "cit_a05fd5192629",
+      "claim_text": "\"Returns 400 if 'title' is missing or not a string\",",
+      "claim_location": {
+        "artifact_path": "artifacts/projects/phase51_w3_gate10/orchestration/w3-6b69b623/documentation.json",
+        "line_range": [
+          26,
+          26
+        ]
+      },
+      "supporting_chunks": [
+        {
+          "chunk_id": "chk_4dee6bb3_40",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.3567236065864563,
+          "excerpt": "er=price lt 10.00\n```\n\n##### filter operators\n\n:heavy_check_mark: **YOU MAY** support the following operators in filter expressions:\n\nOperator                 | Description           | Example\n-------"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_10",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.3349248170852661,
+          "excerpt": "sly.\n\n<a href=\"#http-method-casing\" name=\"http-method-casing\">:white_check_mark:</a> **DO** treat method names as case sensitive and should always be in uppercase\n\n<a href=\"#http-return-resource\" name"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_21",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.3326749801635742,
+          "excerpt": "--------------------- | ----------------------\nPATCH/PUT | Any JSON field name/value not known/valid to the api-version | `400-Bad Request`\nPATCH/PUT | Any Read field passed (client can't set Read fie"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_23",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.3255496025085449,
+          "excerpt": "code` header's value.\n\n<a href=\"#rest-error-response-body-structure\" name=\"rest-error-response-body-structure\">:white_check_mark:</a> **DO** provide a response body with the following structure:\n\n**Er"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_20",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.32507097721099854,
+          "excerpt": "lds\">:white_check_mark:</a> **DO** fail an operation with `400-Bad Request` if the request is improperly-formed or if any JSON field name or value is not fully understood by the specific version of th"
+        }
+      ],
+      "confidence": "LOW",
+      "synthesized_by": "documentation",
+      "synthesized_at": "2026-07-08T09:56:25.599Z"
+    },
+    {
+      "schema_version": "1.0.0",
+      "id": "cit_a05fd5192629",
+      "claim_text": "\"Returns 400 if 'title' is missing or not a string\",",
+      "claim_location": {
+        "artifact_path": "artifacts/projects/phase51_w3_gate10/orchestration/w3-6b69b623/documentation.json",
+        "line_range": [
+          37,
+          37
+        ]
+      },
+      "supporting_chunks": [
+        {
+          "chunk_id": "chk_4dee6bb3_40",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.3567236065864563,
+          "excerpt": "er=price lt 10.00\n```\n\n##### filter operators\n\n:heavy_check_mark: **YOU MAY** support the following operators in filter expressions:\n\nOperator                 | Description           | Example\n-------"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_10",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.3349248170852661,
+          "excerpt": "sly.\n\n<a href=\"#http-method-casing\" name=\"http-method-casing\">:white_check_mark:</a> **DO** treat method names as case sensitive and should always be in uppercase\n\n<a href=\"#http-return-resource\" name"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_21",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.3326749801635742,
+          "excerpt": "--------------------- | ----------------------\nPATCH/PUT | Any JSON field name/value not known/valid to the api-version | `400-Bad Request`\nPATCH/PUT | Any Read field passed (client can't set Read fie"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_23",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.3255496025085449,
+          "excerpt": "code` header's value.\n\n<a href=\"#rest-error-response-body-structure\" name=\"rest-error-response-body-structure\">:white_check_mark:</a> **DO** provide a response body with the following structure:\n\n**Er"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_20",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.32507097721099854,
+          "excerpt": "lds\">:white_check_mark:</a> **DO** fail an operation with `400-Bad Request` if the request is improperly-formed or if any JSON field name or value is not fully understood by the specific version of th"
+        }
+      ],
+      "confidence": "LOW",
+      "synthesized_by": "documentation",
+      "synthesized_at": "2026-07-08T09:56:25.852Z"
+    },
+    {
+      "schema_version": "1.0.0",
+      "id": "cit_26724e78b9ec",
+      "claim_text": "\"logging\": \"Logs are written to the console with details on requests, responses, and errors.\",",
+      "claim_location": {
+        "artifact_path": "artifacts/projects/phase51_w3_gate10/orchestration/w3-6b69b623/documentation.json",
+        "line_range": [
+          57,
+          57
+        ]
+      },
+      "supporting_chunks": [
+        {
+          "chunk_id": "chk_4dee6bb3_70",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.35087376832962036,
+          "excerpt": "s considered the minimum security for files and can be used in lieu of, or in addition to, RBAC.\n\n<a href=\"#byos-http-insecure\" name=\"byos-http-insecure\">:ballot_box_with_check:</a> **YOU SHOULD** if "
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_24",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.3490784168243408,
+          "excerpt": "tion than the current object about the error.\n\nExample:\n```json\n{\n  \"error\": {\n    \"code\": \"InvalidPasswordFormat\",\n    \"message\": \"Human-readable description\",\n    \"target\": \"target of error\",\n    \"i"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_69",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.3397848606109619,
+          "excerpt": "y, do not take away permissions from a role that would break the operation of the service. Any change of RBAC roles that results in a change of the service behavior is considered a breaking change.\n\n\n"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_64",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.3359715938568115,
+          "excerpt": "iled\", contains reason for failure\n`result` | object      |          | If `status`==\"Succeeded\" && Action LRO (POST or PUT), contains success result if needed\nadditional<br/>properties | | | Additiona"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_13",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.33292651176452637,
+          "excerpt": " the headers most used by Azure services:\n\nHeader Key          | Applies to | Example\n------------------- | ---------- | -------------\n_authorization_     | Request    | Bearer eyJ0...Xd6j (Support Az"
+        }
+      ],
+      "confidence": "LOW",
+      "synthesized_by": "documentation",
+      "synthesized_at": "2026-07-08T09:56:26.105Z"
+    },
+    {
+      "schema_version": "1.0.0",
+      "id": "cit_81a6bcbf7ec0",
+      "claim_text": "\"fix\": \"Ensure Node.js and SQLite are installed and revisit configuration settings.\"",
+      "claim_location": {
+        "artifact_path": "artifacts/projects/phase51_w3_gate10/orchestration/w3-6b69b623/documentation.json",
+        "line_range": [
+          62,
+          62
+        ]
+      },
+      "supporting_chunks": [
+        {
+          "chunk_id": "chk_4dee6bb3_0",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.3755154013633728,
+          "excerpt": "# Microsoft Azure REST API Guidelines\n\n<!-- cspell:ignore autorest, BYOS, etag, idempotency, maxpagesize, innererror, trippable, nextlink, condreq, etags -->\n<!-- markdownlint-disable MD033 MD049 MD05"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_19",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.35288262367248535,
+          "excerpt": "ice; it is a breaking change to introduce required fields in a later version. In addition, it is a breaking change to remove a required field or make an optional field required or vice versa.\n\n<a href"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_28",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.34666967391967773,
+          "excerpt": "json-should-be-round-trippable\" name=\"json-should-be-round-trippable\">:white_check_mark:</a> **DO** ensure that information exchanged between your service and any client is \"round-trippable\" across mu"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_52",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.3397896885871887,
+          "excerpt": "t-for-tls-10-and-11/)`\n- `azure-deprecating: Model version 2021-01-15 used in Sentiment analysis will retire on 2022-12-01 (https://aka.ms/ta-modelversions?sentimentAnalysis)`\n- `azure-deprecating: TL"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_25",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.334492027759552,
+          "excerpt": "ing problems.\n\n*Note: Do not use this mechanism to provide information developers need to rely on in code (ex: the error message can give details about why you've been throttled, but the `Retry-After`"
+        }
+      ],
+      "confidence": "LOW",
+      "synthesized_by": "documentation",
+      "synthesized_at": "2026-07-08T09:56:26.397Z"
+    },
+    {
+      "schema_version": "1.0.0",
+      "id": "cit_64204c10adee",
+      "claim_text": "\"fix\": \"Verify that the task ID used is correct and present in the database.\"",
+      "claim_location": {
+        "artifact_path": "artifacts/projects/phase51_w3_gate10/orchestration/w3-6b69b623/documentation.json",
+        "line_range": [
+          67,
+          67
+        ]
+      },
+      "supporting_chunks": [
+        {
+          "chunk_id": "chk_4dee6bb3_20",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.36362946033477783,
+          "excerpt": "lds\">:white_check_mark:</a> **DO** fail an operation with `400-Bad Request` if the request is improperly-formed or if any JSON field name or value is not fully understood by the specific version of th"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_11",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.3383597135543823,
+          "excerpt": "ustomers, but should not be used if even admitting the existence of things could potentially leak customer secrets.]\n\n<a href=\"#http-support-optimistic-concurrency\" name=\"http-support-optimistic-concu"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_57",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.33455657958984375,
+          "excerpt": "generate an ID (typically a GUID) for the status monitor if the `Operation-Id` header was not passed by the client.\n\n<a href=\"#lro-put-operation-id-unique-except-retries\" name=\"lro-put-operation-id-un"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_21",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.329537034034729,
+          "excerpt": "--------------------- | ----------------------\nPATCH/PUT | Any JSON field name/value not known/valid to the api-version | `400-Bad Request`\nPATCH/PUT | Any Read field passed (client can't set Read fie"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_9",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.3274708390235901,
+          "excerpt": "course, the response **MUST** return the URL of the created resource with a 201-Created. One way to make POST idempotent is to use the Repeatability-Request-ID & Repeatability-First-Sent headers (See "
+        }
+      ],
+      "confidence": "LOW",
+      "synthesized_by": "documentation",
+      "synthesized_at": "2026-07-08T09:56:26.681Z"
+    },
+    {
+      "schema_version": "1.0.0",
+      "id": "cit_6d0784b1c122",
+      "claim_text": "\"Real-time synchronization of tasks is out of scope\"",
+      "claim_location": {
+        "artifact_path": "artifacts/projects/phase51_w3_gate10/orchestration/w3-6b69b623/documentation.json",
+        "line_range": [
+          72,
+          72
+        ]
+      },
+      "supporting_chunks": [
+        {
+          "chunk_id": "chk_4dee6bb3_53",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.38112515211105347,
+          "excerpt": "defined in [OASIS Repeatable Requests Version 1.0](https://docs.oasis-open.org/odata/repeatable-requests/v1.0/repeatable-requests-v1.0.html) for POST operations to make them retriable.\n- The tracked t"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_54",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.3156365156173706,
+          "excerpt": "ers. An example would be a dashboard or portal that shows all the operations along with their status.  See the [Long Running Operations section](./ConsiderationsForServiceDesign.md#long-running-operat"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_52",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.3145100474357605,
+          "excerpt": "t-for-tls-10-and-11/)`\n- `azure-deprecating: Model version 2021-01-15 used in Sentiment analysis will retire on 2022-12-01 (https://aka.ms/ta-modelversions?sentimentAnalysis)`\n- `azure-deprecating: TL"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_8",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.2788047194480896,
+          "excerpt": "ers offer optimistic concurrency. The URL of a service, along with its request/response bodies, establishes the overall contract that developers have with your service. As a service provider, how you "
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_18",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.2738950252532959,
+          "excerpt": "nse, GET response, and POST request/response on a given URL path. The PATCH request schema should contain all the same fields with no required fields. This allows one SDK type for input/output operati"
+        }
+      ],
+      "confidence": "LOW",
+      "synthesized_by": "documentation",
+      "synthesized_at": "2026-07-08T09:56:26.961Z"
+    },
+    {
+      "schema_version": "1.0.0",
+      "id": "cit_87da696fa125",
+      "claim_text": "\"summary\": \"This documentation provides an overview of a task management REST API project, including its components, API endpoints, and operations guide for operators and maintainers, ensuring they can deploy and troubleshoot effectively.\"",
+      "claim_location": {
+        "artifact_path": "artifacts/projects/phase51_w3_gate10/orchestration/w3-6b69b623/documentation.json",
+        "line_range": [
+          74,
+          74
+        ]
+      },
+      "supporting_chunks": [
+        {
+          "chunk_id": "chk_4dee6bb3_1",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.4776172637939453,
+          "excerpt": "lines for DNS Done Right                      |\n| 2022-Jul-15 | Update guidance on long-running operations                     |\n| 2022-May-11 | Drop guidance on version discovery                     "
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_16",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.4743809103965759,
+          "excerpt": "er already exists in production [[RFC 6648](https://datatracker.ietf.org/doc/html/rfc6648)].\n\n**Additional References**\n- [StackOverflow - Difference between http parameters and http headers](https://"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_0",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.47303271293640137,
+          "excerpt": "# Microsoft Azure REST API Guidelines\n\n<!-- cspell:ignore autorest, BYOS, etag, idempotency, maxpagesize, innererror, trippable, nextlink, condreq, etags -->\n<!-- markdownlint-disable MD033 MD049 MD05"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_17",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.46830320358276367,
+          "excerpt": "ps://docs.microsoft.com/azure/architecture/best-practices/api-design) for a more detailed discussion of REST API design patterns.\n\nWhen designing your service, it is important to optimize for the deve"
+        },
+        {
+          "chunk_id": "chk_4dee6bb3_83",
+          "source_id": "src_4dee6bb36334",
+          "relevance_score": 0.4485020637512207,
+          "excerpt": "tive, maintainable, consistent, and most importantly, delight our customers.\nBecause APIs affect nearly all downstream decisions, you are encouraged to reach out to the Stewardship board early in the "
+        }
+      ],
+      "confidence": "LOW",
+      "synthesized_by": "documentation",
+      "synthesized_at": "2026-07-08T09:56:27.199Z"
+    }
+  ],
+  "citations_jsonl_count": 8,
+  "relevance_distribution": [
+    {
+      "claim": "\"purpose\": \"This project provides a REST API for task management, desi",
+      "max_relevance": 0.4749,
+      "confidence": "LOW",
+      "chunks": 5
+    },
+    {
+      "claim": "\"Returns 400 if 'title' is missing or not a string\",",
+      "max_relevance": 0.3567,
+      "confidence": "LOW",
+      "chunks": 5
+    },
+    {
+      "claim": "\"Returns 400 if 'title' is missing or not a string\",",
+      "max_relevance": 0.3567,
+      "confidence": "LOW",
+      "chunks": 5
+    },
+    {
+      "claim": "\"logging\": \"Logs are written to the console with details on requests, ",
+      "max_relevance": 0.3509,
+      "confidence": "LOW",
+      "chunks": 5
+    },
+    {
+      "claim": "\"fix\": \"Ensure Node.js and SQLite are installed and revisit configurat",
+      "max_relevance": 0.3755,
+      "confidence": "LOW",
+      "chunks": 5
+    },
+    {
+      "claim": "\"fix\": \"Verify that the task ID used is correct and present in the dat",
+      "max_relevance": 0.3636,
+      "confidence": "LOW",
+      "chunks": 5
+    },
+    {
+      "claim": "\"Real-time synchronization of tasks is out of scope\"",
+      "max_relevance": 0.3811,
+      "confidence": "LOW",
+      "chunks": 5
+    },
+    {
+      "claim": "\"summary\": \"This documentation provides an overview of a task manageme",
+      "max_relevance": 0.4776,
+      "confidence": "LOW",
+      "chunks": 5
+    }
+  ],
+  "pre_fix_relevance": "[0,0,0,0,0,0,0,0] — Express README, pre-fix squared-L2 bug (all clamped to 0.000)",
+  "post_fix_relevance": [
+    0.4749,
+    0.3567,
+    0.3567,
+    0.3509,
+    0.3755,
+    0.3636,
+    0.3811,
+    0.4776
+  ],
+  "assertions": {
+    "audit_pass": true,
+    "advanced_true": true,
+    "advanced_to_qj": true,
+    "graph_qj": true,
+    "citation_pass_cited": true,
+    "citations_written": true
+  },
+  "spend": {
+    "before": {
+      "agent_usd": 0.01563,
+      "kb_usd": 0,
+      "total_usd": 0.01563,
+      "agent_rows": 3,
+      "kb_rows": 0
+    },
+    "after": {
+      "agent_usd": 0.03165,
+      "kb_usd": 0.0005848600000000001,
+      "total_usd": 0.03223486,
+      "agent_rows": 4,
+      "kb_rows": 9
+    },
+    "delta_usd": 0.0166,
+    "cap_usd": 0.15,
+    "kill_bar_usd": 3
+  },
+  "documentation_on_disk": "artifacts\\projects\\phase51_w3_gate10\\orchestration\\w3-6b69b623\\documentation.json",
+  "latency_ms": {
+    "http_round_trip": 12582
+  },
+  "timestamp": "2026-07-08T09:56:27.372Z"
+}
