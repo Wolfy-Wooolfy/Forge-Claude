@@ -4,8 +4,8 @@
   "current_stage": "A",
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
-  "next_phase": "PHASE-51-PENDING-DECISION",
-  "next_step": "PHASE-51-KB-CITE IN PROGRESS (documentation-time citation generation): post-generation citation pass in documentProject (post-persist, pre-§8-audit) that emits CitationRecords so real builds pass the §8 audit. W-0 opened (decision artifact + status flip). Next: W-1 citation pass + S-D/S-E, then mid-checkpoint.",
+  "next_phase": "PHASE-52-PENDING-DECISION",
+  "next_step": "PHASE-51-KB-CITE CLOSED (2026-07-08): documentation-time citation generation end-to-end on the REAL path (real gpt-4o doc -> §7.1 claims -> kb.retrieve -> kb.cite -> citations.jsonl -> §8 PASS -> QUALITY_JUDGE), proven twice with real gpt-4o (W-3 pre-fix + W-A2-3 post-fix). Amendment A-2 caught + fixed a latent squared-L2-vs-cosine relevance bug (Option B .distanceType(cosine); S359 regression; relevance [0x8] -> [0.475..0.478]). SU 352/0/5 (357). Closure LOCAL; push/tag phase-51-complete await CTO fresh-zip verify. PHASE-52 pending owner decision.",
   "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-22-phase-43-first-real-build.md",
   "phase_45": {
     "status": "CLOSED",
@@ -121,6 +121,45 @@
       "KB/Research (#9) -> PHASE-49 (resolve TAVILY vs offline-mode design first)"
     ],
     "next_phase": "PHASE-49-PENDING-DECISION"
+  },
+  "phase_51": {
+    "status": "CLOSED",
+    "closed_at": "2026-07-08",
+    "title": "kb.cite — Documentation-Time Citation Generation",
+    "decision_artifact": "artifacts/decisions/DECISION-2026-07-07-phase-51-kb-cite.md",
+    "closure_artifact": "artifacts/decisions/DECISION-2026-07-08-phase-51-closure.md",
+    "mid_checkpoint": "artifacts/decisions/_phase_51_checkpoints/stage_kb_cite_mid.md",
+    "amendments": [
+      "A-1 (W-2 hermeticity seam: opts._client threaded via engine construction, off the HTTP body)",
+      "A-2 (cosine metric fix: squared-L2-vs-cosine relevance bug caught by real Gate #10)"
+    ],
+    "crux": "documentation-time citation generation end-to-end on the REAL path (real gpt-4o doc -> §7.1 claims -> kb.retrieve -> kb.cite -> citations.jsonl -> §8 PASS -> advance QUALITY_JUDGE); proven twice with real gpt-4o (W-3 pre-fix + W-A2-3 post-fix)",
+    "a2_fix": "storage_lance queried LanceDB with NO metric (default squared-L2, _distance=2(1-cos)) while _toResult scored max(0,1-_distance) -> every cos<0.5 pair clamped to relevance 0.000. Fixed Option B: searchVector .distanceType(cosine) + _toResult relevance=max(0,min(1,1-_distance)). Triple-verified diagnosis ($0); blast radius 0; PHASE-50 unaffected (its HIGH = research finding confidence_level, not citation relevance_score). storage_lance was byte-identical to PHASE-50 (pre-existing latent bug, first exposed here).",
+    "gate_10": "REAL_PASS x2",
+    "gate_10_prefix": {
+      "source": "raw.githubusercontent.com/expressjs/express Readme",
+      "relevance": "[0,0,0,0,0,0,0,0] (latent squared-L2 bug)",
+      "verdict": "GATE_PASS (mechanism) / relevance all-zero (bug)",
+      "spend_usd": 0.0157,
+      "evidence": "artifacts/spikes/phase51_w3/"
+    },
+    "gate_10_postfix": {
+      "source": "raw.githubusercontent.com/microsoft/api-guidelines/vNext/azure/Guidelines.md (84 chunks, REPUTABLE)",
+      "relevance": "[0.475,0.357,0.357,0.351,0.376,0.364,0.381,0.478] all non-zero; all LOW confidence (honest: general REST guidelines moderately-not-exactly related to a bespoke task-API's claims)",
+      "verdict": "GATE_PASS + meaningful non-zero cosine relevance",
+      "spend_usd": 0.0166,
+      "evidence": "artifacts/spikes/phase51_w3_postfix/"
+    },
+    "su_suite": "352/0/5 (357)",
+    "scenarios_added": ["S354", "S355", "S356", "S357", "S358", "S359"],
+    "arc_ledger_count": 10,
+    "l2_tools": 80,
+    "agent_roles": 13,
+    "track_a": "CLEAN on conversationEngine.js + storage_lance.js + citation_pass_test_helper.js + document_project_test_helper.js (no fetch/fs.*Sync/new OpenAI/child_process added on any live-surface line)",
+    "real_spend_usd": 0.0323,
+    "commit_trail": "c069529 W-0 / 6042834 W-1 / 9cffb0c mid / 9259e2a W-2 / e24e190 W-2.1 / 6a404ba W-3 / ec4ef5a A-2-open / bad42b6 A-2-fix+S359 / 3161f16 driver(owner) / c302c39 W-A2-3 / <closure>",
+    "release_status": "CLOSED LOCAL; push + annotated tag phase-51-complete (on the closure commit) await CTO fresh-zip closure-diff + push GO",
+    "next_phase": "PHASE-52-PENDING-DECISION"
   },
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
@@ -2224,8 +2263,8 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-51-KB-CITE-IN-PROGRESS",
-  "last_updated": "2026-07-07T00:00:00.000Z",
+  "current_task": "PHASE-51-KB-CITE-COMPLETE",
+  "last_updated": "2026-07-08T00:00:00.000Z",
   "phase_16": {
     "status": "ACTIVE",
     "started_at": "2026-05-24T16:00:00.000Z",
