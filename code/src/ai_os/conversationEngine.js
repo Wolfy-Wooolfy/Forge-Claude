@@ -31,6 +31,16 @@ const CONFIRMATION_REQUIRED_TRANSITIONS = new Set([
   "EXECUTION_HANDOFF_READY->EXECUTION_HANDOFF_CREATED"
 ]);
 
+// ── PHASE-52 (D2) — Auto web-discovery guardrails (named constants) ─────────────
+// These bound the cost + blast radius of the discovery loop below. The per-run total cap is
+// the real Gate #10 cost ceiling (each research.search_web call ≈ $0.005 + one kb.ingest_url
+// embed ≈ fractions of a cent). Worst case at cap 8 ≈ $0.04 in search + embeds — well under
+// the decision-§8 estimate ($0.03–0.10) and far under the $3 kill bar. Conservative by design.
+const DISCOVERY_MAX_SEARCHES_PER_CLAIM = 1;   // one targeted search per triggered claim (query = claim text)
+const DISCOVERY_MAX_TOTAL_SEARCHES     = 8;   // per-documentProject ceiling (the cost ceiling)
+const DISCOVERY_MAX_URLS_PER_CLAIM     = 1;   // ingest only the top usable result
+const DISCOVERY_SEARCH_MAX_RESULTS     = 5;   // ask for a few; take the first usable url
+
 // ── PHASE-51 (W-1) — Documentation-time citation generation ────────────────────
 // Post-generation citation pass: runs inside documentProject AFTER documentation.json is
 // persisted and BEFORE the §8 citation audit. For each factual claim the §7.1 detector
@@ -52,10 +62,34 @@ const CONFIRMATION_REQUIRED_TRANSITIONS = new Set([
 // `_client` (PHASE-51 A-1, W-2 seam) is an OPTIONAL trailing test seam — a mock embedding
 // client for hermetic retrieval-coupled scenarios. When absent (production), the kb.retrieve
 // ctx is exactly { root } and the path is byte-identical to the seam-absent behavior.
-async function runDocumentationCitationPass(reg, projectId, artifactRelPath, content, root, _client) {
+//
+// ── PHASE-52 (D1) — Auto web-discovery on would-be-uncited claims ──────────────
+// When a §7.1 claim would otherwise stay UNCITED for one of exactly TWO reasons —
+//   (a) zero_chunks : retrieve OK but the active KB holds NO source for this claim, or
+//   (b) cite_blocked: chunks exist but kb.cite skipped (LOW-only support, the PHASE-51-LOW
+//       limit) — the pass runs web discovery: research.search_web(claim) → kb.ingest_url(top
+//   result) into the ACTIVE PROJECT KB → kb.retrieve(claim) again → kb.cite. Discovery is
+//   STRICTLY ADDITIVE: it fires ONLY on those two branches. An already-citable claim reaches
+//   `summary.cited++` on the first cite and NEVER enters discovery (untouched vs PHASE-51).
+//   The retrieve_failed branch is DELIBERATELY EXCLUDED (RULING 2): the retrieve envelope
+//   failed (infra / no embed key / store error); kb.ingest_url re-embeds via the SAME infra
+//   and the re-retrieve would fail identically, so a paid search there is futile.
+// No fabrication (CTO refinement): the re-cite is a normal kb.cite call, so its LOW-filter
+//   (C-2) stays authoritative — if the newly-ingested source only yields LOW chunks, kb.cite
+//   still SKIPS and the claim STAYS UNCITED. Discovery either lifts a claim to a REAL non-LOW
+//   citation or leaves it uncited; it can NEVER force a fabricated/LOW "cited". §8 stays the gate.
+//
+// `_discovery` (PHASE-52 seam, Option-1 A-1 analog) is an OPTIONAL trailing test seam —
+//   { search, ingest } function overrides (+ an optional test-only `maxTotalSearches`) for
+//   hermetic $0 scenarios. When absent (production), search/ingest go through
+//   reg.invoke("research.search_web"/"kb.ingest_url") directly; the ctx is exactly { root }
+//   (or { root, _client } when the embed seam is present) — byte-identical to the seam-absent path.
+async function runDocumentationCitationPass(reg, projectId, artifactRelPath, content, root, _client, _discovery) {
   const summary = {
     claims_detected: 0, cited: 0, uncited: 0,
-    retrieve_failed: 0, zero_chunks: 0, cite_blocked: 0
+    retrieve_failed: 0, zero_chunks: 0, cite_blocked: 0,
+    // PHASE-52 additive forensics (Gate #10 durable evidence; consumed by no existing scenario)
+    discovery_searches: 0, discovery_ingests: 0, discovery_cited: 0, discovery_blocked_low: 0
   };
 
   let claims;
@@ -66,8 +100,95 @@ async function runDocumentationCitationPass(reg, projectId, artifactRelPath, con
   }
   summary.claims_detected = claims.length;
 
-  // Additive-optional: exactly { root } unless the test seam supplies a mock client.
+  // Additive-optional: exactly { root } unless the test seam supplies a mock embed client.
   const retrieveCtx = _client ? { root, _client } : { root };
+  const ingestCtx   = _client ? { root, _client } : { root };
+  const baseCtx     = { root };
+
+  // ── PHASE-52 (D2) guardrails ──
+  const maxTotalSearches = (_discovery && Number.isInteger(_discovery.maxTotalSearches))
+    ? _discovery.maxTotalSearches            // test-only override (production: _discovery absent)
+    : DISCOVERY_MAX_TOTAL_SEARCHES;
+  const ingestedUrls = new Set();            // in-run URL dedup (complements kb.ingest_url's persistent dedup)
+  let   totalSearches = 0;                   // per-documentProject counter, capped at maxTotalSearches
+
+  // Seam-aware invokers: production (default) → reg.invoke; tests → _discovery.{search,ingest}.
+  async function _search(input) {
+    if (_discovery && typeof _discovery.search === "function") return _discovery.search(input, baseCtx);
+    return reg.invoke("research.search_web", input, baseCtx);
+  }
+  async function _ingest(input) {
+    if (_discovery && typeof _discovery.ingest === "function") return _discovery.ingest(input, ingestCtx);
+    return reg.invoke("kb.ingest_url", input, ingestCtx);
+  }
+  async function _retrieve(text) {
+    return reg.invoke("kb.retrieve", {
+      query:             text,
+      project_id:        projectId,
+      credibility_floor: "COMMUNITY"
+    }, retrieveCtx);
+  }
+  async function _cite(text, line, chunks) {
+    return reg.invoke("kb.cite", {
+      claim_text:     text,
+      claim_location: { artifact_path: artifactRelPath, line_range: [line, line] },
+      chunks:         chunks,
+      synthesized_by: "documentation",
+      project_id:     projectId
+    }, baseCtx);
+  }
+
+  // Discovery for a single would-be-uncited claim (zero_chunks / cite_blocked only).
+  // Returns true iff the claim is lifted to a REAL non-LOW citation. Enforces the per-claim
+  // and per-run search caps (D2). Never fabricates — the re-cite's kb.cite LOW-filter decides.
+  async function _attemptDiscovery(text, line) {
+    for (let s = 0; s < DISCOVERY_MAX_SEARCHES_PER_CLAIM; s++) {
+      if (totalSearches >= maxTotalSearches) break;      // per-run total-search cap
+      totalSearches++; summary.discovery_searches++;
+
+      let searchEnv;
+      try {
+        searchEnv = await _search({
+          query:       text,
+          project_id:  projectId,
+          max_results: DISCOVERY_SEARCH_MAX_RESULTS
+        });
+      } catch (_) { searchEnv = null; }
+      // FAILED envelope (e.g. BOTH_PROVIDERS_FAILED) → no source this round.
+      if (!searchEnv || searchEnv.status !== "SUCCESS") continue;
+
+      const found = (searchEnv.output && searchEnv.output.results) || [];
+      const urls  = [];
+      for (const r of found) {
+        if (r && typeof r.url === "string" && r.url) urls.push(r.url);
+        if (urls.length >= DISCOVERY_MAX_URLS_PER_CLAIM) break;
+      }
+      if (urls.length === 0) continue;                   // SUCCESS but nothing usable
+
+      for (const url of urls) {
+        if (ingestedUrls.has(url)) continue;             // in-run URL dedup — skip a repeat ingest
+        ingestedUrls.add(url);
+        let ingestEnv;
+        try { ingestEnv = await _ingest({ url, project_id: projectId }); }
+        catch (_) { ingestEnv = null; }
+        if (ingestEnv && ingestEnv.status === "SUCCESS") summary.discovery_ingests++;
+      }
+
+      // Re-retrieve after ingest, then re-cite (LOW-filter authoritative — CTO refinement).
+      let reEnv;
+      try { reEnv = await _retrieve(text); } catch (_) { reEnv = null; }
+      if (!reEnv || reEnv.status !== "SUCCESS") continue;
+      const reChunks = (reEnv.output && reEnv.output.results) || [];
+      if (reChunks.length === 0) continue;
+
+      let reCiteEnv;
+      try { reCiteEnv = await _cite(text, line, reChunks); } catch (_) { reCiteEnv = null; }
+      if (reCiteEnv && reCiteEnv.status === "SUCCESS") return true;   // lifted to a REAL non-LOW citation
+      summary.discovery_blocked_low++;                               // ingested but re-cite still LOW-only
+      return false;                                                  // stays uncited (fail-closed; no fabrication)
+    }
+    return false;
+  }
 
   for (const claim of claims) {
     const line = claim.line;
@@ -79,14 +200,11 @@ async function runDocumentationCitationPass(reg, projectId, artifactRelPath, con
     // 1. Retrieve supporting chunks. credibility_floor COMMUNITY: non-LOW chunks are
     //    eligible for a CitationRecord (synthesizeCitation still filters LOW as
     //    defense-in-depth). A retrieve failure (e.g. no API key in a hermetic run) leaves
-    //    the claim uncited — the §8 audit below is the fail-closed gate.
+    //    the claim uncited — the §8 audit below is the fail-closed gate. Discovery is
+    //    EXCLUDED on this branch (RULING 2): the same infra would fail the re-retrieve.
     let retrieveEnv = null;
     try {
-      retrieveEnv = await reg.invoke("kb.retrieve", {
-        query:             text,
-        project_id:        projectId,
-        credibility_floor: "COMMUNITY"
-      }, retrieveCtx);
+      retrieveEnv = await _retrieve(text);
     } catch (_) {
       retrieveEnv = null;
     }
@@ -95,27 +213,28 @@ async function runDocumentationCitationPass(reg, projectId, artifactRelPath, con
     }
 
     const chunks = (retrieveEnv.output && retrieveEnv.output.results) || [];
-    if (chunks.length === 0) { summary.zero_chunks++; summary.uncited++; continue; }
+    if (chunks.length === 0) {
+      // (a) zero_chunks — no KB source for this claim (the PHASE-51 L-1 limit). Try discovery.
+      summary.zero_chunks++;
+      if (await _attemptDiscovery(text, line)) { summary.cited++; summary.discovery_cited++; }
+      else { summary.uncited++; }
+      continue;
+    }
 
     // 2. Cite — decide "cited vs uncited" from the kb.cite RESULT (C-2), never fabricate.
     let citeEnv = null;
     try {
-      citeEnv = await reg.invoke("kb.cite", {
-        claim_text:     text,
-        claim_location: { artifact_path: artifactRelPath, line_range: [line, line] },
-        chunks:         chunks,
-        synthesized_by: "documentation",
-        project_id:     projectId
-      }, { root });
+      citeEnv = await _cite(text, line, chunks);
     } catch (_) {
       citeEnv = null;
     }
+    if (citeEnv && citeEnv.status === "SUCCESS") { summary.cited++; continue; }
 
-    if (citeEnv && citeEnv.status === "SUCCESS") {
-      summary.cited++;
-    } else {
-      summary.cite_blocked++; summary.uncited++;
-    }
+    // (b) cite_blocked — chunks exist but support is LOW-only (the PHASE-51 L-2 limit). Try
+    //     discovery for a claim-targeted, non-LOW source.
+    summary.cite_blocked++;
+    if (await _attemptDiscovery(text, line)) { summary.cited++; summary.discovery_cited++; }
+    else { summary.uncited++; }
   }
 
   return summary;
@@ -131,6 +250,11 @@ function createConversationEngine(options = {}) {
   // undefined in production (start-api.js / apiServer.js:82 never pass it) → kb.retrieve
   // falls back to getClient() and behavior is byte-identical to the seam-absent path.
   const _kbEmbedClient = options._client || undefined;
+  // PHASE-52 (D1) discovery seam — OPTIONAL { search, ingest } test overrides, injected at
+  // ENGINE CONSTRUCTION (off the public HTTP body, per G-1; the A-1 _client analog). undefined
+  // in production (start-api.js / apiServer.js never pass it) → the citation pass's web
+  // discovery runs through reg.invoke("research.search_web"/"kb.ingest_url") directly.
+  const _kbDiscovery = options._discovery || undefined;
 
   let _memoryManager = options.conversationMemoryManager || null;
   function getMemoryManager() {
@@ -2435,7 +2559,7 @@ function createConversationEngine(options = {}) {
           if (docReadBack && docReadBack.status === "SUCCESS") {
             citationPass = await runDocumentationCitationPass(
               reg, pid, orchRelDir + "/documentation.json",
-              docReadBack.output.content, root, _kbEmbedClient);
+              docReadBack.output.content, root, _kbEmbedClient, _kbDiscovery);
           }
         } catch {
           citationPass = null;
