@@ -1,0 +1,83 @@
+{
+  "request_body": {
+    "project_id": "phase52_gate10",
+    "loop_id": "g52-c50293b8"
+  },
+  "http_status": 200,
+  "latency_ms": 28924,
+  "response": {
+    "ok": true,
+    "loop_id": "g52-c50293b8",
+    "advanced": false,
+    "doc_error": "UNCITED_CLAIMS",
+    "uncited_claims": [
+      {
+        "line": 5,
+        "text": "\"purpose\": \"This project provides a simple health-check endpoint for monitoring application status. It is intended for system operators and monitoring tools.\","
+      },
+      {
+        "line": 26,
+        "text": "\"None; always returns HTTP 200 if the server is reachable.\""
+      },
+      {
+        "line": 44,
+        "text": "\"logging\": \"Logs startup message including port information at application start. Additional sophisticated logging is not part of the scope.\","
+      },
+      {
+        "line": 49,
+        "text": "\"fix\": \"Ensure the server is running with 'node src/server.js'. Check for console errors.\""
+      },
+      {
+        "line": 55,
+        "text": "\"Persistence, such as database connections and storage, is out of scope.\""
+      },
+      {
+        "line": 57,
+        "text": "\"summary\": \"This documentation covers the basic health-check API built using Node.js and Express. It is intended for operators managing service monitoring and uptime. The documentation outlines the API interface, quickstart instructions, operation guides, and known limitations. No authentication or persistence features are included as per the project scope.\""
+      }
+    ],
+    "citation_audit": {
+      "status": "FAIL_UNCITED",
+      "uncited_claims_count": 6,
+      "cited_claims_count": 0,
+      "uncited_claims": [
+        {
+          "line": 5,
+          "text": "\"purpose\": \"This project provides a simple health-check endpoint for monitoring application status. It is intended for system operators and monitoring tools.\","
+        },
+        {
+          "line": 26,
+          "text": "\"None; always returns HTTP 200 if the server is reachable.\""
+        },
+        {
+          "line": 44,
+          "text": "\"logging\": \"Logs startup message including port information at application start. Additional sophisticated logging is not part of the scope.\","
+        },
+        {
+          "line": 49,
+          "text": "\"fix\": \"Ensure the server is running with 'node src/server.js'. Check for console errors.\""
+        },
+        {
+          "line": 55,
+          "text": "\"Persistence, such as database connections and storage, is out of scope.\""
+        },
+        {
+          "line": 57,
+          "text": "\"summary\": \"This documentation covers the basic health-check API built using Node.js and Express. It is intended for operators managing service monitoring and uptime. The documentation outlines the API interface, quickstart instructions, operation guides, and known limitations. No authentication or persistence features are included as per the project scope.\""
+        }
+      ]
+    },
+    "citation_pass": {
+      "claims_detected": 6,
+      "cited": 0,
+      "uncited": 6,
+      "retrieve_failed": 0,
+      "zero_chunks": 6,
+      "cite_blocked": 0,
+      "discovery_searches": 6,
+      "discovery_ingests": 0,
+      "discovery_cited": 0,
+      "discovery_blocked_low": 0
+    }
+  }
+}

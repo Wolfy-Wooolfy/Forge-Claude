@@ -1,0 +1,178 @@
+{
+  "verdict": "GATE_NOT_PASSED",
+  "stop_code": "GATE_NOT_PASSED",
+  "detail": "§8 did not PASS end-to-end (some §7.1 claim not lifted by discovery). Honest report — NOT rigged. See per_claim for which claims cited vs stayed uncited and the discovered source tiers.",
+  "project_id": "phase52_gate10",
+  "loop_id": "g52-c50293b8",
+  "mode": "REAL_GPT4O_TAVILY",
+  "port": 50900,
+  "request_body": {
+    "project_id": "phase52_gate10",
+    "loop_id": "g52-c50293b8"
+  },
+  "documentProject_result": {
+    "ok": true,
+    "loop_id": "g52-c50293b8",
+    "advanced": false,
+    "doc_error": "UNCITED_CLAIMS",
+    "uncited_claims": [
+      {
+        "line": 5,
+        "text": "\"purpose\": \"This project provides a simple health-check endpoint for monitoring application status. It is intended for system operators and monitoring tools.\","
+      },
+      {
+        "line": 26,
+        "text": "\"None; always returns HTTP 200 if the server is reachable.\""
+      },
+      {
+        "line": 44,
+        "text": "\"logging\": \"Logs startup message including port information at application start. Additional sophisticated logging is not part of the scope.\","
+      },
+      {
+        "line": 49,
+        "text": "\"fix\": \"Ensure the server is running with 'node src/server.js'. Check for console errors.\""
+      },
+      {
+        "line": 55,
+        "text": "\"Persistence, such as database connections and storage, is out of scope.\""
+      },
+      {
+        "line": 57,
+        "text": "\"summary\": \"This documentation covers the basic health-check API built using Node.js and Express. It is intended for operators managing service monitoring and uptime. The documentation outlines the API interface, quickstart instructions, operation guides, and known limitations. No authentication or persistence features are included as per the project scope.\""
+      }
+    ],
+    "citation_audit": {
+      "status": "FAIL_UNCITED",
+      "uncited_claims_count": 6,
+      "cited_claims_count": 0,
+      "uncited_claims": [
+        {
+          "line": 5,
+          "text": "\"purpose\": \"This project provides a simple health-check endpoint for monitoring application status. It is intended for system operators and monitoring tools.\","
+        },
+        {
+          "line": 26,
+          "text": "\"None; always returns HTTP 200 if the server is reachable.\""
+        },
+        {
+          "line": 44,
+          "text": "\"logging\": \"Logs startup message including port information at application start. Additional sophisticated logging is not part of the scope.\","
+        },
+        {
+          "line": 49,
+          "text": "\"fix\": \"Ensure the server is running with 'node src/server.js'. Check for console errors.\""
+        },
+        {
+          "line": 55,
+          "text": "\"Persistence, such as database connections and storage, is out of scope.\""
+        },
+        {
+          "line": 57,
+          "text": "\"summary\": \"This documentation covers the basic health-check API built using Node.js and Express. It is intended for operators managing service monitoring and uptime. The documentation outlines the API interface, quickstart instructions, operation guides, and known limitations. No authentication or persistence features are included as per the project scope.\""
+        }
+      ]
+    },
+    "citation_pass": {
+      "claims_detected": 6,
+      "cited": 0,
+      "uncited": 6,
+      "retrieve_failed": 0,
+      "zero_chunks": 6,
+      "cite_blocked": 0,
+      "discovery_searches": 6,
+      "discovery_ingests": 0,
+      "discovery_cited": 0,
+      "discovery_blocked_low": 0
+    }
+  },
+  "citation_pass": {
+    "claims_detected": 6,
+    "cited": 0,
+    "uncited": 6,
+    "retrieve_failed": 0,
+    "zero_chunks": 6,
+    "cite_blocked": 0,
+    "discovery_searches": 6,
+    "discovery_ingests": 0,
+    "discovery_cited": 0,
+    "discovery_blocked_low": 0
+  },
+  "citation_audit": {
+    "status": "FAIL_UNCITED",
+    "uncited_claims_count": 6,
+    "cited_claims_count": 0,
+    "uncited_claims": [
+      {
+        "line": 5,
+        "text": "\"purpose\": \"This project provides a simple health-check endpoint for monitoring application status. It is intended for system operators and monitoring tools.\","
+      },
+      {
+        "line": 26,
+        "text": "\"None; always returns HTTP 200 if the server is reachable.\""
+      },
+      {
+        "line": 44,
+        "text": "\"logging\": \"Logs startup message including port information at application start. Additional sophisticated logging is not part of the scope.\","
+      },
+      {
+        "line": 49,
+        "text": "\"fix\": \"Ensure the server is running with 'node src/server.js'. Check for console errors.\""
+      },
+      {
+        "line": 55,
+        "text": "\"Persistence, such as database connections and storage, is out of scope.\""
+      },
+      {
+        "line": 57,
+        "text": "\"summary\": \"This documentation covers the basic health-check API built using Node.js and Express. It is intended for operators managing service monitoring and uptime. The documentation outlines the API interface, quickstart instructions, operation guides, and known limitations. No authentication or persistence features are included as per the project scope.\""
+      }
+    ]
+  },
+  "claims_detected_N": 6,
+  "providers_used": [
+    "tavily"
+  ],
+  "kb_sources_after": [],
+  "per_claim": [],
+  "citations_jsonl_count": 0,
+  "relevance_values": [],
+  "max_relevance": null,
+  "phase51_baseline": [
+    0.475,
+    0.478
+  ],
+  "secondary_exceeds_baseline": null,
+  "assertions": {
+    "audit_pass": false,
+    "advanced_true": false,
+    "advanced_to_qj": false,
+    "graph_qj": false,
+    "discovery_fired": true,
+    "discovery_cited": false,
+    "citations_written": false
+  },
+  "spend": {
+    "before": {
+      "agent_usd": 0,
+      "kb_usd": 0,
+      "total_usd": 0,
+      "agent_rows": 1,
+      "kb_rows": 0
+    },
+    "after": {
+      "agent_usd": 0.01339,
+      "kb_usd": 0.030006480000000006,
+      "total_usd": 0.04339648000000001,
+      "agent_rows": 2,
+      "kb_rows": 18
+    },
+    "delta_usd": 0.0434,
+    "cap_usd": 0.15,
+    "kill_bar_usd": 3
+  },
+  "documentation_on_disk": "artifacts\\projects\\phase52_gate10\\orchestration\\g52-c50293b8\\documentation.json",
+  "latency_ms": {
+    "http_round_trip": 28924
+  },
+  "timestamp": "2026-07-08T13:24:21.856Z"
+}
