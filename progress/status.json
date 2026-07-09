@@ -151,7 +151,14 @@
       "evidence": "artifacts/spikes/phase51_w3_postfix/"
     },
     "su_suite": "352/0/5 (357)",
-    "scenarios_added": ["S354", "S355", "S356", "S357", "S358", "S359"],
+    "scenarios_added": [
+      "S354",
+      "S355",
+      "S356",
+      "S357",
+      "S358",
+      "S359"
+    ],
     "arc_ledger_count": 10,
     "l2_tools": 80,
     "agent_roles": 13,
@@ -256,7 +263,7 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-07-06T13:53:15.312Z",
+    "last_doctor_run": "2026-07-09T10:34:59.376Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
