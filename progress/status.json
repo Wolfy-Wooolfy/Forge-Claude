@@ -4,8 +4,8 @@
   "current_stage": "A",
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
-  "next_phase": "PHASE-53-PENDING-DECISION",
-  "next_step": "PHASE-52 CLOSED (2026-07-09): auto web-discovery in the documentation citation pass via Amendment A-1 (Tavily-content ingest — new L2 kb.ingest_content ingests Tavily raw_content directly; Forge never fetches the arbitrary host; allow-list + SSRF guard byte-identical; L2 80->81). First real Gate #10 honestly exposed the allow-list gap (discovery_ingests=0, f8578a8); A-1 closed it; re-run (f7a05dd) = PRIMARY_PASS_SECONDARY_PASS: empty KB -> 7 claims -> 1 Tavily search -> 1 kb.ingest_content ingest seeded the KB -> 7/7 cited -> §8 PASS -> QUALITY_JUDGE; max relevance 0.6348 EXCEEDS the PHASE-51 baseline [0.475..0.478] (first MEDIUM real citation). Erratum #3 (cite_blocked unreachable under COMMUNITY floor) + SU hermeticity hardening (no-op _discovery seam in S357/S358 + forge-test strips provider keys). SU 359/0/5 (364). Closure LOCAL; push/tag phase-52-complete await CTO fresh-zip verify. PHASE-53 (relevance floor candidate) pending owner decision.",
+  "next_phase": "PHASE-54-PENDING-DECISION",
+  "next_step": "PHASE-53 CLOSED (2026-07-09): relevance floor in the documentation citation pass — a claim that WOULD be cited but whose best first-pass relevance < RELEVANCE_FLOOR_MEDIUM (0.60, the existing MEDIUM threshold extracted as the single named constant, R-4) gets ONE targeted web discovery (search_web -> kb.ingest_content, A-1 path) -> re-retrieve -> pre-cite KEEP-BEST -> exactly ONE kb.cite per claim (R-1); no lift -> claim keeps its citation + below_floor flag in claim-granular summary forensics (R-2); one attempt/claim shared across zero_chunks+floor triggers with the shared global cap + URL dedup (R-3); offline-safe, NO new HALT. REAL Gate #10 = GATE_PASS (49453ce): N=8 -> floor_below=7 -> 8 targeted Tavily searches (= cap exactly) -> 8 distinct per-claim REPUTABLE ingests -> 8/8 claims LIFTED (strict improvement each, 0 violations, 0 flag errors) -> §8 PASS -> QUALITY_JUDGE; distribution 0 HIGH / 2 MEDIUM / 6 LOW vs PHASE-52 baseline 1/6; spend $0.05457 ledger (~$0.0146 real cash). SU 365/0/5 (370). Closure LOCAL; push/tag phase-53-complete await CTO fresh-zip verify. PHASE-54 pending owner decision (candidates: Iterative MVP Loop / Browser Automation 7-D / Anthropic switch / providerTrace persistence).",
   "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-22-phase-43-first-real-build.md",
   "phase_45": {
     "status": "CLOSED",
@@ -196,6 +196,34 @@
     "su_added": "S360-S366 (+7): discovery lift / fail-closed / search cap / URL dedup / kb.ingest_content direct / no-arbitrary-fetch proof / E2E content-path lift",
     "phase_53_seed": "relevance floor — per-claim targeted discovery to lift cited-but-LOW claims (the 1-MEDIUM/6-LOW distribution motivates it)",
     "spend_cumulative": "~0.026 real / ~0.061 ledger USD"
+  },
+  "phase_53": {
+    "status": "CLOSED",
+    "closed_at": "2026-07-09",
+    "title": "Relevance floor — per-claim targeted discovery for cited-but-LOW claims",
+    "decision_artifact": "artifacts/decisions/DECISION-2026-07-09-phase-53-relevance-floor.md",
+    "closure_artifact": "artifacts/decisions/DECISION-2026-07-09-phase-53-closure.md",
+    "mid_checkpoint": "artifacts/decisions/_phase_53_checkpoints/stage_floor_mid.md",
+    "preclosure_checkpoint": "artifacts/decisions/_phase_53_checkpoints/stage_preclosure.md",
+    "closure_checkpoint": "artifacts/decisions/_phase_53_checkpoints/stage_closure.md",
+    "rulings": "R-1 pre-cite KEEP-BEST (floor check BEFORE the single kb.cite; exactly one CitationRecord per claim — citations.jsonl is append-only); R-2 below_floor = summary-level claim-granular forensics (floor_value/floor_checked/floor_below/floor_lifted/below_floor_claims/floor_claims[]; NOT a CitationRecord field); R-3 ONE discovery attempt per claim shared across zero_chunks+floor+cite_blocked triggers (shared global cap + shared URL dedup); R-4 RELEVANCE_FLOOR_MEDIUM = 0.60 extracted at citation_engine.js module scope + exported (single source of truth; credibility_scorer 0.6 = blend weight, untouched); R-5 doctor-drift folded into the next legitimate status.json commit. F-1/F-2 surfaced by CC at Step 0; ratified by CTO after independent line-level verification (bidirectional Trust+Verify).",
+    "crux": "the floor closes the cited-but-weak gap left by PHASE-52 — a claim that WOULD be cited but whose best first-pass relevance sits below the MEDIUM threshold gets its OWN targeted discovery, and KEEP-BEST backs the single citation with the better evidence; the Gate proved 8/8 strict lifts from 8 distinct per-claim REPUTABLE sources (vs ONE shared source in PHASE-52) with zero downgrades, zero HALTs, and the shared cap respected exactly (8 searches = ceiling)",
+    "su_added": "S367-S372 (+6): floor trigger + >=floor untouched / keep-best upgrade with the exactly-one-CitationRecord R-1 guard / no-lift keep-best + below_floor flag + NO HALT (incl. offline leg) / shared global cap across triggers (R-3) / shared URL dedup + redundant re-retrieve skip / zero_chunks citation-output regression",
+    "su_suite": "365/0/5 (370)",
+    "arc_ledger_count": 10,
+    "l2_tools": 81,
+    "agent_roles": 13,
+    "live_surface": "code/src/ai_os/conversationEngine.js + code/src/runtime/kb/citation_engine.js only; kb.ingest_url + http allow-list + SSRF guard byte-identical",
+    "docs_addendum": "docs/12_ai_os/22_KNOWLEDGE_BASE_CONTRACT.md §15 (floor semantics, R-1 mechanism + invariants, R-3 caps/dedup, R-2 forensic field table) + §14 cross-ref row",
+    "gate_10": {
+      "verdict": "GATE_PASS",
+      "criteria": "a-e all PASS: (a) floor_below=7 (floor_checked=7, N=8); (b) 7 floor-trigger attempts + 8 web_search ledger rows, tavily-only, production path (no seam); (c) keep-best non-decrease 8/8 records 0 violations; (d) no HALT — §8 PASS, advanced QUALITY_JUDGE (graph confirms), uncited=0; (e) 0 flag errors",
+      "distribution": "0 HIGH / 2 MEDIUM / 6 LOW vs PHASE-52 baseline 1 MEDIUM / 6 LOW",
+      "spend_usd": 0.05457,
+      "evidence": "artifacts/spikes/phase53_gate10/"
+    },
+    "spend_cumulative": "~0.0546 ledger / ~0.0146 real cash USD (Tavily free tier; ledger books a flat $0.005/search estimate x8)",
+    "phase_54_seed": "owner-gated candidates (NOT decided): Iterative MVP Loop (strong — direct owner value) / Browser Automation 7-D (needs new §ARC decision) / Anthropic provider switch (needs ANTHROPIC_API_KEY) / providerTrace response persistence / relevance-quality follow-ups (per-claim query refinement) if floor data motivates them"
   },
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
@@ -2299,7 +2327,7 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-52-RESEARCH-BACKED-CITATIONS-COMPLETE",
+  "current_task": "PHASE-53-RELEVANCE-FLOOR-COMPLETE",
   "last_updated": "2026-07-09T00:00:00.000Z",
   "phase_16": {
     "status": "ACTIVE",
