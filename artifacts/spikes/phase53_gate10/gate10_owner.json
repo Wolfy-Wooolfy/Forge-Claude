@@ -1,0 +1,399 @@
+{
+  "verdict": "GATE_PASS",
+  "mode": "REAL_GPT4O_TAVILY_FLOOR_DISCOVERY",
+  "floor_value": 0.6,
+  "criteria": {
+    "a_below_floor_detected": {
+      "pass": true,
+      "floor_below": 7,
+      "floor_checked": 7
+    },
+    "b_real_targeted_search": {
+      "pass": true,
+      "floor_trigger_attempted": 7,
+      "web_search_ledger_rows": 8,
+      "providers_used": [
+        "tavily"
+      ]
+    },
+    "c_keep_best_non_decrease": {
+      "pass": true,
+      "records_checked": 8,
+      "violations": []
+    },
+    "d_no_halt": {
+      "pass": true,
+      "audit_status": "PASS",
+      "advanced": true,
+      "advanced_to": "QUALITY_JUDGE",
+      "graph_state": "QUALITY_JUDGE",
+      "uncited": 0
+    },
+    "e_flags_correct": {
+      "pass": true,
+      "records_checked": 8,
+      "flag_errors": []
+    }
+  },
+  "project_id": "phase53_gate10",
+  "loop_id": "g53-c746b074",
+  "port": 54809,
+  "request_body": {
+    "project_id": "phase53_gate10",
+    "loop_id": "g53-c746b074"
+  },
+  "citation_pass": {
+    "claims_detected": 8,
+    "cited": 8,
+    "uncited": 0,
+    "retrieve_failed": 0,
+    "zero_chunks": 1,
+    "cite_blocked": 0,
+    "discovery_searches": 8,
+    "discovery_ingests": 8,
+    "discovery_cited": 1,
+    "discovery_blocked_low": 0,
+    "floor_value": 0.6,
+    "floor_checked": 7,
+    "floor_below": 7,
+    "floor_lifted": 2,
+    "below_floor_claims": 6,
+    "floor_claims": [
+      {
+        "line": 5,
+        "text_prefix": "\"purpose\": \"This project provides a simple REST API for checking the health stat",
+        "trigger": "zero_chunks",
+        "best_relevance_before": 0,
+        "best_relevance_after": 0.4837750196456909,
+        "attempted": true,
+        "lifted": true,
+        "below_floor": true
+      },
+      {
+        "line": 44,
+        "text_prefix": "\"health_check\": \"Access the GET /health endpoint. A 200 status code with JSON bo",
+        "trigger": "floor",
+        "best_relevance_before": 0.43248897790908813,
+        "best_relevance_after": 0.5085909366607666,
+        "attempted": true,
+        "lifted": true,
+        "below_floor": true
+      },
+      {
+        "line": 45,
+        "text_prefix": "\"logging\": \"Logs are printed to the console including server start confirmation:",
+        "trigger": "floor",
+        "best_relevance_before": 0.42793965339660645,
+        "best_relevance_after": 0.4306532144546509,
+        "attempted": true,
+        "lifted": true,
+        "below_floor": true
+      },
+      {
+        "line": 49,
+        "text_prefix": "\"cause\": \"Port 3000 is in use or Node.js is not installed\",",
+        "trigger": "floor",
+        "best_relevance_before": 0.32853949069976807,
+        "best_relevance_after": 0.621884822845459,
+        "attempted": true,
+        "lifted": true,
+        "below_floor": false
+      },
+      {
+        "line": 50,
+        "text_prefix": "\"fix\": \"Ensure Node.js is installed and no other application is using port 3000.",
+        "trigger": "floor",
+        "best_relevance_before": 0.5908409357070923,
+        "best_relevance_after": 0.6019173264503479,
+        "attempted": true,
+        "lifted": true,
+        "below_floor": false
+      },
+      {
+        "line": 54,
+        "text_prefix": "\"cause\": \"Server is not running\",",
+        "trigger": "floor",
+        "best_relevance_before": 0.3764137029647827,
+        "best_relevance_after": 0.5031940937042236,
+        "attempted": true,
+        "lifted": true,
+        "below_floor": true
+      },
+      {
+        "line": 60,
+        "text_prefix": "\"Authentication is not provided.\",",
+        "trigger": "floor",
+        "best_relevance_before": 0.2631755471229553,
+        "best_relevance_after": 0.3753230571746826,
+        "attempted": true,
+        "lifted": true,
+        "below_floor": true
+      },
+      {
+        "line": 61,
+        "text_prefix": "\"Persistence is out of scope.\"",
+        "trigger": "floor",
+        "best_relevance_before": 0.2881203889846802,
+        "best_relevance_after": 0.36979371309280396,
+        "attempted": true,
+        "lifted": true,
+        "below_floor": true
+      }
+    ]
+  },
+  "citation_audit": {
+    "status": "PASS",
+    "uncited_claims_count": 0,
+    "cited_claims_count": 8,
+    "uncited_claims": []
+  },
+  "claims_detected_N": 8,
+  "floor_claims": [
+    {
+      "line": 5,
+      "text_prefix": "\"purpose\": \"This project provides a simple REST API for checking the health stat",
+      "trigger": "zero_chunks",
+      "best_relevance_before": 0,
+      "best_relevance_after": 0.4837750196456909,
+      "attempted": true,
+      "lifted": true,
+      "below_floor": true
+    },
+    {
+      "line": 44,
+      "text_prefix": "\"health_check\": \"Access the GET /health endpoint. A 200 status code with JSON bo",
+      "trigger": "floor",
+      "best_relevance_before": 0.43248897790908813,
+      "best_relevance_after": 0.5085909366607666,
+      "attempted": true,
+      "lifted": true,
+      "below_floor": true
+    },
+    {
+      "line": 45,
+      "text_prefix": "\"logging\": \"Logs are printed to the console including server start confirmation:",
+      "trigger": "floor",
+      "best_relevance_before": 0.42793965339660645,
+      "best_relevance_after": 0.4306532144546509,
+      "attempted": true,
+      "lifted": true,
+      "below_floor": true
+    },
+    {
+      "line": 49,
+      "text_prefix": "\"cause\": \"Port 3000 is in use or Node.js is not installed\",",
+      "trigger": "floor",
+      "best_relevance_before": 0.32853949069976807,
+      "best_relevance_after": 0.621884822845459,
+      "attempted": true,
+      "lifted": true,
+      "below_floor": false
+    },
+    {
+      "line": 50,
+      "text_prefix": "\"fix\": \"Ensure Node.js is installed and no other application is using port 3000.",
+      "trigger": "floor",
+      "best_relevance_before": 0.5908409357070923,
+      "best_relevance_after": 0.6019173264503479,
+      "attempted": true,
+      "lifted": true,
+      "below_floor": false
+    },
+    {
+      "line": 54,
+      "text_prefix": "\"cause\": \"Server is not running\",",
+      "trigger": "floor",
+      "best_relevance_before": 0.3764137029647827,
+      "best_relevance_after": 0.5031940937042236,
+      "attempted": true,
+      "lifted": true,
+      "below_floor": true
+    },
+    {
+      "line": 60,
+      "text_prefix": "\"Authentication is not provided.\",",
+      "trigger": "floor",
+      "best_relevance_before": 0.2631755471229553,
+      "best_relevance_after": 0.3753230571746826,
+      "attempted": true,
+      "lifted": true,
+      "below_floor": true
+    },
+    {
+      "line": 61,
+      "text_prefix": "\"Persistence is out of scope.\"",
+      "trigger": "floor",
+      "best_relevance_before": 0.2881203889846802,
+      "best_relevance_after": 0.36979371309280396,
+      "attempted": true,
+      "lifted": true,
+      "below_floor": true
+    }
+  ],
+  "providers_used": [
+    "tavily"
+  ],
+  "kb_sources_after": [
+    {
+      "id": "src_921d075637b2",
+      "url": "https://nurbak.com/en/blog/rest-api-monitoring",
+      "tier": "REPUTABLE"
+    },
+    {
+      "id": "src_13f06aced397",
+      "url": "https://github.com/meilisearch/meilisearch/issues/1282",
+      "tier": "REPUTABLE"
+    },
+    {
+      "id": "src_0a482dc551dd",
+      "url": "https://stackoverflow.com/questions/34932876/python-logging-prevent-log-events-from-being-printed-to-the-console",
+      "tier": "REPUTABLE"
+    },
+    {
+      "id": "src_723585f563df",
+      "url": "https://www.quora.com/Why-is-port-3000-used-when-running-a-Node-js-application",
+      "tier": "REPUTABLE"
+    },
+    {
+      "id": "src_33a22b6032d5",
+      "url": "https://stackoverflow.com/questions/39322089/node-js-port-3000-already-in-use-but-it-actually-isnt",
+      "tier": "REPUTABLE"
+    },
+    {
+      "id": "src_c429f13f8c83",
+      "url": "https://its.ae/hosting/what-does-server-stopped-responding-mean",
+      "tier": "REPUTABLE"
+    },
+    {
+      "id": "src_1d5bdaad7154",
+      "url": "https://groups.google.com/g/django-rest-framework/c/rGJWUaFRi3k",
+      "tier": "REPUTABLE"
+    },
+    {
+      "id": "src_3855646db2fc",
+      "url": "https://stackoverflow.com/questions/13187679/preventing-variables-from-going-out-of-scope-so-they-persist-for-another-thread",
+      "tier": "REPUTABLE"
+    }
+  ],
+  "per_claim": [
+    {
+      "claim": "\"purpose\": \"This project provides a simple REST API for checking the health status of a se",
+      "confidence": "LOW",
+      "max_relevance": 0.4838,
+      "source_id": "src_921d075637b2",
+      "source_url": "https://nurbak.com/en/blog/rest-api-monitoring",
+      "source_tier": "REPUTABLE"
+    },
+    {
+      "claim": "\"health_check\": \"Access the GET /health endpoint. A 200 status code with JSON body {\\\"stat",
+      "confidence": "LOW",
+      "max_relevance": 0.5086,
+      "source_id": "src_13f06aced397",
+      "source_url": "https://github.com/meilisearch/meilisearch/issues/1282",
+      "source_tier": "REPUTABLE"
+    },
+    {
+      "claim": "\"logging\": \"Logs are printed to the console including server start confirmation: 'health a",
+      "confidence": "LOW",
+      "max_relevance": 0.4307,
+      "source_id": "src_0a482dc551dd",
+      "source_url": "https://stackoverflow.com/questions/34932876/python-logging-prevent-log-events-from-being-printed-to-the-console",
+      "source_tier": "REPUTABLE"
+    },
+    {
+      "claim": "\"cause\": \"Port 3000 is in use or Node.js is not installed\",",
+      "confidence": "MEDIUM",
+      "max_relevance": 0.6219,
+      "source_id": "src_723585f563df",
+      "source_url": "https://www.quora.com/Why-is-port-3000-used-when-running-a-Node-js-application",
+      "source_tier": "REPUTABLE"
+    },
+    {
+      "claim": "\"fix\": \"Ensure Node.js is installed and no other application is using port 3000.\"",
+      "confidence": "MEDIUM",
+      "max_relevance": 0.6019,
+      "source_id": "src_33a22b6032d5",
+      "source_url": "https://stackoverflow.com/questions/39322089/node-js-port-3000-already-in-use-but-it-actually-isnt",
+      "source_tier": "REPUTABLE"
+    },
+    {
+      "claim": "\"cause\": \"Server is not running\",",
+      "confidence": "LOW",
+      "max_relevance": 0.5032,
+      "source_id": "src_c429f13f8c83",
+      "source_url": "https://its.ae/hosting/what-does-server-stopped-responding-mean",
+      "source_tier": "REPUTABLE"
+    },
+    {
+      "claim": "\"Authentication is not provided.\",",
+      "confidence": "LOW",
+      "max_relevance": 0.3753,
+      "source_id": "src_1d5bdaad7154",
+      "source_url": "https://groups.google.com/g/django-rest-framework/c/rGJWUaFRi3k",
+      "source_tier": "REPUTABLE"
+    },
+    {
+      "claim": "\"Persistence is out of scope.\"",
+      "confidence": "LOW",
+      "max_relevance": 0.3698,
+      "source_id": "src_3855646db2fc",
+      "source_url": "https://stackoverflow.com/questions/13187679/preventing-variables-from-going-out-of-scope-so-they-persist-for-another-thread",
+      "source_tier": "REPUTABLE"
+    }
+  ],
+  "citations_jsonl_count": 8,
+  "relevance_values": [
+    0.4838,
+    0.5086,
+    0.4307,
+    0.6219,
+    0.6019,
+    0.5032,
+    0.3753,
+    0.3698
+  ],
+  "distribution": "0 HIGH / 2 MEDIUM / 6 LOW",
+  "phase52_baseline": {
+    "distribution": "1 MEDIUM / 6 LOW",
+    "relevance": [
+      0.5928,
+      0.2252,
+      0.6348,
+      0.2752,
+      0.4287,
+      0.2112,
+      0.2614
+    ]
+  },
+  "spend": {
+    "baseline": {
+      "agent_usd": 0,
+      "kb_usd": 0,
+      "total_usd": 0,
+      "agent_rows": 1,
+      "kb_rows": 0
+    },
+    "before": {
+      "agent_usd": 0,
+      "kb_usd": 0,
+      "total_usd": 0,
+      "agent_rows": 1,
+      "kb_rows": 0
+    },
+    "after": {
+      "agent_usd": 0.01422,
+      "kb_usd": 0.04035474000000001,
+      "total_usd": 0.05457474000000001,
+      "agent_rows": 2,
+      "kb_rows": 32
+    },
+    "delta_usd": 0.05457,
+    "cap_usd": 0.15,
+    "kill_bar_usd": 3
+  },
+  "documentation_on_disk": "artifacts\\projects\\phase53_gate10\\orchestration\\g53-c746b074\\documentation.json",
+  "latency_ms": {
+    "http_round_trip": 66428
+  },
+  "timestamp": "2026-07-09T12:17:05.696Z"
+}

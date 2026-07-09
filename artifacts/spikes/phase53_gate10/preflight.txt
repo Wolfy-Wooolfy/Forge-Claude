@@ -1,0 +1,7 @@
+PHASE-53 Gate #10 pre-flight 2026-07-09T12:15:58.719Z
+keys: OPENAI_API_KEY SET (len=164) ✓ · TAVILY_API_KEY SET (len=58, tvly…) ✓ · BRAVE_SEARCH_API_KEY UNSET ✓
+evidence dir created BEFORE any call ✓
+production discovery path: _discovery seam ABSENT (apiServer engine; reg.invoke research.search_web / kb.ingest_content) ✓ · not via bin/forge-test.js ✓
+floor: RELEVANCE_FLOOR_MEDIUM = 0.6 (citation_engine.js)
+cost ledger baseline: agent $0.00000 (1 rows, project-filtered) + kb $0.000000 (0 rows) = $0.00000
+envelope: expected ~$0.02–0.05 · cap $0.15 · kill bar $3

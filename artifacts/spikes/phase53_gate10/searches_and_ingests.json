@@ -1,0 +1,134 @@
+{
+  "web_search_rows": [
+    {
+      "ts": "2026-07-09T12:16:24.966Z",
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "project_id": "phase53_gate10",
+      "operation": "web_search",
+      "cost_usd": 0.005,
+      "model": "tavily",
+      "tool": "research.search_web"
+    },
+    {
+      "ts": "2026-07-09T12:16:32.204Z",
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "project_id": "phase53_gate10",
+      "operation": "web_search",
+      "cost_usd": 0.005,
+      "model": "tavily",
+      "tool": "research.search_web"
+    },
+    {
+      "ts": "2026-07-09T12:16:36.858Z",
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "project_id": "phase53_gate10",
+      "operation": "web_search",
+      "cost_usd": 0.005,
+      "model": "tavily",
+      "tool": "research.search_web"
+    },
+    {
+      "ts": "2026-07-09T12:16:42.810Z",
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "project_id": "phase53_gate10",
+      "operation": "web_search",
+      "cost_usd": 0.005,
+      "model": "tavily",
+      "tool": "research.search_web"
+    },
+    {
+      "ts": "2026-07-09T12:16:48.929Z",
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "project_id": "phase53_gate10",
+      "operation": "web_search",
+      "cost_usd": 0.005,
+      "model": "tavily",
+      "tool": "research.search_web"
+    },
+    {
+      "ts": "2026-07-09T12:16:55.268Z",
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "project_id": "phase53_gate10",
+      "operation": "web_search",
+      "cost_usd": 0.005,
+      "model": "tavily",
+      "tool": "research.search_web"
+    },
+    {
+      "ts": "2026-07-09T12:17:01.293Z",
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "project_id": "phase53_gate10",
+      "operation": "web_search",
+      "cost_usd": 0.005,
+      "model": "tavily",
+      "tool": "research.search_web"
+    },
+    {
+      "ts": "2026-07-09T12:17:04.953Z",
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "project_id": "phase53_gate10",
+      "operation": "web_search",
+      "cost_usd": 0.005,
+      "model": "tavily",
+      "tool": "research.search_web"
+    }
+  ],
+  "kb_sources_after": [
+    {
+      "id": "src_921d075637b2",
+      "url": "https://nurbak.com/en/blog/rest-api-monitoring",
+      "tier": "REPUTABLE",
+      "content_type": "text/plain"
+    },
+    {
+      "id": "src_13f06aced397",
+      "url": "https://github.com/meilisearch/meilisearch/issues/1282",
+      "tier": "REPUTABLE",
+      "content_type": "text/plain"
+    },
+    {
+      "id": "src_0a482dc551dd",
+      "url": "https://stackoverflow.com/questions/34932876/python-logging-prevent-log-events-from-being-printed-to-the-console",
+      "tier": "REPUTABLE",
+      "content_type": "text/plain"
+    },
+    {
+      "id": "src_723585f563df",
+      "url": "https://www.quora.com/Why-is-port-3000-used-when-running-a-Node-js-application",
+      "tier": "REPUTABLE",
+      "content_type": "text/plain"
+    },
+    {
+      "id": "src_33a22b6032d5",
+      "url": "https://stackoverflow.com/questions/39322089/node-js-port-3000-already-in-use-but-it-actually-isnt",
+      "tier": "REPUTABLE",
+      "content_type": "text/plain"
+    },
+    {
+      "id": "src_c429f13f8c83",
+      "url": "https://its.ae/hosting/what-does-server-stopped-responding-mean",
+      "tier": "REPUTABLE",
+      "content_type": "text/plain"
+    },
+    {
+      "id": "src_1d5bdaad7154",
+      "url": "https://groups.google.com/g/django-rest-framework/c/rGJWUaFRi3k",
+      "tier": "REPUTABLE",
+      "content_type": "text/plain"
+    },
+    {
+      "id": "src_3855646db2fc",
+      "url": "https://stackoverflow.com/questions/13187679/preventing-variables-from-going-out-of-scope-so-they-persist-for-another-thread",
+      "tier": "REPUTABLE",
+      "content_type": "text/plain"
+    }
+  ]
+}
