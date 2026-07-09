@@ -73,6 +73,11 @@ New **§15 "Documentation-Pass Relevance Floor (PHASE-53 Addendum)"** + one §14
 - (c) status.json edits in this commit: self_test_last_run/result + scenarios_pass 359→365
   (+ the pre-existing doctor auto-refresh drift folded per R-5). No phase_53 block, no
   next_step/current_task flip — those are closure-time items after CTO verification.
+  **(c-bis, post-commit note):** the doctor drift itself was captured minutes earlier by an
+  OWNER interim commit `3f2b904` "Update status.json" (Khaled, 14:10:35 +0300 — the known
+  owner-U pattern); this commit (`96597d2`) then carried the substantive self_test updates
+  on top. Net R-5 outcome identical (drift + legitimate update in the LOCAL chain, no
+  standalone hygiene commit by CC); recorded per the bidirectional Trust+Verify norm.
 - (d) D3 (caps + dedup wiring) was materially delivered in D1+D2 via the shared
   counter/set; S370/S371 are its verification. No separate D3 code was needed.
 
