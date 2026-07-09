@@ -51,6 +51,12 @@ Introduce a relevance floor in the documentation citation pass:
   All hermetic via the PHASE-52 seam pattern (no real Tavily/network in-suite).
 - Provisional suite target: 365/0/5 (370 total) — exact number locked at Step 0.
 
+> §4 annotation (Step 0, R-1): scenario (b)'s "citation upgraded, old never
+> removed until replaced" is realized as pre-cite KEEP-BEST — exactly ONE
+> kb.cite with the winning chunk set, i.e. exactly one CitationRecord per
+> claim in citations.jsonl (append-only; appendCitation persists immediately
+> at citation_engine.js:94). See §7 R-1.
+
 ## 5. Closure gate (deterministic)
 1. Full SU suite exact green count on CC Windows run (number locked at Step 0).
 2. Track A grep clean (no fetch()/fs.*Sync/child_process/new OpenAI() outside §ARC).
@@ -73,3 +79,51 @@ Introduce a relevance floor in the documentation citation pass:
 - Browser Automation (7-D) — needs new §ARC for subprocess → separate decision.
 - SSRF-guard hardening — not needed under Approach B.
 - Anthropic provider switch — blocked on ANTHROPIC_API_KEY.
+
+## 7. Step 0 Rulings (2026-07-09 — CTO GO)
+
+F-1/F-2 surfaced by CC at Step 0; ratified by CTO after independent
+line-level verification against main@49097f1.
+
+R-1 (F-1 RATIFIED — pre-cite keep-best):
+The floor check runs BEFORE the first kb.cite. Per claim: retrieve → if
+bestRel < FLOOR → one targeted discovery → re-retrieve → KEEP-BEST of
+(original set, new set) by max relevance → exactly ONE kb.cite with the
+winning set. Rationale: citations.jsonl is append-only (appendCitation
+persists immediately at citation_engine.js:94); a post-cite "upgrade" would
+append duplicate records for the same claim. Artifact §2/§4-b "old never
+removed until replaced" described INTENT (never lose citation quality), not
+mechanism. Invariants never-downgrade / never-strip / no-new-HALT hold by
+construction; keep-best is kept as an explicit comparison (defense-in-depth)
+even though post-ingest retrieval is expected monotone. S368 asserts
+exactly-one-record-per-claim in citations.jsonl. Surfaced by CC at Step 0 —
+recorded per the bidirectional Trust+Verify norm.
+
+R-2 (F-2 RATIFIED — summary-level, claim-granular forensics):
+below_floor is NOT a CitationRecord field. Realized as forensic fields on the
+citation-pass summary (PHASE-52 discovery_* precedent). REQUIRED granularity:
+per-claim outcome must be reconstructable from the summary — expose, at
+minimum, per affected claim: {claim ref/index, best_relevance_before,
+best_relevance_after, attempted, lifted, below_floor}. Exact field names =
+CC's choice; claim-level granularity is mandatory (Gate #10 evidence).
+Durable by construction: citation_pass rides both endpoint payloads
+(verified ~:2621/~:2642). Zero touches to _schemas.js / kb_tools.js for this.
+
+R-3 (edge RATIFIED — one attempt per claim, shared across triggers):
+Max ONE discovery attempt per claim per documentation pass, shared between
+the zero_chunks trigger and the floor trigger. A claim lifted via zero_chunks
+that remains < FLOOR: NO second attempt; marked below_floor. Must be asserted
+in one of S367–S372 (S370 is the natural fit — CC's placement choice).
+
+R-4 (constant extraction GO):
+RELEVANCE_FLOOR_MEDIUM = 0.60 at module scope of citation_engine.js;
+_scoreToConfidence consumes it; added to module.exports alongside
+synthesizeCitation; conversationEngine imports it (value-only import,
+precedent :11). HIGH 0.80 stays inline (out of scope). Post-extraction:
+exactly ONE 0.60 relevance-threshold literal in the codebase
+(credibility_scorer.js:149 blend weight is NOT a threshold — untouched).
+
+R-5 (status.json doctor drift):
+Leave uncommitted. Fold into the NEXT commit that legitimately updates
+status.json (mid-checkpoint or later), with a one-line note in that commit
+message. No standalone hygiene commit.
