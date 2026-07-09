@@ -64,8 +64,10 @@ function mask(v) { return { len: v.length, prefix: v.slice(0, 4) }; }
   }
   console.log("  (c) BRAVE_SEARCH_API_KEY: UNSET ✓ (Tavily path will be used)");
 
-  // (d) ONE real research.search_web call — $0 (Tavily free tier)
-  console.log("\n  (d) real research.search_web (Tavily, $0 free tier) — throwaway query …");
+  // (d) ONE real research.search_web call — $0 (Tavily free tier). A-1 re-run addition:
+  //     search_web now sends include_raw_content (D-A1.1); assert ≥1 result carries a
+  //     NON-EMPTY `content` field — the ingest path's input — BEFORE any gpt-4o spend.
+  console.log("\n  (d) real research.search_web (Tavily, $0 free tier, include_raw_content) — throwaway query …");
   const reg = getDefaultRegistry();
   const env = await reg.invoke("research.search_web",
     { query: "REST API design best practices", project_id: PID, max_results: 3 }, { root: ROOT });
@@ -73,15 +75,19 @@ function mask(v) { return { len: v.length, prefix: v.slice(0, 4) }; }
   const out = (env && env.output) || {};
   const results = out.results || [];
   const provider = out.provider_used;
-  console.log("      status=" + (env && env.status) + " provider_used=" + provider + " results=" + results.length);
+  const withContent = results.filter(r => r && typeof r.content === "string" && r.content.trim().length > 0);
+  console.log("      status=" + (env && env.status) + " provider_used=" + provider + " results=" + results.length +
+              " with_non_empty_content=" + withContent.length);
   if (results[0]) console.log("      first url: " + results[0].url);
+  if (withContent[0]) console.log("      first content length: " + withContent[0].content.length + " chars");
   // cleanup the preflight project dir (cost-ledger estimate entry)
   try { const d = path.join(ROOT, "artifacts", "projects", PID); if (fs.existsSync(d)) fs.rmSync(d, { recursive: true, force: true }); } catch (_) {}
 
   if (!ok)                       stop("SEARCH_FAILED", "research.search_web did not return SUCCESS: " + JSON.stringify(env && env.metadata));
   if (provider !== "tavily")     stop("WRONG_PROVIDER", "provider_used=" + provider + " (expected tavily)");
   if (results.length < 1)        stop("NO_RESULTS", "search returned 0 result URLs");
+  if (withContent.length < 1)    stop("NO_RAW_CONTENT", "no result carries a non-empty content field — the ingest path would have nothing to ingest");
 
-  console.log("\n✅  PRE-FLIGHT CLEAN — (a)(b)(c)(d) all pass. Ready for the real Gate #10 run.\n");
+  console.log("\n✅  PRE-FLIGHT CLEAN — (a)(b)(c)(d) all pass. Ready for the real Gate #10 re-run.\n");
   process.exit(0);
 })().catch(e => stop("SCRIPT_ERROR", e && e.stack || e));

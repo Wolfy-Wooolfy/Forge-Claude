@@ -40,7 +40,9 @@ const crypto = require("crypto");
 }());
 
 const ROOT       = path.resolve(__dirname, "..", "..");
-const EVIDENCE   = path.join(ROOT, "artifacts", "spikes", "phase52_gate10");
+// A-1 RE-RUN: distinct evidence dir — keep the committed FIRST-run evidence
+// (artifacts/spikes/phase52_gate10/, GATE_NOT_PASSED, discovery_ingests=0) intact.
+const EVIDENCE   = path.join(ROOT, "artifacts", "spikes", "phase52_gate10_rerun");
 const PROJECT_ID = "phase52_gate10";
 const LOOP_ID    = "g52-" + crypto.randomBytes(4).toString("hex");
 const PROVIDER   = "openai";
@@ -325,26 +327,45 @@ async function main() {
       stopAndReport("WRONG_PROVIDER", "a discovery search used brave (expected tavily only): " + JSON.stringify(providersUsed), { providers_used: providersUsed });
     }
 
-    // Honest assertions.
+    // Honest assertions — A-1 RE-RUN criteria split (per the amendment decision §6.1):
+    // PRIMARY (the pass bar) = the A-1 gap-closed proof: Tavily CONTENT was ingested (no
+    // fetch of the arbitrary host) and lifted ≥1 previously-zero_chunks claim to a REAL
+    // citation, via Tavily only. SECONDARY (measured, NOT the bar) = the full happy path
+    // (§8 PASS → advance) + relevance vs the PHASE-51 baseline — a per-claim source-quality
+    // outcome (erratum #3).
     const graphAfter = fs.existsSync(GRAPH_PATH) ? readJson(GRAPH_PATH) : {};
     const audit_pass          = ca.status === "PASS";
     const advanced_true       = r.advanced === true;
     const advanced_to_qj      = r.advanced_to === "QUALITY_JUDGE";
     const graph_qj            = graphAfter.current_state === "QUALITY_JUDGE";
     const discovery_fired     = typeof cp.discovery_searches === "number" && cp.discovery_searches >= 1;
+    const discovery_ingested  = typeof cp.discovery_ingests === "number" && cp.discovery_ingests >= 1;
     const discovery_cited     = typeof cp.discovery_cited === "number" && cp.discovery_cited >= 1;
     const citations_written   = citedForThisDoc.length >= 1;
+    const tavily_only         = providersUsed.length >= 1 && providersUsed.every(p => p === "tavily");
 
-    const gatePass = DRY
-      ? (advanced_true && advanced_to_qj && graph_qj)
-      : (audit_pass && advanced_true && advanced_to_qj && graph_qj && discovery_fired && discovery_cited && citations_written);
+    const primaryPass   = discovery_fired && discovery_ingested && discovery_cited && citations_written && tavily_only;
+    const secondaryPass = audit_pass && advanced_true && advanced_to_qj && graph_qj;
+
+    const gatePass = DRY ? (advanced_true && advanced_to_qj && graph_qj) : primaryPass;
 
     const maxRel = relevanceValues.length ? Math.max(...relevanceValues) : null;
     const exceedsBaseline = maxRel != null ? (maxRel > PHASE51_BASELINE[1]) : null;
 
     const gateResult = {
-      verdict: gatePass ? "GATE_PASS" : "GATE_NOT_PASSED",
-      mode: DRY ? "DRY_PLUMBING_$0" : "REAL_GPT4O_TAVILY",
+      verdict: DRY
+        ? (gatePass ? "GATE_PASS" : "GATE_NOT_PASSED")
+        : (primaryPass ? (secondaryPass ? "PRIMARY_PASS_SECONDARY_PASS" : "PRIMARY_PASS_SECONDARY_HALT")
+                       : "GATE_NOT_PASSED"),
+      primary:   { pass: primaryPass,   discovery_fired, discovery_ingested, discovery_cited, citations_written, tavily_only },
+      secondary: { pass: secondaryPass, audit_pass, advanced_true, advanced_to_qj, graph_qj },
+      first_gate_before: {
+        evidence: "artifacts/spikes/phase52_gate10/gate10_owner.json (commit f8578a8)",
+        verdict:  "GATE_NOT_PASSED",
+        citation_pass: { claims_detected: 6, zero_chunks: 6, discovery_searches: 6, discovery_ingests: 0, discovery_cited: 0 },
+        root_cause: "kb.ingest_url -> http allow-list HOST_NOT_ALLOWED on arbitrary discovered hosts"
+      },
+      mode: DRY ? "DRY_PLUMBING_$0" : "REAL_GPT4O_TAVILY_CONTENT_INGEST",
       project_id: PROJECT_ID, loop_id: LOOP_ID, port,
       request_body: docBody,
       documentProject_result: r,
@@ -374,16 +395,22 @@ async function main() {
     console.log("  providers used (discovery):", JSON.stringify(providersUsed));
     console.log("  citations.jsonl records:", citedForThisDoc.length);
     if (!DRY) {
+      console.log("  PRIMARY (A-1 pass bar):", JSON.stringify(gateResult.primary));
+      console.log("  SECONDARY (measured):  ", JSON.stringify(gateResult.secondary));
       for (const pc of perClaim) console.log("    • [" + pc.confidence + " rel=" + pc.max_relevance + "] " + pc.claim + "  ←  " + pc.source_tier + " " + pc.source_url);
       console.log("  relevance values:", JSON.stringify(relevanceValues));
-      console.log("  SECONDARY: max_relevance=" + maxRel + "  vs PHASE-51 baseline [" + PHASE51_BASELINE.join("..") + "]  → exceeds:", exceedsBaseline);
+      console.log("  SECONDARY relevance: max=" + maxRel + "  vs PHASE-51 baseline [" + PHASE51_BASELINE.join("..") + "]  → exceeds:", exceedsBaseline);
+      console.log("  BEFORE (first gate): discovery_ingests=0, GATE_NOT_PASSED (allow-list)  →  AFTER: ingests=" + cp.discovery_ingests + ", cited=" + cp.discovery_cited);
     }
     console.log("  ACTUAL spend: $" + costDelta.toFixed(5) + "  (agent $" + spendAfter.agent_usd.toFixed(5) + " + kb $" + spendAfter.kb_usd.toFixed(6) + ")  cap $" + SPEND_CAP);
     console.log("  evidence:", path.relative(ROOT, path.join(EVIDENCE, "gate10_owner.json")));
     console.log("══════════════════════════════════════════════════════════════════\n");
 
-    if (!DRY && !gatePass) {
-      stopAndReport("GATE_NOT_PASSED", "§8 did not PASS end-to-end (some §7.1 claim not lifted by discovery). Honest report — NOT rigged. See per_claim for which claims cited vs stayed uncited and the discovered source tiers.", gateResult);
+    if (!DRY && !primaryPass) {
+      stopAndReport("GATE_NOT_PASSED", "PRIMARY not met: discovery did not ingest+cite via Tavily content. Honest report — NOT rigged. See per_claim + citation_pass.", gateResult);
+    }
+    if (!DRY && primaryPass && !secondaryPass) {
+      console.log("  NOTE: PRIMARY PASSED; SECONDARY halted (§8 " + ca.status + ") — a documented per-claim source-quality result (erratum #3), NOT an A-1 mechanism failure.\n");
     }
   } finally {
     restoreSession();
