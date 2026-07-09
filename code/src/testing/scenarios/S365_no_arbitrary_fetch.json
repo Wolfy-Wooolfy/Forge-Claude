@@ -1,0 +1,17 @@
+{
+  "id": "S365",
+  "name": "PHASE-52 A-1 S365 — NO arbitrary fetch on the EXACT Gate #10 failure case: the REAL kb.ingest_content on the asoasis.tech URL that returned HOST_NOT_ALLOWED in the real Gate #10 SUCCEEDS with an invoke-spy proving ZERO http.get/http.post during the call; CONTRAST: kb.ingest_url on the SAME host is still HOST_NOT_ALLOWED (allow-list + SSRF guard intact).",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/citation_pass_test_helper",
+  "method": "runS365NoArbitraryFetch",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "ingest_success",           "expected": true },
+    { "type": "state_field_equals", "field": "zero_http_calls",          "expected": true },
+    { "type": "state_field_equals", "field": "zero_fetch_of_host",       "expected": true },
+    { "type": "state_field_equals", "field": "spy_saw_ingest",           "expected": true },
+    { "type": "state_field_equals", "field": "ingest_url_still_blocked", "expected": true }
+  ]
+}

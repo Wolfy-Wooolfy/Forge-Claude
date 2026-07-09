@@ -697,6 +697,194 @@ async function runS363UrlDedup() {
   } finally { try { await storage.closeAll(); } catch (_) {} _cleanup(PID); }
 }
 
+// ── PHASE-52 A-1 (D-A1.4) — Tavily-content ingest scenarios (S364–S366) ─────────
+//
+// These prove Approach B (kb.ingest_content — ingest Tavily-RETURNED text, never fetch the
+// arbitrary host) through the REAL tool, per the A-1 Step 2 GO refinements:
+//   S364 — kb.ingest_content direct (real tool; mock embed via ctx._client); empty → REJECTED.
+//   S365 — NON-VACUOUS no-fetch proof: the REAL kb.ingest_content on the EXACT host that
+//          returned HOST_NOT_ALLOWED in the real Gate #10 (asoasis.tech) SUCCEEDS with an
+//          invoke-spy proving ZERO http.get/http.post during the call — while the CONTRAST
+//          leg shows kb.ingest_url on the SAME host is still HOST_NOT_ALLOWED (allow-list
+//          intact). NOT routed through the mocked discovery seam (that would be vacuous).
+//   S366 — E2E content-path lift through the REAL kb.ingest_content: _discovery provides
+//          ONLY search (returns {url, content}); _ingest falls through to the real
+//          reg.invoke("kb.ingest_content") with the mock embed client in ingestCtx.
+//
+// failed() envelope shape (contract): { status:"FAILED", output:null, metadata:{reason,...} }
+// → REJECTED assertions check metadata.reason, not output.
+
+// The EXACT URL that failed with HOST_NOT_ALLOWED in the real Gate #10 ($0 probe evidence,
+// _phase_52_checkpoints/stage_gate10_real.md §3).
+const GATE10_BLOCKED_URL =
+  "https://asoasis.tech/articles/2026-04-07-0253-rest-api-health-check-endpoint-design";
+
+const S36X_CONTENT =
+  "Health check endpoints are a REST API design pattern: the service exposes GET /health " +
+  "and returns HTTP 200 with a small JSON status body when the process is reachable. " +
+  "The endpoint performs no authentication and no persistence access, so it responds fast " +
+  "and is safe for load balancers and uptime monitors to poll frequently.";
+
+// ── S364 — kb.ingest_content direct (the tool works; empty content REJECTED) ──
+async function runS364IngestContentDirect() {
+  const PID = "s364_ingest_content";
+  _cleanup(PID);
+  const storage = _lanceStore();
+  const reg     = getDefaultRegistry();
+  try {
+    const url = "https://example.tld/x";
+    const env = await reg.invoke("kb.ingest_content",
+      { url, content: S36X_CONTENT, title: "S364 Source", project_id: PID },
+      { root: ROOT, _client: _mockEmbedClient() });
+
+    const ingest_ok        = !!(env && env.status === "SUCCESS" && env.output && env.output.status === "OK");
+    const chunks_ge_1      = !!(env && env.output && env.output.chunks_created >= 1);
+    const src_id_valid     = !!(env && env.output && /^src_[a-f0-9]{12}$/.test(env.output.src_id));
+
+    // Credibility scored by URL only → plain https → REPUTABLE (0.55).
+    const sources          = manifests.readSources(PID, "project", { root: ROOT });
+    const rec              = sources.find(s => s.url === url) || null;
+    const tier_reputable   = !!(rec && rec.credibility && rec.credibility.tier === "REPUTABLE");
+    const content_type_plain = !!(rec && rec.content_type === "text/plain");
+
+    // kb.retrieve finds the stored chunk (mock embed: query ≡ chunk → relevance ≈ 1).
+    const rEnv = await reg.invoke("kb.retrieve",
+      { query: "health check endpoint returns 200", project_id: PID, credibility_floor: "COMMUNITY" },
+      { root: ROOT, _client: _mockEmbedClient() });
+    const results   = (rEnv && rEnv.output && rEnv.output.results) || [];
+    const retrieved = rEnv && rEnv.status === "SUCCESS" && results.length >= 1;
+    const retrieved_tier_ok = results.length >= 1 && results[0].credibility_tier === "REPUTABLE";
+
+    // Empty/whitespace content → REJECTED (EMPTY_CONTENT), nothing persisted.
+    const emptyEnv = await reg.invoke("kb.ingest_content",
+      { url: "https://example.tld/empty", content: "   \n\t ", project_id: PID },
+      { root: ROOT, _client: _mockEmbedClient() });
+    const empty_rejected  = !!(emptyEnv && emptyEnv.status !== "SUCCESS" &&
+                               emptyEnv.metadata && emptyEnv.metadata.reason === "EMPTY_CONTENT");
+    const empty_no_source = !manifests.readSources(PID, "project", { root: ROOT })
+                               .some(s => s.url === "https://example.tld/empty");
+
+    return {
+      ingest_ok, chunks_ge_1, src_id_valid, tier_reputable, content_type_plain,
+      retrieved, retrieved_tier_ok, empty_rejected, empty_no_source
+    };
+  } finally {
+    try { await storage.closeAll(); } catch (_) {}
+    _cleanup(PID);
+  }
+}
+
+// ── S365 — NO fetch on the EXACT Gate #10 failure case (real tool + invoke spy) ──
+async function runS365NoArbitraryFetch() {
+  const PID = "s365_no_fetch";
+  _cleanup(PID);
+  const storage = _lanceStore();
+  const reg     = getDefaultRegistry();
+
+  // Spy: record EVERY registry invocation (name + input.url) for the duration of the
+  // kb.ingest_content call, then restore. Test-only, in-process, restored in finally.
+  const calls      = [];
+  const origInvoke = reg.invoke;
+  let ingestEnv    = null;
+  try {
+    // CONTRAST leg FIRST (the Gate #10 case itself, $0 — HOST_NOT_ALLOWED fires in
+    // _validateUrl BEFORE any network I/O): kb.ingest_url on the blocked host, in a
+    // PRISTINE project KB (must run BEFORE ingest_content — otherwise the persistent
+    // srcId(url) dedup returns DUPLICATE before the fetch is ever attempted).
+    const urlEnv = await reg.invoke("kb.ingest_url",
+      { url: GATE10_BLOCKED_URL, project_id: PID }, { root: ROOT });
+    const ingest_url_still_blocked = !!(urlEnv && urlEnv.status !== "SUCCESS" &&
+      urlEnv.metadata && urlEnv.metadata.reason === "HOST_NOT_ALLOWED");
+
+    reg.invoke = async function (name, input, ctx) {
+      calls.push({ name, url: input && input.url });
+      return origInvoke.call(reg, name, input, ctx);
+    };
+    try {
+      ingestEnv = await reg.invoke("kb.ingest_content",
+        { url: GATE10_BLOCKED_URL, content: S36X_CONTENT, title: "Gate10 blocked host", project_id: PID },
+        { root: ROOT, _client: _mockEmbedClient() });
+    } finally {
+      reg.invoke = origInvoke;   // ALWAYS restore before anything else runs
+    }
+
+    // The exact URL that FAILED in the real Gate #10 now INGESTS successfully…
+    const ingest_success = !!(ingestEnv && ingestEnv.status === "SUCCESS" &&
+                              ingestEnv.output && ingestEnv.output.status === "OK" &&
+                              ingestEnv.output.chunks_created >= 1);
+
+    // …with ZERO http.get / http.post during the whole call (Forge never contacted ANY host,
+    // a fortiori not the arbitrary one). Semantic invariant: every contacted host ∈ allow-list
+    // holds vacuously-strongly here because the contacted-host set is EMPTY.
+    const httpCalls          = calls.filter(c => c.name === "http.get" || c.name === "http.post");
+    const zero_http_calls    = httpCalls.length === 0;
+    const zero_fetch_of_host = !calls.some(c =>
+      (c.name === "http.get" || c.name === "http.post") &&
+      typeof c.url === "string" && c.url.indexOf("asoasis.tech") !== -1);
+    const spy_saw_ingest     = calls.some(c => c.name === "kb.ingest_content");
+
+    return {
+      ingest_success, zero_http_calls, zero_fetch_of_host, spy_saw_ingest,
+      ingest_url_still_blocked
+    };
+  } finally {
+    reg.invoke = origInvoke;     // idempotent double-restore (safety)
+    try { await storage.closeAll(); } catch (_) {}
+    _cleanup(PID);
+  }
+}
+
+// ── S366 — E2E content-path lift through the REAL kb.ingest_content ────────────
+// _discovery provides ONLY search; _ingest falls through to the REAL
+// reg.invoke("kb.ingest_content") with the mock embed client in ingestCtx. Only Tavily +
+// the embedder are stubbed — the ingest/store/retrieve/cite chain is real.
+async function runS366ContentPathLift() {
+  const PID     = "s366_content_lift";
+  const LOOP_ID = "loop_s366";
+  _cleanup(PID);
+  const storage = _lanceStore();
+  const state   = { searchQueries: [] };
+  const disc    = {
+    async search(input) {
+      state.searchQueries.push(input.query);
+      return { status: "SUCCESS", output: { results: [{
+        url:     "https://example.tld/discovered-s366",
+        title:   "Discovered S366",
+        snippet: "supporting passage",
+        content: S36X_CONTENT
+      }] } };
+    }
+    // NO ingest override — the loop's _ingest uses the REAL kb.ingest_content.
+  };
+  try {
+    const result = await _runDocumentProjectWithDiscovery(PID, LOOP_ID, disc, null);
+    const cp = result.citation_pass || {};
+
+    const searched            = cp.discovery_searches >= 1 && state.searchQueries.length >= 1;
+    const real_ingest_ran     = cp.discovery_ingests >= 1;
+    const discovery_cited     = cp.discovery_cited >= 1;
+    const advanced_true       = result.advanced === true;
+    const advanced_to_qj      = result.advanced_to === "QUALITY_JUDGE";
+    const audit_pass          = !!(result.citation_audit && result.citation_audit.status === "PASS");
+
+    // The REAL ingest persisted a REPUTABLE text/plain SourceRecord for the discovered URL.
+    const sources = manifests.readSources(PID, "project", { root: ROOT });
+    const src     = sources.find(s => s.url === "https://example.tld/discovered-s366") || null;
+    const source_persisted_reputable = !!(src && src.credibility && src.credibility.tier === "REPUTABLE" &&
+                                          src.content_type === "text/plain");
+    const citations_written = manifests.readCitations(PID, "project", { root: ROOT }).length >= 1;
+
+    return {
+      searched, real_ingest_ran, discovery_cited,
+      advanced_true, advanced_to_qj, audit_pass,
+      source_persisted_reputable, citations_written
+    };
+  } finally {
+    try { await storage.closeAll(); } catch (_) {}
+    _cleanup(PID);
+  }
+}
+
 module.exports = {
   runSDCitationRecordSchema,
   runSENonMutation,
@@ -707,5 +895,8 @@ module.exports = {
   runS360DiscoveryLift,
   runS361DiscoveryUncited,
   runS362SearchCap,
-  runS363UrlDedup
+  runS363UrlDedup,
+  runS364IngestContentDirect,
+  runS365NoArbitraryFetch,
+  runS366ContentPathLift
 };

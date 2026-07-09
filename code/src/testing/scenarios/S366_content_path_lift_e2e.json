@@ -1,0 +1,20 @@
+{
+  "id": "S366",
+  "name": "PHASE-52 A-1 S366 — E2E content-path lift through the REAL kb.ingest_content: zero-chunk claim → mock _discovery.search returns {url, content} → _ingest falls through to the REAL kb.ingest_content (score-by-URL, NO fetch; mock embed via ingestCtx._client) → chunk/store → re-retrieve → re-cite SUCCESS → §8 PASS → advance QUALITY_JUDGE. Asserts discovery_ingests>=1 ∧ discovery_cited>=1 + a REPUTABLE text/plain SourceRecord persisted for the discovered URL.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/citation_pass_test_helper",
+  "method": "runS366ContentPathLift",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "searched",                   "expected": true },
+    { "type": "state_field_equals", "field": "real_ingest_ran",            "expected": true },
+    { "type": "state_field_equals", "field": "discovery_cited",            "expected": true },
+    { "type": "state_field_equals", "field": "advanced_true",              "expected": true },
+    { "type": "state_field_equals", "field": "advanced_to_qj",             "expected": true },
+    { "type": "state_field_equals", "field": "audit_pass",                 "expected": true },
+    { "type": "state_field_equals", "field": "source_persisted_reputable", "expected": true },
+    { "type": "state_field_equals", "field": "citations_written",          "expected": true }
+  ]
+}

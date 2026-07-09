@@ -1,0 +1,21 @@
+{
+  "id": "S364",
+  "name": "PHASE-52 A-1 S364 — kb.ingest_content direct: already-fetched text {url, content} → credibility scored REPUTABLE by URL (no body, no fetch) → chunked/embedded(mock)/stored in real LanceDB → kb.retrieve finds it. Empty/whitespace content → REJECTED (EMPTY_CONTENT), nothing persisted.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/citation_pass_test_helper",
+  "method": "runS364IngestContentDirect",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "ingest_ok",          "expected": true },
+    { "type": "state_field_equals", "field": "chunks_ge_1",        "expected": true },
+    { "type": "state_field_equals", "field": "src_id_valid",       "expected": true },
+    { "type": "state_field_equals", "field": "tier_reputable",     "expected": true },
+    { "type": "state_field_equals", "field": "content_type_plain", "expected": true },
+    { "type": "state_field_equals", "field": "retrieved",          "expected": true },
+    { "type": "state_field_equals", "field": "retrieved_tier_ok",  "expected": true },
+    { "type": "state_field_equals", "field": "empty_rejected",     "expected": true },
+    { "type": "state_field_equals", "field": "empty_no_source",    "expected": true }
+  ]
+}
