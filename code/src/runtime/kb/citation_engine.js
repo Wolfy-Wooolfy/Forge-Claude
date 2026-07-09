@@ -13,9 +13,16 @@ const manifests                  = require("./manifests");
 
 // ── Confidence mapping ────────────────────────────────────────────────────────
 
+// PHASE-53 (R-4): the MEDIUM confidence threshold, extracted as the single named
+// relevance-floor constant. Consumed here by _scoreToConfidence AND by the
+// documentation citation pass (conversationEngine) as the relevance FLOOR that
+// triggers per-claim targeted discovery. Single source of truth — the HIGH
+// threshold (0.80) is not a floor and stays inline.
+const RELEVANCE_FLOOR_MEDIUM = 0.60;
+
 function _scoreToConfidence(maxRelevance) {
   if (maxRelevance >= 0.80) return "HIGH";
-  if (maxRelevance >= 0.60) return "MEDIUM";
+  if (maxRelevance >= RELEVANCE_FLOOR_MEDIUM) return "MEDIUM";
   return "LOW";
 }
 
@@ -96,4 +103,4 @@ function synthesizeCitation(options) {
   return { status: "OK", citation: record };
 }
 
-module.exports = { synthesizeCitation };
+module.exports = { synthesizeCitation, RELEVANCE_FLOOR_MEDIUM };

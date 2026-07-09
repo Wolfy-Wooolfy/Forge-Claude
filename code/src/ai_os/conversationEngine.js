@@ -9,6 +9,10 @@ const ideaSynthesisProvider          = require("../providers/ideaSynthesisProvid
 const { getDefaultRegistry } = require("../runtime/tools/_registry");
 const { serializeFrontmatter, validateFrontmatter, parseFrontmatter } = require("./schemas/visionSchema");
 const { validateCitations } = require("../runtime/kb/citation_validator");
+// PHASE-53 (R-4): value-only import of the MEDIUM threshold — the citation pass's
+// relevance floor. Single source of truth lives in citation_engine.js (no side effect;
+// same layering precedent as the validateCitations import above).
+const { RELEVANCE_FLOOR_MEDIUM } = require("../runtime/kb/citation_engine");
 
 const STATE_TRANSITION_THRESHOLDS = {
   DISCUSSION: ["DISCOVERY_REQUIRED"],
@@ -85,12 +89,34 @@ const DISCOVERY_SEARCH_MAX_RESULTS     = 5;   // ask for a few; take the first u
 //   hermetic $0 scenarios. When absent (production), search/ingest go through
 //   reg.invoke("research.search_web"/"kb.ingest_content") directly; the ctx is exactly { root }
 //   (or { root, _client } when the embed seam is present) — byte-identical to the seam-absent path.
+//
+// ── PHASE-53 (D1+D2) — Relevance floor on cited-able claims ────────────────────
+// FLOOR = RELEVANCE_FLOOR_MEDIUM (the existing MEDIUM confidence threshold — R-4
+//   single source of truth in citation_engine.js). A claim WITH first-pass chunks whose
+//   best relevance_score < FLOOR gets ONE targeted discovery (SAME shared per-run search
+//   cap + SAME URL dedup set as the zero_chunks trigger — one budget, one enforcement
+//   point), then KEEP-BEST of (original set, new set) feeds the SINGLE kb.cite
+//   (R-1 — exactly one CitationRecord per claim; citations.jsonl is append-only).
+//   No lift → the claim is STILL cited with its original set and flagged below_floor in
+//   the summary forensics (R-2) — NEVER a new HALT; offline-safe with no TAVILY key.
+//   ONE discovery attempt per claim, shared across the zero_chunks / floor / cite_blocked
+//   triggers (R-3).
 async function runDocumentationCitationPass(reg, projectId, artifactRelPath, content, root, _client, _discovery) {
   const summary = {
     claims_detected: 0, cited: 0, uncited: 0,
     retrieve_failed: 0, zero_chunks: 0, cite_blocked: 0,
     // PHASE-52 additive forensics (Gate #10 durable evidence; consumed by no existing scenario)
-    discovery_searches: 0, discovery_ingests: 0, discovery_cited: 0, discovery_blocked_low: 0
+    discovery_searches: 0, discovery_ingests: 0, discovery_cited: 0, discovery_blocked_low: 0,
+    // PHASE-53 additive floor forensics (R-2: claim-granular; consumed by no pre-existing
+    // scenario). floor_checked/floor_below/floor_lifted count the FLOOR trigger only
+    // (claims WITH first-pass chunks); below_floor_claims counts claims that FINISH the
+    // pass with best relevance < floor on EITHER trigger path (floor or zero_chunks).
+    // floor_claims carries one record per affected claim:
+    //   { line, text_prefix, trigger, best_relevance_before, best_relevance_after,
+    //     attempted, lifted, below_floor }
+    floor_value: RELEVANCE_FLOOR_MEDIUM,
+    floor_checked: 0, floor_below: 0, floor_lifted: 0, below_floor_claims: 0,
+    floor_claims: []
   };
 
   let claims;
@@ -190,11 +216,91 @@ async function runDocumentationCitationPass(reg, projectId, artifactRelPath, con
 
       let reCiteEnv;
       try { reCiteEnv = await _cite(text, line, reChunks); } catch (_) { reCiteEnv = null; }
-      if (reCiteEnv && reCiteEnv.status === "SUCCESS") return true;   // lifted to a REAL non-LOW citation
+      if (reCiteEnv && reCiteEnv.status === "SUCCESS") {
+        // PHASE-53 (R-3): the claim was lifted from zero_chunks by its ONE discovery
+        // attempt (shared across triggers). If the lifted citation still sits below the
+        // MEDIUM floor, mark below_floor — NO second attempt is ever made for it.
+        const afterBest = _bestRelevance(reChunks);
+        const below     = afterBest < RELEVANCE_FLOOR_MEDIUM;
+        if (below) summary.below_floor_claims++;
+        summary.floor_claims.push({
+          line, text_prefix: text.slice(0, 80), trigger: "zero_chunks",
+          best_relevance_before: 0, best_relevance_after: afterBest,
+          attempted: true, lifted: true, below_floor: below
+        });
+        return true;                                                 // lifted to a REAL non-LOW citation
+      }
       summary.discovery_blocked_low++;                               // ingested but re-cite still LOW-only
       return false;                                                  // stays uncited (fail-closed; no fabrication)
     }
     return false;
+  }
+
+  // PHASE-53 (D2) — max relevance_score across a retrieve result set (0 when empty;
+  // retrieval.js already defaults a missing relevance_score to 0).
+  function _bestRelevance(chunkList) {
+    let best = 0;
+    for (const c of (chunkList || [])) {
+      const r = (c && c.relevance_score != null) ? c.relevance_score : 0;
+      if (r > best) best = r;
+    }
+    return best;
+  }
+
+  // PHASE-53 (D2, R-1) — ONE targeted discovery for a cited-able claim whose best
+  // first-pass relevance sits BELOW the MEDIUM floor. Same shape as _attemptDiscovery
+  // MINUS the cite: search → dedup → kb.ingest_content → re-retrieve → return the new
+  // chunk set for the caller's KEEP-BEST comparison (the single kb.cite happens in the
+  // per-claim loop, AFTER keep-best — never here, so exactly ONE CitationRecord per
+  // claim is ever appended). Enforces the SAME shared per-run search cap (totalSearches)
+  // and the SAME shared URL dedup set (ingestedUrls) as the zero_chunks trigger — one
+  // budget, one enforcement point (decision §3). Every failure mode (cap reached,
+  // search FAILED e.g. no TAVILY key, nothing usable, dedup skip, ingest fail,
+  // re-retrieve fail/empty) returns chunks:null → the caller keeps the original set →
+  // byte-equivalent PHASE-52 outcome, NO new HALT (offline-safe).
+  async function _attemptFloorDiscovery(text) {
+    if (totalSearches >= maxTotalSearches) return { attempted: false, chunks: null };
+    totalSearches++; summary.discovery_searches++;
+
+    let searchEnv;
+    try {
+      searchEnv = await _search({
+        query:       text,
+        project_id:  projectId,
+        max_results: DISCOVERY_SEARCH_MAX_RESULTS
+      });
+    } catch (_) { searchEnv = null; }
+    if (!searchEnv || searchEnv.status !== "SUCCESS") return { attempted: true, chunks: null };
+
+    const found = (searchEnv.output && searchEnv.output.results) || [];
+    const picks = [];
+    for (const r of found) {
+      if (r && typeof r.url === "string" && r.url) {
+        picks.push({ url: r.url, content: (r && r.content) || "", title: (r && r.title) || "" });
+      }
+      if (picks.length >= DISCOVERY_MAX_URLS_PER_CLAIM) break;
+    }
+    if (picks.length === 0) return { attempted: true, chunks: null };
+
+    let ingested = 0;
+    for (const pick of picks) {
+      if (ingestedUrls.has(pick.url)) continue;        // shared in-run URL dedup (§3)
+      ingestedUrls.add(pick.url);
+      if (!pick.content) continue;                      // A-1: no content → never fetch to recover it
+      let ingestEnv;
+      try { ingestEnv = await _ingest({ url: pick.url, content: pick.content, title: pick.title, project_id: projectId }); }
+      catch (_) { ingestEnv = null; }
+      if (ingestEnv && ingestEnv.status === "SUCCESS") { summary.discovery_ingests++; ingested++; }
+    }
+    // Nothing new entered the KB (dedup skip / no content / ingest fail) → the first-pass
+    // retrieve already saw everything the KB holds; skip the redundant re-retrieve.
+    if (ingested === 0) return { attempted: true, chunks: null };
+
+    let reEnv;
+    try { reEnv = await _retrieve(text); } catch (_) { reEnv = null; }
+    if (!reEnv || reEnv.status !== "SUCCESS") return { attempted: true, chunks: null };
+    const reChunks = (reEnv.output && reEnv.output.results) || [];
+    return { attempted: true, chunks: reChunks.length > 0 ? reChunks : null };
   }
 
   for (const claim of claims) {
@@ -228,10 +334,46 @@ async function runDocumentationCitationPass(reg, projectId, artifactRelPath, con
       continue;
     }
 
+    // ── PHASE-53 (D2, R-1) — relevance-floor check BEFORE the single kb.cite ──
+    // A claim that WOULD be cited but whose best first-pass relevance sits below the
+    // MEDIUM floor gets ONE targeted discovery; KEEP-BEST of (original set, new set)
+    // by max relevance decides which set the single kb.cite below receives — so
+    // never-downgrade / never-strip hold by construction (one cite, one CitationRecord,
+    // best set). Discovery failure / absent key / no-lift → citeChunks stays = chunks →
+    // byte-equivalent PHASE-52 outcome; the claim is still cited (NO new HALT) and is
+    // flagged below_floor in the summary forensics (R-2).
+    let citeChunks     = chunks;
+    let floorAttempted = false;
+    summary.floor_checked++;
+    const bestBefore = _bestRelevance(chunks);
+    if (bestBefore < RELEVANCE_FLOOR_MEDIUM) {
+      summary.floor_below++;
+      const lift = await _attemptFloorDiscovery(text);
+      floorAttempted = lift.attempted;
+      let bestAfter = bestBefore;
+      let lifted    = false;
+      if (lift.chunks) {
+        const newBest = _bestRelevance(lift.chunks);
+        if (newBest > bestBefore) {          // KEEP-BEST: replace only on strict improvement
+          citeChunks = lift.chunks;
+          bestAfter  = newBest;
+          lifted     = true;
+        }
+      }
+      const below = bestAfter < RELEVANCE_FLOOR_MEDIUM;
+      if (!below) summary.floor_lifted++;
+      else summary.below_floor_claims++;
+      summary.floor_claims.push({
+        line, text_prefix: text.slice(0, 80), trigger: "floor",
+        best_relevance_before: bestBefore, best_relevance_after: bestAfter,
+        attempted: lift.attempted, lifted, below_floor: below
+      });
+    }
+
     // 2. Cite — decide "cited vs uncited" from the kb.cite RESULT (C-2), never fabricate.
     let citeEnv = null;
     try {
-      citeEnv = await _cite(text, line, chunks);
+      citeEnv = await _cite(text, line, citeChunks);
     } catch (_) {
       citeEnv = null;
     }
@@ -245,7 +387,9 @@ async function runDocumentationCitationPass(reg, projectId, artifactRelPath, con
     // floor (DECISION §5/§10) is a SEPARATE future branch, not this one. (Verified $0: a LOW-tier
     // source → kb.retrieve returns 0 chunks → zero_chunks branch, not this one.)
     summary.cite_blocked++;
-    if (await _attemptDiscovery(text, line)) { summary.cited++; summary.discovery_cited++; }
+    // PHASE-53 (R-3): ONE discovery attempt per claim, shared across triggers — if the
+    // floor path above already consumed this claim's attempt, do NOT search again.
+    if (!floorAttempted && await _attemptDiscovery(text, line)) { summary.cited++; summary.discovery_cited++; }
     else { summary.uncited++; }
   }
 
