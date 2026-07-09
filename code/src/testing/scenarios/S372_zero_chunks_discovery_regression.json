@@ -1,0 +1,20 @@
+{
+  "id": "S372",
+  "name": "PHASE-53 D4 S372 — zero_chunks discovery path regression (CTO scoping: assert the CITATION OUTPUT, not summary byte-identity — PHASE-53 adds an additive floor_claims record on this path): empty KB → zero_chunks → discovery ingests a REPUTABLE ≈1.0 source → lift → same cited/uncited verdict as PHASE-52 S360, same CitationRecord (schema untouched — NO below_floor field on the record; confidence HIGH), §8 PASS → advance QUALITY_JUDGE. No floor trigger fires; below_floor_claims = 0; the additive zero_chunks forensic record says below_floor:false.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/citation_pass_test_helper",
+  "method": "runS372ZeroChunksRegression",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "lift_advanced",           "expected": true },
+    { "type": "state_field_equals", "field": "audit_pass",              "expected": true },
+    { "type": "state_field_equals", "field": "same_verdict",            "expected": true },
+    { "type": "state_field_equals", "field": "same_citation_output",    "expected": true },
+    { "type": "state_field_equals", "field": "record_schema_untouched", "expected": true },
+    { "type": "state_field_equals", "field": "floor_untriggered",       "expected": true },
+    { "type": "state_field_equals", "field": "zc_record_ok",            "expected": true },
+    { "type": "state_field_equals", "field": "state_qj",                "expected": true }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "id": "S369",
+  "name": "PHASE-53 D4 S369 — no better source → keep-best + below_floor flag + NO HALT: Leg A: below-floor claim (0.4472) + WORSE discovered source (0.3162) → keep the original set, claim STILL CITED (LOW), below_floor flagged, §8 PASS → advance QUALITY_JUDGE. Leg B (offline, no key): search FAILED → identical fallback — cited from the original set, flagged, zero ingests, build advances. The floor NEVER halts a citable claim.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/citation_pass_test_helper",
+  "method": "runS369NoLiftNoHalt",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "a_advanced",       "expected": true },
+    { "type": "state_field_equals", "field": "a_to_qj",          "expected": true },
+    { "type": "state_field_equals", "field": "a_audit_pass",     "expected": true },
+    { "type": "state_field_equals", "field": "a_cited",          "expected": true },
+    { "type": "state_field_equals", "field": "a_flagged",        "expected": true },
+    { "type": "state_field_equals", "field": "a_record_ok",      "expected": true },
+    { "type": "state_field_equals", "field": "a_one_low_record", "expected": true },
+    { "type": "state_field_equals", "field": "b_advanced",       "expected": true },
+    { "type": "state_field_equals", "field": "b_cited_flagged",  "expected": true },
+    { "type": "state_field_equals", "field": "b_no_ingest",      "expected": true },
+    { "type": "state_field_equals", "field": "b_attempted",      "expected": true }
+  ]
+}

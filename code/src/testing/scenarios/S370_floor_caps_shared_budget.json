@@ -1,0 +1,22 @@
+{
+  "id": "S370",
+  "name": "PHASE-53 D4 S370 — one attempt/claim + GLOBAL cap SHARED across triggers (R-3): empty store, 4 claims, maxTotalSearches=2. Claim-1 zero_chunks → search#1 → ingest lands below floor (0.4472) → R-3: flagged below_floor, NO second attempt, exactly one floor_claims record. Claims 2–4 floor-trigger (relevance 0 vs the seeded chunk): claim-2 gets search#2 (cap reached; same URL → shared dedup, no ingest); claims 3–4 attempted=false — the SHARED counter (one zero_chunks search + one floor search) blocks them. ALL 4 claims still cited, no HALT.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/citation_pass_test_helper",
+  "method": "runS370CapsSharedBudget",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "four_claims",             "expected": true },
+    { "type": "state_field_equals", "field": "one_zero_chunks",         "expected": true },
+    { "type": "state_field_equals", "field": "three_floor",             "expected": true },
+    { "type": "state_field_equals", "field": "cap_shared",              "expected": true },
+    { "type": "state_field_equals", "field": "one_ingest",              "expected": true },
+    { "type": "state_field_equals", "field": "all_cited_no_halt",       "expected": true },
+    { "type": "state_field_equals", "field": "all_flagged",             "expected": true },
+    { "type": "state_field_equals", "field": "one_record_per_claim",    "expected": true },
+    { "type": "state_field_equals", "field": "r3_zero_chunks_flagged",  "expected": true },
+    { "type": "state_field_equals", "field": "past_cap_not_attempted",  "expected": true }
+  ]
+}

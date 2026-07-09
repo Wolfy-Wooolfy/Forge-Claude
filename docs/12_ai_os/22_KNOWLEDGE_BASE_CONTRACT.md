@@ -882,6 +882,76 @@ Future modifications:
 | `docs/12_ai_os/05_PROJECT_LIFECYCLE.md` | Vision amendment process (governs budget cap changes) |
 | `docs/12_ai_os/15_SEARCH_AND_EXTERNAL_RESEARCH.md` | §19.5 cross-reference to this contract |
 | `code/src/runtime/kb/_schemas.js` | Runtime mirror of schemas §3–§6 (for validation) |
+| `DECISION-2026-07-09-phase-53-relevance-floor.md` | Authorization artifact for §15 (relevance floor + below_floor forensics) |
+
+---
+
+## 15. Documentation-Pass Relevance Floor (PHASE-53 Addendum)
+
+> Added 2026-07-09 via `DECISION-2026-07-09-phase-53-relevance-floor.md` (Step 0 rulings
+> R-1..R-5). Governs the documentation citation pass in
+> `code/src/ai_os/conversationEngine.js` (`runDocumentationCitationPass`). Additive to
+> §5/§7/§8 — no schema in this contract changes (CitationRecord stays v1.0.0).
+
+### 15.1 The floor (single source of truth)
+
+`FLOOR = RELEVANCE_FLOOR_MEDIUM = 0.60` — the EXISTING §5 MEDIUM confidence threshold
+("MEDIUM: max score 0.6–0.799", §5 confidence mapping), extracted as ONE named constant in
+`code/src/runtime/kb/citation_engine.js` (R-4) and consumed by BOTH `_scoreToConfidence`
+and the citation pass. There is no second relevance-threshold literal in the codebase
+(the `0.6` in `credibility_scorer.js` is a heuristic/LLM blend weight, not a threshold).
+The HIGH threshold (0.80) is not a floor and stays inline.
+
+### 15.2 Behavior (R-1 — pre-cite KEEP-BEST)
+
+Per §7.1 claim WITH first-pass retrieve chunks:
+
+1. `best_relevance_before = max(chunks[].relevance_score)`.
+2. If `best_relevance_before < FLOOR` → **ONE** targeted web discovery for that claim
+   (`research.search_web(claim)` → `kb.ingest_content` — the PHASE-52 A-1 content path
+   only; the arbitrary host is never fetched) → re-retrieve.
+3. **KEEP-BEST**: the re-retrieved set replaces the original ONLY on strict improvement
+   of max relevance. The winning set feeds the **SINGLE** `kb.cite` — exactly one
+   CitationRecord per claim is ever appended (citations.jsonl is append-only; a post-cite
+   "upgrade" would duplicate records — the reason keep-best runs pre-cite).
+4. **Invariants**: never-downgrade (strict-improvement replacement), never-strip (one
+   cite, one record), **no new HALT** — every discovery failure mode (cap reached, search
+   FAILED / no `TAVILY_API_KEY`, no usable result, URL dedup skip, ingest failure,
+   re-retrieve failure/empty) falls back to citing the ORIGINAL set: the claim stays
+   CITED with its PHASE-52-equivalent outcome and is flagged `below_floor`. §7/§8 HALT
+   semantics (zero-sources / uncited claims) are unchanged by this section.
+
+### 15.3 Caps + dedup (R-3, shared with PHASE-52 discovery)
+
+Max **ONE** discovery attempt per claim per documentation pass, **shared across
+triggers** (`zero_chunks`, floor, and the defense-in-depth `cite_blocked`). A claim
+lifted from `zero_chunks` that lands below the floor gets NO second attempt — it is
+flagged `below_floor`. Targeted searches count against the SAME per-run global search
+cap and the SAME in-run URL dedup set as zero_chunks discovery (one budget, one
+enforcement point). On a dedup skip / zero new ingests, the redundant re-retrieve is
+skipped and the original set is kept.
+
+### 15.4 below_floor forensics (R-2 — summary-level, claim-granular)
+
+`below_floor` is **NOT** a CitationRecord field (§5 schema untouched; `_schemas.js` and
+`kb_tools.js` untouched). It lives on the citation-pass SUMMARY (the PHASE-52
+`discovery_*` precedent), which rides the `citation_pass` field of both documentProject
+endpoint payloads (durable Gate evidence). Additive fields:
+
+| Field | Meaning |
+|---|---|
+| `floor_value` | the applied FLOOR (self-describing evidence; = RELEVANCE_FLOOR_MEDIUM) |
+| `floor_checked` | claims WITH ≥1 first-pass chunk whose best relevance was evaluated |
+| `floor_below` | of those, claims whose `best_relevance_before < FLOOR` (the floor trigger) |
+| `floor_lifted` | floor-trigger claims whose final best relevance ≥ FLOOR after keep-best |
+| `below_floor_claims` | claims FINISHING the pass with best relevance < FLOOR on EITHER trigger path (floor or zero_chunks) |
+| `floor_claims[]` | one record per affected claim: `{ line, text_prefix, trigger: "floor"\|"zero_chunks", best_relevance_before, best_relevance_after, attempted, lifted, below_floor }` |
+
+Semantics: `attempted` = a targeted search was actually launched for the claim;
+`lifted` = keep-best selected the NEW set (strict improvement — independent of crossing
+the floor); `below_floor` = final best relevance < FLOOR. Claims already ≥ FLOOR on the
+first pass get NO `floor_claims` record (they are unaffected; `floor_checked` counts
+them). Uncited claims are not `below_floor` — that flag applies to CITED claims only.
 
 ---
 

@@ -1,0 +1,17 @@
+{
+  "id": "S368",
+  "name": "PHASE-53 D4 S368 — KEEP-BEST upgrade (the R-1 load-bearing regression guard): below-floor claim (base 0.4472, LOW) + better discovered source (0.7071) → the SINGLE kb.cite uses the winning set → the persisted CitationRecord has confidence MEDIUM, and citations.jsonl holds EXACTLY ONE record for the claim (no duplicate append, no strip — pre-cite keep-best per R-1). The record itself carries NO below_floor field (R-2: summary-level only).",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/citation_pass_test_helper",
+  "method": "runS368KeepBestUpgrade",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "cited_one",             "expected": true },
+    { "type": "state_field_equals", "field": "exactly_one_record",    "expected": true },
+    { "type": "state_field_equals", "field": "confidence_medium",     "expected": true },
+    { "type": "state_field_equals", "field": "upgrade_record_ok",     "expected": true },
+    { "type": "state_field_equals", "field": "record_no_floor_field", "expected": true }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "id": "S371",
+  "name": "PHASE-53 D4 S371 — shared URL dedup on the targeted path: two below-floor claims (base 0.4472), discovery returns the SAME url for both → claim-1 ingests it (worse, 0.3162 → keep-best keeps the original); claim-2 hits the SHARED in-run dedup set → NO second ingest (discovery_ingests stays 1) AND the redundant re-retrieve is skipped (kb.retrieve/embed call count = 3, not 4). Both claims cited from their original sets, both flagged below_floor.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/citation_pass_test_helper",
+  "method": "runS371UrlDedupShared",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "both_triggered",      "expected": true },
+    { "type": "state_field_equals", "field": "ingested_once",       "expected": true },
+    { "type": "state_field_equals", "field": "re_retrieve_skipped", "expected": true },
+    { "type": "state_field_equals", "field": "both_cited_flagged",  "expected": true }
+  ]
+}

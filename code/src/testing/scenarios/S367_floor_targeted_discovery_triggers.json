@@ -1,0 +1,19 @@
+{
+  "id": "S367",
+  "name": "PHASE-53 D4 S367 — relevance floor triggers ONE targeted discovery: a claim WITH first-pass chunks but best relevance 0.4472 < RELEVANCE_FLOOR_MEDIUM (0.60) fires exactly one targeted search (query = the claim text) and is lifted via KEEP-BEST to 0.7071 (MEDIUM); a same-doc claim already at relevance 1.0 (≥ floor) triggers NO search. floor_checked/floor_below counters correct; claim-granular floor_claims record {trigger:floor, attempted, lifted, !below_floor} per R-2.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/citation_pass_test_helper",
+  "method": "runS367FloorTrigger",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "two_claims_checked",    "expected": true },
+    { "type": "state_field_equals", "field": "one_below_floor",       "expected": true },
+    { "type": "state_field_equals", "field": "one_targeted_search",   "expected": true },
+    { "type": "state_field_equals", "field": "above_floor_untouched", "expected": true },
+    { "type": "state_field_equals", "field": "lifted_record_ok",      "expected": true },
+    { "type": "state_field_equals", "field": "floor_lifted_one",      "expected": true },
+    { "type": "state_field_equals", "field": "both_cited",            "expected": true }
+  ]
+}
