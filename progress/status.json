@@ -161,6 +161,35 @@
     "release_status": "CLOSED LOCAL; push + annotated tag phase-51-complete (on the closure commit) await CTO fresh-zip closure-diff + push GO",
     "next_phase": "PHASE-52-PENDING-DECISION"
   },
+  "phase_52": {
+    "status": "CLOSED",
+    "closed_at": "2026-07-09",
+    "title": "Research-backed citations — auto web-discovery in the documentation citation pass",
+    "decision_artifact": "artifacts/decisions/DECISION-2026-07-08-phase-52-research-backed-citations.md",
+    "closure_artifact": "artifacts/decisions/DECISION-2026-07-09-phase-52-closure.md",
+    "mid_checkpoint": "artifacts/decisions/_phase_52_checkpoints/stage_wiring_mid.md",
+    "amendments": [
+      "A-1 (Tavily-content ingest: new L2 kb.ingest_content ingests Tavily raw_content directly; Forge never fetches the arbitrary discovered host; http allow-list + SSRF guard byte-identical; L2 80->81)"
+    ],
+    "crux": "auto web-discovery closes the L-1 gap on the REAL path — a fresh project's documentation build no longer HALTS for lack of manually-seeded sources: empty KB -> zero_chunks -> real Tavily search -> kb.ingest_content -> re-retrieve -> cite -> §8 PASS -> advance QUALITY_JUDGE",
+    "erratum_3": "cite_blocked branch is UNREACHABLE under the COMMUNITY retrieve floor (retrieve filters LOW-credibility before kb.cite; disjoint from cite's all-LOW skip); discovery's reachable trigger is zero_chunks; cite_blocked kept as documented defense-in-depth. CTO mis-modeled originally; caught by CC's $0 probe before D3.",
+    "gate_10": "REAL_FAIL then REAL_PASS",
+    "gate_10_first": {
+      "verdict": "GATE_NOT_PASSED — 8-host http allow-list blocked kb.ingest_url from fetching arbitrary discovered URLs (HOST_NOT_ALLOWED); discovery_ingests=0",
+      "spend_usd": 0.0434,
+      "evidence": "artifacts/spikes/phase52_gate10/"
+    },
+    "gate_10_rerun": {
+      "verdict": "PRIMARY_PASS_SECONDARY_PASS — empty KB -> 7 claims -> 1 Tavily search -> 1 kb.ingest_content ingest (api7.ai, REPUTABLE, no fetch) seeded the KB -> 7/7 cited -> §8 PASS -> QUALITY_JUDGE; max relevance 0.6348 > PHASE-51 baseline [0.475..0.478] (first MEDIUM real citation)",
+      "relevance": "[0.5928,0.2252,0.6348,0.2752,0.4287,0.2112,0.2614] (1 MEDIUM / 6 LOW)",
+      "spend_usd": 0.01763,
+      "evidence": "artifacts/spikes/phase52_gate10_rerun/"
+    },
+    "hermeticity_fix": "A-1 un-masked a latent break — S357/S358 ran the production discovery path (real Tavily call in-suite once TAVILY_API_KEY was in .env). Fixed: no-op _discovery seam in S357/S358 + forge-test.js strips provider keys (TAVILY/BRAVE/OPENAI) from .env + shell env.",
+    "su_added": "S360-S366 (+7): discovery lift / fail-closed / search cap / URL dedup / kb.ingest_content direct / no-arbitrary-fetch proof / E2E content-path lift",
+    "phase_53_seed": "relevance floor — per-claim targeted discovery to lift cited-but-LOW claims (the 1-MEDIUM/6-LOW distribution motivates it)",
+    "spend_cumulative": "~0.026 real / ~0.061 ledger USD"
+  },
   "blueprint_authority": {
     "blueprint_doc": "architecture/FORGE_V2_BLUEPRINT.md",
     "roadmap_doc": "architecture/FORGE_V2_PHASE_ROADMAP.md",
