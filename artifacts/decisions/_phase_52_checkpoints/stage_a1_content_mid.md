@@ -60,3 +60,64 @@ D-A1.4 mock scenarios S364–S366 (target SU 359/0/5 (364)): S364 ingest_content
 
 ## STOP
 D-A1.1+2+3 complete and gate-proven (full suite 356/0/5 unchanged, 10/10 citation scenarios green, Track A clean, §ARC=10, L2=81, http_tools + acquireSource + kb.ingest_url untouched, $0). Awaiting CTO independent verification on a FRESH LOCAL zip before **A-1 Step 2 GO** (D-A1.4). Do NOT run D-A1.5.
+
+---
+
+# D-A1.4 ADDENDUM — 2026-07-09 (after A-1 Step 2 GO; scenarios + hermeticity fix)
+
+## A. S364–S366 built per the refined (non-vacuous) specs — 3/3 GREEN
+- **S364** — REAL `kb.ingest_content` direct: `{url, content}` → REPUTABLE by URL (no body, no fetch) →
+  chunk/embed(mock via ctx._client)/store in real LanceDB → `kb.retrieve` finds it (tier REPUTABLE);
+  empty/whitespace content → REJECTED (`EMPTY_CONTENT` in metadata.reason — `failed()` puts output=null), nothing persisted.
+- **S365** — the NON-VACUOUS no-fetch proof on the EXACT Gate #10 failure case: REAL `kb.ingest_content`
+  on `https://asoasis.tech/...` (the URL that returned HOST_NOT_ALLOWED in the real Gate #10) → SUCCESS
+  (chunks_created ≥ 1) with a `reg.invoke` spy proving ZERO `http.get`/`http.post` during the call, PLUS a
+  CONTRAST leg: `kb.ingest_url` on the SAME host still → HOST_NOT_ALLOWED (allow-list + SSRF guard intact).
+  NOT routed through the mocked discovery seam (that would be vacuous). Implementation note: the contrast
+  leg must run FIRST — after ingest_content persists the source, the srcId(url) dedup returns DUPLICATE
+  before the fetch is ever attempted.
+- **S366** — E2E content-path lift through the REAL tool: `_discovery` provides ONLY `search` (returns
+  {url, content}); `_ingest` falls through to the REAL `reg.invoke("kb.ingest_content")` with the mock
+  embed client in ingestCtx → §8 PASS → advance QUALITY_JUDGE; `discovery_ingests≥1 ∧ discovery_cited≥1`;
+  a REPUTABLE text/plain SourceRecord persisted for the discovered URL.
+- (Owner interim commit `d69c1a1` "U" captured the three scenario files + the S364–S366 helper block.)
+
+## B. FINDING (verified + CTO-confirmed): latent hermeticity break un-masked by A-1 → S357 regression
+First full-suite run: **358/1/5 — S357 (PHASE-51 S-B uncited fail-closed) FAILED** (claim got CITED), then
+failed targeted too. Chain: `bin/forge-test.js:7-20` loads `.env` at startup → `.env` now holds
+`TAVILY_API_KEY` (added for Gate #10) → S357/S358 (claim-bearing doc + `_client` mock embed, NO `_discovery`
+seam) hit `zero_chunks` → discovery fires the PRODUCTION seam → **REAL Tavily network call inside the SU
+suite** → post-A-1 the returned `raw_content` ingests via `kb.ingest_content` (mock embeds, $0) → claim
+CITED → S357's fail-closed assertions flip, non-deterministically on live web results. Pre-A-1 the
+allow-list masked the leak (every discovery ingest died on HOST_NOT_ALLOWED). Exposure was EXACTLY
+S357+S358 (S352/S355 protected by the RULING-2 `retrieve_failed` exclusion; S356 all-cited first-pass;
+S360–S363/S366 inject mock search). Real spend across the affected runs: **$0** (Tavily free tier; embeds
+mocked; ledgers in the discarded overlay). **The FULL suite — not a targeted run — is what caught this**,
+reaffirming the closure-gate full-suite rule.
+
+## C. Hermeticity fix (CTO-ruled: BOTH options; test-infra only, no production runtime change)
+- **Option 1 (per-scenario):** `_hermeticNoDiscovery()` no-op seam injected into the S-B (S357) and S-C
+  (S358) helpers — discovery ATTEMPTS but deterministically finds nothing → empty-KB claim stays UNCITED →
+  §8 FAIL_UNCITED → halt (the original PHASE-51 fail-closed intent), regardless of env keys.
+- **Option 2 (systemic):** `bin/forge-test.js` gains `HERMETIC_STRIP_KEYS = [TAVILY_API_KEY,
+  BRAVE_SEARCH_API_KEY, OPENAI_API_KEY]` — skipped on `.env` load AND stripped from the inherited shell env,
+  so the SU suite can NEVER make a real provider call regardless of `.env` or shell. Gate/spike scripts
+  load `.env` themselves → unaffected. **OPENAI_API_KEY assessment (per ruling): stripping it regressed
+  NOTHING** (full suite 359/0/5; the 5 skips unchanged) → no active scenario makes a latent real OpenAI
+  call; this also closes the documented PHASE-51 risk note (a) (exported key → real embeddings in S352).
+
+## D. SEMANTIC SHIFT (record): after A-1, "empty KB" in the citation pass TRIGGERS AUTO-DISCOVERY.
+Any scenario asserting fail-closed-on-empty-KB must explicitly disable discovery (no-op `_discovery` seam).
+
+## E. Gates (this stage)
+- Targeted: S357+S358 GREEN; hostile-env proof — `TAVILY_API_KEY`/`BRAVE_SEARCH_API_KEY`/`OPENAI_API_KEY`
+  all exported as dummies into the shell → S357/S358/S352/S355 still GREEN (strip + seam hold).
+- **Full SU suite: 359 pass / 0 fail / 5 skip (364 total)** — the D-A1.4 closure-gate target EXACTLY
+  (356 + S364/S365/S366), first-attempt clean after the fix, duration 191028ms.
+- §2 keep-clean grep on all added lines: NONE. Live surface: UNCHANGED this stage (bin/forge-test.js is
+  the test harness; citation_pass_test_helper.js is test infra). §ARC=10 · L2=81 · node --check OK.
+
+## STOP
+D-A1.4 complete (S364–S366 green, hermeticity fixed per ruling, full suite 359/0/5). Awaiting CTO closure
+verification from a FRESH LOCAL zip. D-A1.5 (real Gate #10 re-run) remains a HARD STOP pending a separate
+owner spend "yes" + estimate.

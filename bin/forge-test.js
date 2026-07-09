@@ -4,6 +4,16 @@
 const path = require("path");
 const fs   = require("fs");
 
+// PHASE-52 A-1 hermeticity hardening (CTO-ruled, 2026-07-09): the SU suite is $0/mock by
+// design — provider keys must NEVER reach scenarios, or provider-touching paths could make
+// real network calls in-suite. Concretely: TAVILY_API_KEY landed in .env for Gate #10 and,
+// post-A-1, S357's citation-pass discovery ran a REAL Tavily search whose live results
+// flipped the scenario's fail-closed outcome (S357 regression). OPENAI_API_KEY is included
+// per the same ruling (the documented PHASE-51 risk: an exported key would make S352's pass
+// do real embedding calls). Keys are BOTH skipped on .env load AND stripped from the
+// inherited shell env. Gate/spike scripts (scripts/spikes/*) load .env themselves — unaffected.
+const HERMETIC_STRIP_KEYS = ["TAVILY_API_KEY", "BRAVE_SEARCH_API_KEY", "OPENAI_API_KEY"];
+
 // Load .env from project root (mirrors forge-doctor.js behaviour)
 ;(function loadDotEnv() {
   const envPath = path.join(__dirname, "..", ".env");
@@ -17,10 +27,12 @@ const fs   = require("fs");
       if (eq < 1) continue;
       const key = trimmed.slice(0, eq).trim();
       const val = trimmed.slice(eq + 1).trim();
+      if (HERMETIC_STRIP_KEYS.includes(key)) continue;
       if (!(key in process.env)) process.env[key] = val;
     }
   } catch (_) { /* best-effort */ }
 }());
+for (const k of HERMETIC_STRIP_KEYS) delete process.env[k];
 
 const ROOT = path.resolve(__dirname, "..");
 

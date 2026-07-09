@@ -60,6 +60,21 @@ function _mockEmbedClient() {
   }) } };
 }
 
+// PHASE-52 A-1 hermeticity (CTO-ruled, 2026-07-09): after A-1, an EMPTY project KB triggers
+// the citation pass's auto web-discovery (zero_chunks). Any scenario asserting the
+// fail-closed-on-empty-KB outcome (S-B/S-C) must therefore explicitly DISABLE discovery
+// with this no-op seam — discovery ATTEMPTS but deterministically finds nothing → the claim
+// stays UNCITED → §8 FAIL_UNCITED → halt (the original PHASE-51 intent), regardless of any
+// provider key in the environment. (The production default seam would run a REAL Tavily
+// search if a key leaked in — the S357 regression this fixes, alongside the forge-test.js
+// HERMETIC_STRIP_KEYS hardening.)
+function _hermeticNoDiscovery() {
+  return {
+    search: async () => ({ status: "FAILED", output: null, metadata: { reason: "HERMETIC_NO_DISCOVERY" } }),
+    ingest: async () => ({ status: "FAILED", output: null, metadata: { reason: "HERMETIC_NO_DISCOVERY" } })
+  };
+}
+
 function _cleanup(projectId) {
   try {
     const d = path.join(PROJECTS_ROOT, projectId);
@@ -284,7 +299,9 @@ async function runSBUncitedFailClosed() {
     await _seedLoopAtDocumentation(PID, LOOP_ID, {});
     // No source, no chunk → the active project KB is empty.
 
-    const engine = createConversationEngine({ root: ROOT, _client: _mockEmbedClient() });
+    // A-1: empty KB now triggers discovery — disable it (no-op seam) so the fail-closed
+    // outcome is asserted deterministically (see _hermeticNoDiscovery).
+    const engine = createConversationEngine({ root: ROOT, _client: _mockEmbedClient(), _discovery: _hermeticNoDiscovery() });
     const result = await engine.documentProject({
       project_id: PID, loop_id: LOOP_ID,
       doc_provider: "mock", doc_model: "mock-doc-s352", doc_scenario_id: "S352"
@@ -327,7 +344,9 @@ async function runSCDetectorCoverage() {
     });
     await _seedLoopAtDocumentation(PID, LOOP_ID, {});
 
-    const engine = createConversationEngine({ root: ROOT, _client: _mockEmbedClient() });
+    // A-1: empty KB now triggers discovery — disable it (no-op seam) so the invariant is
+    // measured on a deterministic all-uncited outcome (see _hermeticNoDiscovery).
+    const engine = createConversationEngine({ root: ROOT, _client: _mockEmbedClient(), _discovery: _hermeticNoDiscovery() });
     const result = await engine.documentProject({
       project_id: PID, loop_id: LOOP_ID,
       doc_provider: "mock", doc_model: "mock-doc-s352", doc_scenario_id: "S352"
