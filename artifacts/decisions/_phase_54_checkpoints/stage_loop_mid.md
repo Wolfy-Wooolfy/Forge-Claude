@@ -104,3 +104,17 @@ D3 + D4 complete and gate-proven (372/0/5 (377) exactly, Track A clean, §ARC=10
 roles=13, $0). Awaiting the owner's fresh LOCAL-folder zip + CTO second verification.
 **D5 is NOT started** and will not start before Step-3 GO. Open items for the verification:
 uid_pin ruling (note c) + ACCEPT-on-FAIL semantics (note f).
+
+---
+
+## Amendment 1 (post-commit, append-only — owner interim commit, c-bis norm)
+
+Noticed after committing this checkpoint: OWNER interim commit `144466c1` ("U",
+Wolfy-Wooolfy, 2026-07-30 11:37 +0300) sits between `7dddc560` and `cd40e9ad`. Scope
+verified: `.claude/settings.local.json` (harness session permissions, +16/−3) +
+`progress/status.json` (+3/−3 — doctor auto-refresh capture of MY 2026-07-30 08:33 baseline
+doctor run: `last_doctor_run` → 2026-07-30T08:33:28.531Z, counts 29/5/1 → **30 pass /
+4 warn / 1 fail**; the 1 fail = uid_pin_match, unchanged — corroborates note (c)).
+**Corrected chain:** … `7dddc560` → `144466c1` (owner U) → `cd40e9ad` → `7d0ad74d` →
+`d378a015` → `cd8d921e` → `<this amendment commit>`. Net R-5 outcome unchanged.
+Recorded per the bidirectional Trust+Verify norm.
