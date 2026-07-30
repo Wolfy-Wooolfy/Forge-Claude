@@ -253,6 +253,36 @@ change); **(b)** on mismatch, classify — PASS-with-note if the ONLY differing 
 unilaterally: altering a pass criterion before the gate runs is exactly the "make a red gate
 green" move R-13 forbids. **Please rule (a) or (b).**
 
+## 5.c R-31 — credential contradiction resolved ($0, presence/shape only, 2026-07-30)
+
+Owner reported that no `OPENAI_API_KEY` line existed in `.env` and that he added one. Step-1
+had recorded an assignment at line 3. Mechanical resolution: **the owner's edit did not reach
+this file; the file is byte-unchanged since yesterday.**
+
+| Check | Result |
+|---|---|
+| (a) `.env` mtime now | **2026-07-29T12:10:34.023Z — IDENTICAL to Step-1; NOT newer.** Lines: **7 now vs 7 before**, unchanged. No BOM, LF endings |
+| (b) `OPENAI_API_KEY` assignments | **exactly 1, at line 3** — no duplicates, no commented copies, no other mentions. Winning line = 3, ignored lines = none. **Duplicate-override hazard: NOT present today** |
+| (b) shape of line 3 | clean: no `export`, no leading space, no spaces around `=`, not empty, **not quoted**, no inline comment, no internal space, no trailing CR |
+| (b) value classification | matches OpenAI key shape (`sk-…`), **not** a placeholder ⇒ a real (and per the owner, now **revoked**) key has been on line 3 since yesterday |
+| (b) `TAVILY_API_KEY` | exactly 1, at line 7; no duplicates |
+| (c) stray files | **none** — only `.env`. No `.env.txt`, `.env (1)`, `env`, `.env.*`. `D:\ForgeAI` (the old stale sibling copy) **no longer exists**; no `.env` in the user's home |
+| (d) ambient — HKCU\Environment | **absent** (no `OPENAI_API_KEY`, no `TAVILY_API_KEY`; zero API-ish variable names) |
+| (d) ambient — HKLM Session Manager\Environment | **absent** (same) |
+| (d) this shell's inherited copy | absent |
+| (e) effective resolution (driver-style fresh process) | **`.env` line 3** — no ambient exists to outrank it. Proven: loaded value === line-3 value; and ambient-beats-`.env` re-proven with a sentinel (mechanism confirmed, but currently inapplicable) |
+
+**Conclusion:** the only plausible remaining explanation is an **unsaved editor buffer** — the
+IDE opened `d:\S\Halo\Tech\Forge-Claude\.env` at that moment, and a typed-but-unsaved line
+leaves the disk file untouched exactly as observed. The two ruled-out alternatives (a second
+repo copy, a Windows environment variable) were checked and are negative.
+
+**PREVENTIVE — the hazard the owner is one keystroke away from creating:** he believes there is
+no existing line, so he would naturally **append** a new one. With line 3 still present,
+`env_loader.js:27` (`!(key in process.env)`, first occurrence wins) would keep the **REVOKED**
+key live and silently ignore the new one — while every presence check still reports OK. The
+instruction below therefore says REPLACE line 3, never append.
+
 ## 6. Hygiene + rulings status
 
 - `.gitignore` + `artifacts/projects/phase54_gate10_*/` (PHASE-48 W-4 precedent — driver
