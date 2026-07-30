@@ -67,7 +67,44 @@ the driver (real-b) and IS recorded.
 - Path (ii) (relayed API call) NOT needed; kept only as the documented weaker-witness
   fallback if the UI misbehaves on the day.
 
-**تعليمات المالك (بالعربي — جاهزة للتمرير):**
+**OPS UPDATE 2026-07-30 — RUN_FORGE.bat appears RESOLVED.** The owner's server is running
+and reachable: `GET http://127.0.0.1:3100/api/system/health` → `{"ok":true,
+"service":"forge-workspace-api","ts":"2026-07-30T13:51:22.451Z"}` (auth-exempt probe, $0),
+started by the owner via RUN_FORGE.bat — contradicting the long-standing backlog entry that
+it does not start the server. Corroborating evidence: a server-side bulk touch of 36
+`project_state.json` files at 13:40:25Z (one batch, `last_updated_at` ONLY, +1/−1 per file)
+when the owner opened the UI on cs_sys. Recommend the backlog item be closed with this
+evidence. NOTE: underscore-prefixed projects (`_reference_todo_api`, `_s150_abort_test`)
+were NOT in that sweep — see F-G3.
+
+**تعليمات المالك (بالعربي — جاهزة للتمرير؛ تُستخدم بعد نجاح real-a):**
+
+> **(أ) التبديل من مشروعك cs_sys إلى مشروع الاختبار — بدون أي مساس بمشروعك:**
+> 1. في نفس المتصفح على `http://127.0.0.1:3100/` افتح تبويب **Projects** من الشريط الجانبي.
+> 2. اختر المشروع باسمه بالضبط: **`phase54_gate10_demo`** واضغط عليه لتفعيله.
+> 3. تأكد أن الاسم الظاهر بالأعلى صار `phase54_gate10_demo` قبل ما تكتب أي حاجة.
+>    (مشروعك cs_sys يفضل كما هو — إحنا لا نكتب فيه ولا نغيّره إطلاقًا.)
+> 4. افتح تبويب **Chat**.
+>
+> **(ب) دورك الأول — التعديل:**
+> 5. اقرأ تقرير الـ MVP الظاهر (ماذا بُني، نتائج الاختبارات، وكيف تشغّله).
+> 6. في خانة **«اكتب رسالتك...»** اطلب تعديلًا **بكلماتك أنت** واضغط **إرسال**.
+>    اقتراح آمن ومفيد لواجهة ملاحظات (لا يتعارض مع أي اختبار مجمّد):
+>    *«عايز كل ملاحظة تتسجل بوقت إنشائها ويظهر الوقت ده في رد الإضافة وفي القائمة»*
+>    — أو أي تعديل من عندك بنفس الروح (إضافة معلومة، مش تغيير مسار أو كود حالة).
+> 7. لما يردّ فورج إنه هيعيد البناء بتعديلك، **قف** وأخبر الـ CTO — ولا ترسل رسالة تانية
+>    قبل ما نقول لك، عشان الدور والبناء يمشوا بالتناوب.
+>
+> **(ج) دورك الثاني — الاعتماد (بعد ما نقول لك إن النسخة الجديدة جاهزة):**
+> 8. اقرأ التقرير الجديد.
+> 9. **لو الاختبارات كلها ناجحة:** اكتب موافقتك بكلماتك (مثلًا: *«تمام، اعتمده وكمّل»*).
+> 10. **لو التقرير قال إن في اختبارات فاشلة:** انتبه للفرق ده —
+>     - موافقة عادية (*«تمام اعتمده»*) **لن تمرّ**: فورج هيحذّرك إن الاختبارات فاشلة
+>       وهيسألك سؤال توضيحي، ومش هيكمّل.
+>     - عشان يكمّل فعلًا لازم تقولها **صراحةً**، مثلًا:
+>       *«أنا فاهم إن الاختبارات فاشلة وموافق نكمّل بيها زي ما هي»*.
+>       ساعتها كل المراحل التالية هتحمل علامة إن البناء ده عدّى باختبارات فاشلة (مسجّل بالكامل).
+> 11. أخبر الـ CTO أنك أرسلت الدور الثاني.
 
 > **الدور الأول (تعديل):**
 > 1. افتح terminal في مجلد المشروع وشغّل: `node start-api.js` واتركه شغالًا.
@@ -179,6 +216,42 @@ then (if applicable) checks `step30_review.json` + the persisted `review_report.
 live run" }`. `verify` recomputes all criteria from persisted evidence only; each maps to a
 named boolean in `gate10_result.json`. The flag-off byte-reference was snapshotted at
 preflight and is re-read + string-compared at verify.
+
+## 5.b INCIDENT — real-a attempt #1 (2026-07-30, REAL CASH $0.00)
+
+Authorized under the owner's approval; failed at the FIRST role call.
+
+| | |
+|---|---|
+| Failure | `architect failed: {reason: AGENT_FAILED, detail: "OPENAI_API_KEY not set"}` — openai adapter fail-fast |
+| **Real cash** | **$0.00** — ledger row `outcome:"failed", tokens_in:0, tokens_out:0, latency_ms:1, cost_usd_actual:0`; no network call was made |
+| Ledger delta | 1 row / **$0.0372 estimate-only** (a pre-call estimate booking, not a charge) |
+| Root cause | the driver process never loaded `.env`. `preflight` had loaded it inside ITS OWN process and reported `openai_key_present: true` — assurance that did not carry to the driver process. My preparation gap: a precondition validated in a different process than the one that consumes it. |
+| State left behind | `phase54_gate10_demo` seeded (project_state + vision + loop graph at ARCHITECT_DESIGN, iteration 0); no spec/design/build artifacts. A naive retry hits the driver's own "refuse to reuse" fresh-project guard. |
+| Other projects | untouched by the driver (all its writes are scoped to the demo id) |
+| Evidence | `real/INCIDENT_real_a_attempt_1.json` |
+
+**$0 fixes applied (not yet exercised on a real leg):** (1) `loadDotEnv(ROOT)` at driver init —
+the same sanctioned §ARC-7 path `start-api.js` uses, so preflight/dry/real now resolve
+credentials identically; (2) `_requireApproval` also refuses **before any write** when
+`OPENAI_API_KEY` is unresolvable (exit 4) — a credential problem can never leave a
+half-seeded project again; (3) new **id-guarded `reset` stage** (`FORGE_GATE10_RESET_CONFIRM=1`)
+that archives the failed attempt's evidence to `real_attempt_archive/` and removes ONLY
+`phase54_gate10_demo`. **NOT retried — per spend discipline a real leg is never re-run
+without a fresh CTO GO.**
+
+### F-G3 (CTO ruling requested) — criterion 11 vs the owner's running server
+While the owner's UI is open, the SERVER bulk-touches every listed project's
+`last_updated_at` (36 files at 13:40:25Z, +1/−1 each). Criterion 11 is a BYTE comparison of
+a pre-existing flag-off project state, so such a sweep during the gate would produce a FALSE
+RED that has nothing to do with the MVP loop. Two facts make this currently safe: the sweep
+skips **underscore-prefixed** projects, and the chosen reference is `_reference_todo_api`.
+That property is therefore load-bearing but undocumented. Options: **(a)** keep the byte
+compare and record that the underscore-prefix exemption is what makes it valid (no code
+change); **(b)** on mismatch, classify — PASS-with-note if the ONLY differing key is
+`last_updated_at` and no `mvp_*` key appeared, FAIL otherwise. I did NOT change `verify`
+unilaterally: altering a pass criterion before the gate runs is exactly the "make a red gate
+green" move R-13 forbids. **Please rule (a) or (b).**
 
 ## 6. Hygiene + rulings status
 
