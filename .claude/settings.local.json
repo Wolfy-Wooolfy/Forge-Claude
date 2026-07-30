@@ -1,6 +1,16 @@
 {
   "permissions": {
-    "allow": ["Bash", "Edit", "Write", "MultiEdit", "Read"],
-    "deny": ["Bash(rm:*)", "Bash(rmdir:*)"]
+    "allow": [
+      "Bash",
+      "Edit",
+      "Write",
+      "MultiEdit",
+      "Read",
+      "Bash(git add *)"
+    ],
+    "deny": [
+      "Bash(rm:*)",
+      "Bash(rmdir:*)"
+    ]
   }
 }
