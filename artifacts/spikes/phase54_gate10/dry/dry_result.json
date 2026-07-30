@@ -1,8 +1,23 @@
 {
   "verdict": "DRY_PASS",
   "ledger_delta": {
-    "rows": 11,
+    "rows": 12,
     "usd": 0
   },
-  "note": "driver plumbing, pauses, evidence writers and ledger capture proven at $0; owner turns scripted in dry ONLY"
+  "sequence": [
+    "seed",
+    "design_tests",
+    "build",
+    "run_tests(PASS)->AWAITING",
+    "owner_refine(scripted)",
+    "rebuild",
+    "run_tests_2->AWAITING",
+    "owner_accept(scripted)",
+    "reviewProject",
+    "documentProject",
+    "judgeQuality(gate_pending 2)"
+  ],
+  "note": "driver plumbing, pauses, evidence writers and ledger capture proven at $0; owner turns scripted in dry ONLY",
+  "r23_note": "dry mirrors the real sequence incl. documentProject (no hand-advance). Dry-only hermeticity: fixed-vector embed client + no-op discovery seam + citation_audit_override (empty dry KB). real-c passes NONE of these — real provider, real KB path, no override.",
+  "r24_note": "this dry pass ran WITH the read-only prompt decorator installed on the 'mock' adapter (the adapter this leg actually calls) — non-interference proof in dry_decorator_comparison.json"
 }

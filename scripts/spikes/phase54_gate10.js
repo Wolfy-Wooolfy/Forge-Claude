@@ -112,24 +112,59 @@ function _requireApproval() {
   }
 }
 
-// READ-ONLY prompt recorder around the REAL openai adapter (real legs only).
-function _armPromptRecorder(leg) {
-  const realAdapter = getAdapters().get("openai");
-  if (!realAdapter) throw new Error("openai adapter not registered");
+// ── R-24 — READ-ONLY prompt recorder (driver-local; approved with 5 conditions) ─
+//
+// WHY IT EXISTS: the production agent.invoke path writes no request trace (the
+// PHASE-48 providerTrace gap: responses/<inv>.json is null for the function-calling
+// path), so Gate criterion 5 — "the owner's changes appear VERBATIM in the second
+// materializer prompt" — has no production artifact to read. This decorator supplies
+// that evidence WITHOUT altering behaviour.
+//
+// R-24(i)   strictly pass-through: the prompt string is COPIED for evidence, then the
+//           real adapter is invoked with the ORIGINAL, unmodified arguments (.apply on
+//           the original `arguments` object, bound to the original adapter) and its
+//           result object is returned unmodified.
+// R-24(ii)  NO error handling around the delegate — the delegate call is the last
+//           statement and nothing wraps it; exceptions propagate untouched. (The
+//           recording write above it is deliberately unguarded too: an evidence-write
+//           failure must surface loudly, not be swallowed.)
+// R-24(iii) lives ONLY in this spike file; code/src is byte-identical (no decorator
+//           code, no hook, no seam anywhere in the production tree).
+// R-24(iv)  proven non-interfering by re-running the DRY pass with it installed —
+//           see dry_decorator_comparison.json.
+// R-24(v)   every evidence record states the capture was driver-local instrumentation.
+function _armPromptRecorder(leg, adapterId) {
+  const id          = adapterId || "openai";
+  const realAdapter = getAdapters().get(id);
+  if (!realAdapter) throw new Error("adapter not registered: " + id);
   const file = path.join(_dir(path.join(EV_ROOT, leg)), "prompt_trace.jsonl");
   const wrapped = Object.assign({}, realAdapter, {
-    invoke: function (input) {
-      try {
-        fs.appendFileSync(file, JSON.stringify({
-          at: new Date().toISOString(),
-          model: input && input.model,
-          prompt: (input && input.prompt) || ""
-        }) + "\n", "utf8");
-      } catch (_) { /* recording must never affect the call */ }
-      return realAdapter.invoke(input);
+    invoke: function () {
+      const input = arguments[0];
+      fs.appendFileSync(file, JSON.stringify({
+        at:            new Date().toISOString(),
+        adapter:       id,
+        model:         input && input.model,
+        prompt:        (input && input.prompt) || "",
+        captured_by:   "driver-local read-only decorator (R-24)"
+      }) + "\n", "utf8");
+      return realAdapter.invoke.apply(realAdapter, arguments);
     }
   });
-  getAdapters().set("openai", wrapped);
+  getAdapters().set(id, wrapped);
+  _writeEv(leg, "instrumentation.json", {
+    mechanism:   "driver-local read-only decorator around the '" + id + "' adapter (R-24)",
+    scope:       "scripts/spikes/phase54_gate10.js ONLY — code/src byte-identical, no production seam",
+    behaviour:   "prompt string copied to prompt_trace.jsonl, then the real adapter is invoked " +
+                 "with the original unmodified arguments and its result returned unmodified; " +
+                 "no error handling wraps the delegate",
+    why_needed:  "production agent.invoke writes no request trace (PHASE-48 providerTrace gap), " +
+                 "so criterion 5 (owner changes VERBATIM in the second materializer prompt) has " +
+                 "no production artifact to read",
+    honesty_note: "prompt evidence in this run is INSTRUMENTED, not a production artifact",
+    non_interference_proof: "artifacts/spikes/phase54_gate10/dry/dry_decorator_comparison.json",
+    at: new Date().toISOString()
+  });
 }
 
 // ── fixtures ──────────────────────────────────────────────────────────────────
@@ -289,7 +324,18 @@ function _copyAudit(pid, loopId, leg) {
 
 async function dry() {
   const leg = "dry";
+  // Each dry run is self-contained: clear the previous run's decorator artifacts so
+  // the control/treatment comparison is not polluted by stale files.
+  for (const f of ["prompt_trace.jsonl", "instrumentation.json", "dry_decorator_comparison.json"]) {
+    try { fs.unlinkSync(path.join(EV_ROOT, leg, f)); } catch (_) { /* absent is fine */ }
+  }
   _snapshotBaseline(leg);
+  // R-24(iv): the decorator is installed on the adapter this leg actually calls
+  // ("mock"), so the dry pass is a REAL non-interference test of the decorator,
+  // not a vacuous one. FORGE_GATE10_NO_RECORDER=1 runs the SAME sequence with the
+  // decorator absent — that is the CONTROL arm of the non-interference experiment
+  // (decorator is then the only variable between the two runs).
+  if (process.env.FORGE_GATE10_NO_RECORDER !== "1") _armPromptRecorder(leg, "mock");
   try { fs.rmSync(path.join(ROOT, "artifacts", "projects", PID_DRY), { recursive: true, force: true }); } catch (_) {}
 
   await _seedProject(PID_DRY, LOOP_DRY, { provider: "mock", model: "mock-scope-s373a" }, leg);
@@ -369,17 +415,49 @@ async function dry() {
   if (!(rv.advanced === true && rv.advanced_to === "DOCUMENTATION")) {
     throw new Error("dry review: " + JSON.stringify({ err: rv.review_error, to: rv.advanced_to }));
   }
-  await reg.invoke("orchestration.advance_state", { project_id: PID_DRY, loop_id: LOOP_DRY,
-    to_state: "QUALITY_JUDGE", transition_type: "NORMAL", role_invoked: "documentation" }, { root: ROOT });
+
+  // R-23: the dry leg mirrors the real sequence — reviewProject -> documentProject ->
+  // judgeQuality; NO hand-advance. DRY-ONLY hermeticity (keeps this pass at $0 and
+  // off the network): a dry engine built with the existing PHASE-51/52 seams — a
+  // fixed-vector embed client (no OpenAI embeddings) and a no-op discovery seam (no
+  // Tavily) — plus citation_audit_override, because the dry KB has no seeded sources.
+  // The REAL leg (real-c) passes NONE of this: real provider, real KB path, no override.
+  const dryEmbedClient = { embeddings: { create: async (req) => {
+    const inputs = Array.isArray(req.input) ? req.input : [req.input];
+    const vec = new Array(512).fill(0); vec[0] = 1;
+    return { data: inputs.map(() => ({ embedding: vec })), usage: { total_tokens: 5 * inputs.length } };
+  } } };
+  const dryEng = createConversationEngine({
+    root: ROOT,
+    _client: dryEmbedClient,
+    _discovery: { search: async () => ({ status: "FAILED", results: [] }),
+                  ingest: async () => ({ status: "FAILED" }) }
+  });
+  const doc = await dryEng.documentProject({ project_id: PID_DRY, loop_id: LOOP_DRY,
+    doc_provider: "mock", doc_model: "mock-doc-s302", doc_scenario_id: "S302",
+    citation_audit_override: true });
+  _writeEv(leg, "step15_document.json", doc);
+  if (!(doc.advanced === true && doc.advanced_to === "QUALITY_JUDGE")) {
+    throw new Error("dry documentProject: " + JSON.stringify({ err: doc.doc_error, to: doc.advanced_to }));
+  }
+
   const jq = await eng.judgeQuality({ project_id: PID_DRY, loop_id: LOOP_DRY,
     quality_provider: "mock", quality_model: "mock-qj-s116", quality_scenario_id: "S116" });
-  _writeEv(leg, "step15_judge.json", jq);
+  _writeEv(leg, "step16_judge.json", jq);
   if (jq.gate_pending !== 2) throw new Error("dry judge: " + JSON.stringify(jq));
 
   _copyAudit(PID_DRY, LOOP_DRY, leg);
   _writeEv(leg, "dry_result.json", {
     verdict: "DRY_PASS", ledger_delta: _ledgerDelta(leg),
-    note: "driver plumbing, pauses, evidence writers and ledger capture proven at $0; owner turns scripted in dry ONLY"
+    sequence: ["seed", "design_tests", "build", "run_tests(PASS)->AWAITING", "owner_refine(scripted)",
+               "rebuild", "run_tests_2->AWAITING", "owner_accept(scripted)", "reviewProject",
+               "documentProject", "judgeQuality(gate_pending 2)"],
+    note: "driver plumbing, pauses, evidence writers and ledger capture proven at $0; owner turns scripted in dry ONLY",
+    r23_note: "dry mirrors the real sequence incl. documentProject (no hand-advance). Dry-only hermeticity: " +
+              "fixed-vector embed client + no-op discovery seam + citation_audit_override (empty dry KB). " +
+              "real-c passes NONE of these — real provider, real KB path, no override.",
+    r24_note: "this dry pass ran WITH the read-only prompt decorator installed on the 'mock' adapter " +
+              "(the adapter this leg actually calls) — non-interference proof in dry_decorator_comparison.json"
   });
   console.log("DRY_PASS — evidence under artifacts/spikes/phase54_gate10/dry/");
 }
@@ -454,22 +532,41 @@ async function realC() {
     security_provider: "openai", security_model: "gpt-4o" });
   _writeEv(leg, "step30_review.json", rv);
   _capGuard(leg, "post-review");
-  // DOCUMENTATION deliberately skipped (justified in the plan): its surface was
-  // gate-proven in PHASE-51/52/53 and is orthogonal to the MVP-loop mechanism.
-  if (rv.advanced && rv.advanced_to === "DOCUMENTATION") {
-    await reg.invoke("orchestration.advance_state", { project_id: PID_REAL, loop_id: LOOP_REAL,
-      to_state: "QUALITY_JUDGE", transition_type: "NORMAL", role_invoked: "documentation" }, { root: ROOT });
+  if (!(rv.advanced === true && rv.advanced_to === "DOCUMENTATION")) {
+    throw new Error("reviewProject did not advance to DOCUMENTATION: " +
+      JSON.stringify({ err: rv.review_error, to: rv.advanced_to, verdict: rv.derived_verdict }));
   }
+
+  // R-23: the REAL path runs end to end — reviewProject -> documentProject ->
+  // judgeQuality. NO hand-advance (advance_state validates state IDs only and never
+  // consults TRANSITION_TABLE, so a synthetic hop is a path production never takes).
+  // Real provider, real KB/citation path, NO citation_audit_override.
+  const doc = await eng.documentProject({ project_id: PID_REAL, loop_id: LOOP_REAL,
+    doc_provider: "openai", doc_model: "gpt-4o" });
+  _writeEv(leg, "step31_document.json", doc);
+  _capGuard(leg, "post-document");
+  if (!(doc.advanced === true && doc.advanced_to === "QUALITY_JUDGE")) {
+    throw new Error("documentProject did not advance to QUALITY_JUDGE: " +
+      JSON.stringify({ err: doc.doc_error, to: doc.advanced_to }));
+  }
+
   const jq = await eng.judgeQuality({ project_id: PID_REAL, loop_id: LOOP_REAL,
     quality_provider: "openai", quality_model: "gpt-4o" });
-  _writeEv(leg, "step31_judge.json", jq);
+  _writeEv(leg, "step32_judge.json", jq);
   _capGuard(leg, "post-judge");
   _copyAudit(PID_REAL, LOOP_REAL, leg);
+  const finalState = _readJson("artifacts/projects/" + PID_REAL + "/project_state.json");
   _writeEv(leg, "real_endpoint.json", {
     endpoint: "QUALITY_JUDGE gate_pending 2 (Gate #10 endpoint — no Gate-2 response, no deploy)",
-    review: { advanced_to: rv.advanced_to, derived_verdict: rv.derived_verdict,
-              awft_marker: rv.mvp_accepted_with_failing_tests === true },
-    judge:  { gate_pending: jq.gate_pending, awft_marker: jq.mvp_accepted_with_failing_tests === true },
+    path_taken: "reviewProject -> documentProject -> judgeQuality (R-23: real path, no hand-advance)",
+    owner_took_awft_path: !!(finalState && finalState.mvp_loop &&
+                             finalState.mvp_loop.accepted_with_failing_tests === true),
+    review:   { advanced_to: rv.advanced_to, derived_verdict: rv.derived_verdict,
+                awft_marker: rv.mvp_accepted_with_failing_tests === true },
+    document: { advanced_to: doc.advanced_to,
+                citation_pass: doc.citation_pass ? "present" : "absent" },
+    judge:    { gate_pending: jq.gate_pending,
+                awft_marker: jq.mvp_accepted_with_failing_tests === true },
     ledger_delta: _ledgerDelta(leg)
   });
   console.log("REAL LEGS COMPLETE — run: verify");
@@ -546,8 +643,36 @@ async function verify() {
   const refNow = fs.readFileSync(path.join(ROOT, refBefore.path), "utf8");
   c.flag_off_untouched = refNow === refBefore.content;
 
+  // (12, R-23) AWFT downstream markers — read back from PERSISTED evidence only.
+  // Conditional criterion: applies ONLY if the owner took the
+  // ACCEPT_WITH_FAILING_TESTS path; otherwise recorded N/A with the reason.
+  const snapAccept  = JSON.parse(fs.readFileSync(path.join(EV_ROOT, leg, "snap_post_accept.json"), "utf8"));
+  const tookAwft    = !!(snapAccept.project_state && snapAccept.project_state.mvp_loop &&
+                         snapAccept.project_state.mvp_loop.accepted_with_failing_tests === true);
+  let awftNote = null;
+  if (tookAwft) {
+    const stepReview = JSON.parse(fs.readFileSync(path.join(EV_ROOT, leg, "step30_review.json"), "utf8"));
+    const stepJudge  = JSON.parse(fs.readFileSync(path.join(EV_ROOT, leg, "step32_judge.json"), "utf8"));
+    const persistedReport = _readJson(od + "review_report.json");
+    c.awft_markers_downstream =
+      stepReview.mvp_accepted_with_failing_tests === true &&
+      !!(persistedReport && persistedReport.mvp_accepted_with_failing_tests === true) &&
+      stepJudge.mvp_accepted_with_failing_tests === true;
+    awftNote = "owner took the ACCEPT_WITH_FAILING_TESTS path — marker verified in the " +
+               "reviewProject payload, the persisted review_report.json, and the " +
+               "judgeQuality/Gate-2 payload (all read back from evidence)";
+  } else {
+    awftNote = "N/A — the owner took the plain ACCEPT path (tests green at acceptance), so no " +
+               "AWFT marker exists to propagate. The downstream-marker surface remains proven " +
+               "by S380 alone, NOT by this live run.";
+  }
+
   const pass = Object.keys(c).every(function (k) { return c[k] === true; });
   const result = { verdict: pass ? "GATE_PASS" : "GATE_NOT_PASSED", criteria: c,
+                   criterion_12_awft: { applicable: tookAwft, note: awftNote },
+                   instrumentation_note: "criterion 5 (prompt verbatim) is evidenced via the " +
+                     "driver-local READ-ONLY decorator (R-24) — see instrumentation.json; " +
+                     "production writes no request trace (PHASE-48 gap)",
                    ledger_delta: endpoint.ledger_delta, at: new Date().toISOString() };
   _writeEv(leg, "gate10_result.json", result);
   console.log(JSON.stringify(result, null, 2));

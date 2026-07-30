@@ -31,16 +31,28 @@ Resumable stages: `preflight` / `dry` / `real-a` / `real-b` / `real-c` / `verify
   abort with CAP_ABORT evidence. Real legs additionally hard-require
   `FORGE_GATE10_OWNER_APPROVED=1`.
 
-### F-G2 (CTO ruling requested) — materializer prompt-trace mechanism
-The production agent.invoke path writes NO request trace (the PHASE-48 known
-providerTrace gap family), so criterion 5 needs a capture mechanism. Implemented: a
-**READ-ONLY decorator around the REAL `openai` adapter inside the driver process only** —
-records `input.prompt` verbatim to `prompt_trace.jsonl`, then delegates to the real
-adapter unchanged. Behavior byte-identical; observability, not a behavioral seam (nothing
-scripted, nothing altered). Note: the owner's two feedback interpretations run in the
-SERVER process (no recorder) — criterion 5 concerns the SECOND MATERIALIZER prompt, which
-runs inside the driver (real-b) and IS recorded. Alternative if refused: permanent
-providerTrace fix (existing backlog item) — bigger scope. **Approve/deny the decorator.**
+### R-24 (was F-G2) — prompt-trace decorator: APPROVED + all five conditions satisfied
+The production agent.invoke path writes NO request trace (the PHASE-48 providerTrace gap
+family), so criterion 5 needs a capture mechanism. Implemented and hardened per R-24:
+
+| Condition | How it is met |
+|---|---|
+| (i) strictly pass-through | prompt string COPIED for evidence, then `realAdapter.invoke.apply(realAdapter, arguments)` — original arguments object, original `this`, result returned unmodified |
+| (ii) no error handling around the delegate | the delegate call is the last statement; nothing wraps it — exceptions propagate untouched (the evidence write above it is also unguarded, so an evidence failure surfaces loudly) |
+| (iii) spike-only | lives solely in `scripts/spikes/phase54_gate10.js`; `code/src` byte-identical, no seam/hook anywhere in production |
+| (iv) DRY re-run proves non-interference | **CONTROLLED experiment done — verdict `NON_INTERFERENCE_PROVEN`** (below) |
+| (v) evidence states the instrumentation | `instrumentation.json` written at arm time + `captured_by` on every trace line + a note in `dry_result.json` and in `gate10_result.json` |
+
+**R-24(iv) controlled experiment (both arms $0):** the first comparison confounded two
+changes (decorator + the R-23 documentation step), so the driver gained a control switch
+(`FORGE_GATE10_NO_RECORDER=1`) and both arms were re-run on the IDENTICAL 11-step sequence
+— decorator as the ONLY variable. Result (`dry/dry_decorator_comparison.json`):
+**16/16 evidence files identical after timestamp normalization · both arms `DRY_PASS` ·
+both ledger deltas `{rows: 12, usd: 0}` · 12 prompts captured (incl. BOTH materializer
+codegen prompts) · verdict `NON_INTERFERENCE_PROVEN`.**
+Scope note kept honest: the owner's two feedback interpretations run in the SERVER process
+(no recorder there); criterion 5 concerns the SECOND MATERIALIZER prompt, which runs inside
+the driver (real-b) and IS recorded.
 
 ## 2. Owner participation mechanics (§A.2) — validated at $0
 
@@ -93,19 +105,21 @@ disk; no concurrent writes.)
   derivable entry, so the driver restores a fixture manifest between build and test in
   dry legs ONLY; real legs use the real build's own manifest.)
 
-## 4. Cost estimate (§A.4)
+## 4. Cost estimate (§A.4 — REVISED under R-23)
 
-**Endpoint proposal:** run through **judgeQuality → hold at Gate 2** (gate_pending 2; no
-Gate-2 response, no deployment, no finalize). Justification: exercises the full MVP-loop
-mechanism + the R-20/AWFT downstream surface live (reviewProject + judgeQuality payload
-markers) if the owner chooses the override; Gate-2/deploy/finalize add spend without
-touching any PHASE-54 mechanism.
-**F-G1 (CTO ruling requested):** DOCUMENTATION is SKIPPED (driver advances
-DOCUMENTATION→QUALITY_JUDGE directly): the doc+citation surface was REAL-gate-proven in
-PHASE-51/52/53, is orthogonal to the MVP loop, and skipping saves ~$0.05–0.08 ledger +
-all Tavily accounting (⇒ real cash = ledger, OpenAI only). **Approve/deny the skip.**
+**Endpoint:** **judgeQuality → hold at Gate 2** (gate_pending 2; no Gate-2 response, no
+deployment, no finalize). Exercises the full MVP-loop mechanism plus the R-20/AWFT
+downstream surface live if the owner takes the override; Gate-2/deploy/finalize would add
+spend without touching any PHASE-54 mechanism.
 
-Per-call breakdown (all gpt-4o; unit costs from PHASE-24..46 actuals):
+**R-23 applied (F-G1 REJECTED — documentation is NOT skipped).** real-c now runs the real
+path end to end: `reviewProject → documentProject → judgeQuality`, with **no hand-advance**
+(the synthetic `advance_state` hop is removed from real-c entirely), real provider, real
+KB/citation path, and **no `citation_audit_override`**. The dry leg mirrors the same
+sequence; its hermeticity aids (fixed-vector embed client, no-op discovery seam, override)
+are DRY-ONLY and are named as such in the dry evidence.
+
+Per-call breakdown (all gpt-4o; unit costs from PHASE-24..46 + PHASE-51..53 actuals):
 
 | Call | × | est/unit | subtotal |
 |---|---|---|---|
@@ -121,18 +135,23 @@ Per-call breakdown (all gpt-4o; unit costs from PHASE-24..46 actuals):
 | **mvp_feedback** (cap 0.05 ea) | 2 | $0.005 | $0.010 |
 | reviewer (code B) | 1 | $0.040 | $0.040 |
 | security_auditor | 1 | $0.030 | $0.030 |
+| **documentation (R-23, restored)** | 1 | $0.035 | $0.035 |
+| **citation pass — embeddings (R-23)** | ~8 | ~$0.0003 | ~$0.002 |
+| **citation pass — Tavily searches (R-23)** | ≤8 | $0.005 flat *(ledger estimate; $0 real cash, free tier)* | ≤$0.040 |
 | quality_judge | 1 | $0.035 | $0.035 |
-| **Total (16 calls)** | | | **≈ $0.36 ledger** |
+| **Total (17 gpt-4o calls + KB ops)** | | | **≈ $0.44 ledger** |
 
-- **Range:** $0.25–0.55 (LLM output variance; each internal A-5 loopback, if the first
-  build fails tests, adds a builder+materializer pair ≈ +$0.08).
-- **Real cash = ledger** (OpenAI only; NO Tavily — documentation skipped per F-G1; if
-  the CTO overrules F-G1, add ~$0.05–0.08 ledger of which ~$0.04 is the flat
-  $0.005/search Tavily ledger estimate at $0 real cash on free tier, PHASE-53 precedent).
-- **Hard cap enforced in the driver: $1.00** ledger delta (abort + CAP_ABORT evidence).
-  Kill bar unchanged: $3.00.
-- **Precedent:** PHASE-46 full idea→COMPLETE URL-shortener real run = **$0.34947** —
-  this Gate's two-build-cycle estimate sits in the same band.
+- **Ledger total: ≈ $0.44** · **Real cash: ≈ $0.40** (the ≤$0.040 Tavily line is
+  bookkeeping only — free tier, PHASE-53 precedent booked $0.04 ledger against ~$0 cash).
+- **Range: $0.30–0.65** (LLM output variance; each internal A-5 loopback, if a build fails
+  tests, adds a builder+materializer pair ≈ +$0.08; the citation pass may need fewer than
+  the 8-search cap).
+- **Hard cap enforced in the driver: $1.00** ledger delta, checked at every stage boundary
+  (abort + CAP_ABORT evidence). Kill bar unchanged: **$3.00**.
+- **Precedent:** PHASE-46 full idea→COMPLETE URL-shortener real run = **$0.34947**;
+  PHASE-53 doc+citation Gate = $0.05457 ledger / ~$0.0146 cash. This Gate =
+  two build cycles + full doc path ⇒ the ≈$0.44 estimate sits just above the PHASE-46 band,
+  as expected.
 
 ## 5. Pass criteria (§A.5 — recorded VERBATIM; mechanism-based; output quality is observed data, never a criterion)
 
@@ -144,23 +163,40 @@ Per-call breakdown (all gpt-4o; unit costs from PHASE-24..46 actuals):
 > advance parameter-identical; zero HALT; cap respected; at least one pre-existing flag-off
 > project state byte-untouched by the whole run.
 
-`verify` recomputes all 11 from the persisted evidence only (implemented; each maps to a
-named boolean in `gate10_result.json`). The flag-off byte-reference was snapshotted at
+**12th criterion (added per R-23) — conditional:**
+
+> If the owner takes the ACCEPT_WITH_FAILING_TESTS path, the marker is present in the
+> reviewProject payload, in the persisted review_report.json, AND in the
+> judgeQuality/Gate-2 payload — each read back from the persisted evidence, not from
+> memory. If the owner takes the plain ACCEPT path (tests green), record the marker
+> criterion as N/A with the reason, and the downstream-marker surface stays proven by
+> S380 alone; state that plainly in the evidence.
+
+Implemented exactly so: `verify` reads `snap_post_accept.json` to decide applicability,
+then (if applicable) checks `step30_review.json` + the persisted `review_report.json` +
+`step32_judge.json`; otherwise it records
+`criterion_12_awft: { applicable: false, note: "N/A — … proven by S380 alone, NOT by this
+live run" }`. `verify` recomputes all criteria from persisted evidence only; each maps to a
+named boolean in `gate10_result.json`. The flag-off byte-reference was snapshotted at
 preflight and is re-read + string-compared at verify.
 
-## 6. Hygiene + open items
+## 6. Hygiene + rulings status
 
 - `.gitignore` + `artifacts/projects/phase54_gate10_*/` (PHASE-48 W-4 precedent — driver
   scratch churn; spike evidence stays tracked).
-- Open CTO rulings before real spend: **F-G1** (documentation skip) · **F-G2** (read-only
-  prompt-recorder decorator). Neither blocks presenting the estimate.
+- **F-G1 → R-23: CLOSED (rejected).** Documentation restored on the real path; estimate
+  revised; 12th criterion added.
+- **F-G2 → R-24: CLOSED (approved).** Decorator hardened to all five conditions;
+  non-interference proven by controlled experiment.
 - Known sequencing: owner turns happen while `node start-api.js` runs; driver legs run
   between them (strictly sequential, disk-handoff).
 
 ## STOP
 
-Preparation complete at **$0** (preflight + DRY_PASS evidence on disk). Awaiting: CTO
-presents the estimate (§4) to the owner → owner's explicit spend approval in chat →
-then real-a → owner turn 1 → real-b → owner turn 2 → real-c → verify. Closure artifact,
-status COMPLETE flip, push, and tag remain forbidden until Gate PASS + CTO closure-diff +
-push GO.
+Preparation complete at **$0** — preflight + **three** DRY_PASS runs on disk (pre-R-23
+baseline, R-24 control arm, R-24 treatment arm), zero real provider calls, ledger delta
+$0 across all of them. `FORGE_GATE10_OWNER_APPROVED` is NOT set and real-a/b/c have NOT
+been run. Awaiting: CTO presents the revised estimate (≈$0.44 ledger / ≈$0.40 cash) to the
+owner → owner's explicit spend approval in chat → CTO GO → then real-a → owner turn 1 →
+real-b → owner turn 2 → real-c → verify. Closure artifact, status COMPLETE flip, push, and
+tag remain forbidden until Gate PASS + CTO closure-diff + push GO.
