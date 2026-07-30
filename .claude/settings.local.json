@@ -6,7 +6,8 @@
       "Write",
       "MultiEdit",
       "Read",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(PATH='/c/Program Files/nodejs:__TRACKED_VAR__' node -e 'const s=JSON.parse\\(require\\('\\\\''fs'\\\\''\\).readFileSync\\('\\\\''progress/status.json'\\\\'','\\\\''utf8'\\\\''\\)\\); console.log\\('\\\\''PARSES; next_phase='\\\\''+s.next_phase+'\\\\'' current_task='\\\\''+s.current_task\\)')"
     ],
     "deny": [
       "Bash(rm:*)",
