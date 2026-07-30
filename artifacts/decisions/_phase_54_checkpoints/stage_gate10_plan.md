@@ -311,6 +311,75 @@ Owner reported saving and restarting. **The save did not land — for the second
 ambient variable. The edit exists only in an **unsaved editor buffer** (or the window was
 closed without saving). Remediation is the owner's action; nothing was spent this round.
 
+## 5.e R-35 — H3 CONFIRMED from on-disk history; R-27 Step 3 probe: KEY_LIVE
+
+**The owner's account was CORRECT.** He said the `OPENAI_API_KEY` line did not exist in `.env`
+before yesterday and that he added it yesterday — the evidence supports him exactly. The
+earlier "unsaved buffer / second failed save" reading was **an inference by the CTO** that the
+fuller evidence has now revised; it is recorded here as the CTO's reading, not the owner's error.
+
+**(a) Doctor series — the detail strings name the SOURCE (268 archived reports):**
+
+| Report | `openai_api_key` | `uid_pin_match` |
+|---|---|---|
+| 2026-05-08 (oldest) | FAIL "OPENAI_API_KEY not set" | (check did not exist yet) |
+| **2026-07-09T10:34:59Z** | **PASS "from keychain"** | **PASS (username=Khaled.Sayed)** |
+| **2026-07-29T14:29:35Z** | **PASS "from env"** | **FAIL (mismatch)** |
+| 2026-07-30T12:47:18Z (latest) | PASS "from env" | PASS (username=Khaled Elmasry, re-pinned per R-22) |
+
+Both transitions occur in the **same pair of reports**: the last "from keychain" report is
+also the last `uid_pin` PASS (2026-07-09), and the first "from env" report is also the first
+`uid_pin` FAIL (2026-07-29). **H3 is confirmed from the owner's own machine history** — one
+root cause (the per-user Windows profile change) emptied the per-user credential vault, Forge
+lost the key, and the owner added it to `.env` on 2026-07-29 (file mtime 12:10:34Z; the first
+"from env" doctor report follows at 14:29:35Z the same day). The same root cause explains the
+vanished per-user Python (R-13) and the `uid_pin_match` failure (R-22).
+
+**(b) Profile-change window:** last `uid_pin` PASS **2026-07-09T10:34:59Z** → first FAIL
+**2026-07-29T14:29:35Z**. No doctor run exists between those dates, so the change occurred
+inside that 20-day gap.
+
+**(c) The loose end — CLOSED, no fourth storage location.** Every prior gate driver does BOTH
+steps, mirroring start-api.js:22 + :33-36: `phase51_gate10.js:27`, `phase52_gate10.js:26`,
+`phase52_gate10_preflight.js:14`, `phase53_gate10.js:35` each run a `loadDotEnv` IIFE at the
+top AND then `if (!DRY && !process.env.OPENAI_API_KEY) secret_provider.get("openai_api_key")`;
+`phase45_url_shortener_full_build.js:77-78` and `phase47_fp_replay.js:43-44` call
+`loadDotEnv` from `env_loader`. During the keychain era (2026-07-01 → 07-09) `.env` had no
+`OPENAI_API_KEY` line, so those drivers were served by their own keychain-hydration step.
+**H3 fully accounts for them; no ambient export was ever required.** The deviant was MY
+PHASE-54 driver, which originally had neither step — the direct cause of the real-a attempt-1
+failure. The incident fix added `loadDotEnv`; R-35(c) has now added the keychain-hydration
+step to all three real legs, restoring full parity (inert while the vault is empty).
+
+**R-27 Step 3 — KEY VALIDITY PROBE: `KEY_LIVE`.** Cheapest real call through the SAME
+consumption path the gate uses (loadDotEnv → `reg.invoke("agent.invoke")` → openAiAdapter):
+`gpt-4o-mini-2024-07-18`, 8 tokens in / 10 out, 2047 ms, outcome success.
+
+| Figure | Value |
+|---|---|
+| Ledger delta (rows) | 1 |
+| Ledger delta (`cost_usd_estimated`) | **$0.00000** (the estimator books 0 for gpt-4o-mini at this size) |
+| **Real cash (`cost_usd_actual`)** | **$0.00019** |
+| PHASE-54 cumulative real cash to date | **$0.00019** (attempt-1 architect failure was $0.00) |
+
+**⇒ The key currently in `.env` line 3 WORKS. No `.env` edit is needed; the R-33 helper does
+not need to be run.**
+
+**R-32 re-run in light of this:** check 1 (mtime newer) still FAILS as literally written —
+but it is now **superseded, not waived**: a fresh mtime was only ever a *proxy* for "the
+working key is in place", and the probe establishes that fact **directly and more strongly**
+(R-27's own principle: presence is not validity — and validity outranks a freshness proxy).
+Checks 2, 3, 4 PASS as before. **Check 5 PASSES by the port method:** listener on 3100 is
+PID **9116**, `StartTime 2026-07-30T13:40:24.592Z` > `.env` mtime `2026-07-29T12:10:34.023Z`
+⇒ the running server loaded the **current, live** key. No restart is required.
+
+**CAP-guard soundness (checked before authorising larger spend):** `_capGuard` sums
+`cost_usd_estimated`. For real gpt-4o rows that column is populated and **conservative** —
+recent rows show est $0.0363 vs act $0.01464, est $0.0539 vs act $0.01787, est $0.1301 vs
+act $0.02057 (~2.5x over-booking). The cap therefore trips **earlier** than real spend
+warrants, which is the correct failure direction. Corollary for §4: the ≈$0.44 *ledger*
+estimate corresponds to roughly **$0.15–0.20 real cash**.
+
 ## 6. Hygiene + rulings status
 
 - `.gitignore` + `artifacts/projects/phase54_gate10_*/` (PHASE-48 W-4 precedent — driver

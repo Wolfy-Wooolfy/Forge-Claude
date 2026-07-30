@@ -120,11 +120,33 @@ function _requireApproval() {
   }
   // INCIDENT FIX: fail BEFORE any write/seed if credentials are missing, so a
   // credential problem can never leave a half-seeded project behind again.
+  // (Callers must await _hydrateKeyFromKeychain() first — see below.)
   if (!process.env.OPENAI_API_KEY) {
-    console.error("REFUSED: OPENAI_API_KEY not resolvable (checked after loadDotEnv). " +
-      "Nothing was written.");
+    console.error("REFUSED: OPENAI_API_KEY not resolvable (checked after loadDotEnv " +
+      "and keychain hydration). Nothing was written.");
     process.exit(4);
   }
+}
+
+// R-35(c) PATTERN PARITY: every prior gate driver (phase45/47/51/52/53) does BOTH
+// steps — loadDotEnv at the top AND keychain hydration when the env is still empty,
+// mirroring start-api.js:22 + :33-36. My driver originally did NEITHER (that is what
+// killed real-a attempt #1) and the incident fix added only the first. This restores
+// full parity. Currently inert (the vault is empty for this Windows profile — see
+// ERRATUM E-1), but correct if it is ever repopulated.
+// Async because secret_provider.get is async while _requireApproval is sync.
+async function _hydrateKeyFromKeychain() {
+  if (process.env.OPENAI_API_KEY) return false;
+  try {
+    const secret_provider = require(path.join(ROOT, "code/src/runtime/secrets/secret_provider"));
+    const kr = await secret_provider.get("openai_api_key");
+    if (kr && kr.ok && kr.value) {
+      process.env.OPENAI_API_KEY = kr.value;
+      console.log("  [secret] OPENAI_API_KEY hydrated from keychain");
+      return true;
+    }
+  } catch (_) { /* fail-open: the refusal check below surfaces it */ }
+  return false;
 }
 
 // ── R-24 — READ-ONLY prompt recorder (driver-local; approved with 5 conditions) ─
@@ -482,6 +504,7 @@ async function dry() {
 const REAL_LLM = { provider: "openai", model: "gpt-4o" };
 
 async function realA() {
+  await _hydrateKeyFromKeychain();
   _requireApproval();
   const leg = "real";
   _snapshotBaseline(leg);
@@ -505,6 +528,7 @@ async function realA() {
 }
 
 async function realB() {
+  await _hydrateKeyFromKeychain();
   _requireApproval();
   const leg = "real";
   _armPromptRecorder(leg);
@@ -533,6 +557,7 @@ async function realB() {
 }
 
 async function realC() {
+  await _hydrateKeyFromKeychain();
   _requireApproval();
   const leg = "real";
   _armPromptRecorder(leg);
