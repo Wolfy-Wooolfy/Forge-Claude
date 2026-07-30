@@ -1,0 +1,28 @@
+{
+  "id": "S374",
+  "name": "mvp review gate — flag ON + tests PASS: suppressed advance at RUN_TESTS, artifact-derived report, anti-bypass; flag OFF unchanged (PHASE-54 D3, R-7/R-11)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/mvp_loop_test_helper",
+  "method": "runS374ReviewGate",
+  "args": [],
+  "cleanup_project": "test_s374_mvp",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "on_advanced_false",        "expected": true },
+    { "type": "state_field_equals", "field": "on_review_pending",        "expected": true },
+    { "type": "state_field_equals", "field": "on_no_gate_pending",       "expected": true },
+    { "type": "state_field_equals", "field": "graph_still_run_tests",    "expected": true },
+    { "type": "state_field_equals", "field": "block_awaiting",           "expected": true },
+    { "type": "state_field_equals", "field": "report_file_exists",       "expected": true },
+    { "type": "state_field_equals", "field": "report_kind_pass",         "expected": true },
+    { "type": "state_field_equals", "field": "report_tests_match",       "expected": true },
+    { "type": "state_field_equals", "field": "report_files_match",       "expected": true },
+    { "type": "state_field_equals", "field": "report_entry_match",       "expected": true },
+    { "type": "state_field_equals", "field": "report_slice_match",       "expected": true },
+    { "type": "state_field_equals", "field": "report_summary_ar_nonempty", "expected": true },
+    { "type": "state_field_equals", "field": "anti_bypass_wrong_state",  "expected": true },
+    { "type": "state_field_equals", "field": "off_advanced_reviewer",    "expected": true },
+    { "type": "state_field_equals", "field": "off_no_review_fields",     "expected": true }
+  ]
+}

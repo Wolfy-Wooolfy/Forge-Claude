@@ -24,7 +24,7 @@ function _isSafePath(p) {
   );
 }
 
-function _buildCodegenPrompt(plan, spec, design, scenario_id, repair_feedback) {
+function _buildCodegenPrompt(plan, spec, design, scenario_id, repair_feedback, owner_changes) {
   const filePaths    = plan.map(function (f) { return f.path; }).join(", ");
   const scenarioTag  = scenario_id ? "\nSCENARIO_TAG: " + scenario_id + "\n" : "";
   const specSummary  = (spec  && (spec.scope   || spec.summary))       || "see design";
@@ -58,6 +58,22 @@ function _buildCodegenPrompt(plan, spec, design, scenario_id, repair_feedback) {
   // targeted-repair directive is the most recent instruction the model sees. The assertion
   // type/reason strings are emitted VERBATIM from the report; an ERROR scenario with no failing
   // assertion carries its error message instead.
+  // PHASE-54 R-8: DEDICATED owner_changes block — structurally separate from the A-5
+  // repair block and NEVER merged into it (labelling owner requests as failed checks
+  // would be a false statement to the model and would poison the prompt trace as
+  // forensic evidence). Empty/undefined ⇒ prompt BYTE-IDENTICAL to the pre-PHASE-54
+  // path (S335 asserts across all arities). When both blocks are non-empty the fixed
+  // ordering is: owner_changes FIRST, repair block LAST (preserves the documented A-5
+  // design intent that the targeted-repair directive is the model's most recent
+  // instruction). Change strings are emitted VERBATIM (prompt-trace evidence, R-8/D4).
+  const owners = Array.isArray(owner_changes) ? owner_changes : [];
+  const ownerBlock = owners.length
+    ? "\n\nOWNER REFINE REQUESTS (from the project owner's review of the working MVP) — " +
+      "implement EACH of these changes exactly, without regressing the acceptance criteria " +
+      "that still apply:\n" +
+      owners.map(function (c) { return "- " + c; }).join("\n")
+    : "";
+
   const repair = Array.isArray(repair_feedback) ? repair_feedback : [];
   const repairBlock = repair.length
     ? "\n\nPREVIOUS BUILD ATTEMPT FAILED THESE CHECKS — fix exactly these without " +
@@ -106,6 +122,7 @@ function _buildCodegenPrompt(plan, spec, design, scenario_id, repair_feedback) {
     "acceptance criteria explicitly include it. If the ACs say POST /notes, the app must serve POST /notes, " +
     "NOT /api/notes (e.g. app.use(router) with router.post('/notes', ...), OR app.use('/notes', router) with " +
     "router.post('/', ...) — but NEVER both prefixes)." +
+    ownerBlock +
     repairBlock +
     "\nRESPOND WITH VALID JSON ONLY."
   );
@@ -142,8 +159,11 @@ async function materialize(input, ctx) {
   // A-5 (PHASE-44): OPTIONAL repair feedback from the prior attempt's failing test report.
   // undefined-safe (defaults to []) so a first build is unchanged.
   const repairFeedback = Array.isArray(input.repair_feedback) ? input.repair_feedback : [];
+  // PHASE-54 R-8: OPTIONAL owner refine requests. undefined-safe (defaults to []) so
+  // every pre-PHASE-54 call is byte-identical.
+  const ownerChanges = Array.isArray(input.owner_changes) ? input.owner_changes : [];
 
-  const prompt = _buildCodegenPrompt(plan, spec, design, scenario_id, repairFeedback);
+  const prompt = _buildCodegenPrompt(plan, spec, design, scenario_id, repairFeedback, ownerChanges);
 
   let codegenResult;
   try {

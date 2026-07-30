@@ -1,0 +1,22 @@
+{
+  "id": "S375",
+  "name": "mvp ACCEPT — provider-interpreted, deferred advance parameter-identical, ACCEPTED terminal; post-ACCEPT loop-back does NOT re-engage (PHASE-54 D4, R-7ii/R-17)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/mvp_loop_test_helper",
+  "method": "runS375AcceptPath",
+  "args": [],
+  "cleanup_project": "test_s375_mvp",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "accept_advanced",           "expected": true },
+    { "type": "state_field_equals", "field": "accept_advanced_to_reviewer","expected": true },
+    { "type": "state_field_equals", "field": "graph_at_reviewer",         "expected": true },
+    { "type": "state_field_equals", "field": "block_accepted_terminal",   "expected": true },
+    { "type": "state_field_equals", "field": "history_has_accept",        "expected": true },
+    { "type": "state_field_equals", "field": "r17_build_advances_normally","expected": true },
+    { "type": "state_field_equals", "field": "r17_block_still_accepted",  "expected": true },
+    { "type": "state_field_equals", "field": "r17_fail_loops_back_blind", "expected": true },
+    { "type": "state_field_equals", "field": "r17_no_review_pending",     "expected": true }
+  ]
+}

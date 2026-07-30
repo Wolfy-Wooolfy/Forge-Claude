@@ -1,0 +1,25 @@
+{
+  "id": "S378",
+  "name": "mvp cap + UNCLEAR — REFINE at ITERATION_CAP escalates with plain-language CAP_REACHED; UNCLEAR + provider-failure stay in review with forensic history (PHASE-54 D4, R-9/R-12/R-19)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/mvp_loop_test_helper",
+  "method": "runS378CapAndUnclear",
+  "args": [],
+  "cleanup_project": "test_s378_mvp",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "cap_mode_cap_reached",     "expected": true },
+    { "type": "state_field_equals", "field": "cap_graph_escalated",      "expected": true },
+    { "type": "state_field_equals", "field": "cap_iteration_not_incremented", "expected": true },
+    { "type": "state_field_equals", "field": "cap_block_cap_reached",    "expected": true },
+    { "type": "state_field_equals", "field": "cap_message_plain_language", "expected": true },
+    { "type": "state_field_equals", "field": "cap_escalation_path_present", "expected": true },
+    { "type": "state_field_equals", "field": "unclear_stays_awaiting",   "expected": true },
+    { "type": "state_field_equals", "field": "unclear_clarification_shown", "expected": true },
+    { "type": "state_field_equals", "field": "unclear_history_recorded", "expected": true },
+    { "type": "state_field_equals", "field": "provider_fail_stays_awaiting", "expected": true },
+    { "type": "state_field_equals", "field": "provider_fail_history_unclear", "expected": true },
+    { "type": "state_field_equals", "field": "no_halt_all_paths",        "expected": true }
+  ]
+}

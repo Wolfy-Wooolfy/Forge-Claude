@@ -13,6 +13,12 @@ const { validateCitations } = require("../runtime/kb/citation_validator");
 // relevance floor. Single source of truth lives in citation_engine.js (no side effect;
 // same layering precedent as the validateCitations import above).
 const { RELEVANCE_FLOOR_MEDIUM } = require("../runtime/kb/citation_engine");
+// PHASE-54: MVP loop engine (R-1 flag-gated; every call site guards on isMvpEnabled —
+// an absent/disabled mvp_loop block short-circuits to the exact PHASE-53 path).
+const mvpLoop = require("./mvpLoopEngine");
+// PHASE-54 (R-4/R-9): value-only import — the ONE cap constant, echoed into owner
+// reports. Enforcement stays solely in iteration_controller via orchestration.loop_back.
+const { ITERATION_CAP } = require("../runtime/orchestration/conversation_graph");
 
 const STATE_TRANSITION_THRESHOLDS = {
   DISCUSSION: ["DISCOVERY_REQUIRED"],
@@ -742,6 +748,207 @@ function createConversationEngine(options = {}) {
     return r;
   }
 
+  // ── PHASE-54 D4 — owner review reply handling (R-7/R-8/R-9/R-12/R-19) ───────
+  //
+  // Reached ONLY when isMvpEnabled(state) && mvp_loop.status === AWAITING_OWNER_REVIEW
+  // (the graph is held at RUN_TESTS per R-7). The provider is the ONLY interpreter
+  // (R-12): every failure mode degrades to a clarifying question + stay in review +
+  // an UNCLEAR forensic entry (R-19). ACCEPT performs the DEFERRED advance,
+  // parameter-identical to runTests' own PASS advance (R-7 ii). REFINE reuses
+  // orchestration.loop_back from RUN_TESTS (R-2/R-9 — single cap authority).
+
+  async function _handleMvpReview(projectId, message, state, user_language, body) {
+    const lang    = String(user_language || "ar").toLowerCase().startsWith("en") ? "en" : "ar";
+    const loopId  = body.loop_id || state.loop_id || null;
+    const block   = state.mvp_loop;
+    const reg     = getDefaultRegistry();
+
+    const clarifyFallback = lang === "ar"
+      ? "لم أفهم ردّك بدقة — هل تقصد الموافقة على شريحة الـ MVP كما هي، أم تريد تعديلات محددة؟ اذكرها كنقاط."
+      : "I could not read your reply precisely — do you approve the MVP slice as-is, or do you want specific changes? List them as bullet points.";
+
+    if (!loopId) {
+      const r0 = { ok: false, mode: "BLOCKED", reason: "NO_LOOP_ID", project_id: projectId };
+      await persistTurn(projectId, message, r0);
+      return r0;
+    }
+
+    // R-18: explicit LLM config only — body override or the block's own fields.
+    const fbProvider = body.mvp_provider || block.provider;
+    const fbModel    = body.mvp_model    || block.model;
+    if (!fbProvider || !fbModel) {
+      const rc = { ok: false, mode: "BLOCKED", reason: "MVP_PROVIDER_REQUIRED", project_id: projectId };
+      await persistTurn(projectId, message, rc);
+      return rc;
+    }
+
+    // Facts for the interpreter prompt — best-effort read of the persisted report.
+    let facts;
+    {
+      const repPath = path.join(projectsRoot, projectId, "orchestration", loopId, "mvp_report.json");
+      const rep = readJsonSafe(repPath, null);
+      facts = rep ? { slice_name: rep.slice && rep.slice.slice_name,
+                      pass: rep.tests && rep.tests.pass, total: rep.tests && rep.tests.total,
+                      kind: rep.kind } : undefined;
+    }
+
+    const interp = await mvpLoop.interpretFeedback({
+      project_id: projectId, message, facts,
+      provider: fbProvider, model: fbModel,
+      scenario_id: body.mvp_scenario_id || undefined
+    }, { root });
+
+    const echoIter = Number.isInteger(block.iteration) ? block.iteration : 0;
+
+    // UNCLEAR — by provider verdict OR by any typed interpreter failure (R-12: never
+    // HALT, never guess; stay in review with a focused question; record it, R-19).
+    if (!interp.ok || interp.decision === "UNCLEAR") {
+      const question = (interp.ok && interp.clarification_question)
+        ? interp.clarification_question : clarifyFallback;
+      const updated = { ...state };
+      updated.mvp_loop = { ...block,
+        feedback_history: block.feedback_history.concat([
+          mvpLoop.feedbackEntry("UNCLEAR", [], echoIter)
+        ])
+      };
+      updated.last_updated_at = nowIso();
+      await saveState(projectId, updated);
+      const rU = {
+        ok: true, mode: "MVP_REVIEW_PENDING", mvp_review_pending: true,
+        message: question, project_id: projectId
+      };
+      await persistTurn(projectId, message, rU);
+      return rU;
+    }
+
+    // Both ACCEPT and REFINE act on the graph — verify it is still held at RUN_TESTS.
+    const statusResult = await reg.invoke("orchestration.get_status", {
+      project_id: projectId, loop_id: loopId
+    }, { root });
+    if (!statusResult || statusResult.status !== "SUCCESS" ||
+        statusResult.output.current_state !== "RUN_TESTS") {
+      const rw = { ok: false, mode: "BLOCKED", reason: "MVP_WRONG_STATE",
+                   current_state: statusResult && statusResult.output &&
+                                  statusResult.output.current_state,
+                   project_id: projectId };
+      await persistTurn(projectId, message, rw);
+      return rw;
+    }
+
+    if (interp.decision === "ACCEPT") {
+      // R-7(ii): the DEFERRED advance — parameter-identical to runTests' PASS advance.
+      const adv = await reg.invoke("orchestration.advance_state", {
+        project_id:      projectId,
+        loop_id:         loopId,
+        to_state:        "REVIEWER_CODE_AND_SECURITY",
+        transition_type: "NORMAL",
+        role_invoked:    "builtproject"
+      }, { root });
+      if (!adv || adv.status !== "SUCCESS") {
+        const ra = { ok: false, mode: "BLOCKED", reason: "MVP_ADVANCE_FAILED", project_id: projectId };
+        await persistTurn(projectId, message, ra);
+        return ra;
+      }
+      const tr = mvpLoop.assertTransition(block.status, "ACCEPTED");
+      const updated = { ...state };
+      updated.mvp_loop = { ...block,
+        status: tr.ok ? "ACCEPTED" : block.status,
+        feedback_history: block.feedback_history.concat([
+          mvpLoop.feedbackEntry("ACCEPT", [], echoIter)
+        ])
+      };
+      updated.last_updated_at = nowIso();
+      await saveState(projectId, updated);
+      const rA = {
+        ok: true, mode: "MVP_ACCEPTED", advanced: true,
+        advanced_to: "REVIEWER_CODE_AND_SECURITY",
+        message: lang === "ar"
+          ? "تمت الموافقة على شريحة الـ MVP — الخط الإنتاجي يكمل الآن مراجعة الكود والأمان."
+          : "MVP slice accepted — the pipeline now proceeds to code and security review.",
+        project_id: projectId
+      };
+      await persistTurn(projectId, message, rA);
+      return rA;
+    }
+
+    // REFINE — persist changes[] (R-8 iv: supersedes the previous turn's file),
+    // then the production-proven cap-aware loop_back from RUN_TESTS (R-7 iii).
+    const pf = await mvpLoop.persistOwnerFeedback(projectId, loopId, interp.changes,
+      echoIter + 1, { root });
+    if (!pf.ok) {
+      const rf = { ok: false, mode: "BLOCKED", reason: pf.error_code, project_id: projectId };
+      await persistTurn(projectId, message, rf);
+      return rf;
+    }
+
+    const lbResult = await reg.invoke("orchestration.loop_back", {
+      project_id: projectId, loop_id: loopId
+    }, { root });
+    if (!lbResult || lbResult.status !== "SUCCESS") {
+      const rl = { ok: false, mode: "BLOCKED", reason: "MVP_LOOP_BACK_FAILED", project_id: projectId };
+      await persistTurn(projectId, message, rl);
+      return rl;
+    }
+    const lbOut = lbResult.output;
+
+    if (lbOut.escalated) {
+      // R-9: plain-language cap surfacing — a silent ESCALATED is a phase failure.
+      const trC = mvpLoop.assertTransition(block.status, "CAP_REACHED");
+      const updated = { ...state };
+      updated.mvp_loop = { ...block,
+        status: trC.ok ? "CAP_REACHED" : block.status,
+        feedback_history: block.feedback_history.concat([
+          mvpLoop.feedbackEntry("REFINE", interp.changes, echoIter)
+        ])
+      };
+      updated.last_updated_at = nowIso();
+      await saveState(projectId, updated);
+      const capMsg = lang === "ar"
+        ? "وصلنا إلى الحد الأقصى لمحاولات إعادة البناء في هذه الدورة، فلا يمكن تنفيذ هذا التعديل تلقائيًا الآن. " +
+          "آخر نسخة ناجحة محفوظة كأفضل محاولة. يمكنك: مراجعة تقرير التصعيد، أو بدء دورة بناء جديدة " +
+          "بالفكرة المعدّلة، أو اعتماد النسخة الحالية كما هي."
+        : "We reached the maximum rebuild attempts for this cycle, so this change cannot be applied automatically now. " +
+          "The best attempt is preserved. You can: review the escalation report, start a new build cycle " +
+          "with the adjusted idea, or accept the current version as-is.";
+      const rC = {
+        ok: true, mode: "MVP_CAP_REACHED", escalated: true,
+        escalation_path: lbOut.escalation_path,
+        message: capMsg, project_id: projectId
+      };
+      await persistTurn(projectId, message, rC);
+      return rC;
+    }
+
+    const gs2 = await reg.invoke("orchestration.get_status", {
+      project_id: projectId, loop_id: loopId
+    }, { root });
+    const newIter = (gs2 && gs2.status === "SUCCESS" &&
+                     typeof gs2.output.iteration_count === "number")
+      ? gs2.output.iteration_count : echoIter + 1;
+
+    const trB = mvpLoop.assertTransition(block.status, "BUILDING");
+    const updated = { ...state };
+    updated.mvp_loop = { ...block,
+      status: trB.ok ? "BUILDING" : block.status,
+      iteration: newIter,
+      feedback_history: block.feedback_history.concat([
+        mvpLoop.feedbackEntry("REFINE", interp.changes, newIter)
+      ])
+    };
+    updated.last_updated_at = nowIso();
+    await saveState(projectId, updated);
+    const rR = {
+      ok: true, mode: "MVP_REFINE_LOOPED", loop_back: true,
+      advanced_to: "BUILDER", changes: interp.changes,
+      message: lang === "ar"
+        ? "تمام — جاري إعادة بناء شريحة الـ MVP بالتعديلات التي طلبتها، وسيصلك تقرير جديد بعد الاختبار."
+        : "Got it — rebuilding the MVP slice with your requested changes; a fresh report follows after testing.",
+      project_id: projectId
+    };
+    await persistTurn(projectId, message, rR);
+    return rR;
+  }
+
   async function processMessage(body = {}) {
     const projectId = normalizeProjectId(body.project_id || "");
     const message = String(body.message || "").trim();
@@ -853,6 +1060,14 @@ function createConversationEngine(options = {}) {
       };
       await persistTurn(projectId, message, rUnclear);
       return rUnclear;
+    }
+
+    // PHASE-54 D4 (R-7): owner reply to a pending MVP review — provider-interpreted
+    // (R-12), BEFORE any other routing. Flag-off / non-awaiting projects skip this
+    // branch entirely (byte-identical PHASE-53 behaviour, R-1).
+    if (mvpLoop.isMvpEnabled(state) &&
+        state.mvp_loop.status === "AWAITING_OWNER_REVIEW") {
+      return await _handleMvpReview(projectId, message, state, user_language, body);
     }
 
     // CONVERSATION MODE gate — PHASE-16.1
@@ -1753,6 +1968,28 @@ function createConversationEngine(options = {}) {
       return { ok: true, loop_id: loopId, advanced: false, build_error: "BUILDER_TIMEOUT" };
     }
 
+    // PHASE-54 D4 (R-1 flag-gated): MVP slice threading. Active statuses scope the
+    // spec passed to builder+materializer; a BUILDING rebuild additionally reads the
+    // owner's outstanding REFINE changes (R-8 iv — the file persists across internal
+    // loopbacks until the owner's next review turn supersedes it). Terminal statuses
+    // (ACCEPTED / CAP_REACHED, R-17) and flag-off take the FULL spec with zero MVP
+    // behaviour — no crash, no half-engagement.
+    let effSpec = spec;
+    let mvpOwnerChanges = [];
+    let mvpFlipToBuilding = false;
+    if (mvpLoop.isMvpEnabled(state)) {
+      const mvpBlock = state.mvp_loop;
+      const active = mvpBlock.status === "SCOPE_DERIVED" || mvpBlock.status === "BUILDING";
+      if (active && mvpBlock.mvp_scope) {
+        effSpec = mvpLoop.scopedSpec(spec, mvpBlock.mvp_scope);
+        mvpFlipToBuilding = mvpBlock.status === "SCOPE_DERIVED";
+        if (mvpBlock.status === "BUILDING") {
+          const fb = await mvpLoop.readOwnerFeedback(normalizeProjectId(projectId), loopId, { root });
+          if (fb) mvpOwnerChanges = fb.changes;
+        }
+      }
+    }
+
     // 30s timeout, mirroring formalizeSpec/reviewSpec
     let timeoutHandle;
     const timeoutPromise = new Promise((_, reject) => {
@@ -1764,7 +2001,7 @@ function createConversationEngine(options = {}) {
         reg.invoke("role.invoke", Object.assign(
           {
             role_id:    "builder",
-            input:      { spec, design, project_id: normalizeProjectId(projectId) },
+            input:      { spec: effSpec, design, project_id: normalizeProjectId(projectId) },
             project_id: normalizeProjectId(projectId),
             provider:   buildProvider
           },
@@ -1826,7 +2063,7 @@ function createConversationEngine(options = {}) {
         {
           project_id: normalizeProjectId(projectId),
           plan,
-          spec,
+          spec:       effSpec,
           design,
           provider:   matProvider,
           smoke:      !!smokeEntry
@@ -1835,7 +2072,9 @@ function createConversationEngine(options = {}) {
         matScenId   ? { scenario_id: matScenId   } : {},
         smokeEntry  ? { smoke_entry: smokeEntry  } : {},
         // Additive + optional: absent when empty ⇒ the materialize call is byte-identical to today.
-        repairFeedback.length ? { repair_feedback: repairFeedback } : {}
+        repairFeedback.length ? { repair_feedback: repairFeedback } : {},
+        // PHASE-54 R-8: owner refine requests — additive + optional, same discipline.
+        mvpOwnerChanges.length ? { owner_changes: mvpOwnerChanges } : {}
       ), buildCtx);
 
       const matOut = matResult && matResult.output;
@@ -1915,6 +2154,19 @@ function createConversationEngine(options = {}) {
         role_invoked:    "builder"
       }, { root });
 
+      // PHASE-54 D4: first successful MVP build flips SCOPE_DERIVED → BUILDING
+      // (fail-closed guard; a failed build above returns early and never flips).
+      if (mvpFlipToBuilding &&
+          mvpLoop.assertTransition("SCOPE_DERIVED", "BUILDING").ok) {
+        const st54 = loadState(projectId);
+        if (st54 && st54.mvp_loop && st54.mvp_loop.status === "SCOPE_DERIVED") {
+          const updated54 = { ...st54 };
+          updated54.mvp_loop = { ...st54.mvp_loop, status: "BUILDING" };
+          updated54.last_updated_at = nowIso();
+          await saveState(projectId, updated54);
+        }
+      }
+
       return {
         ok:            true,
         loop_id:       loopId,
@@ -1931,6 +2183,41 @@ function createConversationEngine(options = {}) {
     }
   }
 
+  // ── PHASE-54 D3 — enter the owner review gate (R-7/R-11) ────────────────────
+  //
+  // Shared by runTests' PASS branch (R-7 i) and the R-10 FAIL-with-outstanding-
+  // changes routing. Assembles the report DETERMINISTICALLY from the run output +
+  // build manifest (R-11 — zero provider involvement), persists mvp_report.json,
+  // and flips mvp_loop BUILDING → AWAITING_OWNER_REVIEW. Fail-closed: a report
+  // that cannot persist leaves the block untouched (retryable, graph unmoved).
+
+  async function _mvpEnterOwnerReview(pid, loopId, state, kind, runOutput,
+                                      manifestPaths, derivedEntry, iterationCount) {
+    const report = mvpLoop.assembleMvpReport({
+      project_id: pid,
+      loop_id:    loopId,
+      kind,
+      mvp_scope:  state.mvp_loop.mvp_scope,
+      manifest:   { files: (manifestPaths || []).map(function (p) { return { path: p }; }) },
+      report:     runOutput,
+      entry:      derivedEntry || null,
+      iteration:  iterationCount,
+      cap:        ITERATION_CAP
+    });
+    const pr = await mvpLoop.persistMvpReport(pid, loopId, report, { root });
+    if (!pr.ok) return { ok: false, error_code: pr.error_code };
+
+    const tr = mvpLoop.assertTransition(state.mvp_loop.status, "AWAITING_OWNER_REVIEW");
+    if (!tr.ok) return { ok: false, error_code: tr.error_code };
+
+    const updated = { ...state };
+    updated.mvp_loop = { ...state.mvp_loop,
+      status: "AWAITING_OWNER_REVIEW", iteration: iterationCount };
+    updated.last_updated_at = nowIso();
+    await saveState(pid, updated);
+    return { ok: true, report };
+  }
+
   // ── Run Tests bridge (PHASE-29) ─────────────────────────────────────────────
   //
   // runTests: installs deps + bridges test_plan.json → forge_tests/scenarios/
@@ -1938,6 +2225,9 @@ function createConversationEngine(options = {}) {
   // PASS report → advance RUN_TESTS → REVIEWER_CODE_AND_SECURITY.
   // FAIL report → loop-back to BUILDER via orchestration.loop_back (cap-aware).
   // No LLM call — purely deterministic.
+  // PHASE-54 (R-7): with mvp_loop enabled+BUILDING, PASS suppresses the advance and
+  // enters the owner review gate; FAIL with outstanding owner changes routes to the
+  // owner too (R-10). Flag-off/terminal statuses: byte-identical PHASE-53 behaviour.
 
   async function runTests(body = {}) {
     const projectId = normalizeProjectId(body.project_id || "");
@@ -1970,6 +2260,11 @@ function createConversationEngine(options = {}) {
       return { ok: true, loop_id: loopId, current_state: currentState,
                test_error: "WRONG_STATE", advanced: false };
     }
+
+    // PHASE-54: iteration echo for the owner report — from the SAME get_status call.
+    const iterationCount = (statusResult.output &&
+                            typeof statusResult.output.iteration_count === "number")
+      ? statusResult.output.iteration_count : 0;
 
     // Read test_plan.json
     const planRelPath = "artifacts/projects/" + pid + "/orchestration/" + loopId + "/test_plan.json";
@@ -2197,6 +2492,23 @@ function createConversationEngine(options = {}) {
     // ── Sub-step 4: Advance or loop-back ──────────────────────────────────────
 
     if (runOutput.overall_status === "PASS") {
+      // PHASE-54 R-7(i): active MVP build → SUPPRESS the advance, hold at RUN_TESTS,
+      // hand the decision to the owner (persist-then-BLOCK; signal is
+      // mvp_review_pending — NEVER gate_pending, R-7 iv).
+      if (mvpLoop.isMvpEnabled(state) && state.mvp_loop.status === "BUILDING") {
+        const enter = await _mvpEnterOwnerReview(pid, loopId, state, "PASS_REVIEW",
+          runOutput, manifestPaths, derivedEntry, iterationCount);
+        if (!enter.ok) {
+          return { ok: true, loop_id: loopId, advanced: false,
+                   test_error: enter.error_code, report_summary: reportSummary };
+        }
+        return {
+          ok: true, loop_id: loopId, advanced: false,
+          current_state: "RUN_TESTS", mvp_review_pending: true,
+          mvp_report: enter.report, report_summary: reportSummary
+        };
+      }
+
       await reg.invoke("orchestration.advance_state", {
         project_id:      pid,
         loop_id:         loopId,
@@ -2219,6 +2531,28 @@ function createConversationEngine(options = {}) {
     // fail-OPEN: must run BEFORE loop_back so best is captured before iteration_count++.
     await _snapshotBestAttempt(reg, pid, loopId, runOutput);
 
+    // PHASE-54 R-10: with an outstanding owner REFINE, a FAIL routes to the OWNER
+    // review gate (failing assertions in plain language) instead of the blind
+    // internal loopback — the owner arbitrates their change vs the frozen test
+    // plan. No outstanding changes (or flag-off/terminal) ⇒ the internal A-5 path
+    // below is byte-identical to PHASE-53.
+    if (mvpLoop.isMvpEnabled(state) && state.mvp_loop.status === "BUILDING") {
+      const outstanding = await mvpLoop.readOwnerFeedback(pid, loopId, { root });
+      if (outstanding) {
+        const enter = await _mvpEnterOwnerReview(pid, loopId, state, "FAIL_REVIEW",
+          runOutput, manifestPaths, derivedEntry, iterationCount);
+        if (!enter.ok) {
+          return { ok: true, loop_id: loopId, advanced: false,
+                   test_error: enter.error_code, report_summary: reportSummary };
+        }
+        return {
+          ok: true, loop_id: loopId, advanced: false,
+          current_state: "RUN_TESTS", mvp_review_pending: true,
+          mvp_report: enter.report, report_summary: reportSummary
+        };
+      }
+    }
+
     // FAIL → loop-back (cap-aware via orchestration.loop_back)
     const lbResult = await reg.invoke("orchestration.loop_back", {
       project_id: pid,
@@ -2238,7 +2572,24 @@ function createConversationEngine(options = {}) {
       // Best-effort / fail-OPEN; the escalation decision + return shape are unchanged.
       await _restoreBestAttempt(reg, pid, loopId, { root });
 
-      return {
+      // PHASE-54 R-9: the cap must never be silent for MVP projects — flip the block
+      // to CAP_REACHED and attach a plain-language message (additive fields only).
+      let mvpCapMessage;
+      if (mvpLoop.isMvpEnabled(state) && state.mvp_loop.status === "BUILDING" &&
+          mvpLoop.assertTransition("BUILDING", "CAP_REACHED").ok) {
+        const stC = loadState(pid);
+        if (stC && stC.mvp_loop && stC.mvp_loop.status === "BUILDING") {
+          const updC = { ...stC };
+          updC.mvp_loop = { ...stC.mvp_loop, status: "CAP_REACHED" };
+          updC.last_updated_at = nowIso();
+          await saveState(pid, updC);
+        }
+        mvpCapMessage =
+          "وصلنا إلى الحد الأقصى لمحاولات إعادة البناء في هذه الدورة. آخر نسخة ناجحة محفوظة " +
+          "كأفضل محاولة. يمكنك مراجعة تقرير التصعيد أو بدء دورة بناء جديدة بفكرة معدّلة.";
+      }
+
+      return Object.assign({
         ok:              true,
         loop_id:         loopId,
         advanced:        true,
@@ -2246,7 +2597,7 @@ function createConversationEngine(options = {}) {
         escalated:       true,
         escalation_path: lbOut.escalation_path,
         report_summary:  reportSummary
-      };
+      }, mvpCapMessage ? { mvp_cap_message: mvpCapMessage } : {});
     }
 
     return {
@@ -3213,6 +3564,54 @@ function createConversationEngine(options = {}) {
       return { ok: true, loop_id: loopId, test_error: "INPUT_NOT_FOUND", advanced: false };
     }
 
+    // PHASE-54 D3 (R-1 flag-gated): MVP scope derivation pre-step. INACTIVE → derive
+    // (explicit provider/model ONLY — R-18: body.mvp_* or the block's own fields, no
+    // default fallthrough), persist mvp_scope.json, transition INACTIVE→SCOPE_DERIVED,
+    // and thread the SCOPED spec to the test_designer. A block that already carries a
+    // scope reuses it; terminal statuses (ACCEPTED/CAP_REACHED, R-17) and flag-off
+    // pass the FULL spec through untouched.
+    let effSpec = spec;
+    if (mvpLoop.isMvpEnabled(state)) {
+      const mvpBlock = state.mvp_loop;
+      if (mvpBlock.status === "INACTIVE") {
+        const scopeProvider = body.mvp_provider || mvpBlock.provider;
+        const scopeModel    = body.mvp_model    || mvpBlock.model;
+        if (!scopeProvider || !scopeModel) {
+          return { ok: true, loop_id: loopId, advanced: false,
+                   test_error: "MVP_PROVIDER_REQUIRED" };
+        }
+        const derived = await mvpLoop.deriveScope({
+          project_id: normalizeProjectId(projectId), spec,
+          provider: scopeProvider, model: scopeModel,
+          scenario_id: body.mvp_scenario_id || undefined
+        }, { root });
+        if (!derived.ok) {
+          return { ok: true, loop_id: loopId, advanced: false,
+                   test_error: derived.error_code };
+        }
+        const persisted = await mvpLoop.persistScope(
+          normalizeProjectId(projectId), loopId, derived.mvp_scope, { root });
+        if (!persisted.ok) {
+          return { ok: true, loop_id: loopId, advanced: false,
+                   test_error: persisted.error_code };
+        }
+        const trS = mvpLoop.assertTransition("INACTIVE", "SCOPE_DERIVED");
+        if (!trS.ok) {
+          return { ok: true, loop_id: loopId, advanced: false,
+                   test_error: trS.error_code };
+        }
+        const updatedState = { ...state };
+        updatedState.mvp_loop = { ...mvpBlock, status: "SCOPE_DERIVED",
+                                  mvp_scope: derived.mvp_scope };
+        updatedState.last_updated_at = nowIso();
+        await saveState(projectId, updatedState);
+        effSpec = mvpLoop.scopedSpec(spec, derived.mvp_scope);
+      } else if (mvpBlock.mvp_scope &&
+                 (mvpBlock.status === "SCOPE_DERIVED" || mvpBlock.status === "BUILDING")) {
+        effSpec = mvpLoop.scopedSpec(spec, mvpBlock.mvp_scope);
+      }
+    }
+
     // 30s timeout, mirroring estimateCost/reportEnv
     let timeoutHandle;
     const timeoutPromise = new Promise((_, reject) => {
@@ -3224,7 +3623,7 @@ function createConversationEngine(options = {}) {
         reg.invoke("role.invoke", Object.assign(
           {
             role_id:    "test_designer",
-            input:      { project_id: normalizeProjectId(projectId), spec, design },
+            input:      { project_id: normalizeProjectId(projectId), spec: effSpec, design },
             project_id: normalizeProjectId(projectId),
             provider:   testProvider
           },

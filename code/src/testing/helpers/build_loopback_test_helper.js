@@ -33,6 +33,9 @@ const PROJECTS_ROOT = path.resolve(ROOT, "artifacts", "projects");
 // The exact delimiter emitted by materializerEngine._buildCodegenPrompt's A-5 repair block.
 const REPAIR_MARKER = "PREVIOUS BUILD ATTEMPT FAILED THESE CHECKS";
 
+// PHASE-54 R-8: the exact delimiter of the dedicated owner_changes block.
+const OWNER_MARKER = "OWNER REFINE REQUESTS";
+
 // ── Generic fixtures ──────────────────────────────────────────────────────────
 
 function _ensureProjectDir(projectId) {
@@ -178,12 +181,30 @@ async function runTInvariance() {
       failing_assertions: [{ type: "http_status_equals", reason: "expected 200 but got 404" }] }
   ]);
 
+  // PHASE-54 R-8(ii)/(iii): 6th param owner_changes — byte-identity when absent/empty across
+  // ALL arities, dedicated marker when present, and fixed ordering (owner FIRST, repair LAST).
+  const ownerEmpty = _buildCodegenPrompt(plan, spec, design, sid, [], []);
+  const ownerUndef = _buildCodegenPrompt(plan, spec, design, sid, [], undefined);
+  const withOwner  = _buildCodegenPrompt(plan, spec, design, sid, [],
+    ["Return 201 with a Location header on create"]);
+  const withBoth   = _buildCodegenPrompt(plan, spec, design, sid, [
+    { scenario_id: "T-1", name: "n", status: "FAIL",
+      failing_assertions: [{ type: "http_status_equals", reason: "expected 200 but got 404" }] }
+  ], ["Return 201 with a Location header on create"]);
+
   return {
     pre_equals_empty:       pre === empty,
     pre_equals_undefined:   pre === undef,
     empty_has_no_repair:    pre.indexOf(REPAIR_MARKER) === -1,
     nonempty_block_differs: withFeedback !== pre,
-    nonempty_has_repair:    withFeedback.indexOf(REPAIR_MARKER) !== -1
+    nonempty_has_repair:    withFeedback.indexOf(REPAIR_MARKER) !== -1,
+    owner_pre_equals_empty:     pre === ownerEmpty,
+    owner_pre_equals_undefined: pre === ownerUndef,
+    owner_absent_no_marker:     pre.indexOf(OWNER_MARKER) === -1,
+    owner_present_differs:      withOwner !== pre && withOwner.indexOf(OWNER_MARKER) !== -1,
+    owner_before_repair_order:  withBoth.indexOf(OWNER_MARKER) !== -1 &&
+                                withBoth.indexOf(REPAIR_MARKER) !== -1 &&
+                                withBoth.indexOf(OWNER_MARKER) < withBoth.indexOf(REPAIR_MARKER)
   };
 }
 

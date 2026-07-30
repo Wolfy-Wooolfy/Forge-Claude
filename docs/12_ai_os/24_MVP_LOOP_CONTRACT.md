@@ -79,6 +79,13 @@ BUILDING → CAP_REACHED / AWAITING_OWNER_REVIEW → CAP_REACHED             (te
 - Persistence: `artifacts/projects/<pid>/orchestration/<loopId>/mvp_scope.json`
   (`{ derived_at, mvp_scope }`) via L2 `fs.write_file`.
 - Hermeticity: SU mocks key off `SCENARIO_TAG` in the prompt (mock adapter); S373.
+- **Budget (R-18):** `deriveScope` and `interpretFeedback` default `budget_usd = 0.05`.
+  Precedent: the ONLY other production `agent.invoke` caller passing `budget_usd` is the
+  materializer (0.50 — full codegen, a far larger generation). A single scope derivation /
+  feedback interpretation is ~$0.01–0.03, so 0.05 gives ~2–5x headroom without importing
+  the codegen ceiling. Every wiring path threads provider+model EXPLICITLY (`body.mvp_*`
+  or the block's fields; typed `MVP_PROVIDER_REQUIRED` when absent) — no default
+  fallthrough can reach a real provider, and no SU depends on a default.
 
 ## 5. Owner review gate + report (D3 — SKELETON; semantics locked by R-7/R-11)
 

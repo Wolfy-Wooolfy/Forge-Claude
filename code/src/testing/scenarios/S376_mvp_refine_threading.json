@@ -1,0 +1,27 @@
+{
+  "id": "S376",
+  "name": "mvp REFINE — changes[] persisted + loop_back + verbatim in the materializer owner block; persistence + supersede across turns; owner FIRST repair LAST (PHASE-54 D4, R-8)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/mvp_loop_test_helper",
+  "method": "runS376RefineThreading",
+  "args": [],
+  "cleanup_project": "test_s376_mvp",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "refine_looped",             "expected": true },
+    { "type": "state_field_equals", "field": "iteration_incremented",     "expected": true },
+    { "type": "state_field_equals", "field": "feedback_file_matches",     "expected": true },
+    { "type": "state_field_equals", "field": "block_building",            "expected": true },
+    { "type": "state_field_equals", "field": "history_has_refine",        "expected": true },
+    { "type": "state_field_equals", "field": "prompt1_has_both_changes",  "expected": true },
+    { "type": "state_field_equals", "field": "prompt1_has_owner_marker",  "expected": true },
+    { "type": "state_field_equals", "field": "prompt1_no_repair_marker",  "expected": true },
+    { "type": "state_field_equals", "field": "feedback_survives_rebuild", "expected": true },
+    { "type": "state_field_equals", "field": "fail_routes_to_owner",      "expected": true },
+    { "type": "state_field_equals", "field": "refine2_superseded_file",   "expected": true },
+    { "type": "state_field_equals", "field": "prompt2_has_new_change",    "expected": true },
+    { "type": "state_field_equals", "field": "prompt2_lacks_old_changes", "expected": true },
+    { "type": "state_field_equals", "field": "prompt2_owner_before_repair", "expected": true }
+  ]
+}

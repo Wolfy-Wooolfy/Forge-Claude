@@ -532,5 +532,41 @@
     "tokens_in": 400,
     "tokens_out": 80,
     "finish_reason": "stop"
+  },
+  "mock|mock-fb-s375|scenario:S375A": {
+    "text": "{\"decision\":\"ACCEPT\",\"changes\":[],\"clarification_question\":\"\"}",
+    "tokens_in": 200,
+    "tokens_out": 20,
+    "finish_reason": "stop"
+  },
+  "mock|mock-fb-s376a|scenario:S376A": {
+    "text": "{\"decision\":\"REFINE\",\"changes\":[\"Return 201 with a Location header on create\",\"Add a created_at field to notes\"],\"clarification_question\":\"\"}",
+    "tokens_in": 200,
+    "tokens_out": 60,
+    "finish_reason": "stop"
+  },
+  "mock|mock-fb-s376a|scenario:S376C": {
+    "text": "{\"decision\":\"REFINE\",\"changes\":[\"Serve plain text on the root route\"],\"clarification_question\":\"\"}",
+    "tokens_in": 200,
+    "tokens_out": 40,
+    "finish_reason": "stop"
+  },
+  "mock|mock-fb-s378a|scenario:S378A": {
+    "text": "{\"decision\":\"REFINE\",\"changes\":[\"Add another feature to the slice\"],\"clarification_question\":\"\"}",
+    "tokens_in": 200,
+    "tokens_out": 40,
+    "finish_reason": "stop"
+  },
+  "mock|mock-fb-s378b|scenario:S378B": {
+    "text": "{\"decision\":\"UNCLEAR\",\"changes\":[],\"clarification_question\":\"هل تقصد الموافقة على الشريحة كما هي أم تريد تعديلًا محددًا؟\"}",
+    "tokens_in": 200,
+    "tokens_out": 40,
+    "finish_reason": "stop"
+  },
+  "mock|mock-bld-s376|scenario:S376B": {
+    "text": "{\"files_written\":[{\"path\":\"src/server.js\",\"action\":\"create\",\"line_count\":40,\"sha256\":\"d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5\"},{\"path\":\"src/routes/notes.js\",\"action\":\"create\",\"line_count\":60,\"sha256\":\"e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6\"},{\"path\":\"src/store.js\",\"action\":\"create\",\"line_count\":30,\"sha256\":\"f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1\"}],\"summary\":\"Notes API MVP slice: entry point, notes routes, in-memory store.\",\"dependencies_added\":[{\"ecosystem\":\"npm\",\"package\":\"express\",\"version\":\"^4.18.0\"}],\"notes\":[\"In-memory store resets on restart\"]}",
+    "tokens_in": 600,
+    "tokens_out": 300,
+    "finish_reason": "stop"
   }
 }

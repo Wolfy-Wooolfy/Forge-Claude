@@ -12,6 +12,11 @@
     { "type": "state_field_equals", "field": "pre_equals_undefined",   "expected": true },
     { "type": "state_field_equals", "field": "empty_has_no_repair",    "expected": true },
     { "type": "state_field_equals", "field": "nonempty_block_differs", "expected": true },
-    { "type": "state_field_equals", "field": "nonempty_has_repair",    "expected": true }
+    { "type": "state_field_equals", "field": "nonempty_has_repair",    "expected": true },
+    { "type": "state_field_equals", "field": "owner_pre_equals_empty",     "expected": true },
+    { "type": "state_field_equals", "field": "owner_pre_equals_undefined", "expected": true },
+    { "type": "state_field_equals", "field": "owner_absent_no_marker",     "expected": true },
+    { "type": "state_field_equals", "field": "owner_present_differs",      "expected": true },
+    { "type": "state_field_equals", "field": "owner_before_repair_order",  "expected": true }
   ]
 }

@@ -1,0 +1,25 @@
+{
+  "id": "S379",
+  "name": "mvp derivation wiring — designTests derives+persists scope then threads the SCOPED spec to test_designer, buildProject threads it to builder+materializer; explicit provider required (PHASE-54 D3, R-18)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/mvp_loop_test_helper",
+  "method": "runS379ScopedSpecWiring",
+  "args": [],
+  "cleanup_project": "test_s379_mvp",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "no_provider_typed_failure", "expected": true },
+    { "type": "state_field_equals", "field": "derive_status_scope_derived", "expected": true },
+    { "type": "state_field_equals", "field": "scope_file_persisted",      "expected": true },
+    { "type": "state_field_equals", "field": "design_tests_advanced",     "expected": true },
+    { "type": "state_field_equals", "field": "td_prompt_scoped",          "expected": true },
+    { "type": "state_field_equals", "field": "td_prompt_excludes_ac3",    "expected": true },
+    { "type": "state_field_equals", "field": "build_advanced",            "expected": true },
+    { "type": "state_field_equals", "field": "block_building_after_build","expected": true },
+    { "type": "state_field_equals", "field": "builder_prompt_scoped",     "expected": true },
+    { "type": "state_field_equals", "field": "mat_prompt_scoped",         "expected": true },
+    { "type": "state_field_equals", "field": "mat_prompt_has_slice_annotation", "expected": true },
+    { "type": "state_field_equals", "field": "mat_prompt_no_owner_marker","expected": true }
+  ]
+}

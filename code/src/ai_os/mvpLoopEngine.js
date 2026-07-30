@@ -105,13 +105,22 @@ function validateMvpLoopBlock(block) {
     errors.push("feedback_history must be an array");
   } else {
     block.feedback_history.forEach(function (e, i) {
+      // R-19: UNCLEAR turns are recorded too (decision "UNCLEAR", changes []).
       const okEntry = _isPlainObject(e) &&
         typeof e.at === "string" &&
         Number.isInteger(e.iteration) &&
-        (e.decision === "REFINE" || e.decision === "ACCEPT") &&
+        (e.decision === "REFINE" || e.decision === "ACCEPT" || e.decision === "UNCLEAR") &&
         _isStringArray(e.changes);
       if (!okEntry) errors.push("feedback_history[" + i + "] is malformed");
     });
+  }
+  // R-18: optional explicit LLM config for the MVP steps. Wiring paths REQUIRE it
+  // (or an explicit body override) before any provider call — no default fallthrough.
+  if (block.provider !== undefined && typeof block.provider !== "string") {
+    errors.push("provider must be a string when present");
+  }
+  if (block.model !== undefined && typeof block.model !== "string") {
+    errors.push("model must be a string when present");
   }
   return { valid: errors.length === 0, errors };
 }
@@ -229,7 +238,10 @@ async function deriveScope(input, ctx) {
   const provider   = (input && input.provider) || "openai";
   const model      = (input && input.model) || "gpt-4o";
   const scenario_id = (input && input.scenario_id) || null;
-  const budget_usd  = (input && typeof input.budget_usd === "number") ? input.budget_usd : 0.25;
+  // R-18: aligned default. The only production agent.invoke budget precedent is the
+  // materializer's 0.50 (full codegen); a single scope derivation is ~$0.01–0.03, so
+  // 0.05 gives ~2–5x headroom without silently importing the codegen ceiling.
+  const budget_usd  = (input && typeof input.budget_usd === "number") ? input.budget_usd : 0.05;
 
   if (typeof project_id !== "string" || project_id.length === 0) {
     return { ok: false, status: "FAILED", error_code: "SPEC_INCOMPLETE",
@@ -313,13 +325,275 @@ async function persistScope(project_id, loop_id, mvp_scope, ctx) {
   return { ok: true, path: relPath };
 }
 
+// ── D3: scoped spec (pure) ────────────────────────────────────────────────────
+// Returns a spec derivative restricted to the MVP slice: acceptance_criteria
+// filtered to the included ids, files_to_create filtered to the slice files,
+// and the scope text annotated so every downstream prompt names the slice.
+// Everything else is copied untouched (incl. smoke_entry).
+
+function scopedSpec(spec, mvp_scope) {
+  if (!_isPlainObject(spec) || !_validScopeShape(mvp_scope)) return spec;
+  const out = Object.assign({}, spec);
+  const inc = mvp_scope.acceptance_criteria_ids;
+  out.acceptance_criteria = (Array.isArray(spec.acceptance_criteria) ? spec.acceptance_criteria : [])
+    .filter(function (a) { return a && inc.indexOf(a.id) !== -1; });
+  out.files_to_create = (Array.isArray(spec.files_to_create) ? spec.files_to_create : [])
+    .filter(function (f) { return f && mvp_scope.files.indexOf(f.path) !== -1; });
+  out.scope = "MVP slice '" + mvp_scope.slice_name + "': " + ((spec.scope || spec.summary) || "");
+  return out;
+}
+
+// ── D3: owner report (R-11 — facts are artifact-derived, ZERO provider input) ─
+// Pure assembly over already-parsed artifacts; the deterministic summary_ar /
+// summary_en strings are presentation templates over those facts, never an
+// interpretation.
+
+function assembleMvpReport(args) {
+  const a        = args || {};
+  const kind     = a.kind === "FAIL_REVIEW" ? "FAIL_REVIEW" : "PASS_REVIEW";
+  const scope    = _validScopeShape(a.mvp_scope) ? a.mvp_scope : null;
+  const manifest = _isPlainObject(a.manifest) && Array.isArray(a.manifest.files)
+    ? a.manifest : { files: [] };
+  const files    = manifest.files
+    .map(function (f) { return f && f.path; })
+    .filter(function (p) { return typeof p === "string" && p.length > 0; });
+  const run      = _isPlainObject(a.report) ? a.report : {};
+  const scenarios = (Array.isArray(run.scenarios) ? run.scenarios : []).map(function (s) {
+    const failing = (s && Array.isArray(s.assertions) ? s.assertions : [])
+      .filter(function (x) { return x && x.pass === false; })
+      .map(function (x) { return { type: x.type || "(assertion)", reason: x.reason != null ? x.reason : "" }; });
+    if (s && failing.length === 0 && s.error) {
+      failing.push({ type: "ERROR", reason: String(s.error) });
+    }
+    return { id: (s && s.id) || "", name: (s && s.name) || "",
+             status: (s && s.status) || "", failing };
+  });
+  const entry = (typeof a.entry === "string" && a.entry.length > 0) ? a.entry : null;
+  const iteration = Number.isInteger(a.iteration) ? a.iteration : 0;
+  const cap       = Number.isInteger(a.cap) ? a.cap : 0;
+
+  const sliceName = scope ? scope.slice_name : "(mvp)";
+  const passLine  = String(run.pass || 0) + "/" + String(run.total || 0);
+  const failing   = scenarios.filter(function (s) { return s.status !== "PASS"; });
+  const failText  = failing.map(function (s) {
+    return s.name + " (" + s.failing.map(function (f) { return f.reason; }).join("; ") + ")";
+  }).join(" · ");
+
+  const summary_ar = kind === "PASS_REVIEW"
+    ? "تم بناء شريحة الـ MVP \"" + sliceName + "\" — " + files.length + " ملفات، والاختبارات ناجحة " +
+      passLine + (entry ? ". للتشغيل: node " + entry : "") +
+      ". لو النتيجة مناسبة رُدّ بالموافقة، أو اكتب التعديلات المطلوبة كنقاط."
+    : "أُعيد بناء شريحة الـ MVP \"" + sliceName + "\" لكن " + String(run.fail || 0) + " من " +
+      String(run.total || 0) + " اختبارات فشلت: " + failText +
+      ". أنت صاحب القرار: عدّل طلبك أو اكتب توجيهًا جديدًا.";
+  const summary_en = kind === "PASS_REVIEW"
+    ? "MVP slice \"" + sliceName + "\" is built — " + files.length + " files, tests passing " +
+      passLine + (entry ? ". Run it with: node " + entry : "") +
+      ". Reply with approval, or list the changes you want."
+    : "MVP slice \"" + sliceName + "\" was rebuilt but " + String(run.fail || 0) + " of " +
+      String(run.total || 0) + " tests fail: " + failText +
+      ". You decide: adjust your request or send new directions.";
+
+  return {
+    report_version: 1,
+    assembled_at:   new Date().toISOString(),
+    kind,
+    project_id: a.project_id || "",
+    loop_id:    a.loop_id || "",
+    iteration,
+    cap,
+    slice: scope,
+    build: { file_count: files.length, files, entry },
+    tests: {
+      total: run.total || 0, pass: run.pass || 0,
+      fail: run.fail || 0, error: run.error || 0, scenarios
+    },
+    how_to_see: entry ? "node " + entry : null,
+    summary_ar,
+    summary_en
+  };
+}
+
+async function persistMvpReport(project_id, loop_id, report, ctx) {
+  const reg  = require("../runtime/tools/_registry").getDefaultRegistry();
+  const root = (ctx && ctx.root) || process.cwd();
+  const relPath = "artifacts/projects/" + project_id +
+                  "/orchestration/" + loop_id + "/mvp_report.json";
+  let wr;
+  try {
+    wr = await reg.invoke("fs.write_file", {
+      path: relPath, content: JSON.stringify(report, null, 2)
+    }, { root });
+  } catch (err) {
+    return { ok: false, error_code: "MVP_REPORT_WRITE_FAILED", error_detail: err.message };
+  }
+  if (!wr || wr.status !== "SUCCESS") {
+    const reason = wr && wr.metadata && wr.metadata.reason;
+    return { ok: false, error_code: "MVP_REPORT_WRITE_FAILED", error_detail: reason || "UNKNOWN" };
+  }
+  return { ok: true, path: relPath };
+}
+
+// ── D4: owner feedback persistence (R-8 iv — survives internal loopbacks, ────
+//        superseded only by the owner's next review turn = overwrite) ─────────
+
+async function persistOwnerFeedback(project_id, loop_id, changes, iteration, ctx) {
+  const reg  = require("../runtime/tools/_registry").getDefaultRegistry();
+  const root = (ctx && ctx.root) || process.cwd();
+  const relPath = "artifacts/projects/" + project_id +
+                  "/orchestration/" + loop_id + "/mvp_owner_feedback.json";
+  let wr;
+  try {
+    wr = await reg.invoke("fs.write_file", {
+      path: relPath,
+      content: JSON.stringify({
+        updated_at: new Date().toISOString(),
+        iteration:  Number.isInteger(iteration) ? iteration : 0,
+        changes:    Array.isArray(changes) ? changes : []
+      }, null, 2)
+    }, { root });
+  } catch (err) {
+    return { ok: false, error_code: "MVP_FEEDBACK_WRITE_FAILED", error_detail: err.message };
+  }
+  if (!wr || wr.status !== "SUCCESS") {
+    const reason = wr && wr.metadata && wr.metadata.reason;
+    return { ok: false, error_code: "MVP_FEEDBACK_WRITE_FAILED", error_detail: reason || "UNKNOWN" };
+  }
+  return { ok: true, path: relPath };
+}
+
+// null when absent/unparseable/empty — "no outstanding owner changes" (R-10 gate).
+async function readOwnerFeedback(project_id, loop_id, ctx) {
+  const reg  = require("../runtime/tools/_registry").getDefaultRegistry();
+  const root = (ctx && ctx.root) || process.cwd();
+  const relPath = "artifacts/projects/" + project_id +
+                  "/orchestration/" + loop_id + "/mvp_owner_feedback.json";
+  let rd;
+  try {
+    rd = await reg.invoke("fs.read_file", { path: relPath }, { root });
+  } catch (_) { return null; }
+  if (!rd || rd.status !== "SUCCESS" || !rd.output) return null;
+  let parsed;
+  try { parsed = JSON.parse(rd.output.content); } catch (_) { return null; }
+  if (!_isPlainObject(parsed) || !_isStringArray(parsed.changes) ||
+      parsed.changes.length === 0) return null;
+  return parsed;
+}
+
+// ── D4: feedback interpretation (R-12 — provider-driven ONLY, no keyword ─────
+//        matching of any kind; every failure mode degrades to UNCLEAR at the
+//        wiring layer: clarifying question, stay in review, no HALT) ──────────
+
+const MVP_FEEDBACK_DECISIONS = Object.freeze(["ACCEPT", "REFINE", "UNCLEAR"]);
+
+function _buildFeedbackPrompt(message, facts, scenario_id) {
+  const scenarioTag = scenario_id ? "\nSCENARIO_TAG: " + scenario_id + "\n" : "";
+  const f = _isPlainObject(facts) ? facts : {};
+  const factsBlock =
+    "\nContext facts (from the MVP report):" +
+    "\n- slice: "        + (f.slice_name || "(unknown)") +
+    "\n- tests passing: " + (f.pass != null ? f.pass : "?") + "/" + (f.total != null ? f.total : "?") +
+    "\n- last report kind: " + (f.kind || "(unknown)");
+  return (
+    "You are the MVP review interpreter for Forge. The project owner just replied to an MVP review report. " +
+    "Classify the reply. Return STRICT JSON only — no markdown, no code blocks, no prose." +
+    scenarioTag +
+    "\nReturn exactly this JSON structure:" +
+    "\n{ \"decision\": \"ACCEPT\" | \"REFINE\" | \"UNCLEAR\", \"changes\": [\"<concrete change request>\", ...], \"clarification_question\": \"<question>\" }" +
+    "\nRules: decision=ACCEPT when the owner clearly approves proceeding as-is (changes MUST be an empty array). " +
+    "decision=REFINE when the owner asks for one or more concrete modifications — put EACH requested change as its own " +
+    "plain, self-contained instruction string in changes[], preserving the owner's intent faithfully; NEVER invent " +
+    "changes the owner did not ask for. decision=UNCLEAR when the reply is ambiguous — changes MUST be empty and " +
+    "clarification_question MUST carry one focused question in the owner's language." +
+    factsBlock +
+    "\nOwner reply (verbatim):\n" + String(message || "") +
+    "\nRESPOND WITH VALID JSON ONLY."
+  );
+}
+
+// async (input, ctx) → { ok:true, decision, changes, clarification_question } |
+//                      { ok:false, error_code, error_detail }
+async function interpretFeedback(input, ctx) {
+  const reg        = require("../runtime/tools/_registry").getDefaultRegistry();
+  const root       = (ctx && ctx.root) || process.cwd();
+  const project_id = input && input.project_id;
+  const provider   = input && input.provider;
+  const model      = input && input.model;
+  const scenario_id = (input && input.scenario_id) || null;
+  const budget_usd  = (input && typeof input.budget_usd === "number") ? input.budget_usd : 0.05;
+
+  if (typeof project_id !== "string" || !project_id ||
+      typeof provider !== "string" || !provider ||
+      typeof model !== "string" || !model) {
+    return { ok: false, error_code: "MVP_PROVIDER_REQUIRED",
+             error_detail: "project_id/provider/model must be explicit (R-18)" };
+  }
+
+  const prompt = _buildFeedbackPrompt(input.message, input.facts, scenario_id);
+
+  let agentResult;
+  try {
+    agentResult = await reg.invoke(
+      "agent.invoke",
+      { provider, model, prompt, project_id, budget_usd },
+      { root, role_id: "mvp_feedback" }
+    );
+  } catch (err) {
+    return { ok: false, error_code: "FEEDBACK_AGENT_FAILED", error_detail: err.message };
+  }
+  if (!agentResult || agentResult.status !== "SUCCESS") {
+    const detail = agentResult && agentResult.metadata && agentResult.metadata.reason;
+    return { ok: false, error_code: "FEEDBACK_AGENT_FAILED", error_detail: detail || "non-SUCCESS" };
+  }
+
+  const text   = (agentResult.output && agentResult.output.text) || "";
+  const parsed = _tryParseJson(text);
+  if (!_isPlainObject(parsed)) {
+    return { ok: false, error_code: "INVALID_FEEDBACK_JSON",
+             error_detail: "response is not a JSON object" };
+  }
+
+  const decision = parsed.decision;
+  const changes  = Array.isArray(parsed.changes) ? parsed.changes : null;
+  const cq       = typeof parsed.clarification_question === "string"
+    ? parsed.clarification_question : "";
+
+  if (MVP_FEEDBACK_DECISIONS.indexOf(decision) === -1 || changes === null ||
+      !_isStringArray(changes)) {
+    return { ok: false, error_code: "INVALID_FEEDBACK",
+             error_detail: "decision/changes malformed" };
+  }
+  if (decision === "REFINE" &&
+      (changes.length === 0 || changes.some(function (c) { return c.trim().length === 0; }))) {
+    return { ok: false, error_code: "INVALID_FEEDBACK",
+             error_detail: "REFINE requires non-empty concrete changes[]" };
+  }
+  if (decision !== "REFINE" && changes.length !== 0) {
+    return { ok: false, error_code: "INVALID_FEEDBACK",
+             error_detail: decision + " must carry an empty changes[]" };
+  }
+
+  return { ok: true, decision, changes, clarification_question: cq };
+}
+
+// R-19: forensic history entry — ACCEPT / REFINE / UNCLEAR all recorded.
+function feedbackEntry(decision, changes, iteration) {
+  return {
+    at:        new Date().toISOString(),
+    iteration: Number.isInteger(iteration) ? iteration : 0,
+    decision,
+    changes:   Array.isArray(changes) ? changes : []
+  };
+}
+
 // ── Exports ───────────────────────────────────────────────────────────────────
-// _buildScopePrompt exported for deterministic SU prompt-shape assertions
-// (materializerEngine._buildCodegenPrompt precedent).
+// _buildScopePrompt / _buildFeedbackPrompt exported for deterministic SU
+// prompt-shape assertions (materializerEngine._buildCodegenPrompt precedent).
 
 module.exports = {
   MVP_STATUSES,
   MVP_TRANSITIONS,
+  MVP_FEEDBACK_DECISIONS,
   initMvpLoopBlock,
   isMvpEnabled,
   canTransition,
@@ -328,5 +602,13 @@ module.exports = {
   validateScope,
   deriveScope,
   persistScope,
-  _buildScopePrompt
+  scopedSpec,
+  assembleMvpReport,
+  persistMvpReport,
+  persistOwnerFeedback,
+  readOwnerFeedback,
+  interpretFeedback,
+  feedbackEntry,
+  _buildScopePrompt,
+  _buildFeedbackPrompt
 };

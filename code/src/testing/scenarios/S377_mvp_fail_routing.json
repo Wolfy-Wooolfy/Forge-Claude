@@ -1,0 +1,23 @@
+{
+  "id": "S377",
+  "name": "mvp RUN_TESTS FAIL routing — no outstanding owner changes: internal A-5 loop_back unchanged; outstanding changes: routes to OWNER review with plain-language failures (PHASE-54 D4, R-10)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/mvp_loop_test_helper",
+  "method": "runS377FailRouting",
+  "args": [],
+  "cleanup_project": "test_s377_mvp",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "nochg_looped_back",         "expected": true },
+    { "type": "state_field_equals", "field": "nochg_advanced_to_builder", "expected": true },
+    { "type": "state_field_equals", "field": "nochg_no_review_pending",   "expected": true },
+    { "type": "state_field_equals", "field": "nochg_block_stays_building","expected": true },
+    { "type": "state_field_equals", "field": "chg_review_pending",        "expected": true },
+    { "type": "state_field_equals", "field": "chg_advanced_false",        "expected": true },
+    { "type": "state_field_equals", "field": "chg_graph_still_run_tests", "expected": true },
+    { "type": "state_field_equals", "field": "chg_block_awaiting",        "expected": true },
+    { "type": "state_field_equals", "field": "chg_report_kind_fail",      "expected": true },
+    { "type": "state_field_equals", "field": "chg_report_has_failing_reason", "expected": true }
+  ]
+}
