@@ -196,6 +196,37 @@ gitignored it cannot be verified from the zip, so the RAW forge-doctor JSON summ
 pasted into the closure checkpoint as an artifact (this also discharges the §B verification gap
 raised at the first checkpoint).
 
+### R-23..R-24 (CTO Gate-#10-prep verification GO, 2026-07-30)
+
+R-23 (resolves F-G1) — REJECTED: DO NOT SKIP DOCUMENTATION. The Gate must run the real path
+end to end: reviewProject -> documentProject -> judgeQuality. Rationale: (1) the saving is
+~$0.05-0.08 and Tavily is free-tier, so the "Tavily accounting" saving is bookkeeping, not
+money; (2) advance_state validates state IDs only and never consults TRANSITION_TABLE, so a
+hand-advance from REVIEWER_CODE_AND_SECURITY to QUALITY_JUDGE is a path production never
+takes — injecting a synthetic step into the one owner-witnessed run is exactly how
+"scenario green / real path broken" happens, which is this project's most-repeated lesson;
+(3) R-20(iii) requires the AWFT marker to reach judgeQuality, and skipping the stage between
+them leaves it unproven that the marker survives documentProject. Add a 12th pass criterion:
+if the owner takes the ACCEPT_WITH_FAILING_TESTS path, the marker is present in the
+reviewProject payload, in the persisted review_report.json, AND in the judgeQuality/Gate-2
+payload — each read back from the persisted evidence, not from memory. If the owner takes the
+plain ACCEPT path (tests green), record the marker criterion as N/A with the reason, and the
+downstream-marker surface stays proven by S380 alone; state that plainly in the evidence.
+Update the estimate accordingly and re-report both ledger and real cash.
+
+R-24 (resolves F-G2) — APPROVED, read-only, with five binding conditions:
+  (i)   Strictly pass-through: copy the prompt string for evidence, then invoke the real
+        adapter with the ORIGINAL unmodified arguments and return its result object unmodified.
+  (ii)  No error handling of any kind around the delegate — exceptions propagate untouched.
+  (iii) Lives ONLY in scripts/spikes/phase54_gate10.js. It must never appear in code/src, and
+        the production adapter file stays byte-identical.
+  (iv)  Re-run the DRY pass WITH the decorator installed and prove the dry outcome is
+        unchanged (same stage sequence, same verdicts, ledger delta still $0). This is the
+        non-interference proof and it is mandatory BEFORE any real call.
+  (v)   The evidence record states explicitly that the prompt was captured via a driver-local
+        decorator, so the forensic trail is honest about its own instrumentation. Also note
+        the PHASE-48 production trace gap as the reason the decorator is needed at all.
+
 #### NAMED EXCEPTION (per R-20 iv) — Blueprint Part D.2, narrowly scoped
 
 **Exception name:** `MVP-OWNER-OVERRIDE-ON-FAILING-TESTS` (PHASE-54, Slice 1 only).
