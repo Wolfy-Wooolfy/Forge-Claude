@@ -1,0 +1,20 @@
+{
+  "incident": "real-a attempt #1 FAILED at the architect step",
+  "at": "2026-07-30T13:46:14.053Z",
+  "error": "AGENT_FAILED / OPENAI_API_KEY not set (openai adapter fail-fast)",
+  "root_cause": "the driver process never loaded .env; preflight had loaded it inside its OWN process and reported openai_key_present:true — assurance that did not carry to the driver process",
+  "real_cash_spent_usd": 0,
+  "real_cash_proof": "ledger row outcome=\"failed\", tokens_in=0, tokens_out=0, latency_ms=1, cost_usd_actual=0 — no network call was made",
+  "ledger_delta_rows": 1,
+  "ledger_delta_usd_estimate_only": 0.0372,
+  "ledger_note": "cost_usd_estimated is a pre-call estimate booked by the invoke path; it is NOT a charge",
+  "state_left_behind": "phase54_gate10_demo seeded (project_state.json + vision.md + loop graph at ARCHITECT_DESIGN, iteration 0); no spec/design/build artifacts",
+  "prompt_trace_lines": 1,
+  "other_projects_touched": "none — all driver writes are scoped to phase54_gate10_demo (cs_sys last modified 16:40:25 local, ~6 min BEFORE this run at 16:46 local, i.e. by the owner's own UI session)",
+  "fixes_applied_at_0_cost": [
+    "driver now calls loadDotEnv(ROOT) at init (same sanctioned path start-api.js uses)",
+    "_requireApproval now also refuses BEFORE any write when OPENAI_API_KEY is unresolvable (exit 4)",
+    "new id-guarded reset stage (FORGE_GATE10_RESET_CONFIRM=1) archives this attempt's evidence and removes ONLY the demo project"
+  ],
+  "retry_status": "NOT RETRIED — per spend discipline, a real leg is never re-run without a fresh CTO GO"
+}

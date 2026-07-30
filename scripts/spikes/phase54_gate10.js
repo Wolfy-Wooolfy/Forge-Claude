@@ -44,6 +44,14 @@ const LOOP_DRY  = "gate10_dry";
 const CAP_USD   = 1.00; // hard cap on the agent-ledger delta for the whole real gate
 const LEDGER    = path.join(ROOT, "artifacts", "agent", "cost_ledger.jsonl");
 
+// INCIDENT FIX (real-a attempt #1, 2026-07-30): the driver process never loaded .env,
+// so the openai adapter fail-fast'd with "OPENAI_API_KEY not set" AFTER the project was
+// already seeded. preflight had loaded .env inside ITS OWN process and reported the key
+// present — assurance that did not carry to the driver process. Load it here the same way
+// start-api.js does (Forge's own sanctioned §ARC-7 loader), so every stage — preflight,
+// dry and real — resolves credentials identically.
+require(path.join(ROOT, "code/src/startup/env_loader")).loadDotEnv(ROOT);
+
 const { getDefaultRegistry }       = require(path.join(ROOT, "code/src/runtime/tools/_registry"));
 const { getAdapters }              = require(path.join(ROOT, "code/src/runtime/agents/_adapter_registry"));
 const { createConversationEngine } = require(path.join(ROOT, "code/src/ai_os/conversationEngine"));
@@ -109,6 +117,13 @@ function _requireApproval() {
     console.error("REFUSED: real spend requires FORGE_GATE10_OWNER_APPROVED=1 " +
       "(set ONLY after the owner's explicit approval in chat).");
     process.exit(3);
+  }
+  // INCIDENT FIX: fail BEFORE any write/seed if credentials are missing, so a
+  // credential problem can never leave a half-seeded project behind again.
+  if (!process.env.OPENAI_API_KEY) {
+    console.error("REFUSED: OPENAI_API_KEY not resolvable (checked after loadDotEnv). " +
+      "Nothing was written.");
+    process.exit(4);
   }
 }
 
@@ -678,6 +693,35 @@ async function verify() {
   console.log(JSON.stringify(result, null, 2));
 }
 
+// ── stage: reset ($0 — id-guarded cleanup for an authorized clean retry) ──────
+// Deletes ONLY the gate's own demo project + the real-leg evidence dir. Refuses to
+// touch anything else by construction (the ids are literals, not parameters).
+// Requires FORGE_GATE10_RESET_CONFIRM=1 so it can never fire by accident.
+
+async function reset() {
+  if (process.env.FORGE_GATE10_RESET_CONFIRM !== "1") {
+    console.error("REFUSED: reset requires FORGE_GATE10_RESET_CONFIRM=1 (CTO-authorized only).");
+    process.exit(5);
+  }
+  const demoDir = path.join(ROOT, "artifacts", "projects", PID_REAL);
+  const realEv  = path.join(EV_ROOT, "real");
+  const archive = path.join(EV_ROOT, "real_attempt_archive");
+  _dir(archive);
+  // Archive (never silently discard) the failed attempt's evidence.
+  if (fs.existsSync(realEv)) {
+    for (const f of fs.readdirSync(realEv)) {
+      fs.renameSync(path.join(realEv, f), path.join(archive, "attempt1_" + f));
+    }
+  }
+  if (fs.existsSync(demoDir)) fs.rmSync(demoDir, { recursive: true, force: true });
+  console.log(JSON.stringify({
+    reset: true,
+    removed_project: PID_REAL,
+    archived_evidence_to: "artifacts/spikes/phase54_gate10/real_attempt_archive/",
+    demo_dir_exists_now: fs.existsSync(demoDir)
+  }, null, 2));
+}
+
 async function status() {
   for (const [pid, loopId] of [[PID_DRY, LOOP_DRY], [PID_REAL, LOOP_REAL]]) {
     const g = await _graph(pid, loopId);
@@ -698,5 +742,6 @@ async function status() {
   else if (stage === "real-c") await realC();
   else if (stage === "verify") await verify();
   else if (stage === "status") await status();
-  else { console.log("usage: node scripts/spikes/phase54_gate10.js preflight|dry|real-a|real-b|real-c|verify|status"); process.exit(1); }
+  else if (stage === "reset")  await reset();
+  else { console.log("usage: node scripts/spikes/phase54_gate10.js preflight|dry|real-a|real-b|real-c|verify|status|reset"); process.exit(1); }
 })().catch(e => { console.error("GATE DRIVER ERROR:", e.message); process.exit(1); });
