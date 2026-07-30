@@ -283,6 +283,34 @@ no existing line, so he would naturally **append** a new one. With line 3 still 
 key live and silently ignore the new one — while every presence check still reports OK. The
 instruction below therefore says REPLACE line 3, never append.
 
+## 5.d R-32 — verification FAILED at check 1 ($0, 2026-07-30T14:26Z)
+
+Owner reported saving and restarting. **The save did not land — for the second time.**
+
+| # | Check | Result |
+|---|---|---|
+| 1 | `.env` mtime newer than 2026-07-29T12:10:34.023Z | **FAIL — identical, byte-unchanged.** Line count still 7 |
+| 2 | exactly ONE `OPENAI_API_KEY` assignment | PASS — 1, line 3, zero ignored duplicates |
+| 3 | shape checks on that line | PASS — all 8 (name parses, unquoted, no internal space, no `#`, non-empty, `sk-` prefix, no trailing CR, no `export`) |
+| 4 | no stray `.env`-family file | PASS — only `.env` |
+| 5 | server StartTime later than `.env` mtime | **INCONCLUSIVE as measured** (CommandLine unavailable for every node PID, so the start-api process could not be identified) — and **moot**: check 1 failed, so the restarted server re-read the same revoked key |
+| 6 | key-validity probe | **NOT RUN** — gated behind checks 1-5 |
+
+**Where the save went — decisive evidence (all $0, paths/timestamps only):**
+- Repo sweep, last 45 min: the ONLY modified file in the tree is `scripts/spikes/phase54_gate10.js`
+  (13:48:29Z) — **my own** loadDotEnv fix. Nothing the owner did touched the repo.
+- Filesystem sweep for any `.env*` written in the last 3 hours across `D:\` and the user
+  profile: **zero writes**. The single hit is
+  `…\Windows\Recent\.env.lnk` (14:24:22Z) — a Windows *Recent* shortcut, which is created when
+  a file is **OPENED**, not saved.
+- That shortcut resolves to **`D:\S\Halo\Tech\Forge-Claude\.env`** — i.e. he opened **exactly
+  the right file**, ~2.5 minutes before the check, and its LastWrite is still yesterday.
+- The file is **writable** (`Attributes=Archive`, `IsReadOnly=False`) — nothing is blocking a save.
+
+**Conclusion:** not a wrong-file problem, not a permissions problem, not a stray copy, not an
+ambient variable. The edit exists only in an **unsaved editor buffer** (or the window was
+closed without saving). Remediation is the owner's action; nothing was spent this round.
+
 ## 6. Hygiene + rulings status
 
 - `.gitignore` + `artifacts/projects/phase54_gate10_*/` (PHASE-48 W-4 precedent — driver
