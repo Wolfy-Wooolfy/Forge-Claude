@@ -7,7 +7,11 @@
       "MultiEdit",
       "Read",
       "Bash(git add *)",
-      "Bash(PATH='/c/Program Files/nodejs:__TRACKED_VAR__' node -e 'const s=JSON.parse\\(require\\('\\\\''fs'\\\\''\\).readFileSync\\('\\\\''progress/status.json'\\\\'','\\\\''utf8'\\\\''\\)\\); console.log\\('\\\\''PARSES; next_phase='\\\\''+s.next_phase+'\\\\'' current_task='\\\\''+s.current_task\\)')"
+      "Bash(PATH='/c/Program Files/nodejs:__TRACKED_VAR__' node -e 'const s=JSON.parse\\(require\\('\\\\''fs'\\\\''\\).readFileSync\\('\\\\''progress/status.json'\\\\'','\\\\''utf8'\\\\''\\)\\); console.log\\('\\\\''PARSES; next_phase='\\\\''+s.next_phase+'\\\\'' current_task='\\\\''+s.current_task\\)')",
+      "Bash(PATH='/c/Program Files/nodejs:__TRACKED_VAR__' node -e ' *)",
+      "Bash(PATH='/c/Users/Khaled Elmasry/AppData/Local/Programs/Python/Python312/Scripts:/c/Users/Khaled Elmasry/AppData/Local/Programs/Python/Python312:/c/Program Files/nodejs:__TRACKED_VAR__' node bin/forge-test.js)",
+      "Bash(echo \"SUITE_EXIT=$?\")",
+      "Bash(PATH='/c/Program Files/nodejs:__TRACKED_VAR__' node -e 'const s=JSON.parse\\(require\\('\\\\''fs'\\\\''\\).readFileSync\\('\\\\''progress/status.json'\\\\'','\\\\''utf8'\\\\''\\)\\); console.log\\('\\\\''PARSES ✓ pass='\\\\''+s.runtime_health.self_test_scenarios_pass+'\\\\'' doctor='\\\\''+s.runtime_health.last_doctor_status+'\\\\'' counts='\\\\''+JSON.stringify\\(s.runtime_health.last_doctor_counts\\)\\)')"
     ],
     "deny": [
       "Bash(rm:*)",
