@@ -1,0 +1,139 @@
+{
+  "at": "2026-07-30T13:17:01.658Z",
+  "project_state": {
+    "project_id": "phase54_gate10_dry",
+    "project_name": "phase54_gate10_dry",
+    "conversation_mode": "PIPELINE",
+    "active_runtime_state": "IDEATION",
+    "loop_id": "gate10_dry",
+    "user_language": "ar",
+    "last_updated_at": "2026-07-30T13:17:01.657Z",
+    "mvp_loop": {
+      "enabled": true,
+      "status": "AWAITING_OWNER_REVIEW",
+      "iteration": 1,
+      "mvp_scope": {
+        "slice_name": "notes-create-list",
+        "acceptance_criteria_ids": [
+          "AC-1",
+          "AC-2"
+        ],
+        "excluded_acceptance_criteria_ids": [
+          "AC-3"
+        ],
+        "files": [
+          "src/server.js",
+          "src/routes/notes.js",
+          "src/store.js"
+        ],
+        "rationale": "Create+list is the smallest owner-demonstrable walking skeleton; delete-with-404 is deferred to the full build."
+      },
+      "feedback_history": [
+        {
+          "at": "2026-07-30T13:17:01.634Z",
+          "iteration": 1,
+          "decision": "REFINE",
+          "changes": [
+            "Return 201 with a Location header on create",
+            "Add a created_at field to notes"
+          ]
+        }
+      ],
+      "provider": "mock",
+      "model": "mock-scope-s373a"
+    }
+  },
+  "mvp_scope": {
+    "derived_at": "2026-07-30T13:17:01.589Z",
+    "mvp_scope": {
+      "slice_name": "notes-create-list",
+      "acceptance_criteria_ids": [
+        "AC-1",
+        "AC-2"
+      ],
+      "excluded_acceptance_criteria_ids": [
+        "AC-3"
+      ],
+      "files": [
+        "src/server.js",
+        "src/routes/notes.js",
+        "src/store.js"
+      ],
+      "rationale": "Create+list is the smallest owner-demonstrable walking skeleton; delete-with-404 is deferred to the full build."
+    }
+  },
+  "mvp_report": {
+    "report_version": 1,
+    "assembled_at": "2026-07-30T13:17:01.657Z",
+    "kind": "PASS_REVIEW",
+    "project_id": "phase54_gate10_dry",
+    "loop_id": "gate10_dry",
+    "iteration": 1,
+    "cap": 5,
+    "slice": {
+      "slice_name": "notes-create-list",
+      "acceptance_criteria_ids": [
+        "AC-1",
+        "AC-2"
+      ],
+      "excluded_acceptance_criteria_ids": [
+        "AC-3"
+      ],
+      "files": [
+        "src/server.js",
+        "src/routes/notes.js",
+        "src/store.js"
+      ],
+      "rationale": "Create+list is the smallest owner-demonstrable walking skeleton; delete-with-404 is deferred to the full build."
+    },
+    "build": {
+      "file_count": 1,
+      "files": [
+        "src/server.js"
+      ],
+      "entry": "src/server.js"
+    },
+    "tests": {
+      "total": 2,
+      "pass": 2,
+      "fail": 0,
+      "error": 0,
+      "scenarios": [
+        {
+          "id": "T-1",
+          "name": "create_note_201",
+          "status": "PASS",
+          "failing": []
+        },
+        {
+          "id": "T-2",
+          "name": "list_notes_array",
+          "status": "PASS",
+          "failing": []
+        }
+      ]
+    },
+    "how_to_see": "node src/server.js",
+    "summary_ar": "تم بناء شريحة الـ MVP \"notes-create-list\" — 1 ملفات، والاختبارات ناجحة 2/2. للتشغيل: node src/server.js. لو النتيجة مناسبة رُدّ بالموافقة، أو اكتب التعديلات المطلوبة كنقاط.",
+    "summary_en": "MVP slice \"notes-create-list\" is built — 1 files, tests passing 2/2. Run it with: node src/server.js. Reply with approval, or list the changes you want."
+  },
+  "owner_feedback": {
+    "updated_at": "2026-07-30T13:17:01.627Z",
+    "iteration": 1,
+    "changes": [
+      "Return 201 with a Location header on create",
+      "Add a created_at field to notes"
+    ]
+  },
+  "build_manifest": {
+    "built_at": "2026-07-30T13:17:01.581Z",
+    "files": [
+      {
+        "path": "src/server.js",
+        "action": "create",
+        "line_count": 5,
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    ]
+  }
+}

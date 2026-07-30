@@ -1,0 +1,8 @@
+{
+  "verdict": "DRY_PASS",
+  "ledger_delta": {
+    "rows": 11,
+    "usd": 0
+  },
+  "note": "driver plumbing, pauses, evidence writers and ledger capture proven at $0; owner turns scripted in dry ONLY"
+}

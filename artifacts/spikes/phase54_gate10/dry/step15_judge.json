@@ -1,0 +1,69 @@
+{
+  "ok": true,
+  "loop_id": "gate10_dry",
+  "quality_report": {
+    "role_id": "quality_judge",
+    "verdict": "APPROVED",
+    "confidence_score": 85,
+    "cross_role_issues": [
+      {
+        "severity": "INFO",
+        "issue": "Cost estimate phases do not map explicitly to spec AC IDs",
+        "roles_involved": [
+          "cost_estimator",
+          "spec_writer"
+        ],
+        "recommendation": "Consider annotating cost phases with AC references in future iterations"
+      }
+    ],
+    "role_assessments": {
+      "architect": {
+        "status": "CLEAN",
+        "notes": "Design is internally consistent with clear component boundaries"
+      },
+      "spec_writer": {
+        "status": "CLEAN",
+        "notes": "All 3 ACs are testable and unambiguous"
+      },
+      "reviewer": {
+        "status": "CLEAN",
+        "notes": "Phase A review approved the spec"
+      },
+      "security_auditor": {
+        "status": "CONCERNS",
+        "notes": "MEDIUM threat_level; no BLOCKERs; owner should review WARN findings"
+      },
+      "builder": {
+        "status": "CLEAN",
+        "notes": "All spec files accounted for in build plan"
+      },
+      "test_designer": {
+        "status": "CLEAN",
+        "notes": "All 3 ACs covered by scenarios"
+      },
+      "documentation": {
+        "status": "CLEAN",
+        "notes": "All components and endpoints documented"
+      },
+      "cost_estimator": {
+        "status": "CLEAN",
+        "notes": "Estimate range is reasonable for scope"
+      },
+      "environment": {
+        "status": "CLEAN",
+        "notes": "Container strategy is appropriate; JWT_SECRET correctly flagged as secret"
+      },
+      "deployment": {
+        "status": "CLEAN",
+        "notes": "Rollback procedure covers all irreversible steps"
+      }
+    },
+    "action_items": [
+      "Owner should review security_auditor WARN findings before first production deployment"
+    ],
+    "summary": "Pipeline output is consistent and complete with confidence score 85; one WARN from security audit requires owner acknowledgment; delivery is approved."
+  },
+  "gate_pending": 2,
+  "advanced": false,
+  "model_used": "mock-qj-s116"
+}

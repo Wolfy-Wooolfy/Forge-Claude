@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "mode": "MVP_REFINE_LOOPED",
+  "loop_back": true,
+  "advanced_to": "BUILDER",
+  "changes": [
+    "Return 201 with a Location header on create",
+    "Add a created_at field to notes"
+  ],
+  "message": "تمام — جاري إعادة بناء شريحة الـ MVP بالتعديلات التي طلبتها، وسيصلك تقرير جديد بعد الاختبار.",
+  "project_id": "phase54_gate10_dry"
+}

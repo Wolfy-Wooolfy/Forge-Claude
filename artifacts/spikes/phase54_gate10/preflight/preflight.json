@@ -1,0 +1,15 @@
+{
+  "at": "2026-07-30T13:15:07.520Z",
+  "openai_key_present": true,
+  "demo_project_fresh": true,
+  "dry_project_fresh": true,
+  "evidence_dir": "D:\\S\\Halo\\Tech\\Forge-Claude\\artifacts\\spikes\\phase54_gate10",
+  "no_test_hooks_env": true,
+  "ledger_baseline": {
+    "count": 434,
+    "total": 11.205505,
+    "at": "2026-07-30T13:15:07.523Z"
+  },
+  "cap_usd": 1,
+  "flagoff_ref_recorded": true
+}

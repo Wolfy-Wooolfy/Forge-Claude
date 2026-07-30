@@ -1,0 +1,24 @@
+{
+  "ok": true,
+  "loop_id": "gate10_dry",
+  "advanced": true,
+  "advanced_to": "RUN_TESTS",
+  "files_written": [
+    {
+      "path": "add.js",
+      "action": "create",
+      "line_count": 1,
+      "sha256": "b9aaacf6b556711808f98ce3e015fb358c61e98d0538f626c149c8ee5938c9b3"
+    },
+    {
+      "path": "run.js",
+      "action": "create",
+      "line_count": 1,
+      "sha256": "b03683ada44d8510e2a998831595f1a22a759bf617a5afe85de69f2795ca4e2c"
+    }
+  ],
+  "smoke": {
+    "ran": false
+  },
+  "summary": "Materialized 2 file(s)."
+}
