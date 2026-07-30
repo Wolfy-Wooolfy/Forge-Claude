@@ -112,6 +112,13 @@ BUILDING → CAP_REACHED / AWAITING_OWNER_REVIEW → CAP_REACHED             (te
   assertions in plain language — the owner arbitrates their change vs the frozen
   test plan. First-build behavior (no owner changes yet) is unchanged.
 
+### 6.b SU scoping limit (R-21)
+
+S375's R-17 leg proves ONLY that mvp_loop does not re-engage after ACCEPTED (no crash, no
+half-engagement; the blind internal loop-back fires). Because its fixture manifest is
+hand-restored before the forced-FAIL run, it is NOT end-to-end proof of the post-ACCEPT
+rebuild path on real build output. Do not cite it as such.
+
 ## 7. Iteration cap (R-9)
 
 Owner REFINEs and internal test-failure loopbacks share the single `ITERATION_CAP = 5`

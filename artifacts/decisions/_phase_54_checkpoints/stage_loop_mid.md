@@ -118,3 +118,15 @@ doctor run: `last_doctor_run` → 2026-07-30T08:33:28.531Z, counts 29/5/1 → **
 **Corrected chain:** … `7dddc560` → `144466c1` (owner U) → `cd40e9ad` → `7d0ad74d` →
 `d378a015` → `cd8d921e` → `<this amendment commit>`. Net R-5 outcome unchanged.
 Recorded per the bidirectional Trust+Verify norm.
+
+---
+
+## Amendment 2 (R-21 — scoping limit of S375's R-17 leg, CTO ruling 2026-07-30)
+
+S375's R-17 leg proves a NARROWER property than its name suggests: because the fixture
+manifest is hand-restored before the forced-FAIL runTests call (the mock rebuild's manifest
+lists add.js/run.js, which has no derivable entry), the leg establishes that **mvp_loop does
+not re-engage after ACCEPTED** (no crash, no half-engagement, blind loop-back fires), but it
+does **NOT** establish that the post-ACCEPT rebuild path works END-TO-END on real build
+output. No later reader may cite S375 as end-to-end proof of the post-ACCEPT pipeline.
+Also stated in docs/12_ai_os/24_MVP_LOOP_CONTRACT.md (R-21).
