@@ -91,3 +91,19 @@ D0 + D1 + D2 complete and gate-proven (366/0/5 (371) exactly, Track A clean on a
 lines, §ARC=10, L2=81, roles=13, live surface untouched, $0). Awaiting CTO mid-verification
 from the owner's fresh LOCAL-folder zip. Do NOT proceed to D3/D4/D5 until Step-2 GO.
 Open ruling requested at mid-verification: uid_pin re-pin decision (note 4a).
+
+---
+
+## Amendment 1 (post-commit, append-only — owner interim commit, PHASE-53 c-bis precedent)
+
+Noticed immediately after the D1+D2 commit: an OWNER interim commit `f6086a43`
+("Update status.json", Wolfy-Wooolfy, 2026-07-29 17:39 +0300 — the known owner-U pattern)
+sits between origin/main `5205c6e` and the D0 commit. Scope verified: exactly ONE file
+(progress/status.json, +5/−5) capturing my 2026-07-29 doctor run's auto-refresh drift —
+`last_doctor_run` → 2026-07-29T14:29:35.232Z, `last_doctor_status` → **FAIL**,
+`last_doctor_counts` → **29 pass / 5 warn / 1 fail**. This independently corroborates
+note 4(a): the doctor was already exiting 1 (uid_pin_match critical) on 2026-07-29.
+**Corrected chain:** `5205c6e` (origin/main) → `f6086a43` (owner U, drift capture) →
+`ceeb86b6` (D0) → `b88af4e8` (D1+D2+mid) → `<this amendment commit>`. Net R-5 outcome
+unchanged (drift + legitimate updates all in the LOCAL chain; no standalone hygiene commit
+by CC). Recorded per the bidirectional Trust+Verify norm.
