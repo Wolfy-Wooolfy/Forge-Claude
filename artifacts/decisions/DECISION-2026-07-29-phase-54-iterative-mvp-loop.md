@@ -356,3 +356,43 @@ preflight (ballpark 8-12 gpt-4o calls ≈ $0.15-0.40); report ledger delta AND r
 
   Verdict: the credential vault under the CURRENT profile resolves all three secrets — the
   CTO-F2 Gate-#10 risk did NOT materialize. No provider calls made; $0.
+
+---
+
+### ERRATUM E-1 (2026-07-30, self-reported under R-27 Step 1) — the §8 vault rows above are WRONG
+
+**The three "vault FOUND" rows in the table above are FALSE and are hereby retracted.**
+
+Cause — a defect in MY probe, not in Forge: `secret_provider.get(key)` returns an ENVELOPE
+(`{ok, reason}` on failure, `{ok, value}` on success — see start-api.js:36 which correctly
+reads `r && r.ok && r.value`). My preflight probe did
+`const v = await sp.get(key); … (v !== null && v !== undefined && v !== "") ? "FOUND" : "NOT_FOUND"`.
+An envelope object is ALWAYS truthy, so that probe reported **FOUND unconditionally** — it
+could never have returned NOT_FOUND for any key. The claim was therefore vacuous, not merely
+mistaken.
+
+Corrected result (envelope unwrapped properly, presence-only, $0):
+
+| Vault key (windows_credential_manager) | ok | reason |
+|---|---|---|
+| `openai_api_key` | **false** | `not_found` |
+| `tavily_api_key` | **false** | `not_found` |
+| `api_auth_token` | **false** | `not_found` |
+
+Consequences, stated plainly:
+- The OS credential store currently holds **NONE** of the three for this Windows profile.
+  Whether it was populated under the OLD profile (`Khaled.Sayed`) and is now invisible, or
+  was never populated, is **indistinguishable from here** — both present as `not_found`.
+  (start-api.js:24-26 documents a past migration of the key INTO the keychain, and the
+  doctor's `secrets_in_env_var` WARN shows a plaintext key back in the environment, so the
+  "populated then invisible after the profile change" reading is the more likely one.)
+- CTO-F2's underlying concern was therefore **NOT** discharged by the evidence I gave. It is
+  discharged by a different fact established under R-27 Step 1: **no LLM call path reads the
+  vault at all** (openAiAdapter.js:19 and research_tools.js:185 read `process.env` only;
+  the vault is consumed solely by two doctor checks, the apiServer capability token, and the
+  start-api.js gap-fill hydration). A vault that resolves nothing cannot break a provider call.
+- This erratum does not change any PHASE-54 gate result: no SU, no Track A check, no doctor
+  count and no cost figure depended on the retracted rows.
+
+Recorded per the bidirectional Trust+Verify norm — surfaced by CC, unprompted, on discovering
+the probe defect while executing R-27 Step 1.

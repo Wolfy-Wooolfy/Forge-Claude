@@ -20,7 +20,7 @@
 |---|---|
 | 1. Toolchain | Python **3.12.7** + pip **24.2** confirmed; **pip3 resolves too** (pip_adapter tries pip3 first). Session shell predates the install ⇒ ALL suite/doctor runs in this checkpoint used an **explicitly prefixed PATH** (Python312 + Python312\Scripts + nodejs prepended) — as CTO §C.1 instructed. Note: this sandbox shell's PATH is stripped (even node needed a full path); registry System+User PATH now carries Python via the installer. |
 | 2. Full suite (pre-D0 baseline) | **ALL PASS — 365 passed / 0 failed / 5 skipped (370 total), exit 0** — the PHASE-53 target EXACTLY (R-13 satisfied). |
-| 3. $0 credential pre-flight | Recorded in the decision artifact §8: Khaled.Sayed profile dir ABSENT; env loader RESOLVES both OPENAI/TAVILY keys; vault (windows_credential_manager, current profile) FOUND all three (`forge.openai_api_key`, `forge.tavily_api_key`, `forge.api_auth_token`). CTO-F2 Gate-#10 risk did NOT materialize. Presence/absence only; no provider calls. |
+| 3. $0 credential pre-flight | **⚠ RETRACTED IN PART — see ERRATUM E-1 in the decision artifact (2026-07-30): the three "vault FOUND" rows were produced by a defective probe (secret_provider.get returns an envelope, which is always truthy) and are false; the vault actually holds NONE of the three (`not_found`). The .env rows below stand.** Originally recorded in the decision artifact §8: Khaled.Sayed profile dir ABSENT; env loader RESOLVES both OPENAI/TAVILY keys; vault (windows_credential_manager, current profile) FOUND all three (`forge.openai_api_key`, `forge.tavily_api_key`, `forge.api_auth_token`). CTO-F2 Gate-#10 risk did NOT materialize. Presence/absence only; no provider calls. |
 
 ## 1. State — D0 + D1 + D2 DONE
 
