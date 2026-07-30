@@ -120,6 +120,45 @@ is NOT fixed in PHASE-54; it needs its own decision artifact in a future hardeni
 R-15 — The uncommitted progress/status.json drift from the doctor run is expected under R-5.
 Do not revert it; fold it into the D0 commit.
 
+### R-16..R-19 (CTO mid-checkpoint verification GO, 2026-07-30 — each names the finding it resolves)
+
+CTO-F-A (MUST FIX BEFORE D3) → R-16. status.json currently self-contradicts: current_task =
+"PHASE-54-ITERATIVE-MVP-LOOP" while next_phase = "PHASE-54-PENDING-DECISION". The authoritative
+single source of truth cannot state that this phase is simultaneously in progress and pending
+a decision. R-16: set next_phase = "PHASE-55-PENDING-DECISION". One-line fix, own commit.
+
+CTO-F-C (design interaction hole) → R-17. MVP_STATUSES makes ACCEPTED terminal. Trace the
+consequence: owner ACCEPTs → deferred advance → REVIEWER → DOCUMENTATION → QUALITY_JUDGE →
+Gate 2. If the owner then answers Gate 2 with REJECT_AND_LOOP, the graph returns to BUILDER but
+mvp_loop is terminal, so the rebuild silently falls back to the old blind path with no owner
+MVP review — the owner's second round of feedback goes through the very mechanism this phase
+exists to replace. R-17: for Slice 1 the loop does NOT re-engage after ACCEPTED (ACCEPTED stays
+terminal), but this MUST be stated explicitly in docs/12_ai_os/24_MVP_LOOP_CONTRACT.md as a
+known Slice-1 limitation with this rationale, and Gate-2 loop-backs after ACCEPTED must not
+crash or half-engage the loop. Re-engagement is a later slice with its own decision artifact.
+
+CTO-F-D (spend surface) → R-18. deriveScope defaults provider "openai", model "gpt-4o",
+budget_usd 0.25. The provider/model defaults match existing bridge precedent (reviewProject,
+judgeQuality) — accepted. The budget_usd 0.25 default is NEW to this phase and unjustified: a
+single scope derivation over a spec is roughly $0.01–0.03, so 0.25 is ~10x headroom introduced
+silently. R-18: state the precedent (what other agent.invoke callers pass for budget_usd) and
+either align with it or justify 0.25 explicitly in the contract doc §. Additionally, every D3
+wiring path must thread provider explicitly — no code path may reach a real provider merely by
+falling through to a default, and no SU may depend on the default.
+
+CTO-F-F (D4 decision) → R-19. feedback_history entries accept decision ∈ {ACCEPT, REFINE}
+only, so an UNCLEAR owner turn leaves no forensic trace. R-19: record UNCLEAR turns too
+(decision: "UNCLEAR", changes: []) — additive schema change, extends the existing validator.
+
+> R-18 execution note (recorded at append time): the ONLY production agent.invoke caller
+> passing budget_usd is materializerEngine.js (0.50, full codegen). deriveScope's default is
+> ALIGNED DOWN to 0.05 (~2–5x the CTO's $0.01–0.03 estimate for a single scope derivation;
+> the 0.50 codegen precedent covers a far larger generation); interpretFeedback uses the
+> same 0.05. Justification recorded in 24_MVP_LOOP_CONTRACT.md §4. All D3/D4 wiring paths
+> thread provider+model explicitly from body.mvp_* or the mvp_loop block (typed
+> MVP_PROVIDER_REQUIRED failure when absent — no default fallthrough); every SU passes
+> provider explicitly.
+
 ## 4. Scope & deliverables (Step-0-approved seams; CTO §D: approved as written + delta)
 
 **D0** — this artifact + PROMPT-STAGE-54.md (root) + status.json current_task flip
@@ -188,6 +227,11 @@ preflight (ballpark 8-12 gpt-4o calls ≈ $0.15-0.40); report ledger delta AND r
 - `_invokeRole` comment says 30s while the code is 150000ms (conversationEngine.js ~2397).
 - `estimateCost` does not persist cost_estimate.json although judgeQuality reads it
   best-effort (LOCK-5 tolerates absence).
+- **CTO-F-B (closure checklist item):** status.json `runtime_health.self_test_last_result`
+  still records the PHASE-53 365/0/5 text; MUST be current (with the final PHASE-54 counts)
+  in the closure commit. Not a mid-blocker.
+- **CTO-F-E (optional hardening, decide at D5):** bound `validateMvpLoopBlock`'s `iteration`
+  echo by the IMPORTED `ITERATION_CAP` (free R-4 consistency check, no second constant).
 
 ## 8. Step-0 / environment-incident record
 
