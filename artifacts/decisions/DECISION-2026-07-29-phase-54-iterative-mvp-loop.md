@@ -150,6 +150,70 @@ CTO-F-F (D4 decision) → R-19. feedback_history entries accept decision ∈ {AC
 only, so an UNCLEAR owner turn leaves no forensic trace. R-19: record UNCLEAR turns too
 (decision: "UNCLEAR", changes: []) — additive schema change, extends the existing validator.
 
+### R-20..R-22 (CTO second-checkpoint verification GO, 2026-07-30)
+
+R-20 — ACCEPT ON A FAILING REPORT REQUIRES A DISTINCT, INFORMED DECISION.
+Confirmed by the CTO: ACCEPT performs the deferred advance unconditionally, including when the
+report kind is FAIL_REVIEW. That collides with Blueprint Part D.2 — "if a scenario fails, Forge
+does not advance; the user sees the test report as primary evidence" — a Layer-0 commitment. A
+hard block, however, re-creates exactly the trap R-10 exists to close: an owner whose REFINE
+contradicts the frozen test plan would be locked out until the cap. Therefore the advance is
+PERMITTED under all of the following compensating controls, which are binding:
+  (i)   A bare ACCEPT against a FAIL_REVIEW report resolves to UNCLEAR → clarifying question,
+        no advance. The report must state plainly, in owner language, that tests are failing and
+        that accepting means proceeding with them.
+  (ii)  Advancing requires a DISTINCT decision value — ACCEPT_WITH_FAILING_TESTS — produced by
+        the provider from an unambiguous owner turn. A separate enum value, never a flag or
+        modifier on ACCEPT, so the decision is legible in the forensic record.
+  (iii) Forensic trail, mandatory: the failing report path and the failing assertion ids are
+        recorded in feedback_history AND surfaced downstream. reviewProject, judgeQuality and
+        the Gate-2 payload must each carry a marker that this build advanced with known-failing
+        tests. It is never buried, and no downstream stage may see a clean picture.
+  (iv)  Governance: record this in the decision artifact as a NAMED, narrowly scoped exception
+        to Blueprint Part D.2 — the Blueprint's own authority clause states that Layer-0
+        conflicts are resolved by a decision artifact scoped to the specific conflict, which is
+        exactly what this is. State the rationale (frozen-test-plan trap) and list the
+        compensating controls (i)-(iii). Do NOT edit the Blueprint.
+  (v)   SU: prove both legs — bare ACCEPT on FAIL_REVIEW yields UNCLEAR with no advance and no
+        state movement; explicit ACCEPT_WITH_FAILING_TESTS advances AND the downstream marker
+        plus the forensic entry are both present. Extend S375 or add a new scenario; your call,
+        declare the exact final count.
+
+R-21 — S375's R-17 leg proves a NARROWER property than its name suggests: because the fixture
+manifest is hand-restored before runTests, it establishes that mvp_loop does not re-engage after
+ACCEPTED, but NOT that the post-ACCEPT rebuild path works end-to-end. State this scoping limit
+explicitly in both the checkpoint and docs/12_ai_os/24_MVP_LOOP_CONTRACT.md so no later reader
+mistakes it for end-to-end proof.
+
+R-22 — RE-PIN THE OWNER IDENTITY (authorized, narrowly scoped). uid_pin_match is the sole
+remaining doctor failure (30/4/1) and the Windows profile genuinely changed; the PHASE-12 guard
+is working correctly. The remediation is to RE-PIN, never to weaken, skip, or special-case the
+check. Binding conditions: use the existing sanctioned code path
+(code/src/runtime/production/uid_pin.js, or the install-script entry that calls it) — do NOT
+hand-edit progress/uid_pin.json; record the before and after identity values in the closure
+checkpoint; then re-run the doctor and report the full summary. Because uid_pin.json is
+gitignored it cannot be verified from the zip, so the RAW forge-doctor JSON summary must be
+pasted into the closure checkpoint as an artifact (this also discharges the §B verification gap
+raised at the first checkpoint).
+
+#### NAMED EXCEPTION (per R-20 iv) — Blueprint Part D.2, narrowly scoped
+
+**Exception name:** `MVP-OWNER-OVERRIDE-ON-FAILING-TESTS` (PHASE-54, Slice 1 only).
+**Conflicts with:** Blueprint Part D.2 ("If any scenario fails, Forge does not mark the module
+complete" / L5b block-on-failure intent) — resolved here per the Blueprint's own header
+authority clause (Layer-0 conflicts are resolved by a decision artifact scoped to the specific
+conflict; the Blueprint text itself is NOT edited).
+**Scope:** ONLY the MVP owner-review gate (mvp_loop.enabled=true, status AWAITING_OWNER_REVIEW,
+report kind FAIL_REVIEW), ONLY via the distinct provider decision ACCEPT_WITH_FAILING_TESTS.
+**Rationale:** a hard block re-creates the frozen-test-plan trap R-10 closes — an owner whose
+REFINE legitimately contradicts a frozen test assertion would be locked out until the cap
+escalates, with their requirement silently undone.
+**Compensating controls:** R-20 (i) bare-ACCEPT→UNCLEAR downgrade with plain-language warning ·
+(ii) distinct enum value, never a flag · (iii) mandatory forensic trail (feedback_history entry
+with report path + failing assertion ids; `accepted_with_failing_tests` marker carried by the
+reviewProject payload, the persisted review_report.json, the judgeQuality payload and the
+Gate-2 payload) · (v) SU-proven both legs.
+
 > R-18 execution note (recorded at append time): the ONLY production agent.invoke caller
 > passing budget_usd is materializerEngine.js (0.50, full codegen). deriveScope's default is
 > ALIGNED DOWN to 0.05 (~2–5x the CTO's $0.01–0.03 estimate for a single scope derivation;
