@@ -113,3 +113,12 @@ duration: 51030ms
 D5 + closure preparation complete and gate-proven. Awaiting CTO D5 verification from a
 fresh LOCAL-folder zip; the CTO will then request the Gate #10 estimate + owner spend
 approval. No closure artifact, no status flip to COMPLETE, no push, no tag.
+
+---
+
+## Amendment 1 (append-only — owner interim commit, c-bis norm)
+
+Owner interim commit `53f58f16` ("Update settings.local.json", Wolfy-Wooolfy, 2026-07-30
+14:06 +0300) sits between `b26fc76d` and `32b234bc`. Scope verified: exactly ONE file,
+`.claude/settings.local.json` (+2/−1) — CC-harness session permissions only; zero project
+state touched. Chain updated accordingly. Recorded per the bidirectional Trust+Verify norm.
