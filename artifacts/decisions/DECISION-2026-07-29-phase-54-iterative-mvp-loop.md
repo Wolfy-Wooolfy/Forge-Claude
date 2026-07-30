@@ -396,3 +396,22 @@ Consequences, stated plainly:
 
 Recorded per the bidirectional Trust+Verify norm — surfaced by CC, unprompted, on discovering
 the probe defect while executing R-27 Step 1.
+
+---
+
+### ERRATUM E-2 (2026-07-30, CTO-reported) — conflicting editor instructions
+
+During the credential rotation the CTO instructed the owner to edit `.env` with **Notepad**,
+while the relay text CC had prepared described **VS Code** (unsaved-dot tab indicator, Ctrl+S,
+right-click → Properties → Modified). Two different editors for one step is a confusing
+instruction and likely contributed to the two failed save attempts (R-32 check 1 failed twice
+with the file byte-unchanged). **The CTO records this as its own process error.**
+
+Remediation adopted: **R-33 — remove the editor from the loop entirely.** A single-purpose,
+sandbox-tested PowerShell helper performs the edit deterministically (no-echo prompt,
+replaces only the existing assignment's value, never appends, atomic write with timestamped
+backup, self-verifies R-32 checks 1-4 in the same command). The owner runs ONE command; no
+editor, no save step, no indicator to interpret. Helper lives in the session scratchpad, NOT
+in the repo — machine ops, not a deliverable.
+
+Recorded per the bidirectional Trust+Verify norm, in both directions.
