@@ -514,5 +514,23 @@
     "tokens_in": 120,
     "tokens_out": 20,
     "finish_reason": "stop"
+  },
+  "mock|mock-scope-s373a|scenario:S373A": {
+    "text": "{\"mvp_scope\":{\"slice_name\":\"notes-create-list\",\"acceptance_criteria_ids\":[\"AC-1\",\"AC-2\"],\"excluded_acceptance_criteria_ids\":[\"AC-3\"],\"files\":[\"src/server.js\",\"src/routes/notes.js\",\"src/store.js\"],\"rationale\":\"Create+list is the smallest owner-demonstrable walking skeleton; delete-with-404 is deferred to the full build.\"}}",
+    "tokens_in": 400,
+    "tokens_out": 120,
+    "finish_reason": "stop"
+  },
+  "mock|mock-scope-s373b|scenario:S373B": {
+    "text": "{\"mvp_scope\":{\"slice_name\":\"notes-create-list\",\"excluded_acceptance_criteria_ids\":[\"AC-3\"],\"files\":[\"src/server.js\"],\"rationale\":\"missing acceptance_criteria_ids on purpose (schema-invalid leg)\"}}",
+    "tokens_in": 400,
+    "tokens_out": 80,
+    "finish_reason": "stop"
+  },
+  "mock|mock-scope-s373c|scenario:S373C": {
+    "text": "{\"mvp_scope\":{\"slice_name\":\"notes-create-list\",\"acceptance_criteria_ids\":[\"AC-9\"],\"excluded_acceptance_criteria_ids\":[\"AC-3\"],\"files\":[\"src/server.js\"],\"rationale\":\"AC-9 does not exist in the spec and AC-1/AC-2 are unaccounted for (validation leg)\"}}",
+    "tokens_in": 400,
+    "tokens_out": 80,
+    "finish_reason": "stop"
   }
 }
