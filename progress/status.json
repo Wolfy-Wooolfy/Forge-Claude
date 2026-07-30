@@ -291,13 +291,13 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-07-30T08:33:28.531Z",
-    "last_doctor_status": "FAIL",
+    "last_doctor_run": "2026-07-30T12:47:18.161Z",
+    "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
-    "self_test_last_run": "2026-07-09",
-    "self_test_last_result": "365 passed, 0 failed, 5 skipped (370 total) — PHASE-53 D4 (relevance floor: per-claim targeted discovery for cited-but-LOW claims; rulings R-1 pre-cite KEEP-BEST single-kb.cite, R-2 summary-level claim-granular below_floor forensics, R-3 one attempt/claim shared across zero_chunks+floor triggers, R-4 RELEVANCE_FLOOR_MEDIUM=0.60 extracted in citation_engine.js). +6 SU vs PHASE-52: S367-S372 (floor trigger + >=floor claim untouched / keep-best upgrade LOW->MEDIUM with the exactly-one-CitationRecord R-1 guard / no-lift keep-best + below_floor flag + NO HALT incl. offline no-key leg / shared global search cap across triggers per R-3 / shared URL dedup + redundant re-retrieve skip / zero_chunks citation-output regression per CTO scoping). All hermetic via the PHASE-52 _discovery seam + vector-controlled cosine relevance. §ARC=10 frozen; L2=81; CitationRecord schema untouched; allow-list + SSRF guard byte-identical. PHASE-53 OPEN: real Gate #10 pending a separate owner spend approval.",
-    "self_test_scenarios_pass": 365,
+    "self_test_last_run": "2026-07-30",
+    "self_test_last_result": "374 passed, 0 failed, 5 skipped (379 total) — PHASE-54 D5 (Iterative MVP Loop Slice 1: Owner Review Loop Core; flag-gated per project via project_state.mvp_loop.enabled, default OFF, flag-off byte-identical to PHASE-53). +9 SU vs PHASE-53: S373-S381 (scope derivation schema/partition fail-closed / R-7 review gate at RUN_TESTS + R-11 artifact-derived report + R-7v anti-bypass / R-7ii ACCEPT deferred advance + R-17 terminal no-re-engage / R-8 REFINE threading verbatim + persistence + owner-FIRST-repair-LAST / R-10 fail routing to owner / R-9 plain-language cap + R-12 UNCLEAR + R-19 forensics / R-18 scoped-spec wiring with explicit provider / R-20 ACCEPT_WITH_FAILING_TESTS distinct decision + downstream markers / R-1 flag-off E2E invariance) + S335 extended (R-8ii byte-identity across arities). Rulings R-1..R-22 in DECISION-2026-07-29-phase-54-iterative-mvp-loop.md incl. the NAMED Blueprint Part D.2 exception MVP-OWNER-OVERRIDE-ON-FAILING-TESTS. §ARC=10 frozen; L2=81; roles=13; apiServer byte-identical to a69de85. R-22 uid re-pin done via sanctioned path — doctor 35 checks: 31 PASS / 4 WARN / 0 FAIL, exit 0. PHASE-54 OPEN: real Gate #10 pending a separate owner spend approval.",
+    "self_test_scenarios_pass": 374,
     "self_test_scenarios_skip": 5,
     "self_test_scenarios_fail": 0,
     "providers_registered_count": 14,
@@ -328,9 +328,9 @@
     "adapter_json_extraction": "ENABLED — extractJsonFromResponse in _adapter_contract.js, applied in anthropic/openai/claude_code/aider adapters (DECISION-20260512-0900 addendum)",
     "note": "PHASE-9 CLOSED. KB Runtime (L-KB-1→L-KB-5): source_acquisition, chunking_engine, embedding_engine, storage_lance (LanceDB), cost_ledger, budget_guard, retrieval, manifests, citation_engine, citation_validator, budget_guard vision-override, research_role (12th role, KNOWN-gate, deterministic findings, confidence recompute). 6 KB tools (ingest_url, retrieve, cite, list_sources, delete_source, validate_citations). 3 new doctor checks (kb_budget_status, kb_indexed_sources_count, research_role_registered). Stage 9.7 cleanup: 6 FIX items (retrieval cost ledger, rejected_low_credibility, citation_validator Pattern 4, S137, evidence cap, confidence recompute). scenarios: 128→137 (S129–S137). doctor checks: 21→24. SU assertions: ~276→314. API cost: $0.00.",
     "last_doctor_counts": {
-      "pass": 30,
+      "pass": 31,
       "warn": 4,
-      "fail": 1
+      "fail": 0
     },
     "metrics_window_24h": {
       "window_start_ts": "2026-05-21T08:06:30.478Z",
