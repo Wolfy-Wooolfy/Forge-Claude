@@ -5,7 +5,7 @@
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
   "next_phase": "PHASE-54-PENDING-DECISION",
-  "next_step": "PHASE-53 CLOSED (2026-07-09): relevance floor in the documentation citation pass — a claim that WOULD be cited but whose best first-pass relevance < RELEVANCE_FLOOR_MEDIUM (0.60, the existing MEDIUM threshold extracted as the single named constant, R-4) gets ONE targeted web discovery (search_web -> kb.ingest_content, A-1 path) -> re-retrieve -> pre-cite KEEP-BEST -> exactly ONE kb.cite per claim (R-1); no lift -> claim keeps its citation + below_floor flag in claim-granular summary forensics (R-2); one attempt/claim shared across zero_chunks+floor triggers with the shared global cap + URL dedup (R-3); offline-safe, NO new HALT. REAL Gate #10 = GATE_PASS (49453ce): N=8 -> floor_below=7 -> 8 targeted Tavily searches (= cap exactly) -> 8 distinct per-claim REPUTABLE ingests -> 8/8 claims LIFTED (strict improvement each, 0 violations, 0 flag errors) -> §8 PASS -> QUALITY_JUDGE; distribution 0 HIGH / 2 MEDIUM / 6 LOW vs PHASE-52 baseline 1/6; spend $0.05457 ledger (~$0.0146 real cash). SU 365/0/5 (370). Closure LOCAL; push/tag phase-53-complete await CTO fresh-zip verify. PHASE-54 pending owner decision (candidates: Iterative MVP Loop / Browser Automation 7-D / Anthropic switch / providerTrace persistence).",
+  "next_step": "PHASE-54 IN_PROGRESS (CTO GO 2026-07-29; D0-D2 only, then HARD STOP at stage_core_mid for CTO fresh-zip verification — D3+ forbidden until Step-2 GO): Iterative MVP Loop Slice 1 (Owner Review Loop Core), flag-gated per project (project_state.mvp_loop.enabled, default OFF; flag-off byte-identical to PHASE-53 per R-1). Rulings R-1..R-15 recorded in DECISION-2026-07-29-phase-54-iterative-mvp-loop.md — R-7 review gate hosts at RUN_TESTS in the ai_os layer (no 18th graph state; suppress-then-deferred-advance; mvp_review_pending signal, never gate_pending; anti-bypass SU on reviewProject WRONG_STATE), R-8 dedicated owner_changes prompt block (owner block FIRST, A-5 repair block LAST; empty => byte-identical), R-9 shared ITERATION_CAP=5 + plain-language CAP_REACHED, R-10 post-REFINE test failure routes to owner review (not blind A-5), R-11 report facts artifact-derived only, R-12 zero keyword matching, R-13 environment restored (Python 3.12.7 reinstall; baseline 365/0/5 EXACT re-proven 2026-07-30, exit 0), R-14 S57 requires_binary gap = backlog only, R-15 doctor-drift fold. D1 = mvpLoopEngine.js state model + 24_MVP_LOOP_CONTRACT.md skeleton; D2 = provider-driven mvp_scope derivation (agent.invoke role_id mvp_scope — 13-role registry does NOT grow) + hermetic S373. $0 through D5; Gate #10 real spend needs separate owner approval with estimate shown first. Old next_step (PHASE-53 closure record) preserved in phase_53 block + DECISION-2026-07-09-phase-53-closure.md.",
   "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-22-phase-43-first-real-build.md",
   "phase_45": {
     "status": "CLOSED",
@@ -2327,8 +2327,8 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-53-RELEVANCE-FLOOR-COMPLETE",
-  "last_updated": "2026-07-09T00:00:00.000Z",
+  "current_task": "PHASE-54-ITERATIVE-MVP-LOOP",
+  "last_updated": "2026-07-30T00:00:00.000Z",
   "phase_16": {
     "status": "ACTIVE",
     "started_at": "2026-05-24T16:00:00.000Z",
