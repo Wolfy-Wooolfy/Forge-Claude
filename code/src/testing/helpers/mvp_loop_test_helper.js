@@ -734,6 +734,170 @@ async function runS379ScopedSpecWiring() {
   }
 }
 
+// ── S380 — R-20: ACCEPT on failing tests needs a distinct, informed decision ──
+
+async function runS380AcceptWithFailingTests() {
+  const out = {};
+  const pid = "test_s380_mvp";
+  const lp  = "lp380";
+  const eng = _engine();
+  const od  = "artifacts/projects/" + pid + "/orchestration/" + lp + "/";
+
+  await _writeState2(pid, _pstate(pid, lp,
+    _block({ status: "AWAITING_OWNER_REVIEW", model: "mock-fb-s380", iteration: 1 })));
+  await _seedLoopAt(pid, lp, "RUN_TESTS", { spec: true, design: true });
+  // Manifest files on disk (leg C: reviewProject reads each listed file fail-closed).
+  for (const f of MANIFEST_FIX.files) {
+    await _w("artifacts/projects/" + pid + "/" + f.path, null, "// " + f.path + "\n");
+  }
+  // The persisted FAIL_REVIEW report the owner is replying to (R-11 assembly).
+  const failReport = mvp.assembleMvpReport({
+    project_id: pid, loop_id: lp, kind: "FAIL_REVIEW", mvp_scope: MVP_SCOPE_FIX,
+    manifest: { files: MANIFEST_FIX.files }, report: _failResult(),
+    entry: "src/server.js", iteration: 1, cap: ITERATION_CAP
+  });
+  await _w(od + "mvp_report.json", failReport);
+
+  // Leg A — provider says bare ACCEPT, report is FAIL_REVIEW → downgraded to UNCLEAR
+  const pmA = await eng.processMessage({
+    project_id: pid, message: "تمام اعتمده", user_language: "ar",
+    mvp_scenario_id: "S380A"
+  });
+  out.a_no_advance = !!(pmA.ok === true && pmA.mode === "MVP_REVIEW_PENDING" &&
+    pmA.advanced === undefined);
+  const gsA = await _graphState(pid, lp);
+  out.a_graph_still_run_tests = !!(gsA && gsA.current_state === "RUN_TESTS");
+  let st = await _rj("artifacts/projects/" + pid + "/project_state.json");
+  out.a_block_still_awaiting = !!(st && st.mvp_loop &&
+    st.mvp_loop.status === "AWAITING_OWNER_REVIEW");
+  out.a_message_mentions_failing = !!(typeof pmA.message === "string" &&
+    pmA.message.indexOf("فاشلة") !== -1);
+  let hist = (st && st.mvp_loop && st.mvp_loop.feedback_history) || [];
+  out.a_history_unclear = hist.length === 1 && hist[0].decision === "UNCLEAR";
+
+  // Leg B — explicit ACCEPT_WITH_FAILING_TESTS → deferred advance + forensic trail
+  const pmB = await eng.processMessage({
+    project_id: pid, message: "أنا فاهم إن الاختبارات فاشلة وعايز أكمل بيها زي ما هي",
+    user_language: "ar", mvp_scenario_id: "S380B"
+  });
+  out.b_advanced_reviewer = !!(pmB.ok === true && pmB.advanced === true &&
+    pmB.advanced_to === "REVIEWER_CODE_AND_SECURITY");
+  st = await _rj("artifacts/projects/" + pid + "/project_state.json");
+  out.b_block_accepted   = !!(st && st.mvp_loop && st.mvp_loop.status === "ACCEPTED");
+  out.b_marker_flag_true = !!(st && st.mvp_loop &&
+    st.mvp_loop.accepted_with_failing_tests === true);
+  hist = (st && st.mvp_loop && st.mvp_loop.feedback_history) || [];
+  const last = hist[hist.length - 1] || {};
+  out.b_history_awft = hist.length === 2 &&
+    last.decision === "ACCEPT_WITH_FAILING_TESTS" &&
+    Array.isArray(last.changes) && last.changes.length === 0;
+  out.b_history_has_report_path = typeof last.report_path === "string" &&
+    last.report_path.indexOf("mvp_report.json") !== -1;
+  out.b_history_has_failing_ids = Array.isArray(last.failing_assertion_ids) &&
+    last.failing_assertion_ids.join(",") === "T-1";
+
+  // Leg C — downstream markers (R-20 iii): reviewProject payload + persisted
+  // review_report.json + judgeQuality (Gate-2) payload
+  const rv = await eng.reviewProject({
+    project_id: pid, loop_id: lp,
+    reviewer_provider: "mock", reviewer_model: "mock-rev-s102", reviewer_scenario_id: "S102",
+    security_provider: "mock", security_model: "mock-sec-s96",  security_scenario_id: "S96"
+  });
+  out.c_review_payload_marker = rv.mvp_accepted_with_failing_tests === true;
+  out.c_review_advanced_documentation = !!(rv.advanced === true &&
+    rv.advanced_to === "DOCUMENTATION");
+  const rr = await _rj(od + "review_report.json");
+  out.c_review_report_marker = !!(rr && rr.mvp_accepted_with_failing_tests === true);
+
+  const reg = getDefaultRegistry();
+  await reg.invoke("orchestration.advance_state",
+    { project_id: pid, loop_id: lp, to_state: "QUALITY_JUDGE",
+      transition_type: "NORMAL", role_invoked: "documentation" }, { root: ROOT });
+  const jq = await eng.judgeQuality({
+    project_id: pid, loop_id: lp,
+    quality_provider: "mock", quality_model: "mock-qj-s116", quality_scenario_id: "S116"
+  });
+  out.c_judge_payload_marker = jq.mvp_accepted_with_failing_tests === true;
+  out.c_judge_gate2_pending  = jq.gate_pending === 2 && jq.advanced === false;
+
+  return out;
+}
+
+// ── S381 — R-1: flag-off E2E invariance (no block ⇒ zero MVP behaviour) ──────
+
+async function runS381FlagOffInvariance() {
+  const out = {};
+  const pid = "test_s381_mvp";
+  const lp  = "lp381";
+  const eng = _engine();
+  const od  = "artifacts/projects/" + pid + "/orchestration/" + lp + "/";
+
+  await _writeState2(pid, _pstate(pid, lp, null)); // NO mvp_loop block
+  await _seedLoopAt(pid, lp, "TEST_DESIGN",
+    { plan: false, manifest: false, spec: true, design: true });
+  await _writeVision(pid);
+
+  try {
+    _installStub(_codegenResponder());
+
+    _stubPrompts = [];
+    const dt = await eng.designTests({
+      project_id: pid, loop_id: lp,
+      test_provider: "mvp_stub", test_model: "mvp-stub"
+    });
+    out.dt_advanced_builder = !!(dt.advanced === true && dt.advanced_to === "BUILDER");
+    const tdPrompt = _stubPrompts.find(_isTdPrompt) || "";
+    out.td_prompt_full_ac_set = tdPrompt.indexOf("AC-1") !== -1 &&
+      tdPrompt.indexOf("AC-2") !== -1 && tdPrompt.indexOf("AC-3") !== -1;
+    out.td_prompt_no_slice = tdPrompt.indexOf("MVP slice") === -1;
+
+    _stubPrompts = [];
+    const bp = await eng.buildProject({
+      project_id: pid, loop_id: lp,
+      build_provider: "mvp_stub", build_model: "mvp-stub",
+      mat_provider: "mvp_stub",   mat_model: "mvp-stub"
+    });
+    out.build_advanced_run_tests = !!(bp.advanced === true && bp.advanced_to === "RUN_TESTS");
+    const bldPrompt = _stubPrompts.find(_isBldPrompt) || "";
+    const matPrompt = _stubPrompts.find(_isMatPrompt) || "";
+    out.bld_prompt_full_ac_set = bldPrompt.indexOf("AC-1") !== -1 &&
+      bldPrompt.indexOf("AC-3") !== -1;
+    out.mat_prompt_full_ac_set = matPrompt.indexOf("AC-1") !== -1 &&
+      matPrompt.indexOf("AC-3") !== -1;
+    out.mat_prompt_no_slice        = matPrompt.indexOf("MVP slice") === -1;
+    out.mat_prompt_no_owner_marker = matPrompt.indexOf(OWNER_MARKER) === -1;
+
+    const rt = await eng.runTests({
+      project_id: pid, loop_id: lp,
+      _test_skip_npm_install: true,
+      _test_force_run_scenarios_result: _passResult()
+    });
+    out.rt_advanced_reviewer = !!(rt.advanced === true &&
+      rt.advanced_to === "REVIEWER_CODE_AND_SECURITY");
+    out.no_mvp_payload_fields =
+      dt.test_error === undefined &&
+      rt.mvp_review_pending === undefined && rt.mvp_report === undefined &&
+      rt.mvp_cap_message === undefined &&
+      bp.build_error === undefined;
+
+    const st = await _rj("artifacts/projects/" + pid + "/project_state.json");
+    out.state_has_no_mvp_block = !!(st && !("mvp_loop" in st));
+
+    const reg = getDefaultRegistry();
+    const checks = [];
+    for (const rel of [od + "mvp_scope.json", od + "mvp_report.json",
+                       od + "mvp_owner_feedback.json"]) {
+      const ex = await reg.invoke("fs.exists", { path: rel }, { root: ROOT });
+      checks.push(!(ex && ex.output && ex.output.exists));
+    }
+    out.no_mvp_files_created = checks.every(Boolean);
+
+    return out;
+  } finally {
+    _uninstallStub();
+  }
+}
+
 module.exports = {
   runS373ScopeDerivation,
   runS374ReviewGate,
@@ -741,5 +905,7 @@ module.exports = {
   runS376RefineThreading,
   runS377FailRouting,
   runS378CapAndUnclear,
-  runS379ScopedSpecWiring
+  runS379ScopedSpecWiring,
+  runS380AcceptWithFailingTests,
+  runS381FlagOffInvariance
 };

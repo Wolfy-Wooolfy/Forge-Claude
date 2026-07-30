@@ -782,14 +782,20 @@ function createConversationEngine(options = {}) {
       return rc;
     }
 
-    // Facts for the interpreter prompt — best-effort read of the persisted report.
+    // Facts for the interpreter prompt — best-effort read of the persisted report
+    // (kept whole for the R-20 forensic trail: report path + failing assertion ids).
     let facts;
+    let mvpRep = null;
+    const mvpRepRel = "artifacts/projects/" + projectId +
+                      "/orchestration/" + loopId + "/mvp_report.json";
     {
       const repPath = path.join(projectsRoot, projectId, "orchestration", loopId, "mvp_report.json");
-      const rep = readJsonSafe(repPath, null);
-      facts = rep ? { slice_name: rep.slice && rep.slice.slice_name,
-                      pass: rep.tests && rep.tests.pass, total: rep.tests && rep.tests.total,
-                      kind: rep.kind } : undefined;
+      mvpRep = readJsonSafe(repPath, null);
+      facts = mvpRep ? { slice_name: mvpRep.slice && mvpRep.slice.slice_name,
+                         pass: mvpRep.tests && mvpRep.tests.pass,
+                         total: mvpRep.tests && mvpRep.tests.total,
+                         fail: mvpRep.tests && mvpRep.tests.fail,
+                         kind: mvpRep.kind } : undefined;
     }
 
     const interp = await mvpLoop.interpretFeedback({
@@ -800,11 +806,36 @@ function createConversationEngine(options = {}) {
 
     const echoIter = Number.isInteger(block.iteration) ? block.iteration : 0;
 
-    // UNCLEAR — by provider verdict OR by any typed interpreter failure (R-12: never
-    // HALT, never guess; stay in review with a focused question; record it, R-19).
-    if (!interp.ok || interp.decision === "UNCLEAR") {
-      const question = (interp.ok && interp.clarification_question)
-        ? interp.clarification_question : clarifyFallback;
+    // PHASE-54 R-20(i): a bare ACCEPT against a FAIL_REVIEW report is NOT an
+    // informed decision — downgrade to UNCLEAR with a plain-language warning that
+    // tests are failing and accepting means proceeding with them. Symmetrically,
+    // ACCEPT_WITH_FAILING_TESTS without a failing report is contextually invalid.
+    let effDecision  = interp.ok ? interp.decision : null;
+    let downgradeMsg = null;
+    const repKind    = facts && facts.kind;
+    if (interp.ok && effDecision === "ACCEPT" && repKind === "FAIL_REVIEW") {
+      effDecision  = "UNCLEAR";
+      downgradeMsg = lang === "ar"
+        ? "تنبيه: اختبارات الشريحة فاشلة حاليًا (" + ((facts && facts.fail) != null ? facts.fail : "?") +
+          " من " + ((facts && facts.total) != null ? facts.total : "?") +
+          ") — والموافقة تعني المتابعة بها كما هي. لو تريد ذلك فعلًا فاذكر صراحةً أنك تعتمد " +
+          "رغم فشل الاختبارات، أو اكتب التعديلات المطلوبة كنقاط."
+        : "Heads-up: the slice's tests are currently failing (" +
+          ((facts && facts.fail) != null ? facts.fail : "?") + " of " +
+          ((facts && facts.total) != null ? facts.total : "?") +
+          ") — approving means proceeding with them as-is. If that is really what you want, " +
+          "say explicitly that you accept despite the failing tests, or list the changes you want.";
+    }
+    if (interp.ok && effDecision === "ACCEPT_WITH_FAILING_TESTS" && repKind !== "FAIL_REVIEW") {
+      effDecision = "UNCLEAR";
+    }
+
+    // UNCLEAR — by provider verdict, R-20 downgrade, OR any typed interpreter
+    // failure (R-12: never HALT, never guess; stay in review; record it, R-19).
+    if (!interp.ok || effDecision === "UNCLEAR") {
+      const question = downgradeMsg ||
+        ((interp.ok && interp.clarification_question)
+          ? interp.clarification_question : clarifyFallback);
       const updated = { ...state };
       updated.mvp_loop = { ...block,
         feedback_history: block.feedback_history.concat([
@@ -835,7 +866,7 @@ function createConversationEngine(options = {}) {
       return rw;
     }
 
-    if (interp.decision === "ACCEPT") {
+    if (effDecision === "ACCEPT" || effDecision === "ACCEPT_WITH_FAILING_TESTS") {
       // R-7(ii): the DEFERRED advance — parameter-identical to runTests' PASS advance.
       const adv = await reg.invoke("orchestration.advance_state", {
         project_id:      projectId,
@@ -849,22 +880,40 @@ function createConversationEngine(options = {}) {
         await persistTurn(projectId, message, ra);
         return ra;
       }
+      // R-20(ii)/(iii): the override is a DISTINCT decision with a mandatory
+      // forensic trail — failing report path + failing assertion ids in the
+      // history entry, plus the block marker every downstream stage surfaces.
+      const isAwft = effDecision === "ACCEPT_WITH_FAILING_TESTS";
+      const failingIds = (isAwft && mvpRep && mvpRep.tests &&
+                          Array.isArray(mvpRep.tests.scenarios))
+        ? mvpRep.tests.scenarios
+            .filter(function (s) { return s.status !== "PASS"; })
+            .map(function (s) { return s.id; })
+        : [];
       const tr = mvpLoop.assertTransition(block.status, "ACCEPTED");
       const updated = { ...state };
-      updated.mvp_loop = { ...block,
+      updated.mvp_loop = Object.assign({ ...block,
         status: tr.ok ? "ACCEPTED" : block.status,
         feedback_history: block.feedback_history.concat([
-          mvpLoop.feedbackEntry("ACCEPT", [], echoIter)
+          isAwft
+            ? mvpLoop.feedbackEntry("ACCEPT_WITH_FAILING_TESTS", [], echoIter,
+                { report_path: mvpRepRel, failing_assertion_ids: failingIds })
+            : mvpLoop.feedbackEntry("ACCEPT", [], echoIter)
         ])
-      };
+      }, isAwft ? { accepted_with_failing_tests: true } : {});
       updated.last_updated_at = nowIso();
       await saveState(projectId, updated);
       const rA = {
-        ok: true, mode: "MVP_ACCEPTED", advanced: true,
+        ok: true, mode: isAwft ? "MVP_ACCEPTED_WITH_FAILING_TESTS" : "MVP_ACCEPTED",
+        advanced: true,
         advanced_to: "REVIEWER_CODE_AND_SECURITY",
         message: lang === "ar"
-          ? "تمت الموافقة على شريحة الـ MVP — الخط الإنتاجي يكمل الآن مراجعة الكود والأمان."
-          : "MVP slice accepted — the pipeline now proceeds to code and security review.",
+          ? (isAwft
+              ? "تم الاعتماد رغم فشل الاختبارات — القرار مسجّل بالكامل، وكل المراحل التالية ستحمل علامة أن هذا البناء تقدّم باختبارات فاشلة."
+              : "تمت الموافقة على شريحة الـ MVP — الخط الإنتاجي يكمل الآن مراجعة الكود والأمان.")
+          : (isAwft
+              ? "Accepted despite failing tests — the decision is fully recorded, and every downstream stage will carry the failing-tests marker."
+              : "MVP slice accepted — the pipeline now proceeds to code and security review."),
         project_id: projectId
       };
       await persistTurn(projectId, message, rA);
@@ -2813,13 +2862,20 @@ function createConversationEngine(options = {}) {
 
     const derived_verdict = (reviewer_approve && security_approve) ? "APPROVE" : "REQUEST_CHANGES";
 
+    // PHASE-54 R-20(iii): if this build advanced past RUN_TESTS via the owner's
+    // explicit ACCEPT_WITH_FAILING_TESTS, every downstream stage must see the
+    // marker — never a clean picture. Carried in the persisted report AND on
+    // every return payload of this bridge.
+    const mvpAwft = mvpLoop.isMvpEnabled(state) &&
+      state.mvp_loop.accepted_with_failing_tests === true;
+
     // ── Persist merged review_report.json BEFORE any transition (fail-closed) ──
-    const review_report = {
+    const review_report = Object.assign({
       reviewer:     reviewerOut,
       security:     securityOut,
       derived_verdict,
       computed_at:  new Date().toISOString()
-    };
+    }, mvpAwft ? { mvp_accepted_with_failing_tests: true } : {});
 
     let reportWrite = null;
     try {
@@ -2850,7 +2906,8 @@ function createConversationEngine(options = {}) {
         advanced:     true,
         advanced_to:  "DOCUMENTATION",
         derived_verdict,
-        review_report
+        review_report,
+        ...(mvpAwft ? { mvp_accepted_with_failing_tests: true } : {})
       };
     }
 
@@ -2861,7 +2918,8 @@ function createConversationEngine(options = {}) {
 
     if (!lbResult || lbResult.status !== "SUCCESS") {
       return { ok: true, loop_id: loopId, advanced: false,
-               review_error: "LOOP_BACK_FAILED", derived_verdict, review_report };
+               review_error: "LOOP_BACK_FAILED", derived_verdict, review_report,
+               ...(mvpAwft ? { mvp_accepted_with_failing_tests: true } : {}) };
     }
 
     const lbOut = lbResult.output;
@@ -2875,7 +2933,8 @@ function createConversationEngine(options = {}) {
         escalated:       true,
         escalation_path: lbOut.escalation_path,
         derived_verdict,
-        review_report
+        review_report,
+        ...(mvpAwft ? { mvp_accepted_with_failing_tests: true } : {})
       };
     }
 
@@ -2886,7 +2945,8 @@ function createConversationEngine(options = {}) {
       advanced_to:  "BUILDER",
       loop_back:    true,
       derived_verdict,
-      review_report
+      review_report,
+      ...(mvpAwft ? { mvp_accepted_with_failing_tests: true } : {})
     };
   }
 
@@ -3343,14 +3403,18 @@ function createConversationEngine(options = {}) {
           return { ok: true, loop_id: loopId, advanced: false, quality_error: "QUALITY_WRITE_FAILED" };
         }
 
-        return {
+        // PHASE-54 R-20(iii): the Gate-2 payload must carry the failing-tests
+        // marker when this build advanced via ACCEPT_WITH_FAILING_TESTS.
+        return Object.assign({
           ok:           true,
           loop_id:      loopId,
           quality_report,
           gate_pending: 2,
           advanced:     false,
           model_used:   qjModel
-        };
+        }, (mvpLoop.isMvpEnabled(state) &&
+            state.mvp_loop.accepted_with_failing_tests === true)
+          ? { mvp_accepted_with_failing_tests: true } : {});
       }
 
       // Role non-SUCCESS → fail-closed (no write, no gate_pending). A schema-invalid role

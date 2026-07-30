@@ -1,0 +1,25 @@
+{
+  "id": "S381",
+  "name": "mvp flag-off E2E invariance — designTests+buildProject+runTests with NO mvp_loop block: full AC set in every prompt, no MVP markers/annotations, no mvp files, no mvp payload fields (PHASE-54 D5, R-1)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/mvp_loop_test_helper",
+  "method": "runS381FlagOffInvariance",
+  "args": [],
+  "cleanup_project": "test_s381_mvp",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "dt_advanced_builder",       "expected": true },
+    { "type": "state_field_equals", "field": "td_prompt_full_ac_set",     "expected": true },
+    { "type": "state_field_equals", "field": "td_prompt_no_slice",        "expected": true },
+    { "type": "state_field_equals", "field": "build_advanced_run_tests",  "expected": true },
+    { "type": "state_field_equals", "field": "bld_prompt_full_ac_set",    "expected": true },
+    { "type": "state_field_equals", "field": "mat_prompt_full_ac_set",    "expected": true },
+    { "type": "state_field_equals", "field": "mat_prompt_no_slice",       "expected": true },
+    { "type": "state_field_equals", "field": "mat_prompt_no_owner_marker","expected": true },
+    { "type": "state_field_equals", "field": "rt_advanced_reviewer",      "expected": true },
+    { "type": "state_field_equals", "field": "no_mvp_payload_fields",     "expected": true },
+    { "type": "state_field_equals", "field": "state_has_no_mvp_block",    "expected": true },
+    { "type": "state_field_equals", "field": "no_mvp_files_created",      "expected": true }
+  ]
+}

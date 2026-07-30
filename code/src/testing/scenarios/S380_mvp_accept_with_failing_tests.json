@@ -1,0 +1,29 @@
+{
+  "id": "S380",
+  "name": "mvp R-20 — bare ACCEPT on FAIL_REVIEW downgrades to UNCLEAR (no advance); explicit ACCEPT_WITH_FAILING_TESTS advances with mandatory forensic trail + downstream markers (PHASE-54 D5)",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/mvp_loop_test_helper",
+  "method": "runS380AcceptWithFailingTests",
+  "args": [],
+  "cleanup_project": "test_s380_mvp",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "a_no_advance",              "expected": true },
+    { "type": "state_field_equals", "field": "a_graph_still_run_tests",   "expected": true },
+    { "type": "state_field_equals", "field": "a_block_still_awaiting",    "expected": true },
+    { "type": "state_field_equals", "field": "a_message_mentions_failing","expected": true },
+    { "type": "state_field_equals", "field": "a_history_unclear",         "expected": true },
+    { "type": "state_field_equals", "field": "b_advanced_reviewer",       "expected": true },
+    { "type": "state_field_equals", "field": "b_block_accepted",          "expected": true },
+    { "type": "state_field_equals", "field": "b_marker_flag_true",        "expected": true },
+    { "type": "state_field_equals", "field": "b_history_awft",            "expected": true },
+    { "type": "state_field_equals", "field": "b_history_has_report_path", "expected": true },
+    { "type": "state_field_equals", "field": "b_history_has_failing_ids", "expected": true },
+    { "type": "state_field_equals", "field": "c_review_payload_marker",   "expected": true },
+    { "type": "state_field_equals", "field": "c_review_report_marker",    "expected": true },
+    { "type": "state_field_equals", "field": "c_review_advanced_documentation", "expected": true },
+    { "type": "state_field_equals", "field": "c_judge_payload_marker",    "expected": true },
+    { "type": "state_field_equals", "field": "c_judge_gate2_pending",     "expected": true }
+  ]
+}

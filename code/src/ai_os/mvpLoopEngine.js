@@ -105,11 +105,13 @@ function validateMvpLoopBlock(block) {
     errors.push("feedback_history must be an array");
   } else {
     block.feedback_history.forEach(function (e, i) {
-      // R-19: UNCLEAR turns are recorded too (decision "UNCLEAR", changes []).
+      // R-19: UNCLEAR turns are recorded too; R-20(ii): ACCEPT_WITH_FAILING_TESTS
+      // is its own decision value.
       const okEntry = _isPlainObject(e) &&
         typeof e.at === "string" &&
         Number.isInteger(e.iteration) &&
-        (e.decision === "REFINE" || e.decision === "ACCEPT" || e.decision === "UNCLEAR") &&
+        (e.decision === "REFINE" || e.decision === "ACCEPT" ||
+         e.decision === "ACCEPT_WITH_FAILING_TESTS" || e.decision === "UNCLEAR") &&
         _isStringArray(e.changes);
       if (!okEntry) errors.push("feedback_history[" + i + "] is malformed");
     });
@@ -121,6 +123,11 @@ function validateMvpLoopBlock(block) {
   }
   if (block.model !== undefined && typeof block.model !== "string") {
     errors.push("model must be a string when present");
+  }
+  // R-20(iii): optional marker set ONLY on an ACCEPT_WITH_FAILING_TESTS exit.
+  if (block.accepted_with_failing_tests !== undefined &&
+      typeof block.accepted_with_failing_tests !== "boolean") {
+    errors.push("accepted_with_failing_tests must be a boolean when present");
   }
   return { valid: errors.length === 0, errors };
 }
@@ -484,7 +491,11 @@ async function readOwnerFeedback(project_id, loop_id, ctx) {
 //        matching of any kind; every failure mode degrades to UNCLEAR at the
 //        wiring layer: clarifying question, stay in review, no HALT) ──────────
 
-const MVP_FEEDBACK_DECISIONS = Object.freeze(["ACCEPT", "REFINE", "UNCLEAR"]);
+// R-20(ii): ACCEPT_WITH_FAILING_TESTS is a DISTINCT enum value (never a flag on
+// ACCEPT) — the provider may return it ONLY for an unambiguous owner turn that
+// explicitly chooses to proceed despite failing tests.
+const MVP_FEEDBACK_DECISIONS = Object.freeze(
+  ["ACCEPT", "ACCEPT_WITH_FAILING_TESTS", "REFINE", "UNCLEAR"]);
 
 function _buildFeedbackPrompt(message, facts, scenario_id) {
   const scenarioTag = scenario_id ? "\nSCENARIO_TAG: " + scenario_id + "\n" : "";
@@ -499,8 +510,11 @@ function _buildFeedbackPrompt(message, facts, scenario_id) {
     "Classify the reply. Return STRICT JSON only — no markdown, no code blocks, no prose." +
     scenarioTag +
     "\nReturn exactly this JSON structure:" +
-    "\n{ \"decision\": \"ACCEPT\" | \"REFINE\" | \"UNCLEAR\", \"changes\": [\"<concrete change request>\", ...], \"clarification_question\": \"<question>\" }" +
+    "\n{ \"decision\": \"ACCEPT\" | \"ACCEPT_WITH_FAILING_TESTS\" | \"REFINE\" | \"UNCLEAR\", \"changes\": [\"<concrete change request>\", ...], \"clarification_question\": \"<question>\" }" +
     "\nRules: decision=ACCEPT when the owner clearly approves proceeding as-is (changes MUST be an empty array). " +
+    "decision=ACCEPT_WITH_FAILING_TESTS ONLY when the last report kind is FAIL_REVIEW AND the owner EXPLICITLY and " +
+    "unambiguously chooses to proceed despite the failing tests (changes MUST be empty); a plain approval while tests " +
+    "are failing is NOT enough — that is UNCLEAR. " +
     "decision=REFINE when the owner asks for one or more concrete modifications — put EACH requested change as its own " +
     "plain, self-contained instruction string in changes[], preserving the owner's intent faithfully; NEVER invent " +
     "changes the owner did not ask for. decision=UNCLEAR when the reply is ambiguous — changes MUST be empty and " +
@@ -576,14 +590,16 @@ async function interpretFeedback(input, ctx) {
   return { ok: true, decision, changes, clarification_question: cq };
 }
 
-// R-19: forensic history entry — ACCEPT / REFINE / UNCLEAR all recorded.
-function feedbackEntry(decision, changes, iteration) {
-  return {
+// R-19: forensic history entry — ACCEPT / ACCEPT_WITH_FAILING_TESTS / REFINE /
+// UNCLEAR all recorded. `extras` (R-20 iii) carries the failing report path +
+// failing assertion ids on an ACCEPT_WITH_FAILING_TESTS turn — additive fields.
+function feedbackEntry(decision, changes, iteration, extras) {
+  return Object.assign({
     at:        new Date().toISOString(),
     iteration: Number.isInteger(iteration) ? iteration : 0,
     decision,
     changes:   Array.isArray(changes) ? changes : []
-  };
+  }, _isPlainObject(extras) ? extras : {});
 }
 
 // ── Exports ───────────────────────────────────────────────────────────────────
