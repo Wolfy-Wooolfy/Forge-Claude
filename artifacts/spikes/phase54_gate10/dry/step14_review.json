@@ -52,6 +52,6 @@
       "summary": "Specification has medium threat exposure. No blockers found. Rate limiting on the auth endpoint is absent and JWT secret management is unspecified. Address the WARN before build proceeds."
     },
     "derived_verdict": "APPROVE",
-    "computed_at": "2026-08-02T08:31:53.395Z"
+    "computed_at": "2026-08-02T08:42:12.188Z"
   }
 }

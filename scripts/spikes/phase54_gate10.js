@@ -71,32 +71,73 @@ function _ledgerLines() {
   try { return fs.readFileSync(LEDGER, "utf8").trim().split("\n").filter(Boolean); }
   catch (_) { return []; }
 }
-function _ledgerTotal(lines) {
-  let t = 0;
+// R-37: the guard bounds the quantity the owner actually approved — REAL CASH
+// (cost_usd_actual) — not the ledger's estimate. Both columns are always carried.
+function _ledgerTotals(lines) {
+  let est = 0, act = 0;
   for (const l of lines) {
-    try { const r = JSON.parse(l); t += (r.cost_usd_estimated || 0); } catch (_) {}
+    try {
+      const r = JSON.parse(l);
+      est += (r.cost_usd_estimated || 0);
+      act += (r.cost_usd_actual || 0);
+    } catch (_) {}
   }
-  return t;
+  return { estimated: est, actual: act };
 }
 function _readBaseline(leg) {
   return JSON.parse(fs.readFileSync(path.join(EV_ROOT, leg, "ledger_baseline.json"), "utf8"));
 }
 function _snapshotBaseline(leg) {
   const lines = _ledgerLines();
-  _writeEv(leg, "ledger_baseline.json", { count: lines.length, total: _ledgerTotal(lines), at: new Date().toISOString() });
+  const t = _ledgerTotals(lines);
+  _writeEv(leg, "ledger_baseline.json", {
+    count: lines.length, estimated: t.estimated, actual: t.actual,
+    total: t.estimated, // legacy alias (older evidence files carry `total` = estimated)
+    at: new Date().toISOString()
+  });
 }
 function _ledgerDelta(leg) {
   const base  = _readBaseline(leg);
   const lines = _ledgerLines();
-  return { rows: lines.length - base.count, usd: _ledgerTotal(lines) - base.total };
+  const t     = _ledgerTotals(lines);
+  const baseEst = (base.estimated != null) ? base.estimated : (base.total || 0);
+  // BACK-COMPAT (R-37): baselines written before the cap switched to real cash carry no
+  // `actual` column. Defaulting it to 0 would measure the delta against ALL ledger history
+  // and abort instantly. The ledger is append-only, so the true baseline is recoverable
+  // exactly: sum cost_usd_actual over the first `base.count` rows.
+  const baseAct = (base.actual != null)
+    ? base.actual
+    : _ledgerTotals(lines.slice(0, base.count)).actual;
+  return {
+    rows:      lines.length - base.count,
+    estimated: t.estimated - baseEst,
+    actual:    t.actual - baseAct
+  };
 }
+// R-37(iii): the estimate/actual divergence is a SIGNAL, not a stop condition.
+const EST_WARN_USD = 2.00;
 function _capGuard(leg, stage) {
   const d = _ledgerDelta(leg);
-  if (d.usd > CAP_USD) {
-    _writeEv(leg, "CAP_ABORT.json", { stage, delta: d, cap: CAP_USD });
-    console.error("CAP ABORT at " + stage + ": ledger delta $" + d.usd.toFixed(4) + " > $" + CAP_USD);
+  if (d.actual > CAP_USD) {
+    _writeEv(leg, "CAP_ABORT.json", { stage, delta: d, cap_usd_actual: CAP_USD });
+    console.error("CAP ABORT at " + stage + ": REAL CASH $" + d.actual.toFixed(5) +
+      " > $" + CAP_USD.toFixed(2) + " (estimated was $" + d.estimated.toFixed(5) + ")");
     process.exit(2);
   }
+  if (d.estimated > EST_WARN_USD) {
+    const ratio = d.actual > 0 ? (d.estimated / d.actual) : null;
+    _writeEv(leg, "EST_DIVERGENCE_WARNING.json", {
+      stage, delta: d, est_warn_threshold: EST_WARN_USD, cap_usd_actual: CAP_USD,
+      ratio_estimated_over_actual: ratio,
+      note: "R-37(iii): estimated delta exceeded the warn threshold while real cash is under " +
+            "the cap — captured as a signal, NOT a stop condition; the run continues."
+    });
+    console.warn("!! EST DIVERGENCE at " + stage + ": estimated $" + d.estimated.toFixed(5) +
+      " > $" + EST_WARN_USD.toFixed(2) + " while real cash $" + d.actual.toFixed(5) +
+      " is under the $" + CAP_USD.toFixed(2) + " cap — continuing (warning only).");
+  }
+  console.log("  [cost] " + stage + ": rows +" + d.rows +
+    "  estimated $" + d.estimated.toFixed(5) + "  REAL CASH $" + d.actual.toFixed(5));
   return d;
 }
 async function _w(rel, obj, raw) {
@@ -677,7 +718,11 @@ async function verify() {
   const endpoint = JSON.parse(fs.readFileSync(path.join(EV_ROOT, leg, "real_endpoint.json"), "utf8"));
   c.zero_halt_endpoint_reached = endpoint.judge && endpoint.judge.gate_pending === 2;
   // (10) cap respected
-  c.cap_respected = endpoint.ledger_delta.usd <= CAP_USD;
+  // R-37: the cap is on REAL CASH. Older evidence files carry `usd` (= estimated);
+  // prefer `actual` when present so the criterion measures what the owner approved.
+  const capMeasured = (endpoint.ledger_delta.actual != null)
+    ? endpoint.ledger_delta.actual : endpoint.ledger_delta.usd;
+  c.cap_respected = capMeasured <= CAP_USD;
   // (11) flag-off project untouched — byte-compare a pre-existing project state
   const refBefore = JSON.parse(fs.readFileSync(path.join(EV_ROOT, "preflight", "flagoff_ref.json"), "utf8"));
   const refNow = fs.readFileSync(path.join(ROOT, refBefore.path), "utf8");

@@ -2,7 +2,8 @@
   "verdict": "DRY_PASS",
   "ledger_delta": {
     "rows": 12,
-    "usd": 0
+    "estimated": 0,
+    "actual": 0
   },
   "sequence": [
     "seed",

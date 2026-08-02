@@ -398,6 +398,39 @@ rather than late** — conservative, the correct direction. Consequence for §4:
 ledger** estimate corresponds to roughly **$0.15–0.20 real cash**. Both figures are to be
 reported separately, always.
 
+## 5.g R-37 — the cap now bounds REAL CASH at the same $1.00
+
+**Why the change is safe (R-37 iv).** On real-a the ledger's estimated column ran **~4.0x**
+the real cash it was standing in for: **est $0.58150 vs actual $0.14511**. The old guard was
+therefore strictly more conservative *in the wrong currency* — it would have aborted the gate
+mid-real-c (projected est ≈$1.16) while real spend sat near **$0.30 of the owner's approved
+$1.00**, wasting everything already paid for to satisfy a proxy. Same principle as R-36:
+a proxy yields to a direct measurement of the quantity that actually matters.
+
+**Implemented:** (i) `_capGuard` sums `cost_usd_actual`, ceiling unchanged at $1.00; no other
+spend control touched. (ii) Both columns are carried in every delta and printed at every stage
+boundary (`[cost] <stage>: rows +N estimated $X REAL CASH $Y`). (iii) Secondary tripwire —
+estimated delta > **$2.00** while actual is under the cap emits
+`EST_DIVERGENCE_WARNING.json` (with the est/act ratio) and **continues**; divergence is a
+signal, never a stop condition.
+
+**Latent breakage caught before spending.** The `real` leg's baseline was written under the old
+shape and carries no `actual` column. Defaulting it to 0 would have measured the actual delta
+against **all** ledger history (~$4.01) and fired `CAP_ABORT` on the very first guard call in
+real-b. Fixed by exact recovery rather than a hand-edit: the ledger is append-only, so the
+baseline's actual is recomputed by summing `cost_usd_actual` over the first `base.count` rows.
+Verified to reproduce the known figures exactly — recovered baseline **$4.00768**, real-a delta
+**rows 9 / est $0.58150 / actual $0.14511**, cap check "UNDER $1.00 — would NOT abort".
+
+**(v) Inertness proven:** DRY re-run after the edit → **DRY_PASS**, same 11-step sequence,
+ledger delta unchanged at **12 rows / $0 estimated / $0 actual**, no `CAP_ABORT.json`, no
+`EST_DIVERGENCE_WARNING.json`.
+
+**BACKLOG (not fixed now):** the ledger's `cost_usd_estimated` accuracy. Divergence measured
+here is **~4.0x** on real-a, wider than the ~2.5x recorded in R-36 from historical rows, and the
+estimator books **$0** for small gpt-4o-mini calls (the R-27 probe: est $0.00000 / act $0.00019).
+Needs its own decision artifact in a future phase.
+
 ## 6. Hygiene + rulings status
 
 - `.gitignore` + `artifacts/projects/phase54_gate10_*/` (PHASE-48 W-4 precedent — driver
