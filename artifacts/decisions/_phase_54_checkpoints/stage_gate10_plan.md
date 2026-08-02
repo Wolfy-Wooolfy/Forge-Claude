@@ -431,6 +431,89 @@ here is **~4.0x** on real-a, wider than the ~2.5x recorded in R-36 from historic
 estimator books **$0** for small gpt-4o-mini calls (the R-27 probe: est $0.00000 / act $0.00019).
 Needs its own decision artifact in a future phase.
 
+## 5.h R-38 — REAL-PATH DEFECT: the owner's turn never reached the MVP gate (diagnosis, $0)
+
+**Root cause: `apiServer.buildProjectState` rebuilds `project_state.json` from a fixed field
+whitelist and SILENTLY DROPS unknown keys — including `mvp_loop` and `loop_id` — and
+`listProjects()` runs that rebuild over EVERY project.** Listing the projects in the UI
+therefore destroys the MVP review gate's state.
+
+**1. Where the turn went.** Not to `_handleMvpReview`: it fell through to
+`ideationEngine.expandIdea` (conversationEngine.js:1130). Decisive field values from the live
+state after the turn: `conversation_mode: "PIPELINE"`, `active_runtime_state: "IDEATION"`,
+**`mvp_loop: null`**, and **`loop_id` absent entirely**. The state's key list is the full legacy
+ideation schema (`project_type, requirement_domain, domain_locked, question_count,
+domain_lock_intent, …`) — a *different schema* from the 8-key state real-a wrote, i.e. the file
+was **rebuilt**, not edited. The empty-string domain the owner saw is that rebuild's fresh
+`requirement_domain: ""`.
+
+**2. Why the MVP branch was not selected — ordering and logic are both FINE.** The branch sits
+at conversationEngine.js:1117-1120, *before* the CONVERSATION gate (1124) and *before* the
+ideation route (1130); the `pending_confirmation` block closes at 1112. Evaluated against the
+exact state real-a left (recovered from `real/snap_first_review.json`):
+`isMvpEnabled(state) = true`, `status === "AWAITING_OWNER_REVIEW" = true` ⇒ **the branch would
+have fired.** It did not, because the state on disk *at decision time* was no longer that state.
+
+**Sequence (all timestamps UTC):**
+
+| When | Event |
+|---|---|
+| 08:35:03 | real-a finishes; `project_state.json` holds `mvp_loop` (AWAITING_OWNER_REVIEW) + `loop_id` |
+| **09:16:06** | owner restarts the server (listener PID 34568) and opens the UI → `GET` projects → `listProjects()` (apiServer.js:865) → `persistProjectState()` for **every** project → `buildProjectState()` rebuild → **`mvp_loop` + `loop_id` dropped**, legacy schema written |
+| 09:17:58 | owner's REFINE turn → `loadState` returns the stripped state → `isMvpEnabled` **false** → ideation branch → domain-pivot question + ideation chips (exactly what he saw). `conversation_context.json`, `ideation_log.json`, `project_state.json` all written in that same instant |
+
+Confirmed mechanically: `buildProjectState` (apiServer.js:645-802) contains **zero** `...existing`
+spreads — it reads only named fields off `existing` and returns a freshly-built object.
+This also explains the 2026-07-30 observation of 36 project states touched with a +1/−1
+`last_updated_at` diff: those projects already carried the legacy schema, so only the timestamp
+changed. `phase54_gate10_demo` was the only project holding foreign keys, so it was the only one
+that lost data.
+
+**3. Why all 9 SUs passed — a TEST-FIDELITY GAP, not luck.** The scenarios call
+`engine.processMessage(...)` **directly**, against a `project_state.json` hand-seeded by
+`mvp_loop_test_helper._writeState2`. The live entry point is HTTP → apiServer → *(project
+listing rebuilds the state)* → engine. **The state-stripping layer sits entirely outside the SU
+harness**: no PHASE-54 scenario — indeed no scenario in the suite — exercises apiServer's
+project-state persistence path, so none could observe a live-surface layer that mutates the very
+field the engine branches on. Finding against the SU design: the MVP scenarios validate the
+engine's *decision logic*, never the *state's survival* between the pause and the owner's turn.
+
+**4. Resumability — artifacts intact, gate state destroyed, cost negligible.**
+
+| Item | Status |
+|---|---|
+| Graph | **RUN_TESTS, iteration_count 0** — untouched (the graph lives in `orchestration/<loop>/graph.json`, outside the rebuilt file) |
+| `mvp_report.json`, `mvp_scope.json`, `build_manifest.json`, `spec.json`, `test_plan.json`, `architect_design.json`, `forge_tests/last_report.json` | **all INTACT** |
+| Built code (`src/`) | INTACT (5 entries) |
+| `mvp_loop` block | **DESTROYED** — must be restored before real-b can run |
+| `loop_id` in project_state | **DESTROYED** (the driver passes it explicitly, so this is recoverable) |
+| Stray turn wrote | `project_state.json` (rebuilt), `ai_os/conversation_context.json` (2 turns), `ai_os/ideation_log.json` (1 IDEA_EXPANSION) |
+| Cost | **$0.00 on the agent ledger** — 0 rows since 09:00Z. But the ideation call was REAL (a genuine Arabic expansion was produced): `ideationEngine` uses the **legacy provider path**, which never books to `artifacts/agent/cost_ledger.jsonl` and wrote no providerTrace. **Unmetered real spend, order ~$0.01–0.02** (estimate — no ledger row exists to confirm). |
+
+**⚠ Consequential side-finding:** legacy Stage-A providers make real OpenAI calls that are
+**invisible to the agent cost ledger**, so the R-37 cap guard cannot see them. The cap bounds
+only ledger-visible spend.
+
+### Proposed fix — NOT IMPLEMENTED (needs a CTO ruling on scope; apiServer has been byte-identical since a69de85 and is explicitly out of Slice-1 scope)
+
+- **Option A — fix the normalizer (recommended, general):** `buildProjectState` returns
+  `{ ...existing, ...builtFields }` so unknown keys survive. This is the honest fix: a state
+  normalizer that silently discards data is wrong independently of PHASE-54. Blast radius:
+  apiServer live surface; could resurrect stale keys on other projects — needs a check of what
+  else `existing` may carry.
+- **Option B — narrow allowlist:** carry `mvp_loop` and `loop_id` through explicitly. Smallest
+  blast radius, but whack-a-mole: the general defect (any future block is dropped) survives.
+- **Option C — relocate the block:** persist `mvp_loop` at
+  `orchestration/<loopId>/mvp_loop.json`, alongside `mvp_scope.json`/`mvp_report.json` and the
+  graph, out of reach of the legacy normalizer. Architecturally cleanest and decouples PHASE-54
+  from a schema owned by another layer, but touches D1/D3/D4 wiring and their SUs after D5 was
+  declared closed.
+- **The SU that would have caught it (required with any option):** a scenario that drives
+  `listProjects()`/`persistProjectState()` **between** the runTests pause and the owner's turn,
+  then asserts (a) `mvp_loop` survived byte-identical and (b) `processMessage` routes to the MVP
+  branch. That is the missing fidelity: state survival across the real entry point, not just
+  engine decision logic.
+
 ## 6. Hygiene + rulings status
 
 - `.gitignore` + `artifacts/projects/phase54_gate10_*/` (PHASE-48 W-4 precedent — driver
