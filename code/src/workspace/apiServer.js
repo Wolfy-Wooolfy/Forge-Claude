@@ -696,6 +696,15 @@ function createWorkspaceApiServer(options = {}) {
     const deliveryState = overrides.delivery_state || "NOT_READY";
 
     const state = {
+      // PHASE-54 R-39: preserve keys this builder does not know about. Without the
+      // spread, every listProjects() rebuild silently DESTROYED any field owned by
+      // another layer — conversationEngine's mvp_loop / loop_id / pending_confirmation,
+      // ideationEngine's question_count / domain_lock_intent (which its own comment at
+      // ideationEngine.js:168 declares must "persist in project state across turns").
+      // Computed fields below still win; unknown keys merely survive. Pre-existing
+      // defect (apiServer was byte-identical to a69de85 until this line); PHASE-54 is
+      // the first workload to expose it. Locked by S382.
+      ...existing,
       project_id: projectId,
       project_name: typeof overrides.project_name === "string" && overrides.project_name.trim() !== ""
         ? overrides.project_name.trim()

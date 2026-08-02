@@ -201,8 +201,22 @@ keys the flag-off tree is exactly PHASE-53; flag-on derivation fails typed
 | S379 | derivation wiring + scoped-spec threading (td/builder/materializer prompts) + R-18 explicit provider |
 | S380 | R-20 both legs: bare-ACCEPT downgrade; ACCEPT_WITH_FAILING_TESTS forensic trail + downstream markers |
 | S381 | R-1 flag-off E2E invariance (prompts, payloads, files, state) |
+| S382 | **R-39 state survival across the REAL entry point** — `GET /api/projects` between the pause and the owner turn must not strip `mvp_loop`/`loop_id`, and the turn must still reach the MVP branch |
 
 Plus the S335 extension (R-8 ii byte-identity across all arities + block ordering).
+**Final count: N = 10 (S373–S382); closure gate 365 + 10 = 375.**
+
+### 9.b State-survival requirement (R-39)
+
+`mvp_loop` lives on `project_state.json`, a file **another layer also rewrites**:
+`apiServer.buildProjectState` rebuilds it on every `listProjects()` — i.e. every time the UI
+lists projects. Before R-39 that rebuild dropped every key it did not itself produce, silently
+destroying the review gate mid-run (R-38: the owner's REFINE turn fell through to ideation).
+The builder now spreads `...existing` first, so foreign keys survive while computed fields still
+win. **Any future field added to `project_state.json` by this or another engine inherits that
+protection, and S382 is the regression lock.** Contract consequence: a scenario that exercises
+only the engine function is NOT sufficient evidence for a state-carrying feature — at least one
+scenario must cross the real entry point.
 
 ---
 

@@ -580,5 +580,11 @@
     "tokens_in": 600,
     "tokens_out": 300,
     "finish_reason": "stop"
+  },
+  "mock|mock-fb-s382|scenario:S382U": {
+    "text": "{\"decision\":\"UNCLEAR\",\"changes\":[],\"clarification_question\":\"هل تقصد تعديل شكل الرد أم محتواه؟\"}",
+    "tokens_in": 180,
+    "tokens_out": 24,
+    "finish_reason": "stop"
   }
 }

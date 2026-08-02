@@ -1,0 +1,19 @@
+{
+  "id": "S382",
+  "name": "mvp_loop state SURVIVES the real entry point — GET /api/projects between the runTests pause and the owner turn must not strip the gate (PHASE-54 R-39, closes the R-38 fidelity gap)",
+  "description": "The only PHASE-54 scenario that crosses the live HTTP surface. Boots the workspace API server in-process on a temp root, seeds a project held at AWAITING_OWNER_REVIEW, drives GET /api/projects (listProjects -> persistProjectState -> buildProjectState) exactly as the UI does, then asserts the mvp_loop block and loop_id survived byte-identically and that the owner's next turn through POST /api/ai-os/chat still reaches the MVP review branch instead of falling through to ideation.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/mvp_loop_test_helper",
+  "method": "runS382StateSurvival",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "list_endpoint_ok",       "expected": true },
+    { "type": "state_field_equals", "field": "mvp_block_survived",     "expected": true },
+    { "type": "state_field_equals", "field": "mvp_block_byte_identical","expected": true },
+    { "type": "state_field_equals", "field": "loop_id_survived",       "expected": true },
+    { "type": "state_field_equals", "field": "reached_mvp_branch",     "expected": true },
+    { "type": "state_field_equals", "field": "ideation_not_triggered", "expected": true }
+  ]
+}

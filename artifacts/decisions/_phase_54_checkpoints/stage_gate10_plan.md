@@ -514,6 +514,71 @@ only ledger-visible spend.
   branch. That is the missing fidelity: state survival across the real entry point, not just
   engine decision logic.
 
+## 5.i R-39 — normalizer fixed at the source (measured first, test-first, $0)
+
+**(iii) Key-set delta MEASURED before applying anything — no behavioural resurrection.**
+
+| Measurement | Result |
+|---|---|
+| Projects with a `project_state.json` | **54** |
+| Projects whose key set is already exactly what `buildProjectState` produces | **53 — zero change from the fix** |
+| Projects carrying keys the builder drops today | **1 — `phase54_gate10_demo` only** |
+| Keys that would resurrect there | `domain_lock_intent`, `question_count` |
+
+Both flagged keys were assessed rather than assumed, and **both are intended-to-persist by the
+code that writes them**: `ideationEngine.js:168` states verbatim *"question_count persists in
+project state across turns; cap = 4"*, and `domain_lock_intent` is written as `"SOFT_LOCKED"` at
+:150 and read back at :68. Today the normalizer silently resets both on every project listing —
+so the fix **restores intended behaviour** rather than changing it. The single affected project
+is also the gate demo, which the R-41 reset deletes before the re-run. **No STOP condition.**
+
+Forward-looking (keys the writing engines can produce that the builder omits):
+`loop_id, mvp_loop, pending_confirmation, pipeline_started, user_language` (conversationEngine) +
+`question_count, domain_lock_intent` (ideationEngine). Every one is a field whose loss is the
+defect. `pending_confirmation` deserves a note: its silent loss means a pending owner
+confirmation vanishes if the project list is opened — the same defect class, in the Stage-A
+confirmation flow. Resurrecting a stale one is safe: `confirmTransition` checks `expires_at`
+(30 min) and deletes it fail-safe. Zero projects carry one today.
+
+**(iv) Test-first, RED → GREEN.** `S382` written first; against unfixed code it failed on exactly
+the production symptoms — `mvp_block_survived: false`, `loop_id_survived: false`,
+`reached_mvp_branch: false` — i.e. the scenario reproduces the owner's failure faithfully. After
+the one-line fix: **ALL PASS**.
+
+**(ii) apiServer moves off byte-identical — visibly.** `git diff a69de85 -- apiServer.js` is
+**+9 lines, 0 deletions**: eight comment lines and the single `...existing,` spread. This is the
+first and only apiServer change in PHASE-54. Justification recorded at the change site and here:
+the defect is **pre-existing** (apiServer was byte-identical to `a69de85` until this line, CTO-
+verified with `cmp`, 93061 bytes) and PHASE-54 is merely the first workload to expose it.
+
+**(v) Final SU count: N = 10** (S373–S382). Closure gate = **365 + 10 = 375**.
+
+**Gates after the fix:** suite **375 passed / 0 failed / 5 skipped (380)**, exit 0 ·
+Track A diff-based over all added live-surface lines (conversationEngine, mvpLoopEngine,
+materializerEngine, apiServer): **0 matches** · doctor **ok, 35 checks, 31 PASS / 4 WARN /
+0 FAIL** · §ARC **10** · L2 **81** · roles **13**.
+
+## 5.j R-40 — what the $1.00 cap does NOT cover (must reach the owner)
+
+The cap bounds **agent-ledger calls only**. Legacy Stage-A providers (ideation, conversational
+response, intent classification, business analysis, documentation review) call OpenAI directly
+and book **no ledger row and no providerTrace** — proven today: a real Arabic expansion was
+produced while the ledger gained zero rows. Any spend on that surface is invisible to the guard.
+Named backlog item `UNMETERED-LEGACY-PROVIDER-SPEND` in the decision artifact; **not fixed in
+PHASE-54**.
+
+## 5.k R-41 — the gate restarts clean; budget projection
+
+No hand-restore of the destroyed block: a repaired-by-hand state is not a witness to the real
+path. After CTO verification → id-guarded reset → **real-a from scratch**.
+
+**Projected total real cash for a full clean run:** real-a measured **$0.14511**; real-b ≈
+$0.05 (builder + materializer + the owner's two feedback interpretations); real-c ≈ $0.10
+(reviewer + security + documentation + citation pass + quality_judge) ⇒ **≈ $0.30**, against
+**$0.14530 already spent**, for a cumulative **≈ $0.45** — under the $0.75 threshold, so the
+existing approval stands and no fresh approval is required. Both columns will be reported at
+every stage boundary as always.
+
 ## 6. Hygiene + rulings status
 
 - `.gitignore` + `artifacts/projects/phase54_gate10_*/` (PHASE-48 W-4 precedent — driver

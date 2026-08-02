@@ -227,6 +227,68 @@ R-24 (resolves F-G2) — APPROVED, read-only, with five binding conditions:
         decorator, so the forensic trail is honest about its own instrumentation. Also note
         the PHASE-48 production trace gap as the reason the decorator is needed at all.
 
+### R-39..R-41 (CTO ruling on the R-38 real-path defect, 2026-08-02)
+
+R-39 — FIX THE NORMALIZER (option (a)), NOT THE SYMPTOM. Options (b) and (c) are rejected:
+(b) leaves a state normalizer that silently destroys data for the NEXT feature to trip over;
+(c) relocates PHASE-54's block out of harm's way while leaving every other consumer exposed,
+and reopens D1/D3/D4 after closure. A state normalizer that drops unknown keys is a defect
+independent of this phase and it is fixed at the source.
+  (i)   buildProjectState returns { ...existing, ...builtFields } — computed fields still win,
+        unknown keys survive.
+  (ii)  Scope: apiServer.js gains this one change and nothing else. It moves off byte-identical
+        for the first time in this phase; record that explicitly in the closure evidence with
+        the justification, so the change is visible rather than buried.
+  (iii) Your own stated risk must be measured, not assumed: for every existing project, compute
+        the key-set delta the fix would produce (which previously-dropped keys would now
+        survive) BEFORE applying it. If any resurrected key could change behaviour — a stale
+        vision_locked, a stale loop_id, a stale pending_confirmation — report it and STOP for a
+        ruling instead of proceeding. Report the affected project count either way.
+  (iv)  Test-first, per the phase's own discipline: write the SU you named — drive
+        listProjects()/persistProjectState() between the runTests pause and the owner turn, then
+        assert (a) mvp_loop survives byte-identically and (b) processMessage reaches the MVP
+        branch. It must go RED against the current code and GREEN after the fix. That scenario
+        is the phase's most valuable one: it is the only test that crosses the real entry point.
+  (v)   Declare the new final SU count. The closure gate becomes 365 + N with the new N.
+
+R-40 — THE UNMETERED PROVIDER CALL IS A SEPARATE FINDING, RECORDED NOW, NOT FIXED NOW. Legacy
+Stage-A providers make real OpenAI calls that never reach the agent cost ledger or providerTrace,
+so the R-37 cap guard cannot see them. That is a genuine hole in a spend control the owner
+relies on. Record it in the decision artifact as a named backlog item with today's evidence
+(a real Arabic expansion produced, zero ledger rows since 09:00Z). Do NOT fix it in PHASE-54 —
+it touches the legacy provider surface and needs its own decision artifact. State plainly in the
+closure evidence that the $1.00 cap covers agent-ledger calls only, so the owner is not operating
+under a false assurance about what the cap protects.
+
+R-41 — GATE #10 RESTARTS CLEAN AFTER THE FIX. Do not hand-restore the destroyed mvp_loop block
+to salvage the paused run: a repaired-by-hand state is not a witness to the real path, and the
+whole point of this gate is that the owner's turn traverses the genuine entry point. After the
+fix and the new SU are green, run the id-guarded reset and re-run real-a from scratch. Budget
+impact: real-a cost $0.14511, so a full clean run stays within the owner's $1.00 approval —
+report the projected total before re-running, and if the projection exceeds $0.75 real cash,
+STOP and come back for a fresh approval rather than assuming the existing one stretches.
+
+#### NAMED BACKLOG ITEM (per R-40) — `UNMETERED-LEGACY-PROVIDER-SPEND`
+
+**Finding:** the legacy Stage-A providers (`ideationExpansionProvider`,
+`conversationalResponseProvider`, `intentClassificationProvider`, `businessAnalysisProvider`,
+`documentationReviewProvider`, and the other `code/src/providers/*.js` modules that read
+`process.env.OPENAI_API_KEY` at construction) make **real OpenAI calls that never book a row in
+`artifacts/agent/cost_ledger.jsonl` and write no providerTrace**.
+
+**Evidence (2026-08-02):** the owner's stray turn drove `ideationEngine.expandIdea`, which
+produced a genuine Arabic expansion persisted at
+`artifacts/projects/phase54_gate10_demo/ai_os/ideation_log.json` — while the agent ledger shows
+**zero rows since 09:00Z** and `artifacts/llm/metadata/` gained **zero files**. Real spend,
+completely unmetered. Order of magnitude ~$0.01–0.02 (estimate only; no row exists to confirm).
+
+**Consequence, to be stated plainly in the closure evidence:** the **$1.00 cap covers
+agent-ledger calls only**. Any spend through the legacy provider surface is invisible to it. The
+owner must not be left believing the cap bounds all spend.
+
+**NOT fixed in PHASE-54** — it touches the legacy provider surface and needs its own decision
+artifact.
+
 #### NAMED EXCEPTION (per R-20 iv) — Blueprint Part D.2, narrowly scoped
 
 **Exception name:** `MVP-OWNER-OVERRIDE-ON-FAILING-TESTS` (PHASE-54, Slice 1 only).

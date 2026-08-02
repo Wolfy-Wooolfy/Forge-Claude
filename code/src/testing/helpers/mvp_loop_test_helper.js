@@ -898,7 +898,123 @@ async function runS381FlagOffInvariance() {
   }
 }
 
+// ── S382 — R-39: state SURVIVAL across the REAL entry point ──────────────────
+//
+// The only PHASE-54 scenario that crosses the live HTTP surface. Every other MVP
+// scenario calls engine.processMessage directly against a hand-seeded state, so the
+// apiServer layer that rebuilds project_state.json sits entirely OUTSIDE the harness
+// — which is exactly why 9 green scenarios coexisted with a broken real path (R-38).
+// This drives GET /api/projects (-> listProjects -> persistProjectState ->
+// buildProjectState) BETWEEN the runTests pause and the owner's turn, then proves the
+// mvp_loop block survived byte-identically and that the owner's turn still reaches
+// the MVP review branch instead of falling through to ideation.
+
+const http = require("http");
+const os   = require("os");
+const fsx  = require("fs");
+const pathx = require("path");
+
+function _httpReq(baseUrl, reqPath, method, body) {
+  return new Promise((resolve, reject) => {
+    const parsed  = new URL(baseUrl);
+    const bodyStr = body ? JSON.stringify(body) : null;
+    const options = {
+      hostname: parsed.hostname,
+      port:     Number(parsed.port),
+      path:     reqPath,
+      method,
+      headers:  bodyStr
+        ? { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(bodyStr) }
+        : {},
+      agent: false
+    };
+    const req = http.request(options, (res) => {
+      let buf = "";
+      res.on("data", (c) => { buf += c; });
+      res.on("end", () => resolve({ status: res.statusCode, body: buf }));
+    });
+    req.on("error", reject);
+    if (bodyStr) req.write(bodyStr);
+    req.end();
+  });
+}
+
+async function runS382StateSurvival() {
+  const out = {};
+  const PID = "s382_mvp_gate";
+  const LP  = "lp382";
+  const tempDir = fsx.mkdtempSync(pathx.join(os.tmpdir(), "forge_s382_"));
+  let instance = null;
+
+  try {
+    const projDir = pathx.join(tempDir, "artifacts", "projects", PID);
+    fsx.mkdirSync(pathx.join(projDir, "orchestration", LP), { recursive: true });
+
+    const block = {
+      enabled: true, status: "AWAITING_OWNER_REVIEW", iteration: 0,
+      mvp_scope: {
+        slice_name: "create-and-list",
+        acceptance_criteria_ids: ["AC-1", "AC-2"],
+        excluded_acceptance_criteria_ids: ["AC-3"],
+        files: ["src/server.js"], rationale: "minimal demonstrable slice"
+      },
+      feedback_history: [], provider: "mock", model: "mock-fb-s382"
+    };
+    const state = {
+      project_id: PID, project_name: PID, conversation_mode: "PIPELINE",
+      active_runtime_state: "IDEATION", loop_id: LP, user_language: "ar",
+      last_updated_at: new Date().toISOString(), mvp_loop: block
+    };
+    fsx.writeFileSync(pathx.join(projDir, "project_state.json"),
+      JSON.stringify(state, null, 2), "utf8");
+    fsx.writeFileSync(pathx.join(projDir, "orchestration", LP, "mvp_report.json"),
+      JSON.stringify({ kind: "PASS_REVIEW", slice: { slice_name: "create-and-list" },
+        tests: { total: 2, pass: 2, fail: 0, scenarios: [] } }, null, 2), "utf8");
+
+    const blockBefore = JSON.stringify(block);
+
+    const { createWorkspaceApiServer } = require("../../workspace/apiServer");
+    instance = createWorkspaceApiServer({ root: tempDir, port: 0 });
+    await new Promise((r) => instance.server.listen(0, r));
+    const base = "http://127.0.0.1:" + instance.server.address().port;
+
+    // (a) the REAL entry point that rebuilds every project's state
+    const listRes = await _httpReq(base, "/api/projects", "GET", null);
+    out.list_endpoint_ok = listRes.status === 200;
+
+    // (b) did the MVP gate's state survive that rebuild?
+    const after = JSON.parse(fsx.readFileSync(pathx.join(projDir, "project_state.json"), "utf8"));
+    out.mvp_block_survived        = !!after.mvp_loop;
+    out.mvp_block_byte_identical  = JSON.stringify(after.mvp_loop || null) === blockBefore;
+    out.loop_id_survived          = after.loop_id === LP;
+
+    // (c) does the owner's turn still reach the MVP branch through the real path?
+    const chat = await _httpReq(base, "/api/ai-os/chat", "POST", {
+      project_id: PID, message: "عايز تعديل بسيط في الرد", user_language: "ar",
+      mvp_scenario_id: "S382U"
+    });
+    let payload = {};
+    try { payload = JSON.parse(chat.body); } catch (_) { payload = {}; }
+    out.reached_mvp_branch    = payload.mode === "MVP_REVIEW_PENDING";
+    out.ideation_not_triggered = !fsx.existsSync(pathx.join(projDir, "ai_os", "ideation_log.json"));
+
+    return out;
+  } finally {
+    if (instance && instance.server) {
+      if (typeof instance.server.closeAllConnections === "function") {
+        instance.server.closeAllConnections();
+      }
+      await new Promise((r) => instance.server.close(r));
+    }
+    try { require("../../runtime/secrets/secret_provider")._resetForTest(); } catch (_) {}
+    try { require("../../runtime/tools/_registry").resetDefaultRegistry(); } catch (_) {}
+    try { require("../../runtime/permission/permissionPolicy").resetDefaultPolicy(); } catch (_) {}
+    try { fsx.rmSync(tempDir, { recursive: true, force: true }); } catch (_) {}
+  }
+}
+
 module.exports = {
+  runS382StateSurvival,
   runS373ScopeDerivation,
   runS374ReviewGate,
   runS375AcceptPath,
