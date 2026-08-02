@@ -415,3 +415,23 @@ editor, no save step, no indicator to interpret. Helper lives in the session scr
 in the repo — machine ops, not a deliverable.
 
 Recorded per the bidirectional Trust+Verify norm, in both directions.
+
+---
+
+### ERRATUM E-3 (2026-07-30, CTO-reported) — a ruling was cited but never delivered
+
+**R-34 was never delivered to CC.** The CTO authored it, the owner did not relay that message,
+and the CTO then instructed CC to "branch exactly as specified in R-34" — an instruction
+referencing a ruling CC had no access to. CC refused to assume its content and reported the gap
+instead of guessing; the CTO records that as the correct discipline and as its own process
+error (the third in this stretch, after E-2's conflicting editor instructions).
+
+R-34's content, delivered afterwards: **if the validity probe passes, `.env` holds a LIVE key,
+no rotation was needed, the R-33 helper's refusal path was correct, and the sequence resumes at
+R-26 as written** — which is precisely the branch CC had inferred and declined to act on
+unilaterally.
+
+Resolution of the related operational question (CC's, raised before spending): a revoked key
+cannot return `KEY_LIVE`, so the key on line 3 **is** the post-rotation key — the owner added it
+together with the line on 2026-07-29. There is no pending rotation; the R-33 helper must NOT be
+run; the owner has been told not to touch or revoke any OpenAI key until the gate completes.

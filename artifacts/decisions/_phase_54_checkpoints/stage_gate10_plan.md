@@ -380,6 +380,24 @@ act $0.02057 (~2.5x over-booking). The cap therefore trips **earlier** than real
 warrants, which is the correct failure direction. Corollary for §4: the ≈$0.44 *ledger*
 estimate corresponds to roughly **$0.15–0.20 real cash**.
 
+## 5.f R-36 — durable records (supersession + CAP-guard behaviour)
+
+**R-32 check 1 is SUPERSEDED, not waived.** `.env` mtime never changed; the check as literally
+written FAILS and that failure is recorded here permanently. It is superseded because a fresh
+mtime was only ever a **proxy** for "a valid key is in place", and the R-27 Step 3 probe
+measures **the thing itself** (a real call returning `KEY_LIVE` through the same consumption
+path the gate uses). A criterion may be replaced by a stronger measurement; it may never
+quietly disappear. This is R-13's principle applied in the opposite direction — there, a red
+gate could not be made green by weakening the check; here, a proxy is replaced by a direct
+measurement, and both the original failure and the reason for the replacement stay on the record.
+
+**CAP-guard behaviour (durable note).** `_capGuard` sums `cost_usd_estimated`, which runs
+**~2.5x above** `cost_usd_actual` on real calls (observed: est $0.0363 / act $0.01464 ·
+est $0.0539 / act $0.01787 · est $0.1301 / act $0.02057). The $1.00 cap therefore **cuts early
+rather than late** — conservative, the correct direction. Consequence for §4: the ≈**$0.44
+ledger** estimate corresponds to roughly **$0.15–0.20 real cash**. Both figures are to be
+reported separately, always.
+
 ## 6. Hygiene + rulings status
 
 - `.gitignore` + `artifacts/projects/phase54_gate10_*/` (PHASE-48 W-4 precedent — driver
