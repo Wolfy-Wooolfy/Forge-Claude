@@ -579,6 +579,62 @@ $0.05 (builder + materializer + the owner's two feedback interpretations); real-
 existing approval stands and no fresh approval is required. Both columns will be reported at
 every stage boundary as always.
 
+## 5.l Clean re-run attempt #2 — loop CORRECT, driver expectation too narrow ($0.14837)
+
+Reset verified (58→57, `REMOVED: ["phase54_gate10_demo"]` only, 15 evidence files archived),
+criterion-11b snapshot re-taken after the reset, then real-a ran with the R-37 cost lines live:
+`post-stage-b: rows +5 estimated $0.37300 REAL CASH $0.08611` ·
+`post-first-build: rows +9 estimated $0.59930 REAL CASH $0.14837`.
+
+**The first build's tests did not all pass this time** (LLM codegen is non-deterministic):
+T-1 PASS `post_notes_returns_201` · **T-2 FAIL** `get_notes_returns_all_notes` —
+`response_body_field_equals`: expected `body.title` = "Meeting notes", got `undefined`
+(the list endpoint returns an array, so an object-field assertion on the root cannot hold) ·
+T-3 PASS `delete_note_not_found_returns_404`.
+
+**The MVP loop then did exactly what R-10 specifies** — first build, no owner changes
+outstanding ⇒ internal A-5 loopback, no owner gate: `advanced_to: "BUILDER"`,
+`loop_back: true`, `mvp_loop.status = BUILDING`, graph `BUILDER` with `iteration_count 0 → 1`.
+**This is designed behaviour proven live, not a defect** — and it exercises R-10's
+unchanged-first-build branch on the real path for free.
+
+What aborted is the DRIVER: `real-a` is written to expect a first-build PASS and throws when it
+does not reach AWAITING_OWNER_REVIEW. It has no stage for the internal repair cycle.
+
+Attributions, stated plainly: the T-2 assertion shape (an object-field assertion against an
+array response) is a **test_designer quality gap** in the pre-existing backlog
+(PHASE-45 "test_designer assertion-name discipline"), not a PHASE-54 mechanism defect.
+
+State is fully resumable: `loop_id` present, `mvp_scope` derived and partition-valid
+(`create-and-list-notes`, included AC-1/AC-2/AC-4, excluded AC-3), graph consistent at BUILDER
+iteration 1, all artifacts intact.
+
+**Cumulative PHASE-54 real cash: $0.29367** (attempt-1 $0.14511 + probe $0.00019 +
+attempt-2 $0.14837) of the owner's approved $1.00.
+
+## 5.m ⚠ R-41 step 4 (live entry-point check) — CORRECTLY REFUSED, would have destroyed the run
+
+The instruction was to call `GET /api/projects` against the owner's running server as his browser
+will. **Executing it would have re-created the exact failure it was meant to prevent.**
+
+| Fact | Value |
+|---|---|
+| Live listener | PID **34568**, started **2026-08-02T09:16:06Z** |
+| `apiServer.js` patched (R-39) | **2026-08-02T10:12:55Z** — **56 minutes AFTER** the server started |
+
+The running process therefore holds the **pre-fix** `buildProjectState` in memory, and
+`GET /api/projects` → `listProjects()` → `persistProjectState()` runs over **every** project.
+Against stale code that rebuild strips `mvp_loop`/`loop_id` — i.e. the check would have
+destroyed the gate state a second time. Single-project routes are no escape:
+`/api/projects/activate` also calls `writeActiveProject`, which would switch the owner's UI away
+from cs_sys.
+
+**Consequence for the owner's turn (the important part): the restart is MANDATORY, not optional.**
+Even with no action from us, the moment he opens the Projects tab to switch to the demo, his
+browser triggers `GET /api/projects` against the stale server and destroys the block exactly as
+it did on 2026-08-02T09:16Z. **He must restart the server BEFORE switching projects**, after
+which the live check runs at $0 and confirms the fix in his real environment.
+
 ## 6. Hygiene + rulings status
 
 - `.gitignore` + `artifacts/projects/phase54_gate10_*/` (PHASE-48 W-4 precedent — driver
