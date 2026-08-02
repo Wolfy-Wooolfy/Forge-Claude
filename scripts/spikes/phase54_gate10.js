@@ -56,6 +56,8 @@ const { getDefaultRegistry }       = require(path.join(ROOT, "code/src/runtime/t
 const { getAdapters }              = require(path.join(ROOT, "code/src/runtime/agents/_adapter_registry"));
 const { createConversationEngine } = require(path.join(ROOT, "code/src/ai_os/conversationEngine"));
 const mvp                          = require(path.join(ROOT, "code/src/ai_os/mvpLoopEngine"));
+// R-42(ii): the cap is read from its single source of truth, never redefined here.
+const { ITERATION_CAP }            = require(path.join(ROOT, "code/src/runtime/orchestration/conversation_graph"));
 
 const reg = getDefaultRegistry();
 const eng = createConversationEngine({ root: ROOT });
@@ -568,6 +570,84 @@ async function realA() {
   console.log("Owner instructions: see stage_gate10_plan.md §Owner. Then run: real-b");
 }
 
+// ── stage: real-a-continue (R-42) — ONE internal A-5 repair cycle, resumable ───
+//
+// Runs when real-a's first build produced a partly-failing harness and the loop took
+// the R-10 designed path (internal loopback, no owner gate). Resumes from the
+// PERSISTED graph state exactly as production would: no completed step is re-run and
+// the MVP scope is NOT re-derived (deriveScope fires only at designTests on an
+// INACTIVE block; here the block is BUILDING and mvp_scope.json is already on disk).
+// Bounded to ONE rebuild+retest per invocation, so a repeated failure surfaces for a
+// ruling instead of spending in a loop. ITERATION_CAP stays authoritative and
+// untouched: a CAP_REACHED outcome is reported as a legitimate result, never retried.
+async function realAContinue() {
+  await _hydrateKeyFromKeychain();
+  _requireApproval();
+  const leg = "real";
+  _armPromptRecorder(leg);
+
+  const st = _readJson("artifacts/projects/" + PID_REAL + "/project_state.json");
+  const g  = await _graph(PID_REAL, LOOP_REAL);
+  if (!st || !st.mvp_loop || st.mvp_loop.status !== "BUILDING") {
+    throw new Error("expected mvp_loop.status BUILDING; got " +
+      (st && st.mvp_loop && st.mvp_loop.status) + " — nothing to continue");
+  }
+  if (!g || g.current_state !== "BUILDER") {
+    throw new Error("expected graph at BUILDER; got " + (g && g.current_state));
+  }
+  const iterBefore = g.iteration_count;
+  console.log("  [resume] graph=BUILDER iteration=" + iterBefore +
+    " (cap " + ITERATION_CAP + "), mvp_loop=BUILDING — one repair cycle");
+
+  _snapshotMvpArtifacts(PID_REAL, LOOP_REAL, leg, "pre_repair_iter" + iterBefore);
+
+  const bp = await eng.buildProject({ project_id: PID_REAL, loop_id: LOOP_REAL,
+    build_provider: "openai", build_model: "gpt-4o",
+    mat_provider: "openai", mat_model: "gpt-4o" });
+  _writeEv(leg, "step40_rebuild_iter" + iterBefore + ".json", bp);
+  _capGuard(leg, "post-repair-build");
+  if (!bp.advanced) throw new Error("repair rebuild failed: " + bp.build_error);
+
+  const rt = await eng.runTests({ project_id: PID_REAL, loop_id: LOOP_REAL });
+  _writeEv(leg, "step41_run_tests_iter" + iterBefore + ".json", rt);
+  _capGuard(leg, "post-repair-test");
+
+  const gAfter = await _graph(PID_REAL, LOOP_REAL);
+  _snapshotMvpArtifacts(PID_REAL, LOOP_REAL, leg, "post_repair_iter" + iterBefore);
+
+  // R-42(v): attribution of the failure that triggered this cycle, recorded once.
+  _writeEv(leg, "repair_cycle_note.json", {
+    iteration_before: iterBefore,
+    iteration_after: gAfter ? gAfter.iteration_count : null,
+    graph_after: gAfter ? gAfter.current_state : null,
+    mvp_review_pending: rt.mvp_review_pending === true,
+    trigger_attribution:
+      "The first build's T-2 failure originates in test_designer's assertion SHAPE — an " +
+      "object-field assertion (response_body_field_equals body.title) against an array " +
+      "response from the list endpoint. That is the pre-existing PHASE-45 backlog item " +
+      "('test_designer assertion-name discipline'), NOT PHASE-54 machinery. Not fixed here.",
+    r10_note:
+      "The loopback that produced this cycle is R-10's designed path: first build, no " +
+      "outstanding owner changes => internal A-5 repair, no owner gate.",
+    ledger_delta: _ledgerDelta(leg)
+  });
+
+  if (rt.mvp_review_pending === true) {
+    console.log("\n=== PAUSED — repair cycle PASSED; awaiting the OWNER's REFINE turn ===");
+    console.log("Report summary (ar): " + (rt.mvp_report && rt.mvp_report.summary_ar));
+    console.log("NEXT: owner MUST restart the server before switching projects (R-43).");
+    return;
+  }
+  if (rt.advanced_to === "ESCALATED" || (st.mvp_loop && rt.mvp_cap_message)) {
+    console.log("\n=== CAP_REACHED — legitimate outcome, reporting (no retry) ===");
+    console.log(rt.mvp_cap_message || "(escalated)");
+    return;
+  }
+  console.log("\n=== Repair cycle did not reach the owner gate ===");
+  console.log("graph=" + (gAfter && gAfter.current_state) +
+    " iteration=" + (gAfter && gAfter.iteration_count) + " — STOP for a ruling.");
+}
+
 async function realB() {
   await _hydrateKeyFromKeychain();
   _requireApproval();
@@ -808,10 +888,11 @@ async function status() {
   if (stage === "preflight")   await preflight();
   else if (stage === "dry")    await dry();
   else if (stage === "real-a") await realA();
+  else if (stage === "real-a-continue") await realAContinue();
   else if (stage === "real-b") await realB();
   else if (stage === "real-c") await realC();
   else if (stage === "verify") await verify();
   else if (stage === "status") await status();
   else if (stage === "reset")  await reset();
-  else { console.log("usage: node scripts/spikes/phase54_gate10.js preflight|dry|real-a|real-b|real-c|verify|status|reset"); process.exit(1); }
+  else { console.log("usage: node scripts/spikes/phase54_gate10.js preflight|dry|real-a|real-a-continue|real-b|real-c|verify|status|reset"); process.exit(1); }
 })().catch(e => { console.error("GATE DRIVER ERROR:", e.message); process.exit(1); });

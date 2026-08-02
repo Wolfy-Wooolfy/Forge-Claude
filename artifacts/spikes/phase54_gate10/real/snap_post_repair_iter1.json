@@ -1,0 +1,82 @@
+{
+  "at": "2026-08-02T13:29:47.174Z",
+  "project_state": {
+    "project_id": "phase54_gate10_demo",
+    "project_name": "phase54_gate10_demo",
+    "conversation_mode": "PIPELINE",
+    "active_runtime_state": "IDEATION",
+    "loop_id": "gate10_real",
+    "user_language": "ar",
+    "last_updated_at": "2026-08-02T13:12:22.885Z",
+    "mvp_loop": {
+      "enabled": true,
+      "status": "BUILDING",
+      "iteration": 0,
+      "mvp_scope": {
+        "slice_name": "create-and-list-notes",
+        "acceptance_criteria_ids": [
+          "AC-1",
+          "AC-2",
+          "AC-4"
+        ],
+        "excluded_acceptance_criteria_ids": [
+          "AC-3"
+        ],
+        "files": [
+          "src/server.js",
+          "src/routes/notes.js",
+          "src/storage/inMemoryStorage.js"
+        ],
+        "rationale": "This slice includes creating and listing notes, demonstrating basic end-to-end functionality with storage logic and sequential id generation. The owner can see notes being created and listed without implementing delete, making it the minimal demonstrable skeleton."
+      },
+      "feedback_history": [],
+      "provider": "openai",
+      "model": "gpt-4o"
+    }
+  },
+  "mvp_scope": {
+    "derived_at": "2026-08-02T13:12:03.657Z",
+    "mvp_scope": {
+      "slice_name": "create-and-list-notes",
+      "acceptance_criteria_ids": [
+        "AC-1",
+        "AC-2",
+        "AC-4"
+      ],
+      "excluded_acceptance_criteria_ids": [
+        "AC-3"
+      ],
+      "files": [
+        "src/server.js",
+        "src/routes/notes.js",
+        "src/storage/inMemoryStorage.js"
+      ],
+      "rationale": "This slice includes creating and listing notes, demonstrating basic end-to-end functionality with storage logic and sequential id generation. The owner can see notes being created and listed without implementing delete, making it the minimal demonstrable skeleton."
+    }
+  },
+  "mvp_report": null,
+  "owner_feedback": null,
+  "build_manifest": {
+    "built_at": "2026-08-02T13:29:44.818Z",
+    "files": [
+      {
+        "path": "src/storage/inMemoryStorage.js",
+        "action": "create",
+        "line_count": 29,
+        "sha256": "c2bf742bd4846e6206a4d73842ff738b2f82eeae3856145f0e975596b9050d01"
+      },
+      {
+        "path": "src/routes/notes.js",
+        "action": "create",
+        "line_count": 42,
+        "sha256": "9ffc5e3cb53b0b648909b2cd1485ca0776e8fb88bdf63d2a4eb50cafc80398c4"
+      },
+      {
+        "path": "src/server.js",
+        "action": "create",
+        "line_count": 12,
+        "sha256": "6cb3e908c42619c4f4c9eef79c9437901f7b6e6768070bccb8dce369e45fa0e6"
+      }
+    ]
+  }
+}

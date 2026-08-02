@@ -635,6 +635,50 @@ browser triggers `GET /api/projects` against the stale server and destroys the b
 it did on 2026-08-02T09:16Z. **He must restart the server BEFORE switching projects**, after
 which the live check runs at $0 and confirms the fix in his real environment.
 
+## 5.n R-42 repair cycle — ran correctly; the frozen test plan is UNSATISFIABLE
+
+`real-a-continue` added as its own resumable stage (no completed step re-run, scope NOT
+re-derived, `ITERATION_CAP` imported from its single source of truth, bounded to ONE cycle per
+invocation). $0 checks first: syntax OK, approval gate refuses without the env var (exit 3),
+`ITERATION_CAP = 5` resolves, precondition `mvp_loop.status = BUILDING` true.
+
+Run: `[resume] graph=BUILDER iteration=1 (cap 5)` → rebuild + re-test →
+`post-repair-build / post-repair-test: estimated $0.69900 REAL CASH $0.17770` →
+**graph BUILDER, iteration 1 → 2**, owner gate not reached.
+
+**Why it cannot converge — the frozen T-2 asserts two mutually exclusive things about the same
+response.** `GET /notes` carries:
+
+| # | assertion | requires |
+|---|---|---|
+| 1 | `http_status_equals: 200` | — |
+| 2 | `response_body_is_array` (min 1, max 10) | body **IS a JSON array** |
+| 3 | `response_body_field_equals` field `title` = "Meeting notes" | body has a **root object field** `title` |
+
+(2) and (3) cannot both hold: an array has no root-level `title`. **No implementation can pass
+T-2**, so the A-5 repair loop is guaranteed to burn every remaining iteration and land on
+CAP_REACHED. Continuing further would spend ~$0.09 to reach a foregone conclusion.
+
+**Attribution (R-42 v):** this originates in `test_designer`'s assertion shape — the pre-existing
+PHASE-45 backlog item *"test_designer assertion-name discipline"* — **not** in PHASE-54
+machinery. Not fixed here. Recorded in `real/repair_cycle_note.json`.
+
+**Design observation worth surfacing (not a defect, not fixed here):** R-10 is the safety net for
+"the frozen test plan conflicts with reality", but it routes to the owner **only when owner
+changes are outstanding**. On a FIRST build with a self-contradictory plan there is no owner
+escape hatch — the loop burns to the cap and escalates without ever asking the human whose
+project it is. Worth its own decision artifact later; out of Slice-1 scope.
+
+**Cost:** repair cycle added **$0.02933** real cash (within the $0.03–0.06 projection).
+Leg total $0.17770. **Cumulative PHASE-54 real cash: $0.32300** of the approved $1.00.
+
+**Proposed guard for the next attempt ($0, driver-only, no live surface):** after `designTests`
+and BEFORE `buildProject`, statically screen the generated `test_plan.json` for
+self-contradictory assertion sets (e.g. `response_body_is_array` together with
+`response_body_field_equals` on the same response) and STOP before any build spend if found.
+That turns a ~$0.15 coin flip into a ~$0.09 fail-fast with a named diagnosis, and it would have
+caught this run before both build cycles.
+
 ## 6. Hygiene + rulings status
 
 - `.gitignore` + `artifacts/projects/phase54_gate10_*/` (PHASE-48 W-4 precedent — driver

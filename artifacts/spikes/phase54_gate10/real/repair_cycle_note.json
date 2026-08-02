@@ -1,0 +1,13 @@
+{
+  "iteration_before": 1,
+  "iteration_after": 2,
+  "graph_after": "BUILDER",
+  "mvp_review_pending": false,
+  "trigger_attribution": "The first build's T-2 failure originates in test_designer's assertion SHAPE — an object-field assertion (response_body_field_equals body.title) against an array response from the list endpoint. That is the pre-existing PHASE-45 backlog item ('test_designer assertion-name discipline'), NOT PHASE-54 machinery. Not fixed here.",
+  "r10_note": "The loopback that produced this cycle is R-10's designed path: first build, no outstanding owner changes => internal A-5 repair, no owner gate.",
+  "ledger_delta": {
+    "rows": 11,
+    "estimated": 0.6990000000000016,
+    "actual": 0.17769999999999886
+  }
+}
