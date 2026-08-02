@@ -1,0 +1,281 @@
+{
+  "ok": true,
+  "loop_id": "gate10_real",
+  "advanced": true,
+  "advanced_to": "BUILDER",
+  "test_plan": {
+    "role_id": "test_designer",
+    "scenarios": [
+      {
+        "id": "T-1",
+        "name": "create_note_with_valid_data_returns_201",
+        "description": "POST /notes with valid title and body returns 201 and created note",
+        "category": "http",
+        "fixture": "fresh_db",
+        "setup": {
+          "actions": [
+            {
+              "type": "start_server",
+              "command": "node src/server.js",
+              "wait_for_port": 3000,
+              "timeout_ms": 5000
+            }
+          ]
+        },
+        "execution": {
+          "type": "http_request",
+          "method": "POST",
+          "url": "http://localhost:3000/notes",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "title": "Meeting Notes",
+            "body": "Discuss project milestones"
+          }
+        },
+        "assertions": [
+          {
+            "type": "http_status_equals",
+            "expected": 201
+          },
+          {
+            "type": "response_body_contains_key",
+            "key": "id"
+          },
+          {
+            "type": "response_body_field_equals",
+            "field": "title",
+            "expected": "Meeting Notes"
+          },
+          {
+            "type": "response_body_field_equals",
+            "field": "body",
+            "expected": "Discuss project milestones"
+          }
+        ],
+        "teardown": {
+          "actions": [
+            {
+              "type": "stop_server"
+            }
+          ]
+        },
+        "metadata": {
+          "covers_ac": [
+            "AC-1"
+          ],
+          "estimated_duration_ms": 500
+        }
+      },
+      {
+        "id": "T-2",
+        "name": "create_note_with_missing_title_returns_400",
+        "description": "POST /notes with missing title returns 400 with error message",
+        "category": "http",
+        "fixture": "fresh_db",
+        "setup": {
+          "actions": [
+            {
+              "type": "start_server",
+              "command": "node src/server.js",
+              "wait_for_port": 3000,
+              "timeout_ms": 5000
+            }
+          ]
+        },
+        "execution": {
+          "type": "http_request",
+          "method": "POST",
+          "url": "http://localhost:3000/notes",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "body": "Task details"
+          }
+        },
+        "assertions": [
+          {
+            "type": "http_status_equals",
+            "expected": 400
+          },
+          {
+            "type": "response_body_field_equals",
+            "field": "error.message",
+            "expected": "Title and body are required."
+          }
+        ],
+        "teardown": {
+          "actions": [
+            {
+              "type": "stop_server"
+            }
+          ]
+        },
+        "metadata": {
+          "covers_ac": [
+            "AC-1"
+          ],
+          "estimated_duration_ms": 500
+        }
+      },
+      {
+        "id": "T-3",
+        "name": "create_note_with_missing_body_returns_400",
+        "description": "POST /notes with missing body returns 400 with error message",
+        "category": "http",
+        "fixture": "fresh_db",
+        "setup": {
+          "actions": [
+            {
+              "type": "start_server",
+              "command": "node src/server.js",
+              "wait_for_port": 3000,
+              "timeout_ms": 5000
+            }
+          ]
+        },
+        "execution": {
+          "type": "http_request",
+          "method": "POST",
+          "url": "http://localhost:3000/notes",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "title": "Important Task"
+          }
+        },
+        "assertions": [
+          {
+            "type": "http_status_equals",
+            "expected": 400
+          },
+          {
+            "type": "response_body_field_equals",
+            "field": "error.message",
+            "expected": "Title and body are required."
+          }
+        ],
+        "teardown": {
+          "actions": [
+            {
+              "type": "stop_server"
+            }
+          ]
+        },
+        "metadata": {
+          "covers_ac": [
+            "AC-1"
+          ],
+          "estimated_duration_ms": 500
+        }
+      },
+      {
+        "id": "T-4",
+        "name": "list_all_notes_returns_200_and_notes_array",
+        "description": "GET /notes returns 200 and an array of all notes",
+        "category": "http",
+        "fixture": "fresh_db",
+        "setup": {
+          "actions": [
+            {
+              "type": "start_server",
+              "command": "node src/server.js",
+              "wait_for_port": 3000,
+              "timeout_ms": 5000
+            },
+            {
+              "type": "http_request",
+              "method": "POST",
+              "url": "http://localhost:3000/notes",
+              "headers": {
+                "Content-Type": "application/json"
+              },
+              "body": {
+                "title": "Note 1",
+                "body": "Content 1"
+              }
+            },
+            {
+              "type": "http_request",
+              "method": "POST",
+              "url": "http://localhost:3000/notes",
+              "headers": {
+                "Content-Type": "application/json"
+              },
+              "body": {
+                "title": "Note 2",
+                "body": "Content 2"
+              }
+            }
+          ]
+        },
+        "execution": {
+          "type": "http_request",
+          "method": "GET",
+          "url": "http://localhost:3000/notes",
+          "headers": {
+            "Accept": "application/json"
+          }
+        },
+        "assertions": [
+          {
+            "type": "http_status_equals",
+            "expected": 200
+          },
+          {
+            "type": "response_body_is_array",
+            "min_length": 2,
+            "max_length": 10
+          },
+          {
+            "type": "response_body_matches_schema",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "body": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "title",
+                  "body"
+                ]
+              }
+            }
+          }
+        ],
+        "teardown": {
+          "actions": [
+            {
+              "type": "stop_server"
+            }
+          ]
+        },
+        "metadata": {
+          "covers_ac": [
+            "AC-2"
+          ],
+          "estimated_duration_ms": 500
+        }
+      }
+    ],
+    "coverage_summary": {
+      "acs_total": 2,
+      "acs_covered": 2,
+      "gaps": []
+    }
+  },
+  "model_used": "gpt-4o"
+}

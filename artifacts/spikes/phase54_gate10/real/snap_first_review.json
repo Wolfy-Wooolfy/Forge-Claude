@@ -1,0 +1,148 @@
+{
+  "at": "2026-08-02T08:35:03.628Z",
+  "project_state": {
+    "project_id": "phase54_gate10_demo",
+    "project_name": "phase54_gate10_demo",
+    "conversation_mode": "PIPELINE",
+    "active_runtime_state": "IDEATION",
+    "loop_id": "gate10_real",
+    "user_language": "ar",
+    "last_updated_at": "2026-08-02T08:35:03.623Z",
+    "mvp_loop": {
+      "enabled": true,
+      "status": "AWAITING_OWNER_REVIEW",
+      "iteration": 0,
+      "mvp_scope": {
+        "slice_name": "create-and-list-notes",
+        "acceptance_criteria_ids": [
+          "AC-1",
+          "AC-2"
+        ],
+        "excluded_acceptance_criteria_ids": [
+          "AC-3"
+        ],
+        "files": [
+          "src/server.js",
+          "src/routes/notes.js",
+          "src/storage/notesStorage.js"
+        ],
+        "rationale": "This slice includes the ability to create and list notes, which covers the basic functionality of a notes application. These two features demonstrate the end-to-end flow of creating a note and then retrieving it, showing that the system can both store and fetch data. The slice is minimal yet demonstrable because it allows users to see the lifecycle of a note, from creation to listing."
+      },
+      "feedback_history": [],
+      "provider": "openai",
+      "model": "gpt-4o"
+    }
+  },
+  "mvp_scope": {
+    "derived_at": "2026-08-02T08:34:41.029Z",
+    "mvp_scope": {
+      "slice_name": "create-and-list-notes",
+      "acceptance_criteria_ids": [
+        "AC-1",
+        "AC-2"
+      ],
+      "excluded_acceptance_criteria_ids": [
+        "AC-3"
+      ],
+      "files": [
+        "src/server.js",
+        "src/routes/notes.js",
+        "src/storage/notesStorage.js"
+      ],
+      "rationale": "This slice includes the ability to create and list notes, which covers the basic functionality of a notes application. These two features demonstrate the end-to-end flow of creating a note and then retrieving it, showing that the system can both store and fetch data. The slice is minimal yet demonstrable because it allows users to see the lifecycle of a note, from creation to listing."
+    }
+  },
+  "mvp_report": {
+    "report_version": 1,
+    "assembled_at": "2026-08-02T08:35:03.621Z",
+    "kind": "PASS_REVIEW",
+    "project_id": "phase54_gate10_demo",
+    "loop_id": "gate10_real",
+    "iteration": 0,
+    "cap": 5,
+    "slice": {
+      "slice_name": "create-and-list-notes",
+      "acceptance_criteria_ids": [
+        "AC-1",
+        "AC-2"
+      ],
+      "excluded_acceptance_criteria_ids": [
+        "AC-3"
+      ],
+      "files": [
+        "src/server.js",
+        "src/routes/notes.js",
+        "src/storage/notesStorage.js"
+      ],
+      "rationale": "This slice includes the ability to create and list notes, which covers the basic functionality of a notes application. These two features demonstrate the end-to-end flow of creating a note and then retrieving it, showing that the system can both store and fetch data. The slice is minimal yet demonstrable because it allows users to see the lifecycle of a note, from creation to listing."
+    },
+    "build": {
+      "file_count": 3,
+      "files": [
+        "src/server.js",
+        "src/routes/notes.js",
+        "src/storage/notesStorage.js"
+      ],
+      "entry": "src/server.js"
+    },
+    "tests": {
+      "total": 4,
+      "pass": 4,
+      "fail": 0,
+      "error": 0,
+      "scenarios": [
+        {
+          "id": "T-1",
+          "name": "create_note_with_valid_data_returns_201",
+          "status": "PASS",
+          "failing": []
+        },
+        {
+          "id": "T-2",
+          "name": "create_note_with_missing_title_returns_400",
+          "status": "PASS",
+          "failing": []
+        },
+        {
+          "id": "T-3",
+          "name": "create_note_with_missing_body_returns_400",
+          "status": "PASS",
+          "failing": []
+        },
+        {
+          "id": "T-4",
+          "name": "list_all_notes_returns_200_and_notes_array",
+          "status": "PASS",
+          "failing": []
+        }
+      ]
+    },
+    "how_to_see": "node src/server.js",
+    "summary_ar": "تم بناء شريحة الـ MVP \"create-and-list-notes\" — 3 ملفات، والاختبارات ناجحة 4/4. للتشغيل: node src/server.js. لو النتيجة مناسبة رُدّ بالموافقة، أو اكتب التعديلات المطلوبة كنقاط.",
+    "summary_en": "MVP slice \"create-and-list-notes\" is built — 3 files, tests passing 4/4. Run it with: node src/server.js. Reply with approval, or list the changes you want."
+  },
+  "owner_feedback": null,
+  "build_manifest": {
+    "built_at": "2026-08-02T08:34:58.620Z",
+    "files": [
+      {
+        "path": "src/server.js",
+        "action": "create",
+        "line_count": 12,
+        "sha256": "1f90f88bd248e3d28631cefdb8e45e254a21f7fbc1e7d2e0c46a088bdbc3c6ba"
+      },
+      {
+        "path": "src/routes/notes.js",
+        "action": "create",
+        "line_count": 36,
+        "sha256": "bfd7a89004acd907f3549a67630860ddd43602e6a12091be51c530ffb4ca0771"
+      },
+      {
+        "path": "src/storage/notesStorage.js",
+        "action": "create",
+        "line_count": 27,
+        "sha256": "19c4d78cf327d9ffa936e02024547618ec39b73db4cb31f7e83db1e503fe3664"
+      }
+    ]
+  }
+}
