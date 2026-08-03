@@ -176,6 +176,13 @@ they can do) — a silent ESCALATED is a phase failure. Both surfacing points ar
 the REFINE-at-cap reply (`MVP_CAP_REACHED` mode + message) and the internal-loop
 escalation (`mvp_cap_message` on the runTests payload). SU: S378.
 
+**Known Slice-1 limitation (R-45) — no owner escape hatch on a FIRST build.** R-10 routes a
+RUN_TESTS failure to the owner only when owner changes are outstanding; on a first build there
+are none, so a self-contradictory frozen test plan (one no implementation can satisfy) sends the
+loop to `ITERATION_CAP` and escalation **without ever consulting the owner**. Proven live
+2026-08-02. Backlog item `R10-NO-OWNER-ESCAPE-ON-FIRST-BUILD`; widening R-10 changes
+owner-facing routing and needs its own decision artifact.
+
 **Known Slice-1 limitation (data-driven revisit trigger):** a flaky build can starve the
 owner's REFINE budget, because internal repair loopbacks consume the same counter.
 Revisit ONLY via a separate decision artifact if Gate #10 / real usage shows REFINE

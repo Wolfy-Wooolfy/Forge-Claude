@@ -351,6 +351,36 @@ async function _architectToTestDesign(pid, loopId, leg, llm) {
   if (!g1.advanced || g1.advanced_to !== "TEST_DESIGN") throw new Error("gate1: " + g1.gate_error);
 }
 
+// ── R-44(i) — $0 fail-fast screen on the frozen test plan (DRIVER ONLY) ───────
+//
+// Gate instrumentation, deliberately NOT in code/src: adding plan validation to the
+// live surface after D5 closed would reopen the phase. Scope is narrow by ruling —
+// ONLY the provably-contradictory pair observed on 2026-08-02: a scenario asserting
+// `response_body_is_array` AND `response_body_field_equals` about the SAME response.
+// A JSON array has no root-level object field, so no implementation can satisfy both
+// and the A-5 repair loop is guaranteed to burn to CAP_REACHED. This is not a
+// general-purpose validator and must not grow into one.
+const PLAN_GUARD_DIAGNOSTIC = "CONTRADICTORY_ASSERTION_PAIR_ARRAY_VS_ROOT_FIELD";
+
+function _screenTestPlan(plan) {
+  const scenarios = (plan && Array.isArray(plan.scenarios)) ? plan.scenarios : [];
+  const offenders = [];
+  for (const s of scenarios) {
+    const types = (Array.isArray(s.assertions) ? s.assertions : []).map((a) => a && a.type);
+    const isArray   = types.indexOf("response_body_is_array") !== -1;
+    const rootField = types.indexOf("response_body_field_equals") !== -1;
+    if (isArray && rootField) {
+      offenders.push({
+        scenario_id: s.id, name: s.name,
+        assertions: s.assertions,
+        why: "asserts the body IS an array AND that it has a root-level object field — " +
+             "mutually exclusive; unsatisfiable by any implementation"
+      });
+    }
+  }
+  return { ok: offenders.length === 0, diagnostic: PLAN_GUARD_DIAGNOSTIC, offenders };
+}
+
 async function _designBuildTest(pid, loopId, leg, llm, stepBase, runTestsExtra) {
   const tdModel  = llm.tdModel  || llm.model;
   const bldModel = llm.bldModel || llm.model;
@@ -361,6 +391,28 @@ async function _designBuildTest(pid, loopId, leg, llm, stepBase, runTestsExtra) 
     llm.scopeTag ? { mvp_scenario_id: llm.scopeTag } : {}));
   _writeEv(leg, "step" + stepBase + "_design_tests.json", dt);
   if (!dt.advanced) throw new Error("designTests: " + dt.test_error);
+
+  // R-44(ii): screen the frozen plan BEFORE any build spend. On detection: stop,
+  // write the diagnostic, and report — never auto-retry the plan generation.
+  if (leg === "real") {
+    const plan = _readJson("artifacts/projects/" + pid + "/orchestration/" + loopId + "/test_plan.json");
+    const screen = _screenTestPlan(plan);
+    _writeEv(leg, "step" + stepBase + "a_plan_screen.json", {
+      diagnostic: screen.diagnostic, passed: screen.ok,
+      scenarios_screened: (plan && plan.scenarios) ? plan.scenarios.length : 0,
+      offenders: screen.offenders,
+      ledger_delta_at_screen: _ledgerDelta(leg),
+      note: "R-44 driver-only fail-fast screen; narrow by ruling to the array-vs-root-field pair."
+    });
+    if (!screen.ok) {
+      console.error("\nPLAN GUARD TRIPPED — " + screen.diagnostic +
+        " — stopping BEFORE any build spend.");
+      screen.offenders.forEach((o) => console.error("  " + o.scenario_id + " (" + o.name + "): " + o.why));
+      throw new Error("PLAN_GUARD:" + screen.diagnostic);
+    }
+    console.log("  [plan-guard] PASS — no contradictory assertion pair in " +
+      ((plan && plan.scenarios) ? plan.scenarios.length : 0) + " scenarios");
+  }
 
   const bp = await eng.buildProject(Object.assign({ project_id: pid, loop_id: loopId,
     build_provider: llm.provider, mat_provider: llm.provider },

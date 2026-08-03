@@ -289,6 +289,31 @@ owner must not be left believing the cap bounds all spend.
 **NOT fixed in PHASE-54** — it touches the legacy provider surface and needs its own decision
 artifact.
 
+#### NAMED BACKLOG ITEM (per R-45) — `R10-NO-OWNER-ESCAPE-ON-FIRST-BUILD`
+
+**Finding.** R-10 is the safety net for "the frozen test plan conflicts with reality", but it
+routes a RUN_TESTS failure to the owner **only when owner changes are outstanding**
+(`owner_changes` non-empty). On a **first** build there are none by definition — so a first
+build against a self-contradictory frozen plan has **no owner escape hatch**: the A-5 loop
+repairs, fails, repairs, fails, burns to `ITERATION_CAP` and escalates **without ever asking the
+person who owns the project**, even though the human is the only party who can resolve the
+contradiction.
+
+**Evidence (2026-08-02, real gpt-4o, Gate #10 attempt 2).** The generated plan's T-2 asserted,
+about the same `GET /notes` response, both `response_body_is_array` (min 1) and
+`response_body_field_equals` field `title` = "Meeting notes". A JSON array has no root-level
+object field, so **no implementation can satisfy T-2**. Two real iterations were spent
+(iteration 0 → 1 → 2, $0.14837 + $0.02933 real cash) before the contradiction was proven;
+CAP_REACHED was inevitable by construction, and the owner would never have been consulted.
+
+**Why not fixed here.** Widening R-10 changes owner-facing routing — when Forge interrupts the
+human and what it asks — which is exactly the surface that needs its own decision artifact.
+Slice 1 keeps R-10 as ruled.
+
+**Related but distinct:** the contradiction itself originates in `test_designer`'s assertion
+shape (pre-existing PHASE-45 backlog *"test_designer assertion-name discipline"*). This item is
+about the **absence of an owner escape hatch**, not about the plan generator's quality.
+
 #### NAMED EXCEPTION (per R-20 iv) — Blueprint Part D.2, narrowly scoped
 
 **Exception name:** `MVP-OWNER-OVERRIDE-ON-FAILING-TESTS` (PHASE-54, Slice 1 only).
