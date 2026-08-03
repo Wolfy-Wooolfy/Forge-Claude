@@ -1013,7 +1013,69 @@ async function runS382StateSurvival() {
   }
 }
 
+// ── S383 — R-47: array-assertion discipline (harness truth + prompt fix) ─────
+//
+// Deterministic and mock-only. Locks the SEMANTICS that make the contradictory pair
+// unbuildable (so the guidance can never silently stop being true) and the PRESENCE
+// of the v4 prompt fix. Never invokes a model.
+
+async function runS383ArrayAssertionDiscipline() {
+  const out = {};
+  const AT   = "../../runtime/builtproject/assertion_types/";
+  const isArr = require(AT + "response_body_is_array");
+  const fEq   = require(AT + "response_body_field_equals");
+
+  // A list response, exactly the shape the generated plans assert about.
+  const body = [{ id: 1, title: "Buy groceries" }, { id: 2, title: "Meeting notes" }];
+  const ctx  = { response: { body } };
+
+  const rArr     = await isArr.assert({ min_length: 1, max_length: 10 }, ctx);
+  const rRoot    = await fEq.assert({ field: "title",   expected: "Buy groceries" }, ctx);
+  const rIndexed = await fEq.assert({ field: "0.title", expected: "Buy groceries" }, ctx);
+
+  out.is_array_passes_on_array       = rArr.pass === true;
+  out.root_field_fails_on_array      = rRoot.pass === false;
+  out.root_field_reason_is_undefined = typeof rRoot.reason === "string" &&
+                                       rRoot.reason.indexOf("undefined") !== -1;
+  out.indexed_field_passes_on_array  = rIndexed.pass === true;
+
+  // The pair as the generator emitted it: unsatisfiable — at least one member always fails.
+  out.contradictory_pair_unsatisfiable = (rArr.pass === true && rRoot.pass === false);
+  // The pair as v4 teaches it: both members hold on the same response.
+  out.indexed_pair_satisfiable         = (rArr.pass === true && rIndexed.pass === true);
+
+  // ── the fix itself (registry + role binding) ────────────────────────────────
+  const { loadPrompt } = require("../../runtime/agents/_prompt_loader");
+  let v4 = null, v3 = null;
+  try { v4 = loadPrompt("test_designer_v4"); } catch (_) { v4 = null; }
+  try { v3 = loadPrompt("test_designer_v3"); } catch (_) { v3 = null; }
+
+  out.prompt_v4_exists = typeof v4 === "string" && v4.length > 0;
+  const v4s = v4 || "";
+  out.prompt_v4_has_array_guidance =
+    /array/i.test(v4s) &&
+    v4s.indexOf("response_body_is_array") !== -1 &&
+    v4s.indexOf("response_body_field_equals") !== -1;
+  out.prompt_v4_has_indexed_example = /"0\.[a-z_]+"|field":\s*"0\./i.test(v4s);
+  out.prompt_v4_keeps_nine_types = [
+    "http_status_equals", "response_body_contains_key", "response_body_field_equals",
+    "response_body_is_array", "response_body_matches_schema", "process_exit_code_equals",
+    "file_exists", "stdout_contains", "response_header_equals"
+  ].every((t) => v4s.indexOf(t) !== -1);
+  out.prompt_v4_keeps_naming_rule = v4s.indexOf("FORBIDDEN ASSERTION NAMES") !== -1;
+  out.prompt_v3_retained_deprecated = typeof v3 === "string" && v3.length > 0;
+
+  const roleSrc = require("fs").readFileSync(
+    require("path").join(process.cwd(), "code/src/runtime/agents/roles/test_designer_role.js"),
+    "utf8");
+  out.role_binds_v4 = roleSrc.indexOf('"test_designer_v4"') !== -1 &&
+                      roleSrc.indexOf('loadPrompt("test_designer_v4")') !== -1;
+
+  return out;
+}
+
 module.exports = {
+  runS383ArrayAssertionDiscipline,
   runS382StateSurvival,
   runS373ScopeDerivation,
   runS374ReviewGate,

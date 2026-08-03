@@ -1,0 +1,26 @@
+{
+  "id": "S383",
+  "name": "test_designer_v4 array-assertion discipline — the contradictory pair is unsatisfiable, the indexed path is satisfiable, and the prompt now teaches it (PHASE-54 R-47)",
+  "description": "Locks, deterministically and mock-only, the semantics behind the R-47 prompt fix. (1) Harness truth: against an array response, response_body_is_array PASSES, a ROOT-level response_body_field_equals FAILS, and an INDEXED-path response_body_field_equals PASSES — so pairing is_array with a root-field assertion on the same response is unsatisfiable by construction, which is what made two consecutive generated plans unbuildable. (2) Fix presence: test_designer_v4 exists in the prompt registry with array guidance (list endpoints return arrays; never pair is_array with a root-field assertion; assert element content with an indexed path), v3 is retained and marked DEPRECATED, and the role binds v4. Does NOT test live model output.",
+  "type": "module_call",
+  "permission": "READ_ONLY",
+  "module": "code/src/testing/helpers/mvp_loop_test_helper",
+  "method": "runS383ArrayAssertionDiscipline",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "is_array_passes_on_array",        "expected": true },
+    { "type": "state_field_equals", "field": "root_field_fails_on_array",       "expected": true },
+    { "type": "state_field_equals", "field": "root_field_reason_is_undefined",  "expected": true },
+    { "type": "state_field_equals", "field": "indexed_field_passes_on_array",   "expected": true },
+    { "type": "state_field_equals", "field": "contradictory_pair_unsatisfiable","expected": true },
+    { "type": "state_field_equals", "field": "indexed_pair_satisfiable",        "expected": true },
+    { "type": "state_field_equals", "field": "prompt_v4_exists",                "expected": true },
+    { "type": "state_field_equals", "field": "prompt_v4_has_array_guidance",    "expected": true },
+    { "type": "state_field_equals", "field": "prompt_v4_has_indexed_example",   "expected": true },
+    { "type": "state_field_equals", "field": "prompt_v4_keeps_nine_types",      "expected": true },
+    { "type": "state_field_equals", "field": "prompt_v4_keeps_naming_rule",     "expected": true },
+    { "type": "state_field_equals", "field": "prompt_v3_retained_deprecated",   "expected": true },
+    { "type": "state_field_equals", "field": "role_binds_v4",                   "expected": true }
+  ]
+}

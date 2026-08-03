@@ -289,6 +289,84 @@ owner must not be left believing the cap bounds all spend.
 **NOT fixed in PHASE-54** — it touches the legacy provider surface and needs its own decision
 artifact.
 
+### R-47 (CTO ruling on the R-46 diagnosis, 2026-08-03)
+
+R-47 — PROMPT FIX AUTHORISED, NARROWLY, FOLLOWING THE PHASE-47 PRECEDENT.
+Scope, binding:
+  (i)   New version test_designer_v4 in docs/10_runtime/18b_ROLE_PROMPTS.md. v3 stays in the
+        file, marked DEPRECATED-superseded exactly as v1 and v2 were — the prompt history is
+        append-only.
+  (ii)  Content: the nine assertion types and the PHASE-47 naming discipline stay verbatim. Add
+        ONLY array-response guidance — that a list endpoint returns an array; that a root-level
+        field assertion is unsatisfiable against an array and must never be paired with
+        response_body_is_array on the same response; and that element content is asserted with
+        an indexed path, with a worked example alongside the existing root-field one so the
+        model has a template for both shapes. No other edits, no restructuring, no other
+        behaviour changes.
+  (iii) code/src/runtime/agents/roles/test_designer_role.js: bump the system_prompt_id to
+        test_designer_v4. That one line is the only code change permitted.
+  (iv)  SU, test-first: a scenario that locks the behaviour deterministically. Assert against a
+        mock plan that the contradictory pair (response_body_is_array + root-level
+        response_body_field_equals on the same response) is rejected, and that an indexed-path
+        assertion is accepted. Keep it hermetic and mock-only; do not attempt to test the live
+        model's output. Declare the new final SU count — the closure gate becomes 365 + N.
+  (v)   Decision-artifact entry recording R-47, the diagnosis that justifies it, and the fact
+        that this is the second surface outside Slice 1 touched during gate execution (after
+        apiServer under R-39). Both must be listed explicitly in the closure evidence so the
+        scope creep is visible rather than buried.
+  (vi)  Full gates after the change: exact suite counts, Track A clean, doctor, §ARC/L2/role
+        counts. The driver's plan guard stays in place as defence in depth — the prompt fix
+        makes contradictory plans unlikely, not impossible.
+
+#### R-47 execution record
+
+**Justifying diagnosis (R-46, $0):** the harness implements 9 assertion types;
+`response_body_field_equals` resolves its `field` from the ROOT, so a root-field assertion is
+unsatisfiable against an array — while an INDEXED path (`"0.title"`) already works today with
+zero code change (empirically: `"0.title"` → pass, `"1.title"` → pass, root `"title"` →
+`got undefined`, the exact production failure string). The existential form ("some element
+has X") is genuinely absent but not required, because the generated plans already assert
+`response_body_is_array` with `min_length: 1`. `test_designer_v3` documented the vocabulary but
+carried **no array guidance at all** and modelled a root-field example — so the generator
+composed the contradictory pair, twice in a row. Verdict: **EXISTS-BUT-UNUSED ⇒ prompt fix.**
+
+**Delivered:** `test_designer_v4` appended to 18b (v3 retained, header marked
+DEPRECATED-superseded like v1/v2); delta vs v3 is EXACTLY the one "ARRAY RESPONSES (PHASE-54
+R-47)" paragraph with WRONG/RIGHT worked examples — the 9 types, the naming discipline, the
+self-contained-setup rule, the created-id placeholder rule, the redirect/header rule, the JSON
+schema and every style guideline are carried over verbatim. **S383** written test-first
+(RED: the six fix-presence fields false while the harness-truth fields already passed → GREEN).
+
+**Two honest scope notes:**
+1. **The role bump is TWO lines, not one.** The id appears twice in
+   `test_designer_role.js` — `loadPrompt("…")` at :9 and `system_prompt_id: "…"` at :59 — and
+   both must move together or the role loads v4 while declaring v3. `git diff a69de85` on that
+   file is exactly those 2 lines, nothing else.
+2. **S340 required a companion retarget.** The PHASE-46 W-1 meta-regression pins the role's
+   ACTIVE prompt version, so it failed the moment the bump landed
+   (`active_prompt_id_is_v3: expected true, got false`). Retargeted v3 → v4 in its helper and
+   scenario, with the content checks (9 canonical names, forbidden-name prohibition) unchanged
+   in meaning — v4 carries both verbatim. This is the documented precedent: PHASE-47 bumped
+   reviewer to v6 and S344 pins v6. Flagged rather than folded in silently, because a version
+   pin exists precisely to catch UNAUTHORISED bumps; it may only be retargeted alongside an
+   authorised one.
+
+**Surfaces outside Slice 1 touched during gate execution — the complete list (R-47 v):**
+
+| # | Surface | Ruling | Delta | Why |
+|---|---|---|---|---|
+| 1 | `code/src/workspace/apiServer.js` | R-39 | +9 lines (8 comment + one `...existing,`) | pre-existing normalizer destroyed `mvp_loop`/`loop_id` on every project listing (R-38) |
+| 2 | `docs/10_runtime/18b_ROLE_PROMPTS.md` + `code/src/runtime/agents/roles/test_designer_role.js` | R-47 | new v4 prompt block + 2-line id bump | generator emitted unsatisfiable plans twice, blocking the gate (R-44/R-46) |
+
+Both are pre-existing defects that PHASE-54 was the first workload to expose; neither is a
+PHASE-54 regression. To be listed verbatim in the closure evidence.
+
+**Gates after the change:** suite **376 passed / 0 failed / 5 skipped (381)** ⇒ **N = 11**
+(S373–S383), closure gate **365 + 11 = 376** · Track A over all added live-surface lines
+(incl. apiServer and the role file): **0 matches** · doctor **ok, 35 checks, 31 PASS / 4 WARN /
+0 FAIL** · §ARC **10** · L2 **81** · roles **13** · 381 scenario files (= 376 + 5).
+The driver's R-44 plan guard **stays in place** as defence in depth.
+
 ### ERRATUM E-4 (2026-08-03, CTO-reported) — the gate was designed on a known-defective dependency
 
 The CTO designed Gate #10 assuming a satisfiable first-build test plan, while
