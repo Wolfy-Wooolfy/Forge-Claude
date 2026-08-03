@@ -5,5 +5,5 @@
   "why_needed": "production agent.invoke writes no request trace (PHASE-48 providerTrace gap), so criterion 5 (owner changes VERBATIM in the second materializer prompt) has no production artifact to read",
   "honesty_note": "prompt evidence in this run is INSTRUMENTED, not a production artifact",
   "non_interference_proof": "artifacts/spikes/phase54_gate10/dry/dry_decorator_comparison.json",
-  "at": "2026-08-03T10:44:20.922Z"
+  "at": "2026-08-03T12:26:34.065Z"
 }

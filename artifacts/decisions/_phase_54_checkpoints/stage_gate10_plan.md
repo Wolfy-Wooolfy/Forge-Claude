@@ -767,6 +767,59 @@ and `code/src/runtime/agents/roles/test_designer_role.js` (prompt id bump) — o
 after D5 closure. Not proceeding without the ruling, a decision-artifact entry, and an SU that
 locks the behaviour.
 
+## 5.q Attempt 4 — R-47 WORKED. The third trip is a FALSE POSITIVE of my own guard.
+
+The guard tripped a third time, but the premise behind §A.4 ("three contradictory plans would
+mean the fix did not take") **does not hold here — and I have to own the reason: the defect is
+in the R-44 guard I wrote, not in the prompt fix.**
+
+**R-47 demonstrably took.** The prompt trace proves the model received v4 verbatim:
+`ARRAY RESPONSES (PHASE-54 R-47` present · `RIGHT (indexed element assertion)` present ·
+`"field": "0.title"` example present · `NEVER pair` rule present · full v4-sized prompt.
+
+**And the model followed it.** The generated T-3:
+
+```json
+{ "type": "response_body_is_array",     "min_length": 1 }
+{ "type": "response_body_field_equals", "field": "0.title", "expected": "Test Note" }
+{ "type": "response_body_field_equals", "field": "0.body",  "expected": "Test Body" }
+```
+
+That is **exactly the RIGHT form v4 teaches** — the indexed path, not the root field. Evaluated
+against a realistic list response `[{id:1,title:"Test Note",body:"Test Body"}]`, all three pass:
+`is_array(min 1)` → `{pass:true}` · `0.title` → `{pass:true}` · `0.body` → `{pass:true}`.
+**The plan is satisfiable.** The two prior attempts emitted root-level `field: "title"`; this one
+did not. The prompt fix changed the behaviour it was written to change.
+
+**My guard's defect:** `_screenTestPlan` flags ANY co-occurrence of `response_body_is_array` and
+`response_body_field_equals` in one scenario, **without inspecting the field path**. It therefore
+rejects precisely the construct R-47 established as correct. The ruling that authorised it said
+"narrowly scope it to the provably-contradictory pair you found" — the pair I found was
+**root-level**, and my implementation failed to encode that qualifier. The guard has been broader
+than its authorisation since I wrote it; attempt 4 is the first plan good enough to expose it.
+
+**Cost of my defect:** attempt 4 aborted a GOOD plan after Stage-B — **$0.10811 real cash**
+(est $0.49310). Cumulative **$0.55002**. No build ran (`src/` absent), so nothing downstream was
+wasted.
+
+**Everything is resumable — no reset needed and no Stage-B re-spend.** `designTests` completed
+and advanced before the guard threw: graph **BUILDER, iteration_count 0**, `mvp_loop`
+**SCOPE_DERIVED**, and `spec.json` / `architect_design.json` / `test_plan.json` /
+`mvp_scope.json` all **INTACT**. Resuming from BUILDER costs ~$0.03–0.05 (builder +
+materializer + harness) instead of ~$0.15 for a fresh run — and it preserves the good plan
+rather than rolling the generator again.
+
+**Proposed, NOT applied (needs the ruling §A.4 requires):**
+1. **$0 guard fix (one predicate):** flag only when the field path is **root-level** — i.e. its
+   first dot-segment is not a non-negative integer index. `field: "title"` → flag;
+   `field: "0.title"`, `field: "0.author.name"` → pass. This restores the guard to exactly the
+   authorisation, and S383 already locks the semantics that make the distinction correct.
+2. **Resume rather than reset:** a `real-a-continue`-style resume from BUILDER on the existing
+   good plan (~$0.03–0.05), instead of reset + full re-run (~$0.15).
+   Projection with resume: **$0.55002 + ~$0.05 ≈ $0.60** — under the $0.75 threshold, so the
+   owner's standing approval still covers it. With a full re-run instead: ≈$0.70, also under,
+   but wasteful and it discards a plan that is already correct.
+
 ## 6. Hygiene + rulings status
 
 - `.gitignore` + `artifacts/projects/phase54_gate10_*/` (PHASE-48 W-4 precedent — driver

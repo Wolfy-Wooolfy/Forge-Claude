@@ -5,7 +5,7 @@
   "offenders": [
     {
       "scenario_id": "T-3",
-      "name": "get_all_notes_returns_notes",
+      "name": "list_notes_returns_array_with_notes",
       "assertions": [
         {
           "type": "http_status_equals",
@@ -13,17 +13,13 @@
         },
         {
           "type": "response_body_is_array",
-          "min_length": 1
+          "min_length": 1,
+          "max_length": 10
         },
         {
           "type": "response_body_field_equals",
-          "field": "0.title",
-          "expected": "Test Note"
-        },
-        {
-          "type": "response_body_field_equals",
-          "field": "0.body",
-          "expected": "Test Body"
+          "field": "title",
+          "expected": "Buy groceries"
         }
       ],
       "why": "asserts the body IS an array AND that it has a root-level object field — mutually exclusive; unsatisfiable by any implementation"
@@ -31,8 +27,8 @@
   ],
   "ledger_delta_at_screen": {
     "rows": 7,
-    "estimated": 0.4931000000000001,
-    "actual": 0.10810999999999993
+    "estimated": 0.5077000000000016,
+    "actual": 0.11891000000000052
   },
   "note": "R-44 driver-only fail-fast screen; narrow by ruling to the array-vs-root-field pair."
 }

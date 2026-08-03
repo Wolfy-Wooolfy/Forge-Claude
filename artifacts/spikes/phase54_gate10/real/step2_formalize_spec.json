@@ -5,58 +5,54 @@
   "advanced_to": "REVIEWER_SPEC",
   "spec": {
     "role_id": "spec_writer",
-    "scope": "The project will build a personal notes REST API using Node.js and Express, with operations for creating, listing, and deleting notes. The notes are stored in-memory using a JavaScript Object with sequential integer IDs starting at 1 for new notes. The API does not include authentication or a frontend and operates entirely server-side.",
+    "scope": "This project involves developing a simple REST API for managing personal notes. The system will allow users to create a note, retrieve a list of all notes, and delete a specific note by its id. The backend will be built using Node.js and Express, with in-memory storage for the notes data. No authentication or frontend components are required.",
     "decisions": [
       {
-        "decision": "Store notes in an in-memory JavaScript Object.",
-        "rationale": "This fits the requirement for temporary, volatile storage and allows fast data access and modification during requests."
+        "decision": "Use in-memory storage for notes data",
+        "rationale": "The requirement specifies transient data without persistence. In-memory storage is simple and fits personal use cases."
       },
       {
-        "decision": "Generate sequential integer IDs starting at 1 for new notes using a JavaScript function.",
-        "rationale": "This ensures each note has a unique and predictable server-assigned identifier without needing user input."
+        "decision": "Define a sequential id scheme starting at 1 for notes",
+        "rationale": "The design specifies a sequential integer id starting at 1 to uniquely identify each note."
       },
       {
-        "decision": "Serve the API at the root path without a version or /api prefix.",
-        "rationale": "This simplifies the URL structure and aligns with the provided design specification."
+        "decision": "Implement API endpoints at the root path without prefixes",
+        "rationale": "This is consistent with the design, which does not specify any versioning or api prefix."
       }
     ],
     "acceptance_criteria": [
       {
         "id": "AC-1",
-        "description": "Create a note: POST /notes with JSON body { \"title\": \"<string>\", \"body\": \"<string>\", \"category\": \"<string>\", \"tags\": [\"<string>\"] }. The response must include the created note with a server-assigned id."
+        "description": "POST /notes creates a note with fields title and body, assigns a server-generated sequential integer id starting at 1, and returns a JSON response with the created note including id, title, and body."
       },
       {
         "id": "AC-2",
-        "description": "Return a 400 error if any required field (title, body, category, tags) is missing when creating a note."
+        "description": "GET /notes retrieves all stored notes, returning a JSON array of notes with each note containing id, title, and body."
       },
       {
         "id": "AC-3",
-        "description": "List all notes: GET /notes should return an array of notes with fields { \"id\": \"<integer>\", \"title\": \"<string>\", \"body\": \"<string>\", \"category\": \"<string>\", \"tags\": [\"<string>\"] } for each note."
-      },
-      {
-        "id": "AC-4",
-        "description": "Delete a note: DELETE /notes/:id should delete the note with the given id and return a 204 status code. If the note does not exist, it should return a 404 status code with an error object { \"error\": { \"message\": \"Note not found\" } }."
+        "description": "DELETE /notes/:id removes the note with the specified id from storage and returns a 404 JSON error response if the note does not exist."
       }
     ],
     "files_to_create": [
       {
         "path": "src/server.js",
-        "purpose": "Sets up the Node.js server, mounts all routes, and calls app.listen to accept HTTP requests."
+        "purpose": "Sets up the Express server, mounts all routes, and listens on a specified port."
       },
       {
-        "path": "src/app.js",
-        "purpose": "Contains the main Express application setup, route definitions, and in-memory data handling logic."
+        "path": "src/controllers/NotesController.js",
+        "purpose": "Implements business logic for creating, listing, and deleting notes."
       },
       {
-        "path": "src/idGenerator.js",
-        "purpose": "Provides functionality to generate sequential integer IDs starting at 1 for new notes."
+        "path": "src/storage/InMemoryNotesStorage.js",
+        "purpose": "Manages storage and retrieval of notes data in memory."
       }
     ],
     "files_to_modify": [],
     "out_of_scope": [
-      "Any form of data persistence beyond in-memory storage.",
-      "Authentication or user-specific access control.",
-      "Frontend or client-side components."
+      "Authentication and authorization mechanisms",
+      "Persistent storage solution",
+      "User interface or frontend components"
     ]
   },
   "model_used": "gpt-4o"

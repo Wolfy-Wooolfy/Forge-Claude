@@ -7,16 +7,25 @@
     "runtime_dependencies": [
       {
         "name": "Node.js",
-        "version_constraint": "^18.0.0",
-        "purpose": "Node.js runtime needed for executing JavaScript server-side applications."
+        "version_constraint": "18.x",
+        "purpose": "To run the Express-based REST API application"
       },
       {
         "name": "Express",
-        "version_constraint": "^4.18.0",
-        "purpose": "Web framework for building the REST API."
+        "version_constraint": "4.x",
+        "purpose": "Web framework for handling HTTP requests and responses"
       }
     ],
-    "environment_variables": [],
+    "environment_variables": [
+      {
+        "name": "PORT",
+        "purpose": "Defines the port on which the server listens",
+        "format": "integer",
+        "required": true,
+        "is_secret": false,
+        "example": "3000"
+      }
+    ],
     "external_services": [],
     "os_requirements": {
       "os_family": "linux",
@@ -27,13 +36,14 @@
     "container_recommendation": {
       "base_image": "node:18-alpine",
       "multi_stage": false,
-      "notes": "Using a lightweight Node.js image to reduce container size."
+      "notes": "Use a lightweight Node.js image to minimize resource usage"
     },
     "filesystem_requirements": [],
     "assumption_flags": [
-      "Assuming no external database or persistent storage is required beyond in-memory."
+      "In-memory storage assumes data will not persist across server restarts",
+      "Single-instance deployment due to in-memory storage limitations"
     ],
-    "summary": "The environment is a containerized Node.js server with Express to handle REST API operations for an in-memory notes application. Key dependencies are Node.js and Express. The primary risk is data loss due to the lack of persistent storage."
+    "summary": "The environment requires a container with Node.js 18.x and Express 4.x to serve a REST API managing personal notes. Key risks include data loss on server restart due to in-memory storage and limited scalability for small, personal use cases."
   },
   "gate_pending": 1,
   "advanced": false,

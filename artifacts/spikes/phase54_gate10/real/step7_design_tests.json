@@ -11,7 +11,6 @@
         "name": "create_note_returns_201",
         "description": "POST /notes with valid payload returns 201 and created note",
         "category": "http",
-        "fixture": "empty_db",
         "setup": {
           "actions": [
             {
@@ -30,13 +29,8 @@
             "Content-Type": "application/json"
           },
           "body": {
-            "title": "Meeting notes",
-            "body": "Discuss project timeline and milestones",
-            "category": "Work",
-            "tags": [
-              "meetings",
-              "work"
-            ]
+            "title": "Note Title",
+            "body": "This is the body of the note"
           }
         },
         "assertions": [
@@ -51,7 +45,12 @@
           {
             "type": "response_body_field_equals",
             "field": "title",
-            "expected": "Meeting notes"
+            "expected": "Note Title"
+          },
+          {
+            "type": "response_body_field_equals",
+            "field": "body",
+            "expected": "This is the body of the note"
           }
         ],
         "teardown": {
@@ -70,10 +69,9 @@
       },
       {
         "id": "T-2",
-        "name": "list_notes_initially_empty_returns_200",
-        "description": "GET /notes when no notes exist returns 200 and empty array",
+        "name": "get_all_notes_returns_empty_array",
+        "description": "GET /notes on fresh database returns an empty array",
         "category": "http",
-        "fixture": "empty_db",
         "setup": {
           "actions": [
             {
@@ -88,10 +86,7 @@
           "type": "http_request",
           "method": "GET",
           "url": "http://localhost:3000/notes",
-          "headers": {
-            "Content-Type": "application/json"
-          },
-          "body": {}
+          "headers": {}
         },
         "assertions": [
           {
@@ -113,17 +108,16 @@
         },
         "metadata": {
           "covers_ac": [
-            "AC-3"
+            "AC-2"
           ],
           "estimated_duration_ms": 300
         }
       },
       {
         "id": "T-3",
-        "name": "list_notes_returns_array_with_notes",
-        "description": "GET /notes returns an array with the created notes",
+        "name": "get_all_notes_returns_notes",
+        "description": "GET /notes after creating a note returns a non-empty array",
         "category": "http",
-        "fixture": "fresh_db",
         "setup": {
           "actions": [
             {
@@ -140,13 +134,8 @@
                 "Content-Type": "application/json"
               },
               "body": {
-                "title": "Buy groceries",
-                "body": "Get milk, eggs, and bread",
-                "category": "Personal",
-                "tags": [
-                  "shopping",
-                  "errands"
-                ]
+                "title": "Test Note",
+                "body": "Test Body"
               }
             }
           ]
@@ -155,9 +144,7 @@
           "type": "http_request",
           "method": "GET",
           "url": "http://localhost:3000/notes",
-          "headers": {
-            "Content-Type": "application/json"
-          }
+          "headers": {}
         },
         "assertions": [
           {
@@ -166,13 +153,17 @@
           },
           {
             "type": "response_body_is_array",
-            "min_length": 1,
-            "max_length": 10
+            "min_length": 1
           },
           {
             "type": "response_body_field_equals",
-            "field": "title",
-            "expected": "Buy groceries"
+            "field": "0.title",
+            "expected": "Test Note"
+          },
+          {
+            "type": "response_body_field_equals",
+            "field": "0.body",
+            "expected": "Test Body"
           }
         ],
         "teardown": {
@@ -184,9 +175,9 @@
         },
         "metadata": {
           "covers_ac": [
-            "AC-3"
+            "AC-2"
           ],
-          "estimated_duration_ms": 600
+          "estimated_duration_ms": 500
         }
       }
     ],
