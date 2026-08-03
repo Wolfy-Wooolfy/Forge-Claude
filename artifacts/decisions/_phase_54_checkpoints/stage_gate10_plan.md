@@ -723,6 +723,50 @@ ruling.
 assertion for array responses, so it reaches for the root-field one. That is a hypothesis from
 two samples, offered as a starting point — not a diagnosis.
 
+## 5.p R-46(1) — DIAGNOSIS ($0): EXISTS-BUT-UNUSED ⇒ prompt fix, not a harness change
+
+**(a) What the harness implements — 9 assertion types**
+(`code/src/runtime/builtproject/assertion_types/`): `file_exists`, `http_status_equals`,
+`process_exit_code_equals`, `response_body_contains_key`, `response_body_field_equals`,
+`response_body_is_array`, `response_body_matches_schema`, `response_header_equals`,
+`stdout_contains`.
+
+**Element-wise capability — split answer, verified empirically at $0:**
+
+| Form | Status | Evidence |
+|---|---|---|
+| **Positional** — "element *[i]* has field X = Y" | **EXISTS TODAY, zero code change** | `response_body_field_equals` walks dot-notation from the root (`response_body_field_equals.js:15-22`); arrays are objects, so `field: "0.title"` resolves `body["0"].title`. Ran it: `"0.title"` → `{pass:true}`, `"1.title"` → `{pass:true}`, while root `"title"` → `{pass:false, "Expected body.title …, got undefined"}` — the exact production failure |
+| **Existential** — "SOME element has X = Y" | **genuinely ABSENT** | no type implements it; `response_body_matches_schema` rejects arrays for `required` ("Body must be an object to check required keys") and has no `items` support (`type:"array"` alone passes) |
+
+**The existential form is not required for the gate.** The generated plans already assert
+`response_body_is_array` with `min_length: 1`, so element `[0]` is guaranteed present and the
+positional form expresses the intent exactly.
+
+**(b) The role prompt — `test_designer_v3` (docs/10_runtime/18b_ROLE_PROMPTS.md:2073+)**
+- It **does** document the vocabulary: all 9 types with example JSON, plus the PHASE-47 HARD
+  RULE on exact assertion names.
+- Its `response_body_field_equals` example is `{ "field": "title", "expected": "Buy milk" }` —
+  a **root-level** field, shown with no array context.
+- **There is NO array guidance anywhere**: no statement that a list endpoint returns an array,
+  no indexed-path example, no warning that a root-field assertion cannot hold on an array.
+
+So the generator has a correct vocabulary, an example that models root-field usage, and nothing
+telling it what to do for a list response. Asked to assert list contents, it composes
+`response_body_is_array` + root `response_body_field_equals` — the contradiction, twice.
+
+**(c) VERDICT: EXISTS-BUT-UNUSED ⇒ a prompt/documentation fix.** The harness needs no new
+capability for Gate #10 to proceed. This is the cheapest fix class and matches the PHASE-47
+precedent exactly (prompt-only remediation + `loadPrompt` id bump + a deterministic SU).
+
+**Budget for the ruling:** spent **$0.44191**, remaining **$0.55809**. One further clean real-a
+≈ $0.15 ⇒ cumulative ≈ **$0.59** — under the $0.75 threshold, so the owner's standing approval
+covers it and no fresh approval is needed.
+
+**STOPPING for the scope ruling per R-46(2):** the fix touches `docs/10_runtime/18b_ROLE_PROMPTS.md`
+and `code/src/runtime/agents/roles/test_designer_role.js` (prompt id bump) — outside Slice 1,
+after D5 closure. Not proceeding without the ruling, a decision-artifact entry, and an SU that
+locks the behaviour.
+
 ## 6. Hygiene + rulings status
 
 - `.gitignore` + `artifacts/projects/phase54_gate10_*/` (PHASE-48 W-4 precedent — driver

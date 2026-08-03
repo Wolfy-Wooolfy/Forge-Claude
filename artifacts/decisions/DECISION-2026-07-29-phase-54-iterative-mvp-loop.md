@@ -289,6 +289,16 @@ owner must not be left believing the cap bounds all spend.
 **NOT fixed in PHASE-54** — it touches the legacy provider surface and needs its own decision
 artifact.
 
+### ERRATUM E-4 (2026-08-03, CTO-reported) — the gate was designed on a known-defective dependency
+
+The CTO designed Gate #10 assuming a satisfiable first-build test plan, while
+*"test_designer assertion-name discipline"* was **already a known PHASE-45 backlog item in the
+CTO's own state summary**. Designing an owner-witnessed gate whose success depends on a
+known-defective upstream component, with no mitigation, is a **CTO planning failure**. Cost:
+roughly **$0.30** of the owner's approved budget across attempts 2 and 3
+($0.17770 + $0.11891), before the R-44 guard converted the failure mode into a $0-diagnosed
+fail-fast. Recorded alongside E-1, E-2 and E-3 per the bidirectional Trust+Verify norm.
+
 #### NAMED BACKLOG ITEM (per R-45) — `R10-NO-OWNER-ESCAPE-ON-FIRST-BUILD`
 
 **Finding.** R-10 is the safety net for "the frozen test plan conflicts with reality", but it
