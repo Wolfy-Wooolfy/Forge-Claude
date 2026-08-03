@@ -820,6 +820,47 @@ rather than rolling the generator again.
    owner's standing approval still covers it. With a full re-run instead: ≈$0.70, also under,
    but wasteful and it discards a plan that is already correct.
 
+## 5.r R-43 steps 2+3 — R-39 PROVEN IN THE LIVE ENVIRONMENT ($0)
+
+**Forensic read first (before any HTTP call of mine).** The owner had already loaded the UI, so
+his browser had already fired `GET /api/projects`. The evidence that it did:
+`project_state.json` mtime **12:58:25.143Z** versus real-a's report at **12:38:48.596Z** — the
+file was rewritten ~20 minutes after the run — and the key count is **47**, the full legacy
+schema, where real-a persisted only 8 keys. **The normalizer ran.** And:
+
+| Check | Result |
+|---|---|
+| `mvp_loop` present | **yes** |
+| `mvp_loop.status` | **AWAITING_OWNER_REVIEW** |
+| `loop_id` present | **`gate10_real`** |
+| block byte-identical to the snapshot real-a persisted | **YES** |
+
+**This is the strongest available evidence for R-39: the exact event that destroyed the gate on
+2026-08-02 happened again, in the owner's real environment, and the block survived byte for byte.**
+
+**Step 2 — the server carries post-R-39 code:**
+listener **PID 32856**, StartTime **2026-08-03T12:58:23.704Z** ·
+`apiServer.js` mtime **2026-08-02T10:12:55.696Z** · **StartTime > mtime = TRUE**.
+
+**Step 3 — my own live entry-point check, authenticated exactly as the browser:**
+a first unauthenticated attempt returned **401** — the server was started via `start()` this
+time, so the capability gate is active and that request never reached `listProjects()`; it
+proved nothing and is reported rather than discarded. Re-run after taking the token from the
+HTML shell the way the browser does: **`GET /api/projects` → 200, 52 projects listed, the demo
+among them**, `project_state.json` rewritten by that call (mtime 12:58:25.143Z →
+13:00:30.276Z), and afterwards: `mvp_loop` present, status **AWAITING_OWNER_REVIEW**,
+**byte-identical**, `loop_id` **`gate10_real`** intact, 47 keys.
+
+**Cost: $0.00** (both columns). Cumulative unchanged at **$0.57866**.
+
+**BACKLOG (logged, not fixed): `RUN_FORGE_BAT_NOT_RESTART_SAFE`.** On today's restart
+RUN_FORGE.bat failed — pm2 reported *"Process 0 not found"* and then threw a TypeError on
+`pm2_env` at `API.js:1718` while applying the restart, because its process list still referenced
+the killed process. The owner recovered manually and the server is listening on 3100 with
+`phase54_gate10_demo` active. Note this supersedes nothing: the earlier note that RUN_FORGE.bat
+*starts* the server stands; what fails is *restarting* over a dead pm2 entry. Needs its own
+decision artifact.
+
 ## 6. Hygiene + rulings status
 
 - `.gitignore` + `artifacts/projects/phase54_gate10_*/` (PHASE-48 W-4 precedent — driver
