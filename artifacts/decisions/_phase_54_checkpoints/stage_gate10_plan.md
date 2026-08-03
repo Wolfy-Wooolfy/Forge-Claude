@@ -861,6 +861,88 @@ the killed process. The owner recovered manually and the server is listening on 
 *starts* the server stands; what fails is *restarting* over a dead pm2 entry. Needs its own
 decision artifact.
 
+## 5.s THE OWNER LOOP IS CLOSED ON THE REAL PATH — real-b + ACCEPT + real-c partial
+
+**The phase's core objective is met.** On the genuine entry point, with a real provider and the
+owner typing Arabic into the real UI:
+build → present → **REFINE** → threaded into codegen → rebuild → re-present → **ACCEPT** →
+deferred advance. Evidence below; nothing here is scripted.
+
+**Owner turn 1 (REFINE).** `decision: "REFINE"`, provider-driven (`agent.invoke`,
+`role_id: mvp_feedback`) — zero keyword matching (R-12). One Arabic sentence decomposed into
+three concrete changes, recorded verbatim in `feedback_history` and `mvp_owner_feedback.json`:
+
+```
+"Record the creation time for each note"
+"Display the creation time in the add response"
+"Display the creation time in the note list"
+```
+
+**Loop-back (R-2/RULING-2).** Exactly one row: `from_state=RUN_TESTS → to_state=BUILDER`,
+`type=LOOP_BACK`, ts 13:02:55.678Z; `iteration_count` **0 → 1**; zero NORMAL advances out of
+RUN_TESTS. The dynamic `from_state` reads RUN_TESTS, as RULING-2 requires.
+
+**Threading (R-8).** The R-24 decorator captured two materializer prompts; the SECOND contains
+all three changes **verbatim** under a dedicated marker, with the repair block absent because
+the first build's tests had passed (so R-8(iii) ordering holds vacuously and is not overclaimed):
+
+```
+OWNER REFINE REQUESTS (from the project owner's review of the working MVP) — implement EACH of
+these changes exactly, without regressing the acceptance criteria that still apply:
+- Record the creation time for each note
+- Display the creation time in the add response
+- Display the creation time in the note list
+```
+
+Rebuild: 3 files, harness **3/3 PASS**, advance suppressed again, second report presented,
+`mvp_loop` back to AWAITING_OWNER_REVIEW at iteration 1. Observed data (not a criterion): the
+rebuilt `src/storage/InMemoryNotesStorage.js` now carries a creation-time notion.
+
+**Owner turn 2 (ACCEPT) — the deferred advance is parameter-identical (R-7 ii).** Audit row:
+
+```
+from_state=RUN_TESTS  to_state=REVIEWER_CODE_AND_SECURITY  transition_type=NORMAL
+role_invoked=builtproject   ts=2026-08-03T13:10:45.183Z
+```
+
+Compare the flag-off advance `runTests` emits at conversationEngine.js:2564-2566
+(`to_state REVIEWER_CODE_AND_SECURITY` / `transition_type NORMAL` / `role_invoked builtproject`)
+against the deferred one at :874-876 — **the same three parameters**. The flag-ON ACCEPT
+trajectory converges on the flag-off graph trajectory exactly as ruled.
+
+**Criterion 12 — N/A, with the reason stated.** The owner replied to a `PASS_REVIEW` report
+(3/3 passing) and took the plain ACCEPT path; `mvp_loop.accepted_with_failing_tests` is absent
+and `feedback_history` records `decision: "ACCEPT"`. There is therefore no AWFT marker to
+propagate, and **the downstream-marker surface remains proven by S380 alone, NOT by this live
+run.**
+
+## 5.t real-c stopped at reviewProject — a pipeline VERDICT, not a mechanical failure
+
+`reviewProject` ran for real and returned **`derived_verdict: REQUEST_CHANGES`** →
+`advanced_to: BUILDER`, `loop_back: true`. reviewer **REJECTED** with **4 BLOCKERs**
+(unnecessary `body-parser` import; POST /notes missing field validation; DELETE /notes/:id not
+returning a 404 JSON error; an unspecified GET /notes/:id route); security **LOW, 0 BLOCKERs**.
+The bridge behaved correctly — this is the documented REQUEST_CHANGES branch. What stopped is
+the DRIVER, whose `real-c` expects DOCUMENTATION.
+
+**R-17 observed live.** The graph looped back to **BUILDER, iteration_count 2**, while
+`mvp_loop.status` stayed **ACCEPTED** at iteration 1 — the loop did **not** re-engage, exactly
+as R-17 specifies, and nothing crashed or half-engaged. This is the first live occurrence of the
+`R10-NO-OWNER-ESCAPE-ON-FIRST-BUILD` sibling case: a post-ACCEPTED loop-back goes through the
+pre-PHASE-54 blind path with no owner MVP review.
+
+**R-37 paid for itself here.** The leg's ESTIMATED delta reached **$1.00330** while REAL CASH
+was **$0.21523**. Under the pre-R-37 guard (cap on the estimated column) the gate would have
+aborted mid-review at a bookkeeping figure, with real spend at a fifth of the cap.
+
+**Cost:** leg (attempt-4 + resume + real-b + real-c-partial) est **$1.00330** / **REAL CASH
+$0.21523**. **Cumulative PHASE-54 real cash: $0.65714** of the approved $1.00 — under the $0.75
+threshold, but no further spend without a ruling.
+
+**`verify` cannot run yet:** it reads `real/real_endpoint.json`, which `real-c` writes only after
+judgeQuality. The endpoint-dependent criteria (9 zero-HALT/endpoint, 10 cap, 12 AWFT) are not
+computable from persisted evidence until real-c completes.
+
 ## 6. Hygiene + rulings status
 
 - `.gitignore` + `artifacts/projects/phase54_gate10_*/` (PHASE-48 W-4 precedent — driver
