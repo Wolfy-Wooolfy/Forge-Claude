@@ -362,19 +362,32 @@ async function _architectToTestDesign(pid, loopId, leg, llm) {
 // general-purpose validator and must not grow into one.
 const PLAN_GUARD_DIAGNOSTIC = "CONTRADICTORY_ASSERTION_PAIR_ARRAY_VS_ROOT_FIELD";
 
+// R-48: the flag fires ONLY on a ROOT-LEVEL field path. An indexed path ("0.title",
+// "0.author.name") is the CORRECT construct taught by test_designer_v4 and must pass —
+// the original predicate ignored the path and rejected exactly the fixed output
+// (attempt 4, $0.10811). Root-level = the first dot-segment is not a numeric index.
+function _isRootLevelFieldPath(field) {
+  const first = String(field == null ? "" : field).split(".")[0];
+  return !/^\d+$/.test(first);
+}
+
 function _screenTestPlan(plan) {
   const scenarios = (plan && Array.isArray(plan.scenarios)) ? plan.scenarios : [];
   const offenders = [];
   for (const s of scenarios) {
-    const types = (Array.isArray(s.assertions) ? s.assertions : []).map((a) => a && a.type);
-    const isArray   = types.indexOf("response_body_is_array") !== -1;
-    const rootField = types.indexOf("response_body_field_equals") !== -1;
-    if (isArray && rootField) {
+    const assertions = Array.isArray(s.assertions) ? s.assertions : [];
+    const isArray = assertions.some((a) => a && a.type === "response_body_is_array");
+    const rootFieldAssertions = assertions.filter(
+      (a) => a && a.type === "response_body_field_equals" && _isRootLevelFieldPath(a.field));
+    if (isArray && rootFieldAssertions.length > 0) {
       offenders.push({
         scenario_id: s.id, name: s.name,
         assertions: s.assertions,
-        why: "asserts the body IS an array AND that it has a root-level object field — " +
-             "mutually exclusive; unsatisfiable by any implementation"
+        root_level_fields: rootFieldAssertions.map((a) => a.field),
+        why: "asserts the body IS an array AND that it has a ROOT-LEVEL object field " +
+             "(" + rootFieldAssertions.map((a) => JSON.stringify(a.field)).join(", ") + ") — " +
+             "mutually exclusive; unsatisfiable by any implementation. Use an indexed path " +
+             "(e.g. \"0.title\") per test_designer_v4."
       });
     }
   }
@@ -700,6 +713,78 @@ async function realAContinue() {
     " iteration=" + (gAfter && gAfter.iteration_count) + " — STOP for a ruling.");
 }
 
+// ── stage: real-a-resume (R-49) — continue from BUILDER on EXISTING artifacts ──
+//
+// For the case where real-a aborted AFTER designTests already advanced the graph
+// (attempt 4: the pre-fix plan guard rejected a plan that was in fact correct).
+// Re-running Stage-B would discard a plan already proven satisfiable and pay ~$0.15
+// to regenerate what we have. This resumes from the persisted state: it does NOT
+// re-derive the scope, does NOT re-run designTests, and does NOT re-run any completed
+// Stage-B step — it performs only the build + harness run real-a would have done next.
+async function realAResume() {
+  await _hydrateKeyFromKeychain();
+  _requireApproval();
+  const leg = "real";
+  _armPromptRecorder(leg);
+
+  // ── preconditions, all checked before any spend ────────────────────────────
+  const st = _readJson("artifacts/projects/" + PID_REAL + "/project_state.json");
+  const g  = await _graph(PID_REAL, LOOP_REAL);
+  const od = "artifacts/projects/" + PID_REAL + "/orchestration/" + LOOP_REAL + "/";
+  const required = ["spec.json", "architect_design.json", "test_plan.json", "mvp_scope.json"];
+  const missing  = required.filter((f) => !_readJson(od + f));
+
+  const pre = {
+    graph_at_builder:     !!(g && g.current_state === "BUILDER"),
+    iteration_zero:       !!(g && g.iteration_count === 0),
+    mvp_scope_derived:    !!(st && st.mvp_loop && st.mvp_loop.status === "SCOPE_DERIVED"),
+    artifacts_present:    missing.length === 0,
+    missing_artifacts:    missing
+  };
+  _writeEv(leg, "step7b_resume_preconditions.json", pre);
+  if (!pre.graph_at_builder || !pre.iteration_zero || !pre.mvp_scope_derived || !pre.artifacts_present) {
+    throw new Error("resume preconditions not met: " + JSON.stringify(pre));
+  }
+
+  // Re-screen the EXISTING plan with the narrowed R-48 guard before spending.
+  const screen = _screenTestPlan(_readJson(od + "test_plan.json"));
+  _writeEv(leg, "step7c_resume_plan_rescreen.json", {
+    diagnostic: screen.diagnostic, passed: screen.ok, offenders: screen.offenders
+  });
+  if (!screen.ok) throw new Error("PLAN_GUARD:" + screen.diagnostic + " (on resume re-screen)");
+  console.log("  [resume] graph=BUILDER iteration=0, scope derived, 4/4 artifacts, plan re-screened CLEAN");
+
+  const bp = await eng.buildProject({ project_id: PID_REAL, loop_id: LOOP_REAL,
+    build_provider: "openai", build_model: "gpt-4o",
+    mat_provider: "openai", mat_model: "gpt-4o" });
+  _writeEv(leg, "step8_build.json", bp);
+  _capGuard(leg, "post-resume-build");
+  if (!bp.advanced) throw new Error("buildProject: " + bp.build_error);
+
+  const rt = await eng.runTests({ project_id: PID_REAL, loop_id: LOOP_REAL });
+  _writeEv(leg, "step9_run_tests.json", rt);
+  _capGuard(leg, "post-resume-test");
+
+  if (rt.advanced === false && rt.mvp_review_pending === true) {
+    _snapshotMvpArtifacts(PID_REAL, LOOP_REAL, leg, "first_review");
+    _copyAudit(PID_REAL, LOOP_REAL, leg);
+    console.log("\n=== PAUSED — awaiting the OWNER's REFINE turn via the real UI ===");
+    console.log("Report summary (ar): " + (rt.mvp_report && rt.mvp_report.summary_ar));
+    console.log("R-43: the owner MUST fully restart the server BEFORE switching projects.");
+    return;
+  }
+
+  // R-49(iv): a failing harness here is the legitimate R-10 path, not an error.
+  _writeEv(leg, "UNEXPECTED_rt1.json", rt);
+  _snapshotMvpArtifacts(PID_REAL, LOOP_REAL, leg, "post_resume_not_at_gate");
+  _copyAudit(PID_REAL, LOOP_REAL, leg);
+  const gAfter = await _graph(PID_REAL, LOOP_REAL);
+  console.log("\n=== Did not reach the owner gate — R-10 internal path (legitimate) ===");
+  console.log("advanced_to=" + rt.advanced_to + " loop_back=" + rt.loop_back +
+    " graph=" + (gAfter && gAfter.current_state) + " iteration=" + (gAfter && gAfter.iteration_count));
+  console.log("STOP for a ruling (R-49 iv) — not looping.");
+}
+
 async function realB() {
   await _hydrateKeyFromKeychain();
   _requireApproval();
@@ -940,11 +1025,12 @@ async function status() {
   if (stage === "preflight")   await preflight();
   else if (stage === "dry")    await dry();
   else if (stage === "real-a") await realA();
+  else if (stage === "real-a-resume") await realAResume();
   else if (stage === "real-a-continue") await realAContinue();
   else if (stage === "real-b") await realB();
   else if (stage === "real-c") await realC();
   else if (stage === "verify") await verify();
   else if (stage === "status") await status();
   else if (stage === "reset")  await reset();
-  else { console.log("usage: node scripts/spikes/phase54_gate10.js preflight|dry|real-a|real-a-continue|real-b|real-c|verify|status|reset"); process.exit(1); }
+  else { console.log("usage: node scripts/spikes/phase54_gate10.js preflight|dry|real-a|real-a-resume|real-a-continue|real-b|real-c|verify|status|reset"); process.exit(1); }
 })().catch(e => { console.error("GATE DRIVER ERROR:", e.message); process.exit(1); });
