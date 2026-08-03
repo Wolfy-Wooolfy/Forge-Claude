@@ -7,20 +7,20 @@
     {
       "path": "src/server.js",
       "action": "create",
-      "line_count": 12,
-      "sha256": "1f90f88bd248e3d28631cefdb8e45e254a21f7fbc1e7d2e0c46a088bdbc3c6ba"
+      "line_count": 13,
+      "sha256": "1c86ecd5d3962a698564970633d58d742ba2650763b9a6e04da988c619aa78db"
     },
     {
       "path": "src/routes/notes.js",
       "action": "create",
-      "line_count": 36,
-      "sha256": "bfd7a89004acd907f3549a67630860ddd43602e6a12091be51c530ffb4ca0771"
+      "line_count": 34,
+      "sha256": "25dd0c07453ba9b7e857de526a2f31fdf55c7d715d0eb50be1ce5dd51d25ca5f"
     },
     {
-      "path": "src/storage/notesStorage.js",
+      "path": "src/storage/inMemoryStorage.js",
       "action": "create",
-      "line_count": 27,
-      "sha256": "19c4d78cf327d9ffa936e02024547618ec39b73db4cb31f7e83db1e503fe3664"
+      "line_count": 34,
+      "sha256": "b7c62c29d5abe88ffe44a3e43fca47e72c17361abd8cf2d50e4709bb822e393c"
     }
   ],
   "smoke": {

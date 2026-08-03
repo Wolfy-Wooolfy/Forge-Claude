@@ -679,6 +679,50 @@ self-contradictory assertion sets (e.g. `response_body_is_array` together with
 That turns a ~$0.15 coin flip into a ~$0.09 fail-fast with a named diagnosis, and it would have
 caught this run before both build cycles.
 
+## 5.o R-44 attempt 3 — guard worked, and it caught the SAME contradiction again (R-44 iv STOP)
+
+Reset verified (58→57, `REMOVED: ["phase54_gate10_demo"]` only), 11b snapshot re-taken,
+projection reported before spending (≈$0.47 cumulative, under both thresholds).
+
+`test_designer` produced a **second contradictory plan in a row** — a different scenario id, the
+identical defect class:
+
+```
+T-3  list_notes_returns_array_with_notes
+  http_status_equals        200
+  response_body_is_array    min 1, max 10          <- body IS an array
+  response_body_field_equals field "title" = "Buy groceries"   <- body has a root object field
+```
+
+**The guard did its job exactly as ruled:**
+`[cost] post-stage-b: REAL CASH $0.08493` → `PLAN GUARD TRIPPED —
+CONTRADICTORY_ASSERTION_PAIR_ARRAY_VS_ROOT_FIELD — stopping BEFORE any build spend.`
+`src/` was never created — **no build, no materializer, no doomed repair cycles**.
+
+| | attempt 2 (no guard) | attempt 3 (guard) |
+|---|---|---|
+| Spend on a plan that cannot pass | $0.17770 (build + test + one repair cycle, heading to CAP_REACHED) | **$0.11891, stopped at the plan** |
+| Diagnosis delivered | after two build cycles, inferred | **immediately, named** |
+
+**Unsatisfiability is empirically proven, not assumed:** attempt 2's harness returned
+`Expected body.title to equal "Meeting notes", got undefined` on the array response — i.e. the
+harness evaluates `response_body_field_equals` against the **root**, so the pair genuinely cannot
+both hold.
+
+**R-44(iv) reached — STOPPING, not rolling again.** Two contradictory plans in a row on the same
+domain is not luck; it is a systematic `test_designer` behaviour. Per the ruling this deserves
+its own decision rather than more spend.
+
+**Cost:** attempt 3 = **$0.11891** real cash (est $0.50770). **Cumulative PHASE-54 real cash:
+$0.44191** of the approved $1.00 — under the $0.75 threshold, but no further spend without a
+ruling.
+
+**Observation for whoever takes the test_designer item:** both plans put the contradiction on the
+*list* endpoint, pairing an array-shape assertion with a root-field assertion that clearly
+*intends* "some element has this title". The generator appears to lack an element-scoped
+assertion for array responses, so it reaches for the root-field one. That is a hypothesis from
+two samples, offered as a starting point — not a diagnosis.
+
 ## 6. Hygiene + rulings status
 
 - `.gitignore` + `artifacts/projects/phase54_gate10_*/` (PHASE-48 W-4 precedent — driver
