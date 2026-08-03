@@ -5,7 +5,7 @@
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
   "next_phase": "PHASE-55-PENDING-DECISION",
-  "next_step": "PHASE-54 IN_PROGRESS (CTO GO 2026-07-29; D0-D2 only, then HARD STOP at stage_core_mid for CTO fresh-zip verification — D3+ forbidden until Step-2 GO): Iterative MVP Loop Slice 1 (Owner Review Loop Core), flag-gated per project (project_state.mvp_loop.enabled, default OFF; flag-off byte-identical to PHASE-53 per R-1). Rulings R-1..R-15 recorded in DECISION-2026-07-29-phase-54-iterative-mvp-loop.md — R-7 review gate hosts at RUN_TESTS in the ai_os layer (no 18th graph state; suppress-then-deferred-advance; mvp_review_pending signal, never gate_pending; anti-bypass SU on reviewProject WRONG_STATE), R-8 dedicated owner_changes prompt block (owner block FIRST, A-5 repair block LAST; empty => byte-identical), R-9 shared ITERATION_CAP=5 + plain-language CAP_REACHED, R-10 post-REFINE test failure routes to owner review (not blind A-5), R-11 report facts artifact-derived only, R-12 zero keyword matching, R-13 environment restored (Python 3.12.7 reinstall; baseline 365/0/5 EXACT re-proven 2026-07-30, exit 0), R-14 S57 requires_binary gap = backlog only, R-15 doctor-drift fold. D1 = mvpLoopEngine.js state model + 24_MVP_LOOP_CONTRACT.md skeleton; D2 = provider-driven mvp_scope derivation (agent.invoke role_id mvp_scope — 13-role registry does NOT grow) + hermetic S373. $0 through D5; Gate #10 real spend needs separate owner approval with estimate shown first. Old next_step (PHASE-53 closure record) preserved in phase_53 block + DECISION-2026-07-09-phase-53-closure.md.",
+  "next_step": "PHASE-54 CLOSED (2026-08-03): Iterative MVP Loop Slice 1 — on projects with project_state.mvp_loop.enabled=true Forge derives a minimal MVP scope from the approved spec, builds+tests ONLY that slice via the existing materializer/harness path, SUPPRESSES the RUN_TESTS advance and presents a plain-language report assembled from the real harness verdicts (R-11), waits at mvp_loop.status=AWAITING_OWNER_REVIEW hosted at graph state RUN_TESTS (R-7 — no 18th graph state; mvp_review_pending, never gate_pending), interprets the owner reply as provider-driven structured ACCEPT / ACCEPT_WITH_FAILING_TESTS / REFINE / UNCLEAR with zero keyword matching (R-12/R-20), threads REFINE changes VERBATIM into the materializer via a dedicated owner_changes block ahead of the A-5 repair block (R-8), re-presents, and on ACCEPT performs a deferred advance parameter-identical to the flag-off path (R-7 ii). Flag-off byte-identical to PHASE-53 (R-1). Gate #10 = GATE_PASS, owner-witnessed on the real UI in Arabic (12 criteria computed from persisted evidence; c12 N/A — plain ACCEPT on a PASS_REVIEW report; ENDPOINT CAVEAT: the run stopped at reviewProject with REQUEST_CHANGES and did NOT reach judgeQuality/Gate 2 — the verdict rests on the criteria, not on the driver endpoint expectation). Real spend $0.65714 of $1.00 approved; the cap covers agent-ledger calls only (R-40). SU 376/0/5 (381). Closure LOCAL; push/tag phase-54-complete await CTO closure-diff. PHASE-55 pending owner decision.",
   "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-22-phase-43-first-real-build.md",
   "phase_45": {
     "status": "CLOSED",
@@ -295,9 +295,9 @@
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
-    "self_test_last_run": "2026-07-30",
-    "self_test_last_result": "374 passed, 0 failed, 5 skipped (379 total) — PHASE-54 D5 (Iterative MVP Loop Slice 1: Owner Review Loop Core; flag-gated per project via project_state.mvp_loop.enabled, default OFF, flag-off byte-identical to PHASE-53). +9 SU vs PHASE-53: S373-S381 (scope derivation schema/partition fail-closed / R-7 review gate at RUN_TESTS + R-11 artifact-derived report + R-7v anti-bypass / R-7ii ACCEPT deferred advance + R-17 terminal no-re-engage / R-8 REFINE threading verbatim + persistence + owner-FIRST-repair-LAST / R-10 fail routing to owner / R-9 plain-language cap + R-12 UNCLEAR + R-19 forensics / R-18 scoped-spec wiring with explicit provider / R-20 ACCEPT_WITH_FAILING_TESTS distinct decision + downstream markers / R-1 flag-off E2E invariance) + S335 extended (R-8ii byte-identity across arities). Rulings R-1..R-22 in DECISION-2026-07-29-phase-54-iterative-mvp-loop.md incl. the NAMED Blueprint Part D.2 exception MVP-OWNER-OVERRIDE-ON-FAILING-TESTS. §ARC=10 frozen; L2=81; roles=13; apiServer byte-identical to a69de85. R-22 uid re-pin done via sanctioned path — doctor 35 checks: 31 PASS / 4 WARN / 0 FAIL, exit 0. PHASE-54 OPEN: real Gate #10 pending a separate owner spend approval.",
-    "self_test_scenarios_pass": 374,
+    "self_test_last_run": "2026-08-03",
+    "self_test_last_result": "376 passed, 0 failed, 5 skipped (381 total) — PHASE-54 CLOSED (Iterative MVP Loop Slice 1: Owner Review Loop Core). +11 SU vs PHASE-53: S373-S383 (scope derivation + state model / R-7 review gate at RUN_TESTS + R-11 artifact-derived report + anti-bypass / R-7ii ACCEPT deferred advance + R-17 no-re-engage / R-8 REFINE threading verbatim + supersede / R-10 fail routing / R-9 cap + R-12 UNCLEAR + R-19 forensics / R-18 scoped-spec wiring with explicit provider / R-20 ACCEPT_WITH_FAILING_TESTS both legs / R-1 flag-off E2E invariance / S382 mvp_loop state SURVIVAL across the REAL HTTP entry point / S383 test_designer_v4 array-assertion discipline), plus the S335 invariance extension and the S340 version-pin retarget v3->v4. ARC=10 frozen; L2=81; roles=13 (registry never grew — mvp_scope and mvp_feedback are ctx role_ids). Outside Slice 1 by ruling: apiServer.js +9/-0 (R-39 normalizer now preserves unknown keys; pre-existing defect, locked by S382) and test_designer_v4 plus a 2-line role id bump (R-47, locked by S383). Gate #10 GATE_PASS, owner-witnessed on the real UI; real spend $0.65714 of $1.00.",
+    "self_test_scenarios_pass": 376,
     "self_test_scenarios_skip": 5,
     "self_test_scenarios_fail": 0,
     "providers_registered_count": 14,
@@ -2327,8 +2327,8 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-54-ITERATIVE-MVP-LOOP",
-  "last_updated": "2026-07-30T00:00:00.000Z",
+  "current_task": "PHASE-54-ITERATIVE-MVP-LOOP-COMPLETE",
+  "last_updated": "2026-08-03T00:00:00.000Z",
   "phase_16": {
     "status": "ACTIVE",
     "started_at": "2026-05-24T16:00:00.000Z",
@@ -3087,5 +3087,46 @@
     "step_b_driver": "scripts/spikes/phase44_loopback_real.js",
     "local_commit_only": true,
     "push_tag_pending": "await CTO closure-diff + push GO"
+  },
+  "phase_54": {
+    "status": "CLOSED",
+    "closed_at": "2026-08-03",
+    "title": "Iterative MVP Loop (Slice 1: Owner Review Loop Core)",
+    "decision_artifact": "artifacts/decisions/DECISION-2026-07-29-phase-54-iterative-mvp-loop.md",
+    "closure_artifact": "artifacts/decisions/DECISION-2026-08-03-phase-54-closure.md",
+    "mid_checkpoint": "artifacts/decisions/_phase_54_checkpoints/stage_core_mid.md",
+    "loop_mid_checkpoint": "artifacts/decisions/_phase_54_checkpoints/stage_loop_mid.md",
+    "preclosure_checkpoint": "artifacts/decisions/_phase_54_checkpoints/stage_preclosure.md",
+    "gate10_plan": "artifacts/decisions/_phase_54_checkpoints/stage_gate10_plan.md",
+    "closure_checkpoint": "artifacts/decisions/_phase_54_checkpoints/stage_closure.md",
+    "rulings": "R-1..R-50 (full ledger in the closure artifact section 5). Load-bearing: R-7 review gate hosted at RUN_TESTS in the ai_os layer with suppress-then-deferred-advance and mvp_review_pending (never gate_pending) plus an anti-bypass SU; R-8 dedicated owner_changes block (owner FIRST, A-5 repair LAST; empty => byte-identical) persisting across internal loopbacks; R-9 shared ITERATION_CAP=5 with plain-language CAP_REACHED; R-10 post-REFINE failure routes to the owner; R-11 report facts artifact-derived only; R-12 zero keyword matching; R-17 ACCEPTED terminal, no re-engagement (CONFIRMED LIVE); R-20 ACCEPT_WITH_FAILING_TESTS as a distinct decision with a forensic trail (named Blueprint Part D.2 exception); R-37 the cap bounds REAL CASH; R-39 apiServer normalizer fixed at source; R-47 test_designer_v4 array guidance; R-50 the gate closes PASS at the ACCEPT boundary with the endpoint caveat recorded.",
+    "errata": "E-1 (CC, self-reported: the vacuous vault-probe rows retracted); E-2..E-5 (CTO: conflicting editor instructions; R-34 cited but never delivered; the gate designed on a known-defective dependency; R-44 wording predated R-47 and made the guard reject the fixed output).",
+    "crux": "the owner review loop closed END TO END on the REAL path with a real provider and the owner typing Arabic in the live UI: derive -> build -> suppress -> present -> REFINE -> provider interpretation -> loop_back FROM RUN_TESTS (0->1) -> changes VERBATIM in the second materializer prompt -> rebuild 3/3 PASS -> re-present -> ACCEPT -> deferred advance parameter-identical to the flag-off path (RUN_TESTS/REVIEWER_CODE_AND_SECURITY/NORMAL/builtproject)",
+    "su_added": "S373-S383 (+11): scope derivation + state model / R-7 review gate + R-11 artifact-derived report + anti-bypass / R-7ii ACCEPT deferred advance + R-17 no-re-engage / R-8 REFINE threading verbatim + supersede / R-10 fail routing / R-9 cap + R-12 UNCLEAR + R-19 forensics / R-18 scoped-spec wiring with explicit provider / R-20 ACCEPT_WITH_FAILING_TESTS both legs / R-1 flag-off E2E invariance / S382 mvp_loop state SURVIVAL across the REAL HTTP entry point / S383 test_designer_v4 array-assertion discipline. Plus the S335 invariance extension and the S340 version-pin retarget v3->v4.",
+    "su_suite": "376/0/5 (381)",
+    "arc_ledger_count": 10,
+    "l2_tools": 81,
+    "agent_roles": 13,
+    "live_surface": "code/src/ai_os/mvpLoopEngine.js (new) + conversationEngine.js + materializerEngine.js; OUTSIDE Slice 1 by ruling: apiServer.js +9/-0 (R-39, pre-existing normalizer defect, locked by S382) and docs/10_runtime/18b_ROLE_PROMPTS.md + test_designer_role.js 2-line id bump (R-47, locked by S383)",
+    "docs_addendum": "docs/12_ai_os/24_MVP_LOOP_CONTRACT.md (new, FINAL for Slice 1) + test_designer_v4 in docs/10_runtime/18b_ROLE_PROMPTS.md (v3 retained, marked DEPRECATED)",
+    "gate_10": {
+      "verdict": "GATE_PASS",
+      "criteria": "12 computed from persisted evidence: c1-c10 plus c11a (zero HALT) and c11b (flag-off byte-untouched) all true; c12 (AWFT downstream markers) N/A — the owner took the plain ACCEPT path on a PASS_REVIEW report, so that surface remains proven by S380 alone",
+      "endpoint_caveat": "the run did NOT reach judgeQuality/Gate 2 — it stopped at reviewProject with derived_verdict REQUEST_CHANGES (reviewer REJECTED, 4 BLOCKERs; security LOW, 0 BLOCKERs). The verdict rests on the twelve criteria, not on the driver endpoint expectation",
+      "live_bonus": "R-39 confirmed in the owner environment — his browser rebuilt project_state.json (8 keys -> 47) and mvp_loop + loop_id survived byte-identically; R-17 confirmed live (graph BUILDER iteration 2 while mvp_loop stayed ACCEPTED at iteration 1)",
+      "spend_usd": 0.65714,
+      "evidence": "artifacts/spikes/phase54_gate10/"
+    },
+    "spend_cumulative": "$0.65714 real cash of $1.00 approved (estimated $1.00330 on the final leg — R-37 proved the estimate-based cap would have aborted at roughly one fifth of actual spend). NOTE: the cap covers agent-ledger calls only (R-40); legacy Stage-A providers spend unmetered.",
+    "backlog": [
+      "S57 requires_binary gap (R-14)",
+      "RUN_FORGE_BAT_NOT_RESTART_SAFE (pm2 Process 0 not found + TypeError at API.js:1718 on restart)",
+      "UNMETERED-LEGACY-PROVIDER-SPEND (R-40)",
+      "R10-NO-OWNER-ESCAPE-ON-FIRST-BUILD (R-45)",
+      "test_designer reliability (two consecutive contradictory plans pre-R-47)",
+      "ledger estimator accuracy (estimated ran ~2.5-4.0x actual; books $0 for small gpt-4o-mini calls)"
+    ],
+    "release_status": "CLOSED LOCAL; push + annotated tag phase-54-complete await CTO fresh-zip closure-diff + push GO",
+    "phase_55_seed": "owner-gated (NOT decided): MVP-loop Slice 2 (re-engagement after ACCEPTED — R-17/R-45) / test_designer reliability / unmetered legacy provider spend / ledger estimator accuracy / RUN_FORGE.bat restart-safety / Browser Automation 7-D / Anthropic provider switch"
   }
 }
