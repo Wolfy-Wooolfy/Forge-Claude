@@ -163,3 +163,31 @@ definition. **No further real spend in PHASE-54 without a fresh owner approval.*
 
 Closure preparation complete. Awaiting CTO verification from a fresh local-folder zip.
 NOT done, by instruction: closure decision artifact, `status.json` COMPLETE flip, push, tag.
+
+---
+
+## 8. CORRECTION (R-51 iii) — the "LOCAL; no push" convention was factually wrong
+
+Every PHASE-54 commit message ends with **"(LOCAL; no push/tag)"**. That phrasing described CC's
+own behaviour accurately — **no CTO push ever occurred, and CC pushed nothing at any point** —
+but it was **factually wrong about the repository state**: the owner pushes from his own
+environment as a matter of routine, and his pushes carried the PHASE-54 chain up to `origin`
+as the phase went along. `git reflog origin/main` records repeated *"update by push"* entries,
+and by the time the closure-diff was measured the closure commit
+`9e35e46e6c5d001ee7896e1743aa8543e7f6c3b2` was **already on `origin/main`** — before any CTO
+push GO was given. The CTO's release model had assumed a local-only chain that did not exist.
+
+This is **not a protocol breach**: the protocol's real control point is the **annotated tag**,
+not incidental pushes, and the tag was withheld until the CTO's explicit GO. Recorded rather
+than excused, per the bidirectional Trust+Verify norm — the finding was surfaced by CC while
+reporting the closure chain and upheld by the CTO from GitHub.
+
+**Release facts:**
+- Tag `phase-54-complete` created on the **closure commit hash explicitly** (never on HEAD):
+  tag object `e0a98826…` → peels to **`9e35e46e6c5d001ee7896e1743aa8543e7f6c3b2`**.
+- **Only the tag was pushed** (`git push origin refs/tags/phase-54-complete`); independently
+  verified with `git ls-remote --tags origin`.
+
+**BACKLOG:** the **"LOCAL; no push/tag" commit-message convention is misleading under this
+owner's push pattern** and should be reworded in a future phase — e.g. "CC did not push; the
+owner may push independently" — so a reader cannot infer repository state from it.
