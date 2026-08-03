@@ -4,8 +4,8 @@
   "current_stage": "A",
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
-  "next_phase": "PHASE-55-PENDING-DECISION",
-  "next_step": "PHASE-54 CLOSED (2026-08-03): Iterative MVP Loop Slice 1 — on projects with project_state.mvp_loop.enabled=true Forge derives a minimal MVP scope from the approved spec, builds+tests ONLY that slice via the existing materializer/harness path, SUPPRESSES the RUN_TESTS advance and presents a plain-language report assembled from the real harness verdicts (R-11), waits at mvp_loop.status=AWAITING_OWNER_REVIEW hosted at graph state RUN_TESTS (R-7 — no 18th graph state; mvp_review_pending, never gate_pending), interprets the owner reply as provider-driven structured ACCEPT / ACCEPT_WITH_FAILING_TESTS / REFINE / UNCLEAR with zero keyword matching (R-12/R-20), threads REFINE changes VERBATIM into the materializer via a dedicated owner_changes block ahead of the A-5 repair block (R-8), re-presents, and on ACCEPT performs a deferred advance parameter-identical to the flag-off path (R-7 ii). Flag-off byte-identical to PHASE-53 (R-1). Gate #10 = GATE_PASS, owner-witnessed on the real UI in Arabic (12 criteria computed from persisted evidence; c12 N/A — plain ACCEPT on a PASS_REVIEW report; ENDPOINT CAVEAT: the run stopped at reviewProject with REQUEST_CHANGES and did NOT reach judgeQuality/Gate 2 — the verdict rests on the criteria, not on the driver endpoint expectation). Real spend $0.65714 of $1.00 approved; the cap covers agent-ledger calls only (R-40). SU 376/0/5 (381). Closure LOCAL; push/tag phase-54-complete await CTO closure-diff. PHASE-55 pending owner decision.",
+  "next_phase": "PHASE-56-PENDING-DECISION",
+  "next_step": "PHASE-55 HARDENING BATCH IN_PROGRESS (D0 2026-08-03, DECISION-2026-08-03-phase-55-hardening-batch.md, rulings R-1..R-20): five scope-locked items, zero new capability, one at a time — W-1 spend visibility (single seam: wrap chat.completions.create on the getClient() client per R-12; sentinel + budget-check inclusion per R-11(ii); closes PHASE-54 R-40) -> C1; W-2 owner escape on non-convergence (R-16 predicate at the runTests FAIL branch, existing review-gate surface, R-10 branch byte-identical, ITERATION_CAP untouched; closes R-45) -> C2; W-3 S57 requires_binary guard (value by R-17 probe; gate arithmetic declared both ways per R-6) + W-4 restart-safe RUN_FORGE.bat (R-18 Task-Scheduler inventory first; R-7 executed-cycle proof) + W-5 docs/convention reword (R-19 waiver) -> C3. SU plan N=4 (S384-S387): closure 380/0/5 (385) pip-present / 379/0/6 (385) pip-absent. Mock-default $0; sole real spend = W-1 proof ~$0.02 behind separate owner approval. Kill bar $3.00. CURRENT: D0 committed LOCAL; Step 0.5 addendum posted (R-11 choice (ii), F-8 marker-persistence finding, F-9 reverse_vision double-count finding); awaiting CTO W-1 GO.",
   "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-22-phase-43-first-real-build.md",
   "phase_45": {
     "status": "CLOSED",
@@ -2327,8 +2327,8 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-54-ITERATIVE-MVP-LOOP-COMPLETE",
-  "last_updated": "2026-08-03T00:00:00.000Z",
+  "current_task": "PHASE-55-HARDENING-BATCH",
+  "last_updated": "2026-08-03T18:00:00.000Z",
   "phase_16": {
     "status": "ACTIVE",
     "started_at": "2026-05-24T16:00:00.000Z",
