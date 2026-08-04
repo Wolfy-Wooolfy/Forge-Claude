@@ -1,0 +1,18 @@
+{
+  "id": "S387",
+  "name": "S57 declares the requires_binary environment guard — meta-lock, S340 pattern (PHASE-55 W-3, closes PHASE-54 R-14)",
+  "description": "Locks S57's requires_binary declaration ('pip3', fixed by the R-17 measurement: both pip3 and pip probed SUCCESS on the owner's machine; pip3 mirrors pip_adapter.js:22's primary choice) so the environment guard cannot silently disappear, plus core-shape pins (direct_tool pkg.install, pip adapter, >=5 assertions) so the lock cannot be satisfied by gutting the real Tier-1 scenario. The guard's runtime skip semantics are already locked by the five docker scenarios (scenario_runner.js:914-924); the environmental RED/GREEN legs (S57 FAIL under a Python-stripped PATH before the declaration, SKIP after) are captured in checkpoint C3 per R-2.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/requires_binary_guard_test_helper",
+  "method": "runS387S57GuardDeclared",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "s57_file_parses",                    "expected": true },
+    { "type": "state_field_equals", "field": "s57_declares_requires_binary",       "expected": true },
+    { "type": "state_field_equals", "field": "s57_still_direct_tool_pkg_install",  "expected": true },
+    { "type": "state_field_equals", "field": "s57_still_pip_adapter",              "expected": true },
+    { "type": "state_field_equals", "field": "s57_assertions_intact",              "expected": true }
+  ]
+}

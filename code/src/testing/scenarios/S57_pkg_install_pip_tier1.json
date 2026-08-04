@@ -3,6 +3,7 @@
   "name": "pkg.install pip installs package into test workspace --target (Tier 1)",
   "type": "direct_tool",
   "permission": "WORKSPACE_WRITE",
+  "requires_binary": "pip3",
   "tool": "pkg.install",
   "fixture_files": [
     { "path": "artifacts/projects/test_pkg_s57/.gitkeep", "content": "" },

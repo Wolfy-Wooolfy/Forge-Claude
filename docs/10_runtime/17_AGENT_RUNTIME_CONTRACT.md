@@ -149,6 +149,35 @@ L4  Doctor              checks/agent_runtime.js   (19th check)
 - `role` is null in PHASE-7-E (populated by PHASE-7-F roles).
 - `outcome` is one of: `success`, `failed`, `budget_exceeded`, `timeout`, `auth_error`.
 
+### Legacy Stage-A metering rows (PHASE-55 W-1 — R-11(ii)/R-12/R-13/R-14)
+
+Legacy Stage-A providers (`code/src/providers/*.js`) do not go through `agent.invoke`;
+their OpenAI calls are metered by a seam in
+`code/src/providers/_contract/openAiAdapter.js` that wraps `chat.completions.create`
+on the shared client. Each such call appends ONE additional row to THIS ledger with:
+
+- `project_id: "_legacy_stage_a"` — a fixed sentinel; the seam has no project
+  attribution (threading the real project id through 11 providers was rejected as
+  out of single-seam scope).
+- `provider: "openai"`, `model` from the request/response, usage-based
+  `cost_usd_estimated` = `cost_usd_actual` at metering prices (prefix-matched map
+  with a conservative non-zero default — no real call can book $0 by falling
+  through).
+- Streaming calls (`stream: true`) carry no usage: they book `tokens_in/out: 0`,
+  `cost 0`, plus the additive marker **`tokens_unavailable: true`** so a reader
+  cannot mistake the zero for "this call was free". **Streaming spend is VISIBLE
+  but NOT COSTED** (R-14 — declared backlog; the request body is never mutated to
+  obtain usage).
+- Failed calls book `outcome: "failed"` with zero tokens/cost.
+- Embeddings are NOT metered here (R-13) — KB embeddings already book to the KB
+  ledger (`kb/cost_ledger.jsonl`).
+- Known double-visibility, enumerated (R-15 as amended by E-1):
+  `ideaSynthesisProvider` and `reverseVisionProvider` (defineProvider path) also
+  write `artifacts/ai/cost_ledger.jsonl` via providerTrace; `credibility_scorer`
+  also books to the KB ledger. `reverseVisionProvider` invoked via `agent.invoke`
+  additionally double-counts WITHIN this ledger (agent row + sentinel row) —
+  measured worst case 0.01933% of the default cap per intake (R-23; accepted).
+
 ---
 
 ## 5. Budget Enforcement
@@ -166,7 +195,28 @@ Three levels, checked at L3 (Step 1.8) before `agent.invoke` executes:
 - `max_total_usd` (default: 50.00)
 - `max_per_iteration_usd` (default: 5.00, enforced per-call)
 
-**Projected cost** = `getTotalCost(project_id)` + `estimateCost(provider, prompt)`.
+**Projected cost (PHASE-55 W-1)** = `getTotalCost(project_id)` +
+`legacy_since_first_activity(project_id)` + `estimateCost(provider, prompt)`.
+
+`legacy_since_first_activity(P)` sums `cost_usd_actual` over `_legacy_stage_a`
+sentinel rows whose `ts` is at or after P's FIRST row in this ledger; if P has no
+rows at all it is **0** — a brand-new project can never be born over-cap from
+historical legacy spend (R-21 lifetime bound; the unbounded global total was
+rejected as a delayed denial of service, CTO-F-D). Conservative over-count is the
+intended error direction: every project's cap check absorbs the legacy spend that
+occurred during its own lifetime, without per-project attribution.
+
+### R-25 — owner-facing limitation (plain language, binding disclosure)
+
+> **بالعربي:** غطاء الميزانية (الـ cap) يحسب إنفاق الـ AI بدءاً من أول نشاط بناء
+> فعلي للمشروع في سجل التكلفة. **محادثات بلورة الفكرة المبكرة (الـ ideation) التي
+> تسبق أول نشاط بناء تظهر في السجل لكنها لا تُحتسب ضد غطاء المشروع.** أي أن الغطاء
+> لا يغطي كل شيء — إنفاق ما قبل البناء مرئي لكنه غير محدود بالغطاء.
+>
+> **English:** the budget cap counts AI spend from a project's FIRST real build
+> activity in the cost ledger onward. **Early ideation turns that precede any build
+> activity are VISIBLE in the ledger but are NOT counted against the project's
+> cap.** The cap does not cover everything — pre-build spend is visible, not capped.
 
 ---
 

@@ -552,6 +552,14 @@ afterwards.
    costing them needs usage capture that must not mutate the request.
 4. **R-17 `requires_binary` cannot express pip3-OR-pip** (single-string field;
    array form = capability change, forbidden this phase).
+5. **R-18(c) INSTALL_FORGE.bat boot-model comment is STALE** (found during the W-4
+   inventory): ":72-75 declares Task Scheduler the sole boot mechanism, but since
+   PHASE-49 W-D the AtLogOn task only runs `pm2 resurrect` over a dump the
+   installer itself just emptied (`pm2 delete forge` + `pm2 save --force`, :78-79)
+   — a fresh install does NOT auto-start Forge at boot. Fixing it (correct the
+   comment, or save the dump at install) changes boot behavior = its own decision;
+   NOT absorbed into W-4 (which touches RUN_FORGE.bat only and preserves the dump
+   bit-for-bit)."
 
 ### W-1 real-proof authorization status
 

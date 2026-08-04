@@ -1,8 +1,8 @@
 # 24. MVP Loop Contract (PHASE-54 — Slice 1: Owner Review Loop Core)
 
 **Document ID:** DOC-12-24
-**Status:** FINAL (Slice 1) — finalized at PHASE-54 D5
-**Authority:** `artifacts/decisions/DECISION-2026-07-29-phase-54-iterative-mvp-loop.md` (rulings R-1..R-22) + PROMPT-STAGE-54 §1
+**Status:** FINAL (Slice 1) — finalized at PHASE-54 D5; PHASE-55 W-2/W-5 addendum applied 2026-08-04
+**Authority:** `artifacts/decisions/DECISION-2026-07-29-phase-54-iterative-mvp-loop.md` (rulings R-1..R-22) + PROMPT-STAGE-54 §1 · PHASE-55 additions per `DECISION-2026-08-03-phase-55-hardening-batch.md` (R-16/R-26)
 **Applies to:** projects with `project_state.mvp_loop.enabled = true` ONLY
 
 ---
@@ -120,10 +120,17 @@ decision artifact.
 
 ## 5. Owner review gate + report (D3 — R-7/R-11)
 
-- Entry points: runTests PASS with an active MVP build (R-7 i), and runTests FAIL with an
-  outstanding owner REFINE (R-10). Both suppress state movement, persist the report, flip
-  the block to AWAITING_OWNER_REVIEW, and return
-  `{ advanced: false, mvp_review_pending: true, mvp_report }`.
+- Entry points: runTests PASS with an active MVP build (R-7 i); runTests FAIL with an
+  outstanding owner REFINE (R-10); and — since PHASE-55 W-2 (R-16) — runTests FAIL with
+  NO outstanding changes once the graph's `iteration_count >= 1` (the non-convergence
+  escape: the internal A-5 loop spent its one free self-repair attempt and failed again,
+  so the owner is consulted instead of burning further iterations toward the cap; the
+  R-10 branch takes precedence and iteration 0 keeps the internal loopback unchanged;
+  `iteration_count` is the graph counter, never the `mvp_loop.iteration` display echo).
+  All suppress state movement, persist the report, flip the block to
+  AWAITING_OWNER_REVIEW, and return
+  `{ advanced: false, mvp_review_pending: true, mvp_report }`. SU: S385 (direct) +
+  S386 (real HTTP entry point).
 - Report facts are **artifact-derived with zero provider involvement** (R-11): files
   built (+count) from `build_manifest.json` paths, scenario names + pass/fail + failing
   assertion reasons verbatim from the harness run output, run instructions from the
@@ -176,17 +183,37 @@ they can do) — a silent ESCALATED is a phase failure. Both surfacing points ar
 the REFINE-at-cap reply (`MVP_CAP_REACHED` mode + message) and the internal-loop
 escalation (`mvp_cap_message` on the runTests payload). SU: S378.
 
-**Known Slice-1 limitation (R-45) — no owner escape hatch on a FIRST build.** R-10 routes a
-RUN_TESTS failure to the owner only when owner changes are outstanding; on a first build there
-are none, so a self-contradictory frozen test plan (one no implementation can satisfy) sends the
-loop to `ITERATION_CAP` and escalation **without ever consulting the owner**. Proven live
-2026-08-02. Backlog item `R10-NO-OWNER-ESCAPE-ON-FIRST-BUILD`; widening R-10 changes
-owner-facing routing and needs its own decision artifact.
+**CLOSED in PHASE-55 W-2 (was: R-45 — no owner escape hatch on a FIRST build).** R-10 alone
+routed a RUN_TESTS failure to the owner only when owner changes were outstanding; on a first
+build there are none, so a self-contradictory frozen test plan sent the loop to
+`ITERATION_CAP` and escalation without ever consulting the owner (proven live 2026-08-02).
+The R-16 non-convergence escape (§5) closes this: after the internal loop's one free repair
+attempt, ANY further failure routes to the owner review gate. The backlog item
+`R10-NO-OWNER-ESCAPE-ON-FIRST-BUILD` is closed by `DECISION-2026-08-03-phase-55-hardening-batch.md`.
 
-**Known Slice-1 limitation (data-driven revisit trigger):** a flaky build can starve the
-owner's REFINE budget, because internal repair loopbacks consume the same counter.
-Revisit ONLY via a separate decision artifact if Gate #10 / real usage shows REFINE
-starvation — never via a second cap constant.
+**R-26 — owner-facing statement (PHASE-55, plain language, binding disclosure):**
+
+> **بالعربي:** في مشاريع الـ MVP، لو البناء فشل في الاختبارات مرتين، فورج **هيسألك أنت**
+> بعد المحاولة الفاشلة الثانية بدل ما يفضل يعيد المحاولة في صمت لحد ما يستهلك الحد
+> الأقصى للمحاولات. هتشوف تقريراً واضحاً بالاختبارات الفاشلة وأنت صاحب القرار: تعدّل
+> طلبك، أو تعتمد رغم الفشل، أو توجّه فورج من جديد.
+>
+> **English:** on MVP projects, if a build fails its tests twice, Forge **asks you** after
+> the second failed attempt instead of silently retrying up to the iteration cap. You get a
+> plain report of the failing tests and you decide: adjust your request, accept as-is, or
+> redirect Forge.
+
+Consequence, stated for precision: for flag-ON MVP builds the runTests-side silent
+escalation branch is effectively unreachable (any FAIL at iteration ≥ 1 consults the owner
+first); `CAP_REACHED` remains reachable via the REFINE-at-cap path with its plain-language
+message (R-9, S378), and flag-OFF builds keep the pre-PHASE-55 escalation behavior
+unchanged. The now-dormant branch stays in the code — it is live for flag-OFF.
+
+**Known Slice-1 limitation (data-driven revisit trigger — softened by R-16, PHASE-55):**
+internal repair loopbacks and owner REFINEs still share the single counter, so a flaky
+build still consumes REFINE budget; but from iteration 1 onward every failure consults the
+owner rather than burning silently. Revisit ONLY via a separate decision artifact — never
+via a second cap constant.
 
 ## 8. Track A / §ARC
 
@@ -195,7 +222,7 @@ All side effects via `reg.invoke`; `mvpLoopEngine` performs no direct fs access.
 keys the flag-off tree is exactly PHASE-53; flag-on derivation fails typed
 (`SCOPE_AGENT_FAILED`), never HALTs the flag-off path.
 
-## 9. SU coverage (final — N = 9, S373–S381)
+## 9. SU coverage (final — N = 11, S373–S383; PHASE-55 additions S385/S386 below)
 
 | SU | Proves |
 |---|---|
@@ -209,9 +236,20 @@ keys the flag-off tree is exactly PHASE-53; flag-on derivation fails typed
 | S380 | R-20 both legs: bare-ACCEPT downgrade; ACCEPT_WITH_FAILING_TESTS forensic trail + downstream markers |
 | S381 | R-1 flag-off E2E invariance (prompts, payloads, files, state) |
 | S382 | **R-39 state survival across the REAL entry point** — `GET /api/projects` between the pause and the owner turn must not strip `mvp_loop`/`loop_id`, and the turn must still reach the MVP branch |
+| S383 | R-47 array-assertion discipline: the contradictory pair (`response_body_is_array` + root-level `response_body_field_equals`) is unbuildable; the indexed form works; `test_designer_v4` carries the guidance |
 
 Plus the S335 extension (R-8 ii byte-identity across all arities + block ordering).
-**Final count: N = 10 (S373–S382); closure gate 365 + 10 = 375.**
+**Final count: N = 11 (S373–S383); closure gate 365 + 11 = 376.**
+*(Correction note, PHASE-55 W-5 / F-5: this section previously read "N = 9" in the
+heading and "N = 10 (S373–S382); closure gate 375" here — both stale; the actual
+PHASE-54 closure was N = 11 / 376 with S383 included.)*
+
+**PHASE-55 additions (R-16 escape — this contract's §5/§7):**
+
+| SU | Proves |
+|---|---|
+| S385 | R-16 predicate, direct engine: FAIL #1 at iteration 0 loops back blind (A-5's one free repair); FAIL #2 at iteration 1 escapes to the owner gate with a FAIL_REVIEW report, graph held at RUN_TESTS, no increment |
+| S386 | The same escape across the REAL entry point (S382 pattern): in-process server + live `POST /api/ai-os/project/run-tests` |
 
 ### 9.b State-survival requirement (R-39)
 

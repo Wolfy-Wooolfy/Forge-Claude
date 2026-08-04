@@ -10,6 +10,19 @@ if errorlevel 1 (
     exit /b 1
 )
 
+:: ── PHASE-55 W-4: restart-safe start ─────────────────────────────────────────
+:: Remove any existing pm2 "forge" entry FIRST (tolerant — INSTALL_FORGE.bat:78
+:: precedent). This (a) cleanly stops a pm2-managed instance, including one the
+:: ForgeAPI Task-Scheduler task resurrected at logon (same pm2 daemon — PHASE-49
+:: W-D), so the taskkill below never kills a managed process behind pm2's back
+:: and autorestart cannot race this script; and (b) clears a DEAD entry left by a
+:: previous kill, which made the bare `pm2 start` below crash with "Process 0 not
+:: found" + TypeError on pm2_env at API.js:1718 (restart-over-dead-entry). If the
+:: pm2 daemon itself is broken the delete no-ops and the self-heal below fixes it;
+:: a fresh daemon starts with an empty list, which is equally restart-safe.
+echo Removing any existing pm2 forge entry (restart-safe)...
+call pm2 delete forge >nul 2>&1
+
 echo Clearing any orphan processes on port 3100...
 for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":3100" ^| findstr "LISTENING" 2^>nul') do (
     taskkill /F /PID %%a >nul 2>&1
