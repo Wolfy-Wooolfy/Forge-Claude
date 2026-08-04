@@ -13,7 +13,8 @@
       "Bash(echo \"SUITE_EXIT=$?\")",
       "Bash(PATH='/c/Program Files/nodejs:__TRACKED_VAR__' node -e 'const s=JSON.parse\\(require\\('\\\\''fs'\\\\''\\).readFileSync\\('\\\\''progress/status.json'\\\\'','\\\\''utf8'\\\\''\\)\\); console.log\\('\\\\''PARSES ✓ pass='\\\\''+s.runtime_health.self_test_scenarios_pass+'\\\\'' doctor='\\\\''+s.runtime_health.last_doctor_status+'\\\\'' counts='\\\\''+JSON.stringify\\(s.runtime_health.last_doctor_counts\\)\\)')",
       "Bash(git ls-remote *)",
-      "Bash(node -e \"JSON.parse\\(require\\('fs'\\).readFileSync\\('progress/status.json','utf8'\\)\\); console.log\\('status.json PARSE OK'\\)\")"
+      "Bash(node -e \"JSON.parse\\(require\\('fs'\\).readFileSync\\('progress/status.json','utf8'\\)\\); console.log\\('status.json PARSE OK'\\)\")",
+      "Bash(git tag *)"
     ],
     "deny": [
       "Bash(rm:*)",
