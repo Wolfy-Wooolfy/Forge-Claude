@@ -138,16 +138,19 @@ reverse_vision rows: 2 — exactly ONE per intake project lifecycle:
 - **Calls per project lifecycle: 1** (matches PHASE-48's `single_reverse_vision_call`
   gate criterion; the mock row cost is estimate-booked).
 - **Typical real cost:** $0.009665 (1438 in / 165 out, gpt-4o-2024-08-06).
-- **Double-count inflation under W-1:** the seam books a second row for the same
-  call at metering prices — for the PHASE-48 real shape: 1438/1M×$2.50 +
-  165/1M×$10.00 = **$0.005245**. Worst-case counted total per intake ≈ $0.0149 vs
-  true $0.0097.
-- **As % of DEFAULT_MAX_TOTAL_USD ($50.00): 0.0105% per intake** (the extra row
-  alone; even 100 intakes ≈ 1.05%). Against the smallest cap used in practice
-  (the $1.00 gate cap): 0.52% per intake.
-- **Conclusion: a single intake CANNOT plausibly push a real project past 80%** —
-  three orders of magnitude of headroom. The R-23 accept-and-enumerate answer
-  stands; no design change needed. Backlog item recorded (decision artifact §6.5).
+- **Double-count inflation under W-1 — WORST CASE = max(observed), per CTO-F-E
+  (corrected 2026-08-04; the original figure here used the seam-priced value
+  $0.005245, which understated the required worst case by ~1.84x):**
+  **max(observed reverse_vision cost) = $0.009665** ⇒ inflation
+  **0.01933% of the $50.00 default cap** and **0.96650% of a $1.00 cap** per
+  intake. This is max(observed), NOT a mean. (Secondary context, not the bound:
+  the seam row itself would book that call's token shape at metering prices as
+  $0.005245 — strictly ≤ the agent row since metering rates $2.50/$10 sit below
+  agent_tools' $5/$15, so max(observed agent row) is a true upper bound.)
+- **Conclusion (disposition unchanged): a single intake CANNOT plausibly push a
+  real project past 80%** — three orders of magnitude of headroom. The R-23
+  accept-and-enumerate answer stands; no design change needed. Backlog item
+  recorded (decision artifact §6.5).
 
 ## 7. Real-proof proposal (R-4 — NOT run; awaiting separate owner approval)
 

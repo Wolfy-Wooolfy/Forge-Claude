@@ -1,0 +1,21 @@
+{
+  "id": "S386",
+  "name": "mvp non-convergence owner escape crosses the REAL entry point — POST /api/ai-os/project/run-tests at iteration 1 escapes to the owner, not the blind loop (PHASE-55 W-2, R-10/S382 pattern)",
+  "description": "The W-2 real-path scenario required by PROMPT-STAGE-55 R-10. Boots the workspace API server in-process on a temp root, seeds the loop to RUN_TESTS with iteration_count=1 via the REAL orchestration tools (start_loop → RUN_TESTS → loop_back → RUN_TESTS), then drives POST /api/ai-os/project/run-tests over live HTTP exactly as the UI does with a forced FAIL harness verdict. Asserts through the real surface: the R-16 escape fires (advanced false, mvp_review_pending true, no blind loop_back to BUILDER), the graph stays at RUN_TESTS with iteration 1, the block flips to AWAITING_OWNER_REVIEW, and the persisted mvp_report is FAIL_REVIEW.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/mvp_loop_test_helper",
+  "method": "runS386NonConvergenceEscapeRealPath",
+  "args": [],
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "run_tests_endpoint_ok",     "expected": true },
+    { "type": "state_field_equals", "field": "escaped_to_owner_review",   "expected": true },
+    { "type": "state_field_equals", "field": "payload_state_run_tests",   "expected": true },
+    { "type": "state_field_equals", "field": "not_blind_loop_back",       "expected": true },
+    { "type": "state_field_equals", "field": "graph_held_at_run_tests",   "expected": true },
+    { "type": "state_field_equals", "field": "iteration_stayed_one",      "expected": true },
+    { "type": "state_field_equals", "field": "block_awaiting_review",     "expected": true },
+    { "type": "state_field_equals", "field": "report_kind_fail",          "expected": true }
+  ]
+}

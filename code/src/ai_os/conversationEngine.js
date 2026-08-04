@@ -2600,6 +2600,28 @@ function createConversationEngine(options = {}) {
           mvp_report: enter.report, report_summary: reportSummary
         };
       }
+      // PHASE-55 W-2 (R-16, closes PHASE-54 R-45): non-convergence escape.
+      // No outstanding owner changes (the R-10 branch above takes precedence and
+      // is byte-identical), harness verdict FAIL, and the graph's iteration_count
+      // — bound above from the SAME get_status call; NEVER the mvp_loop.iteration
+      // display echo — is >= 1: the internal A-5 loop already spent its one free
+      // self-repair attempt and failed again, so the owner is consulted via the
+      // EXISTING review-gate surface instead of burning further iterations toward
+      // the cap without ever asking the person who owns the project.
+      // iterationCount === 0 falls through to the loop_back below, byte-identical.
+      if (iterationCount >= 1) {
+        const enter = await _mvpEnterOwnerReview(pid, loopId, state, "FAIL_REVIEW",
+          runOutput, manifestPaths, derivedEntry, iterationCount);
+        if (!enter.ok) {
+          return { ok: true, loop_id: loopId, advanced: false,
+                   test_error: enter.error_code, report_summary: reportSummary };
+        }
+        return {
+          ok: true, loop_id: loopId, advanced: false,
+          current_state: "RUN_TESTS", mvp_review_pending: true,
+          mvp_report: enter.report, report_summary: reportSummary
+        };
+      }
     }
 
     // FAIL → loop-back (cap-aware via orchestration.loop_back)

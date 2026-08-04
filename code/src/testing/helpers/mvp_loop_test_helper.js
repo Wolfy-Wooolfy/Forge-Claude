@@ -1074,7 +1074,178 @@ async function runS383ArrayAssertionDiscipline() {
   return out;
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// PHASE-55 W-2 — S385/S386: owner escape on non-convergence (R-16, closes
+// PHASE-54 R-45). Same discipline as S373-S382.
+// ════════════════════════════════════════════════════════════════════════════
+
+// ── S385 — R-16 predicate, direct engine ─────────────────────────────────────
+// FAIL #1 at iteration 0 (no outstanding changes): internal A-5 loop_back,
+// byte-identical — R-16(e) false. FAIL #2 at iteration 1: the escape fires —
+// owner review gate, FAIL_REVIEW report, graph held at RUN_TESTS, no increment.
+
+async function runS385NonConvergenceEscape() {
+  const out = {};
+  const pid = "test_s385_mvp";
+  const lp  = "lp385";
+  const eng = _engine();
+  const reg = getDefaultRegistry();
+  const od  = "artifacts/projects/" + pid + "/orchestration/" + lp + "/";
+
+  await _writeState2(pid, _pstate(pid, lp, _block()));
+  await _seedLoopAt(pid, lp, "RUN_TESTS");
+
+  // FAIL #1 — iteration 0, no outstanding owner changes: A-5 keeps its one free
+  // self-repair attempt (R-16 rationale) — blind loop_back exactly as today.
+  const rt1 = await eng.runTests({
+    project_id: pid, loop_id: lp,
+    _test_skip_npm_install: true,
+    _test_force_run_scenarios_result: _failResult()
+  });
+  out.first_fail_loops_back_blind = !!(rt1.advanced === true &&
+    rt1.advanced_to === "BUILDER" && rt1.loop_back === true);
+  out.first_fail_no_review = rt1.mvp_review_pending === undefined;
+  const gs1 = await _graphState(pid, lp);
+  out.first_fail_iteration_one = !!(gs1 && gs1.iteration_count === 1 &&
+    gs1.current_state === "BUILDER");
+  let st = await _rj("artifacts/projects/" + pid + "/project_state.json");
+  out.first_fail_block_building = !!(st && st.mvp_loop &&
+    st.mvp_loop.status === "BUILDING");
+
+  // The normal post-rebuild trajectory back to RUN_TESTS.
+  await reg.invoke("orchestration.advance_state",
+    { project_id: pid, loop_id: lp, to_state: "RUN_TESTS",
+      transition_type: "NORMAL", role_invoked: "builtproject" }, { root: ROOT });
+
+  // FAIL #2 — iterationCount = 1 (graph truth, NOT the display echo), still no
+  // outstanding changes: R-16 escape → owner review with the failing assertions
+  // in plain language.
+  const rt2 = await eng.runTests({
+    project_id: pid, loop_id: lp,
+    _test_skip_npm_install: true,
+    _test_force_run_scenarios_result: _failResult()
+  });
+  out.second_fail_routes_to_owner = !!(rt2.advanced === false &&
+    rt2.mvp_review_pending === true);
+  out.second_fail_payload_state = rt2.current_state === "RUN_TESTS";
+  const gs2 = await _graphState(pid, lp);
+  out.graph_held_at_run_tests = !!(gs2 && gs2.current_state === "RUN_TESTS");
+  out.iteration_not_incremented = !!(gs2 && gs2.iteration_count === 1);
+  st = await _rj("artifacts/projects/" + pid + "/project_state.json");
+  out.block_awaiting_review = !!(st && st.mvp_loop &&
+    st.mvp_loop.status === "AWAITING_OWNER_REVIEW");
+
+  const rep = await _rj(od + "mvp_report.json");
+  out.report_kind_fail = !!(rep && rep.kind === "FAIL_REVIEW");
+  const t1 = rep && rep.tests && Array.isArray(rep.tests.scenarios)
+    ? rep.tests.scenarios.find(function (s) { return s.id === "T-1"; }) : null;
+  out.report_failing_reason_plain = !!(t1 && Array.isArray(t1.failing) &&
+    t1.failing.length === 1 && t1.failing[0].reason === "expected 201 but got 200");
+  out.report_summary_owner_decides = !!(rep && typeof rep.summary_ar === "string" &&
+    rep.summary_ar.indexOf("أنت صاحب القرار") !== -1);
+
+  return out;
+}
+
+// ── S386 — R-16 escape across the REAL entry point (R-10 / S382 pattern) ─────
+// Boots the workspace API server in-process on a temp root, seeds the loop to
+// RUN_TESTS with iteration_count = 1 via the REAL orchestration tools (start →
+// RUN_TESTS → loop_back → BUILDER → RUN_TESTS), then drives
+// POST /api/ai-os/project/run-tests exactly as the UI does and asserts the
+// escape through the live HTTP surface.
+
+async function runS386NonConvergenceEscapeRealPath() {
+  const out = {};
+  const PID = "s386_mvp_escape";
+  const LP  = "lp386";
+  const tempDir = fsx.mkdtempSync(pathx.join(os.tmpdir(), "forge_s386_"));
+  let instance = null;
+
+  try {
+    const reg = getDefaultRegistry();
+    const projDir = pathx.join(tempDir, "artifacts", "projects", PID);
+    fsx.mkdirSync(pathx.join(projDir, "orchestration", LP), { recursive: true });
+
+    // Project state: flag ON, BUILDING (S382 direct-fs-on-tempdir precedent).
+    fsx.writeFileSync(pathx.join(projDir, "project_state.json"), JSON.stringify(
+      _pstate(PID, LP, _block()), null, 2), "utf8");
+    fsx.writeFileSync(pathx.join(projDir, "orchestration", LP, "test_plan.json"),
+      JSON.stringify(TEST_PLAN_FIX, null, 2), "utf8");
+    fsx.writeFileSync(pathx.join(projDir, "orchestration", LP, "build_manifest.json"),
+      JSON.stringify(MANIFEST_FIX, null, 2), "utf8");
+
+    // Graph truth at iteration 1, held at RUN_TESTS — via the REAL orchestration
+    // tools against the temp root (no hand-built graph file).
+    await reg.invoke("orchestration.start_loop",
+      { project_id: PID, loop_id: LP, owner_intent_source: "vision_locked_intake" },
+      { root: tempDir });
+    await reg.invoke("orchestration.advance_state",
+      { project_id: PID, loop_id: LP, to_state: "RUN_TESTS",
+        transition_type: "NORMAL", role_invoked: "builtproject" }, { root: tempDir });
+    await reg.invoke("orchestration.loop_back",
+      { project_id: PID, loop_id: LP }, { root: tempDir });
+    await reg.invoke("orchestration.advance_state",
+      { project_id: PID, loop_id: LP, to_state: "RUN_TESTS",
+        transition_type: "NORMAL", role_invoked: "builtproject" }, { root: tempDir });
+
+    const { createWorkspaceApiServer } = require("../../workspace/apiServer");
+    instance = createWorkspaceApiServer({ root: tempDir, port: 0 });
+    await new Promise(function (r) { instance.server.listen(0, r); });
+    const base = "http://127.0.0.1:" + instance.server.address().port;
+
+    // The REAL entry point: HTTP → apiServer → conversationEngine.runTests.
+    const res = await _httpReq(base, "/api/ai-os/project/run-tests", "POST", {
+      project_id: PID, loop_id: LP,
+      _test_skip_npm_install: true,
+      _test_force_run_scenarios_result: _failResult()
+    });
+    out.run_tests_endpoint_ok = res.status === 200;
+    let payload = {};
+    try { payload = JSON.parse(res.body); } catch (_) { payload = {}; }
+
+    out.escaped_to_owner_review = !!(payload.advanced === false &&
+      payload.mvp_review_pending === true);
+    out.payload_state_run_tests = payload.current_state === "RUN_TESTS";
+    out.not_blind_loop_back = payload.loop_back !== true &&
+      payload.advanced_to !== "BUILDER";
+
+    const gs = await reg.invoke("orchestration.get_status",
+      { project_id: PID, loop_id: LP }, { root: tempDir });
+    out.graph_held_at_run_tests = !!(gs && gs.status === "SUCCESS" &&
+      gs.output.current_state === "RUN_TESTS");
+    out.iteration_stayed_one = !!(gs && gs.status === "SUCCESS" &&
+      gs.output.iteration_count === 1);
+
+    const after = JSON.parse(fsx.readFileSync(
+      pathx.join(projDir, "project_state.json"), "utf8"));
+    out.block_awaiting_review = !!(after.mvp_loop &&
+      after.mvp_loop.status === "AWAITING_OWNER_REVIEW");
+
+    let rep = null;
+    try {
+      rep = JSON.parse(fsx.readFileSync(
+        pathx.join(projDir, "orchestration", LP, "mvp_report.json"), "utf8"));
+    } catch (_) { rep = null; }
+    out.report_kind_fail = !!(rep && rep.kind === "FAIL_REVIEW");
+
+    return out;
+  } finally {
+    if (instance && instance.server) {
+      if (typeof instance.server.closeAllConnections === "function") {
+        instance.server.closeAllConnections();
+      }
+      await new Promise(function (r) { instance.server.close(r); });
+    }
+    try { require("../../runtime/secrets/secret_provider")._resetForTest(); } catch (_) {}
+    try { require("../../runtime/tools/_registry").resetDefaultRegistry(); } catch (_) {}
+    try { require("../../runtime/permission/permissionPolicy").resetDefaultPolicy(); } catch (_) {}
+    try { fsx.rmSync(tempDir, { recursive: true, force: true }); } catch (_) {}
+  }
+}
+
 module.exports = {
+  runS385NonConvergenceEscape,
+  runS386NonConvergenceEscapeRealPath,
   runS383ArrayAssertionDiscipline,
   runS382StateSurvival,
   runS373ScopeDerivation,

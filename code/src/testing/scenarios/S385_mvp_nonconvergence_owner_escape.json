@@ -1,0 +1,26 @@
+{
+  "id": "S385",
+  "name": "mvp non-convergence owner escape — second FAIL with no outstanding changes routes to the owner review gate (PHASE-55 W-2, R-16, closes PHASE-54 R-45)",
+  "description": "R-16 predicate, direct engine: FAIL #1 at graph iteration 0 with no outstanding owner changes takes the internal A-5 loop_back byte-identically (R-16(e) false — A-5 keeps its one free self-repair attempt). After the normal return to RUN_TESTS, FAIL #2 at iterationCount=1 (graph truth from get_status, never the mvp_loop.iteration display echo) fires the escape: _mvpEnterOwnerReview with kind FAIL_REVIEW — advance suppressed, mvp_review_pending, graph held at RUN_TESTS with no increment, block BUILDING→AWAITING_OWNER_REVIEW, persisted report carries the failing assertion reasons verbatim and the owner-decides summary. R-10's outstanding-changes branch takes precedence and stays byte-identical (locked by S377).",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/mvp_loop_test_helper",
+  "method": "runS385NonConvergenceEscape",
+  "args": [],
+  "cleanup_project": "test_s385_mvp",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "first_fail_loops_back_blind",    "expected": true },
+    { "type": "state_field_equals", "field": "first_fail_no_review",           "expected": true },
+    { "type": "state_field_equals", "field": "first_fail_iteration_one",       "expected": true },
+    { "type": "state_field_equals", "field": "first_fail_block_building",      "expected": true },
+    { "type": "state_field_equals", "field": "second_fail_routes_to_owner",    "expected": true },
+    { "type": "state_field_equals", "field": "second_fail_payload_state",      "expected": true },
+    { "type": "state_field_equals", "field": "graph_held_at_run_tests",        "expected": true },
+    { "type": "state_field_equals", "field": "iteration_not_incremented",      "expected": true },
+    { "type": "state_field_equals", "field": "block_awaiting_review",          "expected": true },
+    { "type": "state_field_equals", "field": "report_kind_fail",               "expected": true },
+    { "type": "state_field_equals", "field": "report_failing_reason_plain",    "expected": true },
+    { "type": "state_field_equals", "field": "report_summary_owner_decides",   "expected": true }
+  ]
+}

@@ -506,6 +506,53 @@ agent-ledger row (e.g. P's own pre-pipeline ideation turns) is not counted again
 P's cap; the direction is under-count for that window only, bounded-correct
 afterwards.
 
+### 6.6 CTO verification of C1 (2026-08-04) — W-1 VERIFIED AND ACCEPTED; W-2 GO
+
+- **CTO-F-E (correction, applied in C1 §6 and here):** the R-23(2) figure as first
+  reported used the seam-priced $0.005245 and understated the required WORST case
+  by ~1.84x. Corrected: worst case = **max(observed) = $0.009665** ⇒ **0.01933%**
+  of the $50.00 default cap / **0.96650%** of a $1.00 cap per intake — stated
+  explicitly as max(observed), not a mean. Disposition unchanged (R-23(a) holds;
+  three orders of magnitude below the 80% threshold). Same error class as F-6 —
+  recorded rather than excused.
+- **R-25 (verbatim disposition):** the residual R-21 gap — legacy spend before
+  P's first agent-ledger row (e.g. a fresh project's pre-pipeline ideation turns)
+  is VISIBLE in the ledger but NOT capped — is **ACCEPTED, W-1 NOT reopened**:
+  (a) R-21's required property (lifetime-bounded, no delayed denial of service)
+  is met and the residual is disclosed at the code seam; (b) the delta is real —
+  before W-1 that spend was invisible everywhere AND ungated, after W-1 it is
+  always visible and gated from first agent activity onward; (c) a
+  project-creation-timestamp bound would grow the live-file list mid-item and
+  break R-1's independent revertibility for a small magnitude. **Bindings:**
+  (1) backlog item BY NAME: *"R-25 pre-first-activity legacy spend is visible but
+  not capped — bound is first-activity, not project creation"*; (2) **W-5 MUST
+  state this in OWNER-FACING plain language** — the owner must not believe the
+  cap covers a project's pre-build ideation when it does not.
+- **Real proof:** shape accepted; NOT authorized yet — awaiting the owner's
+  explicit yes relayed by the CTO. When approved: run, then APPEND evidence to C1
+  as a dated addendum (no rewriting of existing C1 sections), reporting BOTH the
+  ledger delta AND the real cash.
+- **W-2 GO:** granted; predicate = R-16 unchanged; R-5 + R-10 (real-path S386,
+  S382 pattern) still bind. Expected count after W-2: **379/0/5 (384)**.
+  W-2 live-file list confirmed pre-code: `code/src/ai_os/conversationEngine.js`
+  ONLY (the :2588-2603 FAIL-branch region); mvpLoopEngine.js ZERO touches — any
+  perceived need = STOP before the edit per R-8.
+
+### 6.7 Named backlog items raised by W-1 (none fixed in this phase)
+
+1. **R-23 reverse_vision double-count in the cap's ledger** — reverseVisionProvider
+   invoked via agent.invoke books twice (agent_tools :142 + the seam) under (ii);
+   measured worst case 0.01933% of the default cap per intake (max(observed),
+   CTO-F-E-corrected).
+2. **R-25 pre-first-activity legacy spend is visible but not capped — bound is
+   first-activity, not project creation.** Owner-facing disclosure mandatory in
+   W-5.
+3. **R-14 streaming spend is VISIBLE but NOT COSTED** —
+   conversationalResponseProvider streams book tokens 0 + `tokens_unavailable`;
+   costing them needs usage capture that must not mutate the request.
+4. **R-17 `requires_binary` cannot express pip3-OR-pip** (single-string field;
+   array form = capability change, forbidden this phase).
+
 ### W-1 real-proof authorization status
 
 NOT authorized. Proposed at C1 with the estimate; the CTO takes it to the owner as
