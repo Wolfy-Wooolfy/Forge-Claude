@@ -58,6 +58,10 @@ function appendEntry(entry, options) {
     cost_usd_actual:    typeof entry.cost_usd_actual    === "number" ? entry.cost_usd_actual    : 0,
     outcome:            entry.outcome
   };
+  // PHASE-55 W-1 (R-14/R-22, additive): streaming rows carry no usage — the
+  // explicit marker prevents a reader mistaking their zero for "this call was
+  // free". Only ever written as literal true.
+  if (entry.tokens_unavailable === true) record.tokens_unavailable = true;
 
   const filePath = _ledgerPath(root);
   try {

@@ -23,6 +23,41 @@ function _readVisionCaps(projectId, root) {
   }
 }
 
+// ── Legacy sentinel spend (PHASE-55 W-1 — R-11(ii) + R-21) ────────────────────
+//
+// Legacy Stage-A provider calls are metered by the openAiAdapter seam under the
+// sentinel project_id below (they carry no project attribution at the seam), so
+// the cap must fold them in or they stay invisible to the number it reads.
+//
+// R-21 lifetime bound (CTO-F-D: an unbounded global total is a delayed denial of
+// service — once cumulative legacy spend crosses a cap, every NEW project would
+// be born BUDGET_EXCEEDED). Predicate as implemented:
+//   legacy_total(P) = Σ cost_usd_actual over rows r where
+//     r.project_id === "_legacy_stage_a" AND r.ts >= min{ r'.ts : r'.project_id === P }
+//   and legacy_total(P) = 0 when P has no ledger rows at all — a brand-new
+//   project can never be blocked by historical legacy spend.
+// Declared limitation: legacy spend before P's first agent-ledger row (e.g. P's
+// own pre-pipeline ideation turns) is not counted; bounded-correct afterwards.
+
+const LEGACY_SENTINEL_PROJECT_ID = "_legacy_stage_a";
+
+function _legacySpendSince(project_id, root) {
+  if (!project_id || project_id === LEGACY_SENTINEL_PROJECT_ID) return 0;
+  const own = ledger.readEntries({ project_id }, { root });
+  if (own.length === 0) return 0;
+  let firstTs = own[0].ts;
+  for (const r of own) {
+    if (typeof r.ts === "string" && r.ts < firstTs) firstTs = r.ts;
+  }
+  const rows = ledger.readEntries(
+    { project_id: LEGACY_SENTINEL_PROJECT_ID, since: firstTs }, { root });
+  let total = 0;
+  for (const r of rows) {
+    total += (typeof r.cost_usd_actual === "number" ? r.cost_usd_actual : 0);
+  }
+  return Math.round(total * 100000) / 100000;
+}
+
 // ── checkBudget ───────────────────────────────────────────────────────────────
 //
 // Returns one of:
@@ -40,7 +75,8 @@ function checkBudget(project_id, estimated_cost_usd, options) {
     max_per_iteration_usd: DEFAULT_MAX_PER_ITERATION_USD
   };
 
-  const totalSpent   = ledger.getTotalCost(project_id, { root });
+  const totalSpent   = ledger.getTotalCost(project_id, { root }) +
+                       _legacySpendSince(project_id, root);
   const projected    = totalSpent + (estimated_cost_usd || 0);
   const cap          = caps.max_total_usd;
 

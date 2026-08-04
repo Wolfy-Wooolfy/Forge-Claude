@@ -271,8 +271,8 @@ statements).
 | F-5 | 24_MVP_LOOP_CONTRACT.md §9 drift (N=9/N=10 vs actual N=11; S383 missing) | CONFIRMED independently (R-20); W-5 target |
 | F-6 | Three conflicting estimators (analysis in §3.2) | Accepted as the written finding (R-20); recommendation text only, zero code |
 | F-7 | R-2 satisfaction for W-4/W-5 without SU | RESOLVED (R-19): W-4 = executed transcript; W-5 = formal waiver + before/after quoted text |
-| F-8 | (Step 0.5) R-14 marker survives validation but NOT persistence — see §6.2 | RAISED — awaiting CTO ruling with W-1 GO |
-| F-9 | (Step 0.5) reverse_vision via agent.invoke would double-count WITHIN the agent ledger — see §6.4 | RAISED — awaiting CTO ruling with W-1 GO |
+| F-8 | (Step 0.5) R-14 marker survives validation but NOT persistence — see §6.2 | CONFIRMED by CTO; RESOLVED option (a) per R-22 (additive field in the record builder; SU must read it BACK from the JSONL) |
+| F-9 | (Step 0.5) reverse_vision via agent.invoke would double-count WITHIN the agent ledger — see §6.4 | CONFIRMED by CTO (E-1 erratum on R-15); RESOLVED option (a) per R-23 (accept + enumerate + R-23(2) measurement in C1 + backlog item) |
 | O-1 | KB ledger out of W-1 scope | CONFIRMED (R-20) |
 | O-2 | credibility_scorer cross-ledger double visibility | ACCEPTED + enumerated (R-15) |
 | O-3 | S384 needs a test-only injection seam in openAiAdapter | APPROVED (R-20; in-repo precedent conversationEngine.js:413, opts._client) |
@@ -304,7 +304,7 @@ W-4: RED/GREEN = executed restart transcripts (R-7/R-19). W-5: R-2 formally waiv
 
 | Item | Live files |
 |---|---|
-| W-1 | `code/src/providers/_contract/openAiAdapter.js` + `code/src/runtime/agents/budget_enforcer.js` (per R-11 choice (ii), §6.1) — **plus, pending the F-8 ruling, possibly `code/src/runtime/agents/cost_ledger.js` (+1 additive line)** |
+| W-1 | **Superseded by the §6.5 R-8 re-bound (final):** `code/src/providers/_contract/openAiAdapter.js` + `code/src/runtime/agents/budget_enforcer.js` + `code/src/runtime/agents/cost_ledger.js` (additive only, per R-22/R-21) |
 | W-2 | `code/src/ai_os/conversationEngine.js` (the :2588-2603 region only); `code/src/ai_os/mvpLoopEngine.js` contingent (likely zero change; any touch pre-announced) |
 | W-3 | `code/src/testing/scenarios/S57_pkg_install_pip_tier1.json` (one line) |
 | W-4 | `RUN_FORGE.bat` (INSTALL_FORGE.bat: no change) |
@@ -407,6 +407,109 @@ files; conservative over-count direction; reverse_vision is intake-only and rare
 (b) suppress the seam booking inside the provider_id branch via a call-scoped marker
 (adds `agent_tools.js` to the live list + reintroduces ambient-state complexity).
 **Recommendation: (a).** Awaiting ruling.
+
+## 6.5 CTO review of D0 + Step 0.5 addendum (2026-08-04) — D0 VERIFIED; W-1 GO granted, scope re-bound
+
+F-8 and F-9 both CONFIRMED line-level by the CTO. D0 verified from a fresh zip
+(commit `eed8f30d` local; $0; no push, no tag).
+
+### ERRATUM E-1 (CTO; detected by CC via F-9)
+
+R-15's clause "visibility across two ledgers, not double counting within the one
+the cap reads" is **WRONG** for reverse_vision invoked via agent.invoke. It holds
+for ideaSynthesisProvider and credibility_scorer only. R-15 is amended accordingly.
+Attribution: CTO. Detected by: CC (F-9) — the second time in two phases that CC has
+falsified a CTO ruling before it reached code.
+
+### CTO-F-D — the R-11(ii) design as written is a delayed denial of service
+
+`getTotalCost("_legacy_stage_a")` reads every matching row ever written, from a
+JSONL that never resets, and the §6.1 design added that unbounded total to EVERY
+project's cap check. budget_enforcer.js:34-55 compares projected/cap with
+DEFAULT_MAX_TOTAL_USD = 50.00. Therefore: once cumulative legacy spend crosses a
+project's cap, every NEW project returns BUDGET_EXCEEDED before its first call —
+a guaranteed future outage of the owner's own tool. `cost_ledger.readEntries`
+already supports `filter.since` — the bound is cheap. Resolved by R-21.
+
+### R-21..R-24 (CTO, 2026-08-04 — verbatim)
+
+R-21  LEGACY CONTRIBUTION MUST BE LIFETIME-BOUNDED TO THE PROJECT.
+      Required property: the legacy amount added to project P's cap check counts
+      ONLY legacy spend that occurred within P's own lifetime. An unbounded global
+      total is REJECTED. Mechanism is yours to choose (filter.since already exists;
+      a project creation/first-activity timestamp is the natural bound —
+      budget_enforcer._readVisionCaps already reads project files). Declare the
+      chosen bound and its exact predicate in the artifact. If no bound is
+      implementable within the re-bound file list => STOP-AND-REPORT.
+      SU consequence: S384 must ALSO assert the bound — a legacy row written BEFORE
+      project P existed must NOT appear in checkBudget(P). Without that assertion
+      the bound is unproven.
+R-22  F-8 RESOLVED — OPTION (a) APPROVED. One additive field in the record builder
+      in cost_ledger.js. This is a §ARC module but the change reuses its own
+      declared write path: NO new §ARC, ledger remains at 10. Option (b) is REJECTED
+      because it violates R-14's text. BINDING: the SU must read the field BACK from
+      the persisted JSONL, not merely assert appendEntry returned. Presence is not
+      validity — a marker asserted from the return value and absent from disk is the
+      exact defect you just found.
+R-23  F-9 RESOLVED — OPTION (a) ACCEPTED, with three bindings:
+      (1) Name it explicitly in the artifact: reverseVisionProvider invoked via
+          agent.invoke double-counts in the cap's own ledger under (ii).
+      (2) BOUND IT BY MEASUREMENT, NOT ASSERTION. Report in C1: how many
+          reverse_vision calls occur per project lifecycle, their typical cost, and
+          the resulting worst-case cap inflation as a percentage of
+          DEFAULT_MAX_TOTAL_USD. If a single intake can plausibly push a real
+          project past 80%, come back — the answer changes. The R-37 precedent is
+          why this is a measurement and not a shrug: an over-counting cap already
+          nearly aborted a legitimate run in PHASE-54.
+      (3) Backlog item recorded.
+      Option (b) is REJECTED: it reintroduces call-scope ambient state — the exact
+      thing R-11 rejected as racy — for a rare path. Trading a bounded deterministic
+      over-count for a race in the metering layer is a bad trade.
+R-24  A-2 APPROVED — CITATION VERIFIED. I checked it rather than accepting it:
+      DECISION-2026-07-29-phase-54-iterative-mvp-loop.md:125-128 and the closure
+      artifact line 101 both record R-16 as "next_phase may not say PENDING-DECISION
+      while the phase is in progress". Applying the established convention and
+      disclosing it is correct behavior, not scope creep. No erratum needed.
+
+### R-8 RE-BOUND — W-1 live file list (supersedes §5's W-1 row and §6.1's list)
+
+1. `code/src/providers/_contract/openAiAdapter.js`   (the seam wrapper)
+2. `code/src/runtime/agents/budget_enforcer.js`      (sentinel inclusion + R-21 bound)
+3. `code/src/runtime/agents/cost_ledger.js`          (additive ONLY: R-22 marker
+   field in the record builder + whatever pass-through R-21's bound requires)
+
+Three live files. Anything else => STOP before the edit. Each independently
+revertible per R-1 — how, stated in C1.
+
+### S384 final assertion set (per the W-1 GO)
+
+(a) `getTotalCost("_legacy_stage_a")` increases by the row's `cost_usd_actual`;
+(b) `checkBudget(P, …)` crosses a seeded vision-cap threshold because of that row —
+the number the cap reads actually moved;
+(c) R-21 bound holds: a legacy row predating P is excluded from `checkBudget(P)`;
+(d) R-22: the streaming marker is present when read BACK from the persisted JSONL.
+
+### R-21 bound — chosen mechanism + exact predicate (CC declaration)
+
+**Bound = P's first-activity timestamp in the agent ledger itself.** Rationale: it
+needs zero new file dependencies (the ledger is already being read), is
+deterministic, and covers the intake window (reverse_vision runs before any vision
+exists, so a vision-timestamp bound has a hole exactly there; the vision-lock
+timestamp also postdates Stage-A ideation spend).
+
+**Predicate as implemented:**
+`legacy_total(P) = Σ cost_usd_actual over rows r where r.project_id === "_legacy_stage_a" AND r.ts >= min{ r'.ts : r'.project_id === P }`;
+**if P has no ledger rows at all, `legacy_total(P) = 0`** — a brand-new project can
+never be blocked by historical legacy spend (this kills the CTO-F-D outage by
+construction). Declared limitation: legacy spend occurring before P's first
+agent-ledger row (e.g. P's own pre-pipeline ideation turns) is not counted against
+P's cap; the direction is under-count for that window only, bounded-correct
+afterwards.
+
+### W-1 real-proof authorization status
+
+NOT authorized. Proposed at C1 with the estimate; the CTO takes it to the owner as
+a separate approval. Mock-only / $0 for all W-1 test work.
 
 ## 7. Checkpoints + stop-and-report
 

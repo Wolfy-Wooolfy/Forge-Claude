@@ -1,0 +1,25 @@
+{
+  "id": "S384",
+  "name": "legacy Stage-A spend visibility — the cap's own number moves, R-21 lifetime bound holds, R-22 stream marker read back from disk (PHASE-55 W-1)",
+  "description": "R-11(ii): a legacy Stage-A provider call (real ideationExpansionProvider chain, fake transport via the openAiAdapter test seam) books a sentinel _legacy_stage_a agent-ledger row whose cost moves the number budget_enforcer.checkBudget actually reads — asserted by a seeded vision-cap threshold crossing (allow before, BUDGET_95_PCT_REQUIRES_APPROVAL after; BUDGET_EXCEEDED would betray an R-21 bound leak of the pre-P 0.05 row). R-21: legacy rows predating project P's first-activity ledger row are excluded. R-22/R-14: a stream:true call books tokens 0 with tokens_unavailable:true, asserted by reading the persisted JSONL back, not appendEntry's return value.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/spend_seam_test_helper",
+  "method": "runS384LegacySpendVisibility",
+  "args": [],
+  "cleanup_project": "test_s384_spend",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "fixture_vision_written",        "expected": true },
+    { "type": "state_field_equals", "field": "seam_injection_available",      "expected": true },
+    { "type": "state_field_equals", "field": "legacy_call_completed",         "expected": true },
+    { "type": "state_field_equals", "field": "c_r21_pre_p_legacy_excluded",   "expected": true },
+    { "type": "state_field_equals", "field": "a_sentinel_total_increased",    "expected": true },
+    { "type": "state_field_equals", "field": "a_delta_equals_row_actual",     "expected": true },
+    { "type": "state_field_equals", "field": "b_cap_denied_after_call",       "expected": true },
+    { "type": "state_field_equals", "field": "b_cap_reason_is_95pct",         "expected": true },
+    { "type": "state_field_equals", "field": "d_stream_call_completed",       "expected": true },
+    { "type": "state_field_equals", "field": "d_stream_row_persisted",        "expected": true },
+    { "type": "state_field_equals", "field": "d_marker_read_back_from_disk",  "expected": true }
+  ]
+}
