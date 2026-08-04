@@ -5,7 +5,7 @@
   "overall_progress_percent": 100,
   "stage_progress_percent": 100,
   "next_phase": "PHASE-56-PENDING-DECISION",
-  "next_step": "PHASE-55 HARDENING BATCH IN_PROGRESS (D0 2026-08-03, DECISION-2026-08-03-phase-55-hardening-batch.md, rulings R-1..R-20): five scope-locked items, zero new capability, one at a time — W-1 spend visibility (single seam: wrap chat.completions.create on the getClient() client per R-12; sentinel + budget-check inclusion per R-11(ii); closes PHASE-54 R-40) -> C1; W-2 owner escape on non-convergence (R-16 predicate at the runTests FAIL branch, existing review-gate surface, R-10 branch byte-identical, ITERATION_CAP untouched; closes R-45) -> C2; W-3 S57 requires_binary guard (value by R-17 probe; gate arithmetic declared both ways per R-6) + W-4 restart-safe RUN_FORGE.bat (R-18 Task-Scheduler inventory first; R-7 executed-cycle proof) + W-5 docs/convention reword (R-19 waiver) -> C3. SU plan N=4 (S384-S387): closure 380/0/5 (385) pip-present / 379/0/6 (385) pip-absent. Mock-default $0; sole real spend = W-1 proof ~$0.02 behind separate owner approval. Kill bar $3.00. CURRENT: D0 committed LOCAL; Step 0.5 addendum posted (R-11 choice (ii), F-8 marker-persistence finding, F-9 reverse_vision double-count finding); awaiting CTO W-1 GO.",
+  "next_step": "PHASE-55 CLOSED (2026-08-04): Hardening Batch — W-1 every legacy Stage-A OpenAI call is metered at ONE seam (chat.completions.create wrapped on the getClient() client, R-12; sentinel _legacy_stage_a rows; budget check folds them in lifetime-bounded to the project's first agent-ledger activity, R-11(ii)/R-21; streaming rows visible-not-costed with tokens_unavailable, R-14/R-22; REAL proof: one gpt-4o-mini call booked $0.0000135 = independent recompute EXACTLY, divergence $0, and a pre-existing project's cap total moved by the proof amount — the declared over-count as designed). W-2 owner escape on non-convergence (R-16: MVP FAIL at graph iteration>=1 with no outstanding changes routes to the existing owner review gate instead of the blind A-5 loop; R-10 branch byte-identical; proven direct + across the REAL HTTP entry point, S385/S386; closes PHASE-54 R-45). W-3 S57 requires_binary=pip3 (R-17 measured; S387 meta-lock; closes R-14). W-4 restart-safe RUN_FORGE.bat (pm2 delete-first; RED 'Process 0 not found' + TypeError API.js:1718 reproduced verbatim then five-leg cycle clean per R-7; boot dump untouched, measured []). W-5 docs/convention (par.9 drift fixed to N=11/376; R-25+R-26 bilingual owner disclosures; convention reworded). SU 380/0/5 (385) present / 379/0/6 (385) pip-absent per R-6. Real spend $0.0000135 of $3.00. Closure LOCAL; push + tag phase-55-complete (on the closure commit hash) await CTO closure-diff + push GO. PHASE-56 pending owner decision.",
   "last_completed_artifact": "artifacts/decisions/DECISION-2026-06-22-phase-43-first-real-build.md",
   "phase_45": {
     "status": "CLOSED",
@@ -291,13 +291,13 @@
   "issues": [],
   "blocking_questions": [],
   "runtime_health": {
-    "last_doctor_run": "2026-08-03T13:22:19.861Z",
+    "last_doctor_run": "2026-08-04T12:34:06.659Z",
     "last_doctor_status": "PASS",
     "doctor_endpoint_available": false,
     "self_test_harness_available": true,
-    "self_test_last_run": "2026-08-03",
-    "self_test_last_result": "376 passed, 0 failed, 5 skipped (381 total) — PHASE-54 CLOSED (Iterative MVP Loop Slice 1: Owner Review Loop Core). +11 SU vs PHASE-53: S373-S383 (scope derivation + state model / R-7 review gate at RUN_TESTS + R-11 artifact-derived report + anti-bypass / R-7ii ACCEPT deferred advance + R-17 no-re-engage / R-8 REFINE threading verbatim + supersede / R-10 fail routing / R-9 cap + R-12 UNCLEAR + R-19 forensics / R-18 scoped-spec wiring with explicit provider / R-20 ACCEPT_WITH_FAILING_TESTS both legs / R-1 flag-off E2E invariance / S382 mvp_loop state SURVIVAL across the REAL HTTP entry point / S383 test_designer_v4 array-assertion discipline), plus the S335 invariance extension and the S340 version-pin retarget v3->v4. ARC=10 frozen; L2=81; roles=13 (registry never grew — mvp_scope and mvp_feedback are ctx role_ids). Outside Slice 1 by ruling: apiServer.js +9/-0 (R-39 normalizer now preserves unknown keys; pre-existing defect, locked by S382) and test_designer_v4 plus a 2-line role id bump (R-47, locked by S383). Gate #10 GATE_PASS, owner-witnessed on the real UI; real spend $0.65714 of $1.00.",
-    "self_test_scenarios_pass": 376,
+    "self_test_last_run": "2026-08-04",
+    "self_test_last_result": "380 passed, 0 failed, 5 skipped (385 total) — PHASE-55 CLOSED (Hardening Batch). +4 SU vs PHASE-54: S384 legacy Stage-A spend visibility (the cap's own number moves: sentinel _legacy_stage_a + R-21 first-activity bound + R-22 tokens_unavailable marker read back from disk) / S385 R-16 non-convergence owner escape, direct engine / S386 the same escape across the REAL HTTP entry point (S382 pattern) / S387 S57 requires_binary=pip3 meta-lock (S340 pattern). R-6 alternate count on a Python-absent machine: 379/0/6 (385) — S57 SKIPs instead of reddening the suite. ARC=10 frozen; L2=81; roles=13. Live surface: openAiAdapter + budget_enforcer + cost_ledger (W-1, the re-bound R-8 three) / conversationEngine +22 pure insertion (W-2; mvpLoopEngine ZERO touches) / S57 json one line (W-3) / RUN_FORGE.bat (W-4) / two contract docs incl. bilingual R-25+R-26 owner disclosures (W-5). Real proof: one gpt-4o-mini call, booked $0.0000135 = independent recompute exactly, divergence $0; R-7 restart cycle RED reproduced verbatim then five legs clean. Real spend $0.0000135 of $3.00.",
+    "self_test_scenarios_pass": 380,
     "self_test_scenarios_skip": 5,
     "self_test_scenarios_fail": 0,
     "providers_registered_count": 14,
@@ -2327,7 +2327,7 @@
     "total_live_cap_remaining_usd": 11.92136,
     "architectural_followup": "RESOLVED — Stage 11.4 Approach 1 implemented and verified (reverseVisionProvider mock branch, reverse_vision_role single path, _buildPrompt deleted)"
   },
-  "current_task": "PHASE-55-HARDENING-BATCH",
+  "current_task": "PHASE-55-HARDENING-BATCH-COMPLETE",
   "last_updated": "2026-08-03T18:00:00.000Z",
   "phase_16": {
     "status": "ACTIVE",
@@ -3128,5 +3128,38 @@
     ],
     "release_status": "CLOSED LOCAL; push + annotated tag phase-54-complete await CTO fresh-zip closure-diff + push GO",
     "phase_55_seed": "owner-gated (NOT decided): MVP-loop Slice 2 (re-engagement after ACCEPTED — R-17/R-45) / test_designer reliability / unmetered legacy provider spend / ledger estimator accuracy / RUN_FORGE.bat restart-safety / Browser Automation 7-D / Anthropic provider switch"
+  },
+  "phase_55": {
+    "status": "CLOSED",
+    "closed_at": "2026-08-04",
+    "title": "Hardening Batch (W-1 spend visibility / W-2 owner escape on non-convergence / W-3 S57 environment guard / W-4 restart-safe RUN_FORGE.bat / W-5 docs+convention)",
+    "decision_artifact": "artifacts/decisions/DECISION-2026-08-03-phase-55-hardening-batch.md",
+    "closure_artifact": "artifacts/decisions/DECISION-2026-08-04-phase-55-closure.md",
+    "spend_mid_checkpoint": "artifacts/decisions/_phase_55_checkpoints/stage_spend_mid.md",
+    "loop_mid_checkpoint": "artifacts/decisions/_phase_55_checkpoints/stage_loop_mid.md",
+    "preclosure_checkpoint": "artifacts/decisions/_phase_55_checkpoints/stage_preclosure.md",
+    "closure_checkpoint": "artifacts/decisions/_phase_55_checkpoints/stage_closure.md",
+    "rulings": "R-1..R-26 + erratum E-1 + CTO-F-A..G (full ledger in the plan artifact; index in the closure artifact section 4). Load-bearing: R-11(ii)+R-21 the cap's own number moves, legacy contribution lifetime-bounded to first agent-ledger activity (a new project can never be born blocked); R-12 the seam is the client getClient() returns, chat-only per R-13; R-14/R-22 streaming rows visible-not-costed with a persisted tokens_unavailable marker; R-16 the escape predicate (graph iterationCount >= 1, never the display echo; R-10 branch byte-identical and precedent); R-17 W-3 value by measurement (both probes SUCCESS -> pip3); R-18 Task-Scheduler inventoried + boot dump MEASURED []; R-25/R-26 owner-facing disclosures shipped bilingual in the contract docs",
+    "crux": "the two spend-and-control holes PHASE-54 named are closed ON THE REAL PATH: a real legacy Stage-A call now books a sentinel row the cap actually reads (real proof: booked $0.0000135 = independent recompute exactly, divergence $0; a pre-existing project's cap total moved by exactly the proof amount - the declared over-count as designed), and an MVP build that fails twice consults the OWNER through the existing review gate instead of burning silently to the cap (proven direct AND across live HTTP)",
+    "su_added": "S384-S387 (+4): S384 legacy spend visibility (cap's-own-number predicate + R-21 bound + R-22 marker read back from disk) / S385 R-16 escape direct / S386 R-16 escape across the REAL entry point (S382 pattern) / S387 S57 requires_binary meta-lock (S340 pattern)",
+    "su_suite": "380/0/5 (385); R-6 alternate count, Python-absent environment: 379/0/6 (385) - S57 skip_reason 'binary not found: pip3'",
+    "arc_ledger_count": 10,
+    "l2_tools": 81,
+    "agent_roles": 13,
+    "live_surface": "W-1: code/src/providers/_contract/openAiAdapter.js + code/src/runtime/agents/budget_enforcer.js + code/src/runtime/agents/cost_ledger.js (additive marker) - exactly the re-bound R-8 three; W-2: code/src/ai_os/conversationEngine.js (+22 pure insertion; mvpLoopEngine ZERO touches, sha256-verified by CTO); W-3: S57 json one line; W-4: RUN_FORGE.bat; W-5: docs/12_ai_os/24_MVP_LOOP_CONTRACT.md + docs/10_runtime/17_AGENT_RUNTIME_CONTRACT.md",
+    "real_spend_usd": 0.0000135,
+    "spend_note": "the single owner-approved W-1 real proof (gpt-4o-mini, envelope $0.02, used 0.07%); ledger delta 3 rows / est $0.0000135 / actual $0.0000135; every other leg $0",
+    "backlog": [
+      "R-23 reverse_vision double-count in the cap's ledger (worst case max(observed) 0.01933% of $50 per intake, CTO-F-E-corrected)",
+      "R-25 pre-first-activity legacy spend visible but not capped (bound is first-activity, not project creation)",
+      "R-14 streaming spend VISIBLE but NOT COSTED (tokens_unavailable marker)",
+      "R-17 requires_binary cannot express pip3-OR-pip (single string)",
+      "R-18(c) stale boot mechanism - MEASURED: dump.pm2=[] so the AtLogOn pm2-resurrect task restores nothing; INSTALL comment stale; fix = boot behavior change = own decision",
+      "F-6 sharpened per CTO-F-G: two pricing tables write one ledger - seam LEGACY_PRICING_PER_1M (correct $2.50/$10) vs agent_tools._estimateCostUsd:22-37 ($5/$15) + _adapter_contract.estimateCost:101-107 (chars/4, $0 rounding); reconcile toward the seam's table",
+      "CTO-F-F workspace_path drive-letter case churn (36 tracked project_state.json per restart)",
+      "carried: owner_gate_id:2 on LOOP_BACK rows / phase_16 stale ACTIVE / _invokeRole comment 30s vs 150000ms / estimateCost no cost_estimate.json persist / providerTrace response gap on agent.invoke / getTotalCost 5-dp display rounding"
+    ],
+    "release_status": "CLOSED LOCAL; push + annotated tag phase-55-complete (on the CLOSURE COMMIT HASH, not HEAD) await CTO closure-diff + push GO",
+    "phase_56_seed": "owner-gated (NOT decided): MVP-loop Slice 2 (re-engagement after ACCEPTED) / estimator reconciliation toward the seam table / boot-mechanism repair / test_designer reliability / Browser Automation 7-D / Anthropic provider switch / legacy provider v2 migration (12 pre-v2)"
   }
 }

@@ -563,6 +563,21 @@ afterwards.
    (2 bytes, empty array) while `pm2 list` shows the owner's live forge process
    (id 0, uptime 23h) — a logon resurrect currently restores NOTHING on this
    machine; raw output in C3 §R-18 measurement addendum.**
+6. **F-6 SHARPENED per CTO-F-G (closure review): two pricing tables now write ONE
+   ledger** (`artifacts/agent/cost_ledger.jsonl`) — the W-1 seam's
+   `LEGACY_PRICING_PER_1M` in `code/src/providers/_contract/openAiAdapter.js`
+   (longest-prefix-first; gpt-4o at the CORRECT $2.50/$10.00; non-zero default)
+   vs `agent_tools._estimateCostUsd` (`code/src/runtime/tools/agent_tools.js:22-37`,
+   gpt-4o at $5/$15 ≈ 2x over) and `_adapter_contract.estimateCost`
+   (`code/src/runtime/agents/_adapter_contract.js:101-107`, chars/4 + output=2×in
+   + 4-dp rounding → $0 for small calls); `providerTrace.PRICING_TABLE`
+   (`code/src/providers/_contract/providerTrace.js:7-12`) correct but v2-path-only.
+   The seam's table is the correct one; the agent path over-estimates in the safe
+   direction for a cap. Reconcile toward the seam's table in the estimator phase.
+7. **CTO-F-F: workspace_path drive-letter case churn** — a restart flips
+   `workspace_path` "D:" ↔ "d:" across 36 tracked `project_state.json` files
+   depending on invocation case; harmless, pollutes diffs; the closure commit
+   excludes them (explicit-paths rule; no `git add -A` / `git add .`).
 
 ### W-1 real-proof authorization status
 
