@@ -2,11 +2,20 @@
 setlocal enabledelayedexpansion
 
 :: ── Forge API Service Installer — Option B: Windows Task Scheduler ───────────
-:: Registers Forge to boot on user logon via a SINGLE canonical path: `pm2 resurrect`
-:: (PHASE-49 W-D). pm2 is the supervisor (crash-restart + daemon self-heal); this task
-:: only triggers `pm2 resurrect` at logon to restore the saved pm2 process list (`forge`).
+:: Registers Forge to boot on user logon via a SINGLE canonical path: pm2 (PHASE-49 W-D).
+:: pm2 is the supervisor (crash-restart + daemon self-heal); this task only asks pm2 to
+:: bring `forge` up at logon.
 :: (Previously this task ran `node start-api.js` directly — a second, un-supervised boot
 :: path that competed with pm2 for :3100; retired in PHASE-49 W-D.)
+::
+:: PHASE-56 W-0 — BOOT AUTO-START REPAIR (PHASE-55 backlog 5 / R-18(c), MEASURED).
+:: The logon action was `pm2 resurrect`, which restores the SAVED pm2 process list —
+:: but INSTALL_FORGE.bat:76-80 deliberately clears that list so nothing can race Task
+:: Scheduler at boot. Measured 2026-08-04: %USERPROFILE%\.pm2\dump.pm2 == `[]` while a
+:: live forge process was running, i.e. a logon resurrect restored NOTHING and Forge did
+:: not auto-start. The action is now `pm2 start "<ecosystem.config.js>" --update-env`,
+:: which depends on no saved dump at all. The saved list stays empty, so the boot race
+:: INSTALL_FORGE.bat guards against stays closed and no change is needed there.
 :: No third-party software required (Task Scheduler is built into Windows).
 ::
 :: Usage (run as current user — no Administrator required):
@@ -30,6 +39,8 @@ set "SCRIPT_DIR=%~dp0"
 for %%A in ("%SCRIPT_DIR%..\..")  do set "FORGE_DIR=%%~fA"
 set "LAUNCH_SCRIPT=%FORGE_DIR%\start-api.js"
 set "LOG_DIR=%FORGE_DIR%\logs"
+:: PHASE-56 W-0: the pm2 app definition the logon task starts (no saved dump needed).
+set "ECOSYSTEM=%FORGE_DIR%\ecosystem.config.js"
 
 :: ── Argument dispatch ────────────────────────────────────────────────────────
 if "%~1"=="" goto :usage
@@ -57,11 +68,18 @@ if not exist "%PM2_CLI%" (
     exit /b 1
 )
 
-:: A-5: windowless launcher — wscript runs the resurrect with window style 0 (hidden),
-:: removing the console-close kill-vector that terminated the logon resurrect (0xC000013A).
+:: A-5: windowless launcher — wscript runs the pm2 command with window style 0 (hidden),
+:: removing the console-close kill-vector that terminated the logon launch (0xC000013A).
 set "VBS_LAUNCHER=%SCRIPT_DIR%resurrect_hidden.vbs"
 if not exist "%VBS_LAUNCHER%" (
     echo [ERROR] resurrect_hidden.vbs not found at "%VBS_LAUNCHER%".
+    exit /b 1
+)
+
+:: PHASE-56 W-0: fail closed if the app definition is missing — registering a task that
+:: cannot start anything is worse than refusing to register it.
+if not exist "%ECOSYSTEM%" (
+    echo [ERROR] ecosystem.config.js not found at "%ECOSYSTEM%".
     exit /b 1
 )
 
@@ -81,7 +99,7 @@ if not errorlevel 1 (
 echo [INFO] Creating ^"%TASK_NAME%^" via PowerShell Register-ScheduledTask...
 
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-  "$action   = New-ScheduledTaskAction -Execute 'wscript.exe' -Argument ([char]34 + '%VBS_LAUNCHER%' + [char]34 + ' ' + [char]34 + '%NODE_EXE%' + [char]34 + ' ' + [char]34 + '%PM2_CLI%' + [char]34) -WorkingDirectory '%FORGE_DIR%';" ^
+  "$action   = New-ScheduledTaskAction -Execute 'wscript.exe' -Argument ([char]34 + '%VBS_LAUNCHER%' + [char]34 + ' ' + [char]34 + '%NODE_EXE%' + [char]34 + ' ' + [char]34 + '%PM2_CLI%' + [char]34 + ' ' + [char]34 + '%ECOSYSTEM%' + [char]34) -WorkingDirectory '%FORGE_DIR%';" ^
   "$trigger  = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME;" ^
   "$settings = New-ScheduledTaskSettingsSet -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1) -ExecutionTimeLimit ([TimeSpan]::Zero) -MultipleInstances IgnoreNew;" ^
   "Register-ScheduledTask -TaskName '%TASK_NAME%' -Action $action -Trigger $trigger -Settings $settings -Force | Out-Null;" ^
@@ -103,7 +121,7 @@ echo.
 echo [OK] ForgeAPI task installed.
 echo      Task name : %TASK_NAME%
 echo      Forge dir : %FORGE_DIR%
-echo      Action    : wscript.exe resurrect_hidden.vbs (hidden pm2 resurrect — no console window)
+echo      Action    : wscript.exe resurrect_hidden.vbs (hidden pm2 start ecosystem.config.js --update-env — no console window)
 echo      Trigger   : On logon (user: %USERNAME%), restart 3x on failure (1min delay)
 echo.
 echo To verify: schtasks /query /tn ForgeAPI /v /fo LIST
