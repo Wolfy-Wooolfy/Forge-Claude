@@ -559,7 +559,10 @@ afterwards.
    — a fresh install does NOT auto-start Forge at boot. Fixing it (correct the
    comment, or save the dump at install) changes boot behavior = its own decision;
    NOT absorbed into W-4 (which touches RUN_FORGE.bat only and preserves the dump
-   bit-for-bit)."
+   bit-for-bit)." **MEASURED 2026-08-04 (CTO-ordered, read-only): dump.pm2 = `[]`
+   (2 bytes, empty array) while `pm2 list` shows the owner's live forge process
+   (id 0, uptime 23h) — a logon resurrect currently restores NOTHING on this
+   machine; raw output in C3 §R-18 measurement addendum.**
 
 ### W-1 real-proof authorization status
 

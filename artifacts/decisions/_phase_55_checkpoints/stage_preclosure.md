@@ -143,6 +143,31 @@ unmanaged strays. The fix does NOT touch the pm2 dump, so whatever boot behavior
 exists today is preserved bit-for-bit. Restart-safety requires NO reconciliation
 with a foreign process ⇒ no STOP-AND-REPORT.
 
+### §R-18 measurement addendum (2026-08-04, CTO-ordered, read-only, $0)
+
+The boot finding is now MEASURED, not inferred (raw output, verbatim):
+
+```
+=== dump.pm2 ===
+2 C:\Users\Khaled Elmasry/.pm2/dump.pm2
+[]
+=== pm2 list ===
+│ 0  │ forge    │ default     │ 2.0.0-… │ fork    │ 32856    │ 23h    │ 0    │ online    │ ...
+```
+
+- `%USERPROFILE%\.pm2\dump.pm2` EXISTS and contains exactly `[]` — a 2-byte EMPTY
+  array.
+- `pm2 list` shows ONE live managed process: `forge`, **id 0**, pid 32856, uptime
+  23h, online — the owner's interactively-started server (untouched; no pm2
+  start/stop/delete was run).
+
+**Measured verdict (one line): NO — a logon `pm2 resurrect` currently has NOTHING
+to restore on this machine; the dump is empty even while a live forge process is
+running.** Fresh-boot auto-start does not happen; the running server exists only
+because the owner started it via RUN_FORGE.bat. Corroborating detail: the live
+entry's id is **0** — exactly the entry whose dead form produced the
+"Process 0 not found" crash this W-4 fixes.
+
 ## 3. W-4 — code delivered; R-7 cycle ON HOLD
 
 RUN_FORGE.bat +13 lines: a commented restart-safe block inserting tolerant
