@@ -1,0 +1,46 @@
+{
+  "mode": "REAL",
+  "ts": "2026-08-04T12:22:28.044Z",
+  "sentinel_total_before": 0,
+  "scratch_cap_before_seed": 0,
+  "preexisting_cap_before": 0.65714,
+  "first_activity_seeded": false,
+  "scratch_cap_before_call": 0,
+  "projected_cost_usd": 0.00004065,
+  "latency_ms": 1699,
+  "a_raw_usage": {
+    "prompt_tokens": 70,
+    "completion_tokens": 5,
+    "total_tokens": 75
+  },
+  "model_returned": "gpt-4o-mini-2024-07-18",
+  "tool_arguments": {
+    "text": "ok"
+  },
+  "c_recomputed_usd": 0.0000135,
+  "rows_delta": 1,
+  "booked_row": {
+    "ts": "2026-08-04T12:22:29.755Z",
+    "invocation_id": "8c101355-f463-4bb7-be4f-123398617bbc",
+    "project_id": "_legacy_stage_a",
+    "provider": "openai",
+    "model": "gpt-4o-mini-2024-07-18",
+    "role": null,
+    "tokens_in": 70,
+    "tokens_out": 5,
+    "latency_ms": 1632,
+    "cost_usd_estimated": 0.0000135,
+    "cost_usd_actual": 0.0000135,
+    "outcome": "success"
+  },
+  "b_booked_actual": 0.0000135,
+  "b_booked_estimated": 0.0000135,
+  "d_divergence_usd": 0,
+  "sentinel_total_after": 0.00001,
+  "scratch_cap_after": 0.00001,
+  "preexisting_cap_after": 0.65715,
+  "sentinel_moved_by": 0.00001,
+  "scratch_moved_by": 0.00001,
+  "preexisting_moved_by": 0.00001,
+  "envelope_ok": true
+}

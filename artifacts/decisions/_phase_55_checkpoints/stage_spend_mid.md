@@ -196,3 +196,53 @@ No cross-item coupling: W-2..W-5 files untouched this leg
 W-1 complete and gate-proven at **$0**. Awaiting: owner fresh LOCAL-folder zip →
 CTO C1 verification → (separately) owner approval for the §7 real proof → then
 W-2 GO. W-2..W-5 not started.
+
+---
+
+## DATED ADDENDUM — W-1 real proof (2026-08-04, owner-approved ~$0.002 / HARD envelope $0.02)
+
+Driver: `scripts/spikes/phase55_w1_real_proof.js` (spike-only; code/src untouched).
+Evidence: `artifacts/spikes/phase55_w1_proof/{dry_result.json, real_result.json}`.
+
+**$0 preflight first (per the approval's own terms):** full dry run with the
+injected fake client — driver plumbing, first-activity seeding, sentinel booking
+and evidence writes all verified with a self-identifying cost-0 row
+(model `gpt-4o-mini-dry-fake`); the only untested variable at flip time was the
+network. Dry evidence on disk.
+
+**THE real call — exactly ONE**, `gpt-4o-mini`, minimal prompt, through
+`callChatWithTool` (the exact class-1 legacy entry) → the REAL `getClient()`
+client → the real network. NOT the test seam (`_resetClientForTests()` executed
+first). Projected cost $0.00004065 — under the envelope; call proceeded.
+
+### The four figures, uncollapsed (order of computation preserved in the driver)
+
+| # | Figure | Value |
+|---|---|---|
+| (a) | RAW `usage` returned by the API, verbatim | `{ "prompt_tokens": 70, "completion_tokens": 5, "total_tokens": 75 }` — model `gpt-4o-mini-2024-07-18`, latency 1699 ms |
+| (c) | INDEPENDENT recompute from published gpt-4o-mini pricing ($0.15/1M in, $0.60/1M out), computed from (a) BEFORE reading the ledger | 70/1M×0.15 + 5/1M×0.60 = **$0.0000135** |
+| (b) | What the ledger BOOKED (`cost_usd_actual` on the new row, read back from disk) | **$0.0000135** (`cost_usd_estimated` identical; row `project_id: "_legacy_stage_a"`, `provider: "openai"`, tokens 70/5, `outcome: "success"`, invocation `8c101355…`) |
+| (d) | Divergence (b) vs (c) | **$0 — exact match.** Cause of agreement: the seam's metering map prefix-matches `gpt-4o-mini` against the dated model string and carries the published rates; no pricing-table defect |
+
+### The cap moved — on real data (R-11(ii)/R-21 made concrete)
+
+| Number the cap reads | Before | After | Δ |
+|---|---|---|---|
+| `getTotalCost("_legacy_stage_a")` | 0 | 0.00001 | **+0.00001** |
+| Scratch project `phase55_w1_proof` (first-activity seeded, cost 0) | 0 | 0.00001 | **+0.00001** |
+| Pre-existing project `phase54_gate10_demo` | 0.65714 | 0.65715 | **+0.00001** |
+
+The pre-existing project's total moving by exactly the proof amount is the
+**declared R-11(ii)/R-21 over-count behaving as designed** — every project whose
+first activity predates the legacy row absorbs it into its cap check; expected
+behavior, not a bug. Precision note, stated plainly: the deltas read 0.00001
+rather than 0.0000135 because `getTotalCost` rounds totals at 5 decimal places
+(pre-existing behavior; the ROW on disk carries the full 0.0000135 — adjacent to
+the F-6 estimator recommendation, not a booking defect).
+
+### Spend accounting (both columns, exact)
+
+- This leg's ledger delta: 3 rows (dry first-activity seed $0 + dry sentinel $0 +
+  the real sentinel row) · estimated **$0.0000135** · **REAL CASH $0.0000135**.
+- Envelope: $0.0000135 of the $0.02 hard envelope (0.07%) — `envelope_ok: true`.
+- **PHASE-55 cumulative real cash: $0.0000135** of the $3.00 kill bar.

@@ -230,6 +230,69 @@ the cycle runs.
 | §ARC / L2 / roles | **10 / 81 / 13** unchanged |
 | Doc integrity (post-drop R-0) | 24_MVP_LOOP_CONTRACT.md sections 1→9.b in order, zero duplicated blocks, END OF DOCUMENT present |
 
+---
+
+## DATED ADDENDUM — R-7 cycle (2026-08-04, owner window "now" relayed by the CTO)
+
+### RED — pre-fix failure REPRODUCED with the explicit old commands (fix NOT reverted)
+
+Baseline: `pm2 list` → forge **id 0**, pid 32856, 23h uptime, online; :3100 LISTENING pid 32856.
+
+(b) old lines 13-16 behavior — `taskkill /F /PID 32856` → `SUCCESS: The process with PID 32856 has been terminated.`
+(c) old line 34 behavior — `pm2 start ecosystem.config.js --update-env` with NO prior delete:
+
+```
+[PM2] Applying action restartProcessId on app [forge](ids: [ 0 ])
+[PM2][ERROR] Process 0 not found
+Process 0 not found
+node:events:487
+      throw er; // Unhandled 'error' event
+      ^
+TypeError: Cannot read properties of undefined (reading 'pm2_env')
+    at C:\Users\Khaled Elmasry\AppData\Roaming\npm\node_modules\pm2\lib\API.js:1718:25
+    at Array.forEach (<anonymous>)
+    at API.speedList (C:\Users\Khaled Elmasry\AppData\Roaming\npm\node_modules\pm2\lib\API.js:1717:18)
+```
+
+**The exact reported defect — "Process 0 not found" + TypeError on `pm2_env` at
+API.js:1718 — reproduced verbatim.** Honest observation: the crash is in the pm2
+CLI/script layer (the .bat aborts at this point — the owner-visible failure);
+the pm2 DAEMON's restart action separately autorestarted the app ~20s later
+(pid 42936, ↺1 observed before GREEN leg 1). The defect is the script crash, and
+that is what W-4 fixes.
+
+### GREEN — five legs through the ACTUAL scripts (RUN_FORGE.bat / STOP_FORGE.bat)
+
+| Leg | Script | Key transcript lines | Outcome |
+|---|---|---|---|
+| start #1 (over the post-RED mess) | RUN_FORGE.bat | `Removing any existing pm2 forge entry (restart-safe)...` → `Clearing any orphan processes...` → `[PM2][WARN] Applications forge not running, starting...` → `[PM2] App [forge] launched (1 instances)` → forge id 0 pid 55800 online → `Forge is running -> http://127.0.0.1:3100` | ✓ |
+| stop #1 | STOP_FORGE.bat | `stopProcessId ... ✓` → status stopped → `deleteProcessId ... ✓` → `Forge stopped.` | ✓ |
+| start #2 | RUN_FORGE.bat | same sequence → pid 27120 online → `Forge is running -> http://127.0.0.1:3100` | ✓ |
+| stop #2 | STOP_FORGE.bat | stop ✓ → delete ✓ → `Forge stopped.` | ✓ |
+| start #3 | RUN_FORGE.bat | same sequence → pid 48312 online → `Forge is running -> http://127.0.0.1:3100` | ✓ |
+
+Zero `Process 0 not found`, zero TypeErrors, across all five legs — including
+start #1 over exactly the messy state that crashed the old script.
+
+### Recovery verified (HARD requirement)
+
+```
+pm2 list → │ 0 │ forge │ ... │ 48312 │ 16s │ 0 │ online │
+HTTP GET http://127.0.0.1:3100/          → HTTP 200 in 0.004s
+GET /api/system/health → { "ok": true, "service": "forge-workspace-api", "ts": "2026-08-04T12:20:23.232Z" }
+```
+
+### Boot-behavior regression check (read-only)
+
+`dump.pm2` after the full cycle: **2 bytes, `[]`** — unchanged in either
+direction (no `pm2 save` was run; the auto-boot item stays backlogged §6.7-5).
+New entry id: **0** (same id, fresh entry).
+
+Transcript environment notes (cosmetic, disclosed): the batch `timeout` lines
+error-fast under redirected stdin (Git Bash driver) and each successful start
+opens the browser via the script's own `start ""` line — neither affects the pm2
+sequence under test.
+
 ## STOP (HARD)
 
 W-3 + W-4-code + W-5 complete at **$0**. Outstanding, in order:
