@@ -31,14 +31,130 @@ const MVP_STATUSES = Object.freeze([
 // AWAITING_OWNER_REVIEW → AWAITING_OWNER_REVIEW is the R-12 UNCLEAR self-loop
 // (clarifying question, no state movement). BUILDING → BUILDING is the internal
 // A-5 loopback with no outstanding owner changes (R-10 unchanged-first-build path).
+// PHASE-56 W-1 (R-3): ACCEPTED is no longer terminal — its ONLY outgoing edge is
+// back to SCOPE_DERIVED, which opens the next slice. No 7th status was needed:
+// SCOPE_DERIVED is reused at its documented meaning ("mvp_scope accepted +
+// persisted") and the existing SCOPE_DERIVED → BUILDING → AWAITING_OWNER_REVIEW →
+// ACCEPTED cycle then replays verbatim. CAP_REACHED stays terminal: a slice that
+// exhausted ITERATION_CAP is not a starting point for another one.
 const MVP_TRANSITIONS = Object.freeze({
   INACTIVE:              Object.freeze(["SCOPE_DERIVED"]),
   SCOPE_DERIVED:         Object.freeze(["BUILDING"]),
   BUILDING:              Object.freeze(["BUILDING", "AWAITING_OWNER_REVIEW", "CAP_REACHED"]),
   AWAITING_OWNER_REVIEW: Object.freeze(["AWAITING_OWNER_REVIEW", "BUILDING", "ACCEPTED", "CAP_REACHED"]),
-  ACCEPTED:              Object.freeze([]),
+  ACCEPTED:              Object.freeze(["SCOPE_DERIVED"]),
   CAP_REACHED:           Object.freeze([])
 });
+
+// ── PHASE-56 W-1: slice bounds (R-4 / R-19) ───────────────────────────────────
+//
+// R-4 forbids the cap becoming unbounded across slices. Each slice runs in its OWN
+// orchestration loop, so graph.iteration_count resets to 0 per slice — that reset is
+// bounded THREE ways, and reaching any bound is surfaced to the owner in plain
+// language WITH his exits (R-19), never as a silent stop:
+//
+//   1. per slice   — ITERATION_CAP = 5, the SOLE authority over iterations, defined
+//                    in conversation_graph.js and boot-locked with strict equality.
+//                    This file never redefines it and never counts iterations.
+//   2. slice count — MVP_MAX_SLICES below. Hard ceiling: 3 x 5 = 15 rebuild
+//                    iterations per project, ever. It bounds SLICES, not iterations.
+//   3. structural  — each slice's accepted-criteria set must strictly grow (R-20),
+//                    and the spec's criteria set is finite; when nothing is left
+//                    excluded, there is no next slice to derive.
+//
+// Raising the ceiling is a one-line decision here plus its line in
+// docs/12_ai_os/24_MVP_LOOP_CONTRACT.md — never a refactor.
+const MVP_MAX_SLICES = 3;
+
+// The owner's exits, quoted verbatim into every bound message (R-19: a limit
+// message with no exit is a dead end wearing a polite sentence). Exported so the
+// SU asserts against these constants rather than against prose.
+const MVP_BOUND_EXITS_AR = Object.freeze([
+  "ابدأ مشروعاً جديداً بالفكرة الموسّعة",
+  "اعتمد النسخة الحالية كما هي وأكمل خط الإنتاج",
+  "راجع ما تم بناؤه في الشرائح السابقة"
+]);
+
+// (block) → { allowed, reason?, slice_index, max }
+// Pure. Never throws. MAX is checked before EXHAUSTED so the owner is told the
+// binding reason, not an incidental one.
+function sliceBoundCheck(block) {
+  const idx = (block && Number.isInteger(block.slice_index)) ? block.slice_index : 1;
+  const base = { slice_index: idx, max: MVP_MAX_SLICES };
+  if (idx >= MVP_MAX_SLICES) {
+    return Object.assign({ allowed: false, reason: "MVP_MAX_SLICES_REACHED" }, base);
+  }
+  const exc = (block && block.mvp_scope &&
+               Array.isArray(block.mvp_scope.excluded_acceptance_criteria_ids))
+    ? block.mvp_scope.excluded_acceptance_criteria_ids : [];
+  if (exc.length === 0) {
+    return Object.assign({ allowed: false, reason: "MVP_SPEC_EXHAUSTED" }, base);
+  }
+  return Object.assign({ allowed: true }, base);
+}
+
+// Deterministic plain-Arabic bound message. Facts first, then the exits verbatim.
+function buildBoundMessageAr(check) {
+  const c = check || {};
+  const head = c.reason === "MVP_MAX_SLICES_REACHED"
+    ? "وصلنا إلى الحد الأقصى لعدد شرائح البناء في هذا المشروع (" +
+      String(c.slice_index) + " من " + String(c.max) + ")، فلا يمكن فتح شريحة جديدة هنا."
+    : "كل ما هو موصوف في مواصفة المشروع تم بناؤه بالفعل، فلا توجد شريحة تالية تُشتق منها.";
+  return head + " أمامك الآن: " +
+    MVP_BOUND_EXITS_AR.map(function (x, i) { return "(" + (i + 1) + ") " + x; }).join("، ") + ".";
+}
+
+// ── PHASE-56 W-1: the slice walk (R-17 — self-enforced against the frozen table) ─
+//
+// A new slice needs a NEW test plan, and designTests only runs at TEST_DESIGN; the
+// frozen transition table has no row from any post-RUN_TESTS state back to it. So
+// slice N runs in a NEW loop, walked from the entry state along DECLARED rows only.
+//
+// The walk STOPS at ENV_REPORT. The next row, ENV_REPORT → TEST_DESIGN, is gated on
+// "Gate 1 owner response = APPROVE" — crossing it here would fabricate the owner's
+// consent (R-16). Forge presents the slice and waits for his real act.
+//
+// R-17: orchestration.advance_state performs NO transition validation (see the
+// named backlog item ADVANCE_STATE_NO_TRANSITION_VALIDATION), so "declared rows
+// only" would be a discipline with nothing enforcing it. validateWalk therefore
+// re-derives legality from conversation_graph itself and callers fail closed.
+const SLICE_WALK = Object.freeze([
+  "OWNER_INTENT", "ARCHITECT_DESIGN", "SPEC_WRITER_FORMALIZE",
+  "REVIEWER_SPEC", "COST_ESTIMATE", "ENV_REPORT"
+]);
+
+// (states[]) → { ok } | { ok:false, error_code:"MVP_UNDECLARED_HOP", error_detail }
+// Never throws. Validates EVERY consecutive pair, including terminal-state origins.
+function validateWalk(states) {
+  const cg = require("../runtime/orchestration/conversation_graph");
+  if (!Array.isArray(states) || states.length < 2) {
+    return { ok: false, error_code: "MVP_UNDECLARED_HOP",
+             error_detail: "a walk needs at least two states" };
+  }
+  for (let i = 0; i < states.length - 1; i++) {
+    const v = cg.validateTransition(states[i], states[i + 1]);
+    if (!v || v.allowed !== true) {
+      return { ok: false, error_code: "MVP_UNDECLARED_HOP",
+               error_detail: String(states[i]) + " -> " + String(states[i + 1]) + ": " +
+                             ((v && v.reason) || "not declared in the transition table") };
+    }
+  }
+  return { ok: true };
+}
+
+// Append-only slice history entry (R-7). One per slice, never rewritten.
+function sliceRecord(args) {
+  const a = args || {};
+  return {
+    index:                   Number.isInteger(a.index) ? a.index : 1,
+    loop_id:                 typeof a.loop_id === "string" ? a.loop_id : "",
+    slice_name:              typeof a.slice_name === "string" ? a.slice_name : "",
+    acceptance_criteria_ids: _isStringArray(a.acceptance_criteria_ids)
+      ? a.acceptance_criteria_ids.slice() : [],
+    owner_request:           typeof a.owner_request === "string" ? a.owner_request : null,
+    accepted_at:             typeof a.accepted_at === "string" ? a.accepted_at : null
+  };
+}
 
 // (enabled) → fresh additive block. iteration is a DISPLAY ECHO of
 // graph.iteration_count — never an enforcement source (R-4/R-9: the single cap
@@ -49,7 +165,12 @@ function initMvpLoopBlock(enabled) {
     status:           "INACTIVE",
     iteration:        0,
     mvp_scope:        null,
-    feedback_history: []
+    feedback_history: [],
+    // PHASE-56 W-1 (R-7): 1-based slice counter + append-only slice history. Both
+    // are OPTIONAL in validateMvpLoopBlock so PHASE-54/55 blocks written before
+    // this phase stay valid and read as slice 1 with no history.
+    slice_index:      1,
+    slices:           []
   };
 }
 
@@ -128,6 +249,28 @@ function validateMvpLoopBlock(block) {
   if (block.accepted_with_failing_tests !== undefined &&
       typeof block.accepted_with_failing_tests !== "boolean") {
     errors.push("accepted_with_failing_tests must be a boolean when present");
+  }
+  // PHASE-56 W-1 (R-7): optional slice bookkeeping. Absent ⇒ slice 1, no history —
+  // exactly how every pre-PHASE-56 block reads.
+  if (block.slice_index !== undefined &&
+      (!Number.isInteger(block.slice_index) || block.slice_index < 1)) {
+    errors.push("slice_index must be an integer >= 1 when present");
+  }
+  if (block.slices !== undefined) {
+    if (!Array.isArray(block.slices)) {
+      errors.push("slices must be an array when present");
+    } else {
+      block.slices.forEach(function (s, i) {
+        const okSlice = _isPlainObject(s) &&
+          Number.isInteger(s.index) && s.index >= 1 &&
+          typeof s.loop_id === "string" && s.loop_id.length > 0 &&
+          typeof s.slice_name === "string" &&
+          _isStringArray(s.acceptance_criteria_ids) &&
+          (s.owner_request === null || typeof s.owner_request === "string") &&
+          (s.accepted_at === null || typeof s.accepted_at === "string");
+        if (!okSlice) errors.push("slices[" + i + "] is malformed");
+      });
+    }
   }
   return { valid: errors.length === 0, errors };
 }
@@ -590,6 +733,134 @@ async function interpretFeedback(input, ctx) {
   return { ok: true, decision, changes, clarification_question: cq };
 }
 
+// ── PHASE-56 W-1/W-2: re-engagement interpretation (R-12 discipline carried ───
+//        forward verbatim — provider-driven ONLY, zero keyword matching) ───────
+//
+// The owner has accepted a slice and said something else. Only a provider decides
+// what that something is, and it may choose ONLY from acceptance criteria the spec
+// already declares and this project has not built yet. It never invents criteria:
+// a request that maps to none is NOT_IN_SPEC, which the wiring layer turns into a
+// plain-Arabic "that needs a change to the specification" (R-22/F-5).
+
+const MVP_REENGAGE_DECISIONS = Object.freeze(
+  ["MORE_WORK", "NOT_IN_SPEC", "NOT_A_BUILD_REQUEST", "UNCLEAR"]);
+
+function _buildReengagePrompt(message, remainingAcs, facts, scenario_id) {
+  const scenarioTag = scenario_id ? "\nSCENARIO_TAG: " + scenario_id + "\n" : "";
+  const f = _isPlainObject(facts) ? facts : {};
+  const acBlock = (Array.isArray(remainingAcs) ? remainingAcs : []).map(function (a) {
+    return "- " + (a && a.id ? a.id + ": " : "") + ((a && (a.description || a.text)) || "");
+  }).join("\n");
+  return (
+    "You are the MVP re-engagement interpreter for Forge. The project owner already accepted a " +
+    "working slice of his project and has now said something new. Classify it and, if he is asking " +
+    "for more of the project to be built, choose which of the REMAINING acceptance criteria he means. " +
+    "Return STRICT JSON only — no markdown, no code blocks, no prose." +
+    scenarioTag +
+    "\nReturn exactly this JSON structure:" +
+    "\n{ \"decision\": \"MORE_WORK\" | \"NOT_IN_SPEC\" | \"NOT_A_BUILD_REQUEST\" | \"UNCLEAR\", " +
+    "\"requested_ac_ids\": [\"<id>\", ...], \"owner_request\": \"<the owner's request in his own words>\", " +
+    "\"clarification_question\": \"<question>\" }" +
+    "\nRules: decision=MORE_WORK when he is asking for more of THIS project to be built AND at least one " +
+    "remaining acceptance criterion below covers it — put those ids in requested_ac_ids (NEVER an id that " +
+    "is not listed below, NEVER an empty list for MORE_WORK) and copy his request VERBATIM into " +
+    "owner_request. decision=NOT_IN_SPEC when he is clearly asking for more work but NO remaining " +
+    "criterion below covers it (requested_ac_ids MUST be empty; still copy owner_request verbatim). " +
+    "decision=NOT_A_BUILD_REQUEST when he is not asking for more building at all (a question, a comment, " +
+    "thanks). decision=UNCLEAR when you cannot tell — put one focused question in the owner's language " +
+    "into clarification_question. For every decision other than MORE_WORK, requested_ac_ids MUST be empty." +
+    "\nAlready built and accepted in this project: " + (f.built_slice || "(the previous slice)") +
+    "\nREMAINING acceptance criteria (the ONLY ids you may choose):\n" + acBlock +
+    "\nOwner message (verbatim):\n" + String(message || "") +
+    "\nRESPOND WITH VALID JSON ONLY."
+  );
+}
+
+// async (input, ctx) → { ok:true, decision, requested_ac_ids, owner_request,
+//                        clarification_question } | { ok:false, error_code, error_detail }
+// Never throws. Every failure mode is typed; the wiring layer degrades them to a
+// clarifying question and leaves the block in ACCEPTED (no state movement).
+async function interpretReengagement(input, ctx) {
+  const reg         = require("../runtime/tools/_registry").getDefaultRegistry();
+  const root        = (ctx && ctx.root) || process.cwd();
+  const project_id  = input && input.project_id;
+  const provider    = input && input.provider;
+  const model       = input && input.model;
+  const scenario_id = (input && input.scenario_id) || null;
+  const remaining   = (input && Array.isArray(input.remaining_acs)) ? input.remaining_acs : [];
+  const budget_usd  = (input && typeof input.budget_usd === "number") ? input.budget_usd : 0.05;
+
+  if (typeof project_id !== "string" || !project_id ||
+      typeof provider !== "string" || !provider ||
+      typeof model !== "string" || !model) {
+    return { ok: false, error_code: "MVP_PROVIDER_REQUIRED",
+             error_detail: "project_id/provider/model must be explicit (R-18)" };
+  }
+  if (remaining.length === 0) {
+    return { ok: false, error_code: "MVP_NO_REMAINING_CRITERIA",
+             error_detail: "no unbuilt acceptance criteria remain" };
+  }
+
+  const prompt = _buildReengagePrompt(input.message, remaining, input.facts, scenario_id);
+
+  let agentResult;
+  try {
+    agentResult = await reg.invoke(
+      "agent.invoke",
+      { provider, model, prompt, project_id, budget_usd },
+      { root, role_id: "mvp_reengage" }
+    );
+  } catch (err) {
+    return { ok: false, error_code: "REENGAGE_AGENT_FAILED", error_detail: err.message };
+  }
+  if (!agentResult || agentResult.status !== "SUCCESS") {
+    const detail = agentResult && agentResult.metadata && agentResult.metadata.reason;
+    return { ok: false, error_code: "REENGAGE_AGENT_FAILED", error_detail: detail || "non-SUCCESS" };
+  }
+
+  const parsed = _tryParseJson((agentResult.output && agentResult.output.text) || "");
+  if (!_isPlainObject(parsed)) {
+    return { ok: false, error_code: "INVALID_REENGAGE_JSON",
+             error_detail: "response is not a JSON object" };
+  }
+
+  const decision = parsed.decision;
+  const ids      = Array.isArray(parsed.requested_ac_ids) ? parsed.requested_ac_ids : null;
+  const ownerReq = typeof parsed.owner_request === "string" ? parsed.owner_request : "";
+  const cq       = typeof parsed.clarification_question === "string"
+    ? parsed.clarification_question : "";
+
+  if (MVP_REENGAGE_DECISIONS.indexOf(decision) === -1 || ids === null || !_isStringArray(ids)) {
+    return { ok: false, error_code: "INVALID_REENGAGE",
+             error_detail: "decision/requested_ac_ids malformed" };
+  }
+  if (decision !== "MORE_WORK" && ids.length !== 0) {
+    return { ok: false, error_code: "INVALID_REENGAGE",
+             error_detail: decision + " must carry an empty requested_ac_ids[]" };
+  }
+  if (decision === "MORE_WORK") {
+    if (ids.length === 0) {
+      return { ok: false, error_code: "INVALID_REENGAGE",
+               error_detail: "MORE_WORK requires at least one requested_ac_id" };
+    }
+    if (new Set(ids).size !== ids.length) {
+      return { ok: false, error_code: "INVALID_REENGAGE",
+               error_detail: "requested_ac_ids contains duplicates" };
+    }
+    // The provider may choose only from what it was shown — verified here, never trusted.
+    const allowed = remaining.map(function (a) { return a && a.id; });
+    for (const id of ids) {
+      if (allowed.indexOf(id) === -1) {
+        return { ok: false, error_code: "INVALID_REENGAGE",
+                 error_detail: "requested id '" + id + "' is not an unbuilt acceptance criterion" };
+      }
+    }
+  }
+
+  return { ok: true, decision, requested_ac_ids: ids, owner_request: ownerReq,
+           clarification_question: cq };
+}
+
 // R-19: forensic history entry — ACCEPT / ACCEPT_WITH_FAILING_TESTS / REFINE /
 // UNCLEAR all recorded. `extras` (R-20 iii) carries the failing report path +
 // failing assertion ids on an ACCEPT_WITH_FAILING_TESTS turn — additive fields.
@@ -610,6 +881,17 @@ module.exports = {
   MVP_STATUSES,
   MVP_TRANSITIONS,
   MVP_FEEDBACK_DECISIONS,
+  // PHASE-56 W-1
+  MVP_MAX_SLICES,
+  MVP_BOUND_EXITS_AR,
+  MVP_REENGAGE_DECISIONS,
+  SLICE_WALK,
+  sliceBoundCheck,
+  buildBoundMessageAr,
+  validateWalk,
+  sliceRecord,
+  interpretReengagement,
+  _buildReengagePrompt,
   initMvpLoopBlock,
   isMvpEnabled,
   canTransition,

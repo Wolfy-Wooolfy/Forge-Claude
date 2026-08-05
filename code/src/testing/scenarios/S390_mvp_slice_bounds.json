@@ -1,0 +1,67 @@
+{
+  "id": "S390",
+  "name": "mvp slice bounds — MVP_MAX_SLICES and the exhausted-spec bound each stop re-engagement and tell the owner what he CAN do next (PHASE-56 W-1, R-4/R-19)",
+  "description": "PHASE-56 W-1. R-4 forbids an unbounded cap across slices; R-19 fixes MVP_MAX_SLICES = 3 as a slice-count bound (ITERATION_CAP stays the sole authority over iterations, untouched at 5) and binds the message: a bound must state the owner's exits, never merely block. Two legs. Leg A: a project already at slice_index = MVP_MAX_SLICES gets refused — no new loop, no status change, no slice appended — with a plain-Arabic message carrying all three declared exits. Leg B: a project whose slice scope has an EMPTY excluded_acceptance_criteria_ids set (everything in the specification is built) is refused the same way with the exhausted-spec message and its own exits. Also asserts MVP_MAX_SLICES is exported as a single named constant and that ITERATION_CAP is untouched at 5.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/mvp_loop_test_helper",
+  "method": "runS390SliceBounds",
+  "args": [],
+  "cleanup_project": "test_s390_mvp",
+  "assertions": [
+    {
+      "type": "status_equals",
+      "expected": "SUCCESS"
+    },
+    {
+      "type": "state_field_equals",
+      "field": "max_slices_constant_is_3",
+      "expected": true
+    },
+    {
+      "type": "state_field_equals",
+      "field": "iteration_cap_untouched_at_5",
+      "expected": true
+    },
+    {
+      "type": "state_field_equals",
+      "field": "max_slices_bound_blocks",
+      "expected": true
+    },
+    {
+      "type": "state_field_equals",
+      "field": "max_slices_no_new_loop",
+      "expected": true
+    },
+    {
+      "type": "state_field_equals",
+      "field": "max_slices_status_unchanged",
+      "expected": true
+    },
+    {
+      "type": "state_field_equals",
+      "field": "max_slices_no_slice_appended",
+      "expected": true
+    },
+    {
+      "type": "state_field_equals",
+      "field": "max_slices_message_states_exits",
+      "expected": true
+    },
+    {
+      "type": "state_field_equals",
+      "field": "spec_exhausted_bound_blocks",
+      "expected": true
+    },
+    {
+      "type": "state_field_equals",
+      "field": "spec_exhausted_no_new_loop",
+      "expected": true
+    },
+    {
+      "type": "state_field_equals",
+      "field": "spec_exhausted_message_states_exits",
+      "expected": true
+    }
+  ]
+}

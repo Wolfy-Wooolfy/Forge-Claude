@@ -533,6 +533,18 @@
     "tokens_out": 80,
     "finish_reason": "stop"
   },
+  "mock|mock-reengage-s389|scenario:S389A": {
+    "text": "{\"decision\":\"MORE_WORK\",\"requested_ac_ids\":[\"AC-3\"],\"owner_request\":\"دلوقتي عايز كمان أقدر أمسح ملاحظة بالـ id بتاعها\",\"clarification_question\":\"\"}",
+    "tokens_in": 240,
+    "tokens_out": 40,
+    "finish_reason": "stop"
+  },
+  "mock|mock-reengage-s391|scenario:S391A": {
+    "text": "{\"decision\":\"MORE_WORK\",\"requested_ac_ids\":[\"AC-3\"],\"owner_request\":\"ضيف كمان حذف ملاحظة\",\"clarification_question\":\"\"}",
+    "tokens_in": 240,
+    "tokens_out": 40,
+    "finish_reason": "stop"
+  },
   "mock|mock-fb-s375|scenario:S375A": {
     "text": "{\"decision\":\"ACCEPT\",\"changes\":[],\"clarification_question\":\"\"}",
     "tokens_in": 200,

@@ -1,0 +1,58 @@
+{
+  "project_id": "test_s389_mvp",
+  "project_name": "test_s389_mvp",
+  "conversation_mode": "PIPELINE",
+  "active_runtime_state": "IDEATION",
+  "loop_id": "5d51f10c-f0b7-4069-b1fe-42ffabdeacec",
+  "user_language": "ar",
+  "last_updated_at": "2026-08-05T08:14:34.287Z",
+  "mvp_loop": {
+    "enabled": true,
+    "status": "SCOPE_DERIVED",
+    "iteration": 0,
+    "mvp_scope": {
+      "slice_name": "notes-create-list-plus-ac-3",
+      "acceptance_criteria_ids": [
+        "AC-1",
+        "AC-2",
+        "AC-3"
+      ],
+      "excluded_acceptance_criteria_ids": [],
+      "files": [
+        "src/server.js",
+        "src/routes/notes.js",
+        "src/store.js"
+      ],
+      "rationale": "Slice 2 grows the accepted slice with: دلوقتي عايز كمان أقدر أمسح ملاحظة بالـ id بتاعها"
+    },
+    "feedback_history": [],
+    "provider": "mock",
+    "model": "mock-reengage-s389",
+    "slice_index": 2,
+    "slices": [
+      {
+        "index": 1,
+        "loop_id": "lp389s1",
+        "slice_name": "notes-create-list",
+        "acceptance_criteria_ids": [
+          "AC-1",
+          "AC-2"
+        ],
+        "owner_request": null,
+        "accepted_at": "2026-08-04T00:00:00.000Z"
+      },
+      {
+        "index": 2,
+        "loop_id": "5d51f10c-f0b7-4069-b1fe-42ffabdeacec",
+        "slice_name": "notes-create-list-plus-ac-3",
+        "acceptance_criteria_ids": [
+          "AC-1",
+          "AC-2",
+          "AC-3"
+        ],
+        "owner_request": "دلوقتي عايز كمان أقدر أمسح ملاحظة بالـ id بتاعها",
+        "accepted_at": null
+      }
+    ]
+  }
+}

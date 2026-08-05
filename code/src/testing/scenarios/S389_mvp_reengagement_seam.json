@@ -1,0 +1,77 @@
+{
+  "id": "S389",
+  "name": "mvp re-engagement seam — an ACCEPTED project's follow-up reaches the loop instead of ideation, opens slice 2 in a NEW loop, and leaves slice 1's loop directory byte-identical (PHASE-56 W-1, R-17/R-18(i))",
+  "description": "PHASE-56 W-1. A project whose mvp_loop is ACCEPTED (slice 1 accepted, graph advanced past RUN_TESTS) receives an owner follow-up asking for more work. Before this phase the turn fell through processMessage to ideationEngine.expandIdea and the loop never re-engaged. Asserts: the re-engagement branch is reached (ideation NOT triggered); ACCEPTED -> SCOPE_DERIVED is a declared mvp_loop transition; a NEW orchestration loop is created and project_state.loop_id re-points to it; slice_index goes 1 -> 2 and slices[] is append-only with slice 1's record preserved; the new graph is halted at ENV_REPORT awaiting the owner's real Gate-1 act (R-16 — it must NOT have crossed into TEST_DESIGN); and slice 1's ENTIRE loop directory is byte-identical before and after (R-18(i)).",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/mvp_loop_test_helper",
+  "method": "runS389ReengagementSeam",
+  "args": [],
+  "cleanup_project": "test_s389_mvp",
+  "assertions": [
+    {
+      "type": "status_equals",
+      "expected": "SUCCESS"
+    },
+    {
+      "type": "state_field_equals",
+      "field": "transition_accepted_to_scope_derived",
+      "expected": true
+    },
+    {
+      "type": "state_field_equals",
+      "field": "reengage_branch_reached",
+      "expected": true
+    },
+    {
+      "type": "state_field_equals",
+      "field": "ideation_not_triggered",
+      "expected": true
+    },
+    {
+      "type": "state_field_equals",
+      "field": "new_loop_created",
+      "expected": true
+    },
+    {
+      "type": "state_field_equals",
+      "field": "loop_id_repointed",
+      "expected": true
+    },
+    {
+      "type": "state_field_equals",
+      "field": "status_scope_derived",
+      "expected": true
+    },
+    {
+      "type": "state_field_equals",
+      "field": "slice_index_two",
+      "expected": true
+    },
+    {
+      "type": "state_field_equals",
+      "field": "slices_append_only",
+      "expected": true
+    },
+    {
+      "type": "state_field_equals",
+      "field": "slice1_record_preserved",
+      "expected": true
+    },
+    {
+      "type": "state_field_equals",
+      "field": "graph_halted_at_env_report",
+      "expected": true
+    },
+    {
+      "type": "state_field_equals",
+      "field": "gate1_not_crossed",
+      "expected": true
+    },
+    {
+      "type": "state_field_equals",
+      "field": "slice1_loop_dir_byte_identical",
+      "expected": true
+    }
+  ]
+}

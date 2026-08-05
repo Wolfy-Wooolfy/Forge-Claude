@@ -998,6 +998,267 @@ function createConversationEngine(options = {}) {
     return rR;
   }
 
+  // ── PHASE-56 W-1 — re-engagement after ACCEPTED (R-3/R-4/R-7/R-16/R-17) ─────
+  //
+  // Reached ONLY when isMvpEnabled(state) && mvp_loop.status === ACCEPTED. Order is
+  // load-bearing and fail-closed at every step: bounds BEFORE any provider call, and
+  // the whole new-slice construction completes BEFORE project_state is touched, so a
+  // failure anywhere leaves the owner exactly where he was, still pointed at slice 1.
+  //
+  // The slice runs in a NEW orchestration loop (R-17): designTests only runs at
+  // TEST_DESIGN and the frozen table has no row back to it from a post-RUN_TESTS
+  // state. The walk stops at ENV_REPORT — the next row is gated on the owner's Gate-1
+  // APPROVE and Forge will not cross it on his behalf (R-16).
+  //
+  // NOTE (R-26/F-13): /api/ai-os/chat/stream forwards only a whitelist of fields to
+  // the browser, so everything the owner must SEE is inside `message`.
+
+  async function _handleMvpReengage(projectId, message, state, user_language, body) {
+    const lang   = String(user_language || "ar").toLowerCase().startsWith("en") ? "en" : "ar";
+    const block  = state.mvp_loop;
+    const prevLoopId = body.loop_id || state.loop_id || null;
+    const reg    = getDefaultRegistry();
+    const pid    = normalizeProjectId(projectId);
+
+    if (!prevLoopId) {
+      const r0 = { ok: false, mode: "BLOCKED", reason: "NO_LOOP_ID", project_id: projectId };
+      await persistTurn(projectId, message, r0);
+      return r0;
+    }
+
+    // ── R-4/R-19: bounds first. No provider call, no loop, no state movement. ──
+    const bound = mvpLoop.sliceBoundCheck(block);
+    if (!bound.allowed) {
+      const rB = {
+        ok: true, mode: "MVP_SLICE_BOUND_REACHED", bound: bound.reason,
+        slice_index: bound.slice_index, max_slices: bound.max,
+        message: mvpLoop.buildBoundMessageAr(bound),
+        project_id: projectId
+      };
+      await persistTurn(projectId, message, rB);
+      return rB;
+    }
+
+    // R-18: explicit LLM config only — body override or the block's own fields.
+    const rProvider = body.mvp_provider || block.provider;
+    const rModel    = body.mvp_model    || block.model;
+    if (!rProvider || !rModel) {
+      const rc = { ok: false, mode: "BLOCKED", reason: "MVP_PROVIDER_REQUIRED", project_id: projectId };
+      await persistTurn(projectId, message, rc);
+      return rc;
+    }
+
+    // The spec is the slice-1 loop's own artifact — the SAME approved specification
+    // every slice of this project is derived from. Never re-synthesized here.
+    const specRel = "artifacts/projects/" + pid + "/orchestration/" + prevLoopId + "/spec.json";
+    const specRead = await reg.invoke("fs.read_file", { path: specRel }, { root });
+    let spec = null;
+    if (specRead && specRead.status === "SUCCESS" && specRead.output) {
+      try { spec = JSON.parse(specRead.output.content); } catch (_) { spec = null; }
+    }
+    if (!spec || !Array.isArray(spec.acceptance_criteria)) {
+      const rs = { ok: false, mode: "BLOCKED", reason: "MVP_SPEC_NOT_FOUND", project_id: projectId };
+      await persistTurn(projectId, message, rs);
+      return rs;
+    }
+
+    const builtIds = (block.mvp_scope && Array.isArray(block.mvp_scope.acceptance_criteria_ids))
+      ? block.mvp_scope.acceptance_criteria_ids : [];
+    const remaining = spec.acceptance_criteria.filter(function (a) {
+      return a && typeof a.id === "string" && builtIds.indexOf(a.id) === -1;
+    });
+
+    const clarifyFallback = lang === "ar"
+      ? "لم أفهم قصدك بدقة — هل تريد إضافة جزء جديد من المشروع؟ اذكر ما تريده كنقاط."
+      : "I could not read your message precisely — do you want another part of the project built? List it as bullet points.";
+
+    const interp = await mvpLoop.interpretReengagement({
+      project_id: pid, message, remaining_acs: remaining,
+      facts: { built_slice: (block.mvp_scope && block.mvp_scope.slice_name) || "" },
+      provider: rProvider, model: rModel,
+      scenario_id: body.mvp_scenario_id || undefined
+    }, { root });
+
+    // R-12 discipline: UNCLEAR, a non-build turn, an out-of-spec ask, or ANY typed
+    // interpreter failure ⇒ say so plainly, stay in ACCEPTED, move nothing.
+    if (!interp.ok || interp.decision !== "MORE_WORK") {
+      let msg;
+      if (interp.ok && interp.decision === "NOT_IN_SPEC") {
+        msg = lang === "ar"
+          ? "ما طلبته ليس ضمن مواصفة هذا المشروع المعتمدة، ولا أستطيع اختراع متطلبات لم توافق عليها. " +
+            "لتنفيذه نحتاج تعديل المواصفة، وهذا يبدأ بدورة بناء جديدة."
+          : "What you asked for is not in this project's approved specification, and I will not invent " +
+            "requirements you never approved. It needs a specification change, which starts a new build cycle.";
+      } else if (interp.ok && interp.decision === "NOT_A_BUILD_REQUEST") {
+        msg = lang === "ar"
+          ? "تمام — لو أردت إضافة جزء جديد من المشروع اذكره وسأبدأ شريحة جديدة."
+          : "Understood — if you want another part of the project built, say so and I will open a new slice.";
+      } else {
+        msg = (interp.ok && interp.clarification_question) || clarifyFallback;
+      }
+      const rU = {
+        ok: true, mode: "MVP_REENGAGE_UNCLEAR",
+        decision: interp.ok ? interp.decision : null,
+        message: msg, project_id: projectId
+      };
+      await persistTurn(projectId, message, rU);
+      return rU;
+    }
+
+    // ── The next slice's scope. Cumulative by construction (R-20): the union of ──
+    // what is already built with what he just asked for, so the materializer
+    // regenerates a coherent whole and the new test plan re-proves the old slice.
+    const nextIncluded = builtIds.concat(interp.requested_ac_ids.filter(function (id) {
+      return builtIds.indexOf(id) === -1;
+    }));
+    const allIds = spec.acceptance_criteria
+      .map(function (a) { return a && a.id; })
+      .filter(function (id) { return typeof id === "string" && id.length > 0; });
+    const nextScope = {
+      slice_name: (block.mvp_scope && block.mvp_scope.slice_name ? block.mvp_scope.slice_name : "mvp") +
+                  "-plus-" + interp.requested_ac_ids.join("-").toLowerCase(),
+      acceptance_criteria_ids: nextIncluded,
+      excluded_acceptance_criteria_ids: allIds.filter(function (id) {
+        return nextIncluded.indexOf(id) === -1;
+      }),
+      files: (block.mvp_scope && Array.isArray(block.mvp_scope.files))
+        ? block.mvp_scope.files.slice() : [],
+      rationale: "Slice " + (bound.slice_index + 1) + " grows the accepted slice with: " +
+                 (interp.owner_request || interp.requested_ac_ids.join(", "))
+    };
+    const scopeCheck = mvpLoop.validateScope(nextScope, spec);
+    if (!scopeCheck.valid) {
+      const rv = { ok: false, mode: "BLOCKED", reason: "MVP_INVALID_NEXT_SCOPE",
+                   detail: scopeCheck.errors, project_id: projectId };
+      await persistTurn(projectId, message, rv);
+      return rv;
+    }
+
+    const trS = mvpLoop.assertTransition(block.status, "SCOPE_DERIVED");
+    if (!trS.ok) {
+      const rt = { ok: false, mode: "BLOCKED", reason: trS.error_code, project_id: projectId };
+      await persistTurn(projectId, message, rt);
+      return rt;
+    }
+
+    // ── R-17: the new loop + the self-validated walk. Nothing touches ──────────
+    // project_state until every step below has succeeded.
+    const walkOk = mvpLoop.validateWalk(mvpLoop.SLICE_WALK);
+    if (!walkOk.ok) {
+      const rw = { ok: false, mode: "BLOCKED", reason: walkOk.error_code,
+                   detail: walkOk.error_detail, project_id: projectId };
+      await persistTurn(projectId, message, rw);
+      return rw;
+    }
+
+    const startRes = await reg.invoke("orchestration.start_loop",
+      { project_id: pid }, { root });
+    if (!startRes || startRes.status !== "SUCCESS" || !startRes.output) {
+      const rl = { ok: false, mode: "BLOCKED", reason: "MVP_SLICE_LOOP_FAILED", project_id: projectId };
+      await persistTurn(projectId, message, rl);
+      return rl;
+    }
+    const newLoopId = startRes.output.loop_id;
+
+    // Carry the approved spec + design into the new loop so it is self-contained.
+    for (const artifact of ["spec.json", "architect_design.json"]) {
+      const src = await reg.invoke("fs.read_file", {
+        path: "artifacts/projects/" + pid + "/orchestration/" + prevLoopId + "/" + artifact
+      }, { root });
+      if (!src || src.status !== "SUCCESS" || !src.output) {
+        const ra = { ok: false, mode: "BLOCKED", reason: "MVP_SLICE_ARTIFACT_MISSING",
+                     detail: artifact, project_id: projectId };
+        await persistTurn(projectId, message, ra);
+        return ra;
+      }
+      const wr = await reg.invoke("fs.write_file", {
+        path: "artifacts/projects/" + pid + "/orchestration/" + newLoopId + "/" + artifact,
+        content: src.output.content
+      }, { root });
+      if (!wr || wr.status !== "SUCCESS") {
+        const rw2 = { ok: false, mode: "BLOCKED", reason: "MVP_SLICE_ARTIFACT_COPY_FAILED",
+                      detail: artifact, project_id: projectId };
+        await persistTurn(projectId, message, rw2);
+        return rw2;
+      }
+    }
+
+    // Execute the walk hop by hop. Each hop is re-validated immediately before it
+    // fires (R-17) — advance_state itself validates nothing (backlog
+    // ADVANCE_STATE_NO_TRANSITION_VALIDATION), so this is the only thing standing
+    // between a typo and an undeclared graph move.
+    for (let i = 0; i < mvpLoop.SLICE_WALK.length - 1; i++) {
+      const from = mvpLoop.SLICE_WALK[i];
+      const to   = mvpLoop.SLICE_WALK[i + 1];
+      const hop  = mvpLoop.validateWalk([from, to]);
+      if (!hop.ok) {
+        const rh = { ok: false, mode: "BLOCKED", reason: hop.error_code,
+                     detail: hop.error_detail, project_id: projectId };
+        await persistTurn(projectId, message, rh);
+        return rh;
+      }
+      const adv = await reg.invoke("orchestration.advance_state", {
+        project_id: pid, loop_id: newLoopId, to_state: to,
+        transition_type: "VACUOUS_SKIP"
+      }, { root });
+      if (!adv || adv.status !== "SUCCESS") {
+        const rA = { ok: false, mode: "BLOCKED", reason: "MVP_SLICE_WALK_FAILED",
+                     detail: from + " -> " + to, project_id: projectId };
+        await persistTurn(projectId, message, rA);
+        return rA;
+      }
+    }
+
+    const persisted = await mvpLoop.persistScope(pid, newLoopId, nextScope, { root });
+    if (!persisted.ok) {
+      const rp = { ok: false, mode: "BLOCKED", reason: persisted.error_code, project_id: projectId };
+      await persistTurn(projectId, message, rp);
+      return rp;
+    }
+
+    // ── Everything succeeded: now, and only now, move the owner's project. ─────
+    const nextIndex = bound.slice_index + 1;
+    const updated   = { ...state };
+    updated.loop_id  = newLoopId;
+    updated.mvp_loop = { ...block,
+      status:      "SCOPE_DERIVED",
+      iteration:   0,
+      mvp_scope:   nextScope,
+      slice_index: nextIndex,
+      slices: (Array.isArray(block.slices) ? block.slices : []).concat([
+        mvpLoop.sliceRecord({
+          index: nextIndex, loop_id: newLoopId, slice_name: nextScope.slice_name,
+          acceptance_criteria_ids: nextScope.acceptance_criteria_ids,
+          owner_request: interp.owner_request || message
+        })
+      ])
+    };
+    updated.last_updated_at = nowIso();
+    await saveState(projectId, updated);
+
+    const addedNames = spec.acceptance_criteria
+      .filter(function (a) { return a && interp.requested_ac_ids.indexOf(a.id) !== -1; })
+      .map(function (a) { return a.description || a.text || a.id; });
+
+    const rOk = {
+      ok: true, mode: "MVP_SLICE_PROPOSED",
+      loop_id: newLoopId, slice_index: nextIndex,
+      slice_name: nextScope.slice_name,
+      added_acceptance_criteria_ids: interp.requested_ac_ids,
+      awaiting: "OWNER_GATE_1",
+      message: lang === "ar"
+        ? "تمام. الشريحة رقم " + nextIndex + " هتضيف: " + addedNames.join("؛ ") +
+          " — مع الإبقاء على كل ما تم بناؤه واعتماده قبل كده، وهيتم اختباره كله من جديد. " +
+          "قبل ما أبدأ التنفيذ محتاج موافقتك الصريحة على الخطة دي."
+        : "Slice " + nextIndex + " will add: " + addedNames.join("; ") +
+          " — while keeping everything already built and accepted, all of it re-tested. " +
+          "I need your explicit approval of this plan before I start.",
+      project_id: projectId
+    };
+    await persistTurn(projectId, message, rOk);
+    return rOk;
+  }
+
   async function processMessage(body = {}) {
     const projectId = normalizeProjectId(body.project_id || "");
     const message = String(body.message || "").trim();
@@ -1117,6 +1378,16 @@ function createConversationEngine(options = {}) {
     if (mvpLoop.isMvpEnabled(state) &&
         state.mvp_loop.status === "AWAITING_OWNER_REVIEW") {
       return await _handleMvpReview(projectId, message, state, user_language, body);
+    }
+
+    // PHASE-56 W-1 (R-3/R-4/R-17): the owner accepted a slice and is asking for
+    // more of the same project. Before this branch the turn fell through to the
+    // ideation engine and the loop never re-engaged (PHASE-54 R-17, contract §3.b).
+    // Flag-off / non-ACCEPTED projects skip it entirely — pure insertion, so the
+    // PHASE-53 tree is untouched (R-6).
+    if (mvpLoop.isMvpEnabled(state) &&
+        state.mvp_loop.status === "ACCEPTED") {
+      return await _handleMvpReengage(projectId, message, state, user_language, body);
     }
 
     // CONVERSATION MODE gate — PHASE-16.1

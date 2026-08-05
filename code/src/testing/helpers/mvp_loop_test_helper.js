@@ -1243,7 +1243,250 @@ async function runS386NonConvergenceEscapeRealPath() {
   }
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// PHASE-56 W-1 — S389/S390/S391: the re-engagement seam, its bounds, and the
+// R-17 self-validated slice walk. Same discipline as PHASE-54/55: mock-only, $0,
+// every side effect and assertion read through L2.
+// ════════════════════════════════════════════════════════════════════════════
+
+// Slice 1 as the owner left it: AC-1+AC-2 built and accepted, AC-3 still excluded.
+function _slice1Record(loopId) {
+  return {
+    index: 1,
+    loop_id: loopId,
+    slice_name: MVP_SCOPE_FIX.slice_name,
+    acceptance_criteria_ids: MVP_SCOPE_FIX.acceptance_criteria_ids.slice(),
+    owner_request: null,
+    accepted_at: "2026-08-04T00:00:00.000Z"
+  };
+}
+
+function _acceptedBlock(loopId, over) {
+  return Object.assign(_block({
+    status: "ACCEPTED",
+    mvp_scope: MVP_SCOPE_FIX,
+    model: "mock-reengage-s389",
+    slice_index: 1,
+    slices: [_slice1Record(loopId)]
+  }), over || {});
+}
+
+// Recursive byte snapshot of a loop directory (R-18(i) evidence).
+function _snapshotDir(absDir) {
+  const out = {};
+  if (!fsx.existsSync(absDir)) return out;
+  const walk = function (dir, prefix) {
+    for (const name of fsx.readdirSync(dir).sort()) {
+      const p = pathx.join(dir, name);
+      const rel = prefix ? prefix + "/" + name : name;
+      const st = fsx.statSync(p);
+      if (st.isDirectory()) walk(p, rel);
+      else out[rel] = fsx.readFileSync(p).toString("base64");
+    }
+  };
+  walk(absDir, "");
+  return out;
+}
+
+function _auditRows(pid, loopId) {
+  const p = pathx.join(ROOT, "artifacts", "projects", pid,
+    "orchestration", loopId, "conversation_log.jsonl");
+  if (!fsx.existsSync(p)) return [];
+  return fsx.readFileSync(p, "utf8").split("\n").filter(function (l) { return l.trim(); })
+    .map(function (l) { try { return JSON.parse(l); } catch (_) { return null; } })
+    .filter(Boolean);
+}
+
+async function _seedAcceptedProject(pid, loopId, blockOver) {
+  await _writeVision(pid);
+  await _writeState2(pid, _pstate(pid, loopId, _acceptedBlock(loopId, blockOver)));
+  // Post-ACCEPT position: the deferred advance already moved the graph past RUN_TESTS.
+  await _seedLoopAt(pid, loopId, "REVIEWER_CODE_AND_SECURITY", { spec: true, design: true });
+}
+
+// ── S389 — the seam itself (R-17 route + R-18(i) non-destructive re-pointing) ─
+
+async function runS389ReengagementSeam() {
+  const out = {};
+  const pid = "test_s389_mvp";
+  const lp1 = "lp389s1";
+  const eng = _engine();
+
+  // Pure: ACCEPTED is no longer terminal, and the only new edge is to SCOPE_DERIVED.
+  out.transition_accepted_to_scope_derived =
+    mvp.assertTransition("ACCEPTED", "SCOPE_DERIVED").ok === true &&
+    mvp.assertTransition("ACCEPTED", "BUILDING").ok === false &&
+    mvp.assertTransition("CAP_REACHED", "SCOPE_DERIVED").ok === false;
+
+  await _seedAcceptedProject(pid, lp1);
+
+  const slice1Dir = pathx.join(ROOT, "artifacts", "projects", pid, "orchestration", lp1);
+  const before    = _snapshotDir(slice1Dir);
+
+  const pm = await eng.processMessage({
+    project_id: pid,
+    message: "تمام، دلوقتي عايز كمان أقدر أمسح ملاحظة بالـ id بتاعها",
+    user_language: "ar",
+    mvp_scenario_id: "S389A"
+  });
+
+  out.reengage_branch_reached = pm.mode === "MVP_SLICE_PROPOSED";
+  out.ideation_not_triggered  =
+    pm.mode !== "IDEATION_IN_PROGRESS" && pm.mode !== "MESSAGE_PROCESSED";
+
+  const st = await _rj("artifacts/projects/" + pid + "/project_state.json");
+  const blk = (st && st.mvp_loop) || {};
+  const lp2 = st && st.loop_id;
+
+  out.new_loop_created  = typeof lp2 === "string" && lp2.length > 0 && lp2 !== lp1;
+  out.loop_id_repointed = out.new_loop_created && pm.loop_id === lp2;
+  out.status_scope_derived = blk.status === "SCOPE_DERIVED";
+  out.slice_index_two      = blk.slice_index === 2;
+
+  const slices = Array.isArray(blk.slices) ? blk.slices : [];
+  out.slices_append_only = slices.length === 2 &&
+    slices[0].index === 1 && slices[1].index === 2 &&
+    slices[1].loop_id === lp2;
+  out.slice1_record_preserved =
+    JSON.stringify(slices[0] || null) === JSON.stringify(_slice1Record(lp1));
+
+  const gs2 = out.new_loop_created ? await _graphState(pid, lp2) : null;
+  out.graph_halted_at_env_report = !!(gs2 && gs2.current_state === "ENV_REPORT");
+  out.gate1_not_crossed = !!(gs2 && gs2.current_state !== "TEST_DESIGN") &&
+    _auditRows(pid, lp2).every(function (r) { return r.transition_type !== "GATE_APPROVE"; });
+
+  out.slice1_loop_dir_byte_identical =
+    JSON.stringify(_snapshotDir(slice1Dir)) === JSON.stringify(before);
+
+  return out;
+}
+
+// ── S390 — R-4/R-19 bounds, each with the owner's exits in the message ───────
+
+async function runS390SliceBounds() {
+  const out = {};
+  const eng = _engine();
+
+  out.max_slices_constant_is_3     = mvp.MVP_MAX_SLICES === 3;
+  out.iteration_cap_untouched_at_5 = ITERATION_CAP === 5;
+
+  const _statesExits = function (msg) {
+    return typeof msg === "string" &&
+      mvp.MVP_BOUND_EXITS_AR.every(function (x) { return msg.indexOf(x) !== -1; });
+  };
+
+  // Both legs share ONE project (the cleanup_project directive takes a single id);
+  // leg B rewrites the block in place, which is also closer to how a real project
+  // moves between these two states.
+  const pidA = "test_s390_mvp";
+  const lpA  = "lp390a";
+
+  // Leg A — slice budget spent.
+  await _seedAcceptedProject(pidA, lpA, {
+    slice_index: mvp.MVP_MAX_SLICES,
+    slices: [_slice1Record(lpA)]
+  });
+  const stA0 = await _rj("artifacts/projects/" + pidA + "/project_state.json");
+
+  const pmA = await eng.processMessage({
+    project_id: pidA, message: "عايز أضيف حاجة كمان", user_language: "ar",
+    mvp_scenario_id: "S390A"
+  });
+  out.max_slices_bound_blocks = pmA.mode === "MVP_SLICE_BOUND_REACHED" &&
+    pmA.bound === "MVP_MAX_SLICES_REACHED";
+  out.max_slices_message_states_exits = _statesExits(pmA.message);
+
+  const stA1 = await _rj("artifacts/projects/" + pidA + "/project_state.json");
+  out.max_slices_no_new_loop       = stA1.loop_id === lpA;
+  out.max_slices_status_unchanged  = stA1.mvp_loop.status === "ACCEPTED";
+  out.max_slices_no_slice_appended =
+    stA1.mvp_loop.slices.length === stA0.mvp_loop.slices.length;
+
+  // Leg B — same project, now with every acceptance criterion already built.
+  const pidB = pidA;
+  const lpB  = "lp390b";
+  await _seedAcceptedProject(pidB, lpB, {
+    slice_index: 1,
+    mvp_scope: Object.assign({}, MVP_SCOPE_FIX, {
+      acceptance_criteria_ids: ["AC-1", "AC-2", "AC-3"],
+      excluded_acceptance_criteria_ids: []
+    })
+  });
+
+  const pmB = await eng.processMessage({
+    project_id: pidB, message: "عايز أضيف حاجة كمان", user_language: "ar",
+    mvp_scenario_id: "S390B"
+  });
+  out.spec_exhausted_bound_blocks = pmB.mode === "MVP_SLICE_BOUND_REACHED" &&
+    pmB.bound === "MVP_SPEC_EXHAUSTED";
+  out.spec_exhausted_message_states_exits = _statesExits(pmB.message);
+
+  const stB1 = await _rj("artifacts/projects/" + pidB + "/project_state.json");
+  out.spec_exhausted_no_new_loop = stB1.loop_id === lpB;
+
+  return out;
+}
+
+// ── S391 — R-17: every hop validated against the frozen table, fail-closed ───
+
+async function runS391SliceWalkDeclaredHopsOnly() {
+  const out = {};
+  const cg  = require("../../runtime/orchestration/conversation_graph");
+
+  const EXPECTED = ["OWNER_INTENT", "ARCHITECT_DESIGN", "SPEC_WRITER_FORMALIZE",
+                    "REVIEWER_SPEC", "COST_ESTIMATE", "ENV_REPORT"];
+  const plan = mvp.SLICE_WALK;
+
+  out.walk_plan_is_expected = JSON.stringify(plan) === JSON.stringify(EXPECTED);
+
+  // Independently re-derive "declared" from the graph module, not from our own list.
+  let allDeclared = true;
+  for (let i = 0; i < plan.length - 1; i++) {
+    if (!cg.validateTransition(plan[i], plan[i + 1]).allowed) allDeclared = false;
+  }
+  out.walk_plan_all_declared = allDeclared && mvp.validateWalk(plan).ok === true;
+
+  // R-16: the owner-gated hop is NOT part of the walk.
+  out.walk_plan_stops_before_gate1 =
+    plan[plan.length - 1] === "ENV_REPORT" && plan.indexOf("TEST_DESIGN") === -1;
+
+  const bad = mvp.validateWalk(["REVIEWER_CODE_AND_SECURITY", "TEST_DESIGN"]);
+  out.undeclared_hop_refused     = bad.ok === false;
+  out.undeclared_hop_typed_error = bad.error_code === "MVP_UNDECLARED_HOP" &&
+    typeof bad.error_detail === "string" &&
+    bad.error_detail.indexOf("REVIEWER_CODE_AND_SECURITY") !== -1;
+
+  out.terminal_hop_refused = mvp.validateWalk(["COMPLETE", "BUILDER"]).ok === false;
+
+  // The executed walk must write exactly the declared hops, all VACUOUS_SKIP.
+  const pid = "test_s391_mvp";
+  const lp1 = "lp391s1";
+  const eng = _engine();
+  await _seedAcceptedProject(pid, lp1, { model: "mock-reengage-s391" });
+
+  await eng.processMessage({
+    project_id: pid, message: "ضيف كمان حذف ملاحظة", user_language: "ar",
+    mvp_scenario_id: "S391A"
+  });
+
+  const st  = await _rj("artifacts/projects/" + pid + "/project_state.json");
+  const lp2 = st && st.loop_id;
+  const rows = (lp2 && lp2 !== lp1) ? _auditRows(pid, lp2) : [];
+  const hops = rows.map(function (r) { return [r.from_state, r.to_state]; });
+  const expectedHops = [];
+  for (let i = 0; i < EXPECTED.length - 1; i++) expectedHops.push([EXPECTED[i], EXPECTED[i + 1]]);
+
+  out.audit_rows_match_plan = JSON.stringify(hops) === JSON.stringify(expectedHops);
+  out.audit_rows_all_vacuous_skip = rows.length === expectedHops.length &&
+    rows.every(function (r) { return r.transition_type === "VACUOUS_SKIP"; });
+
+  return out;
+}
+
 module.exports = {
+  runS389ReengagementSeam,
+  runS390SliceBounds,
+  runS391SliceWalkDeclaredHopsOnly,
   runS385NonConvergenceEscape,
   runS386NonConvergenceEscapeRealPath,
   runS383ArrayAssertionDiscipline,

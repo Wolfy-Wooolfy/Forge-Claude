@@ -1,0 +1,57 @@
+{
+  "id": "S391",
+  "name": "mvp slice walk validates every hop against the frozen transition table and refuses an undeclared one, fail-closed (PHASE-56 W-1, R-17 — forced by F-2)",
+  "description": "PHASE-56 W-1, ruling R-17. orchestration.advance_state performs NO transition validation (F-2/R-21: conversation_graph.validateTransition has no runtime caller and the 28-row table is documentation, not enforcement), so 'walk only declared rows' would otherwise be a discipline with nothing enforcing it. The slice walk therefore validates each hop itself before executing it and fails closed on rejection. Asserts: the production walk plan is OWNER_INTENT -> ARCHITECT_DESIGN -> SPEC_WRITER_FORMALIZE -> REVIEWER_SPEC -> COST_ESTIMATE -> ENV_REPORT and every consecutive pair is a DECLARED row; the plan stops at ENV_REPORT and never contains the owner-gated ENV_REPORT -> TEST_DESIGN hop (R-16); an undeclared hop (REVIEWER_CODE_AND_SECURITY -> TEST_DESIGN) is refused with a typed error and no partial execution; a hop out of a terminal state is refused; and the audit rows written by a real re-engagement contain exactly the declared hops in order, each typed VACUOUS_SKIP (already a sanctioned transition_type, so contract 12.2 is untouched).",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/mvp_loop_test_helper",
+  "method": "runS391SliceWalkDeclaredHopsOnly",
+  "args": [],
+  "cleanup_project": "test_s391_mvp",
+  "assertions": [
+    {
+      "type": "status_equals",
+      "expected": "SUCCESS"
+    },
+    {
+      "type": "state_field_equals",
+      "field": "walk_plan_is_expected",
+      "expected": true
+    },
+    {
+      "type": "state_field_equals",
+      "field": "walk_plan_all_declared",
+      "expected": true
+    },
+    {
+      "type": "state_field_equals",
+      "field": "walk_plan_stops_before_gate1",
+      "expected": true
+    },
+    {
+      "type": "state_field_equals",
+      "field": "undeclared_hop_refused",
+      "expected": true
+    },
+    {
+      "type": "state_field_equals",
+      "field": "undeclared_hop_typed_error",
+      "expected": true
+    },
+    {
+      "type": "state_field_equals",
+      "field": "terminal_hop_refused",
+      "expected": true
+    },
+    {
+      "type": "state_field_equals",
+      "field": "audit_rows_match_plan",
+      "expected": true
+    },
+    {
+      "type": "state_field_equals",
+      "field": "audit_rows_all_vacuous_skip",
+      "expected": true
+    }
+  ]
+}
