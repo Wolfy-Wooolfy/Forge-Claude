@@ -104,6 +104,41 @@ function buildBoundMessageAr(check) {
     MVP_BOUND_EXITS_AR.map(function (x, i) { return "(" + (i + 1) + ") " + x; }).join("، ") + ".";
 }
 
+// ── PHASE-56 W-3: plain-language budget surfacing (R-5 / R-26) ───────────────
+//
+// R-26/F-13: /api/ai-os/chat/stream forwards only a whitelist of fields to the
+// browser, so anything the owner must SEE has to be inside the message text. These
+// builders are the single place that formats money for him.
+//
+// Figures come from budget_enforcer.budgetStatus — the cap's own numbers,
+// PHASE-55 W-1 legacy Stage-A spend included. Two decimals, because this is the
+// owner's money and not a diagnostic.
+
+function _usd(n) {
+  return (typeof n === "number" && isFinite(n)) ? n.toFixed(2) : "?";
+}
+
+// Refusal: the slice cannot start because the project is at or over its cap.
+// States the three numbers and what he can do — never a bare "blocked" (R-19 spirit).
+function buildBudgetRefusalMessageAr(status) {
+  const s = status || {};
+  return "لا أستطيع بدء شريحة جديدة: ميزانية هذا المشروع بلغت حدّها. " +
+    "الحدّ " + _usd(s.cap_usd) + " دولار، والمصروف حتى الآن " + _usd(s.spent_usd) + " دولار، " +
+    "والمتبقّي " + _usd(s.remaining_usd) + " دولار. " +
+    "أمامك: ارفع حدّ الميزانية في وثيقة الرؤية، أو اعتمد النسخة الحالية كما هي، " +
+    "أو ابدأ مشروعاً جديداً بميزانية خاصة به. " +
+    "ملاحظة: الحدّ يحسب الإنفاق من أول نشاط بناء فعلي للمشروع، ومحادثات بلورة الفكرة " +
+    "التي تسبقه تظهر في السجل لكنها لا تُحتسب ضده.";
+}
+
+// Attached to the slice proposal, so the owner approves the plan KNOWING the cost
+// position (R-5: surfaced at the moment he is asked what to build next).
+function buildBudgetRemainingClauseAr(status) {
+  const s = status || {};
+  return " المتبقّي من ميزانية المشروع: " + _usd(s.remaining_usd) +
+         " دولار من أصل " + _usd(s.cap_usd) + ".";
+}
+
 // ── PHASE-56 W-1: the slice walk (R-17 — self-enforced against the frozen table) ─
 //
 // A new slice needs a NEW test plan, and designTests only runs at TEST_DESIGN; the
@@ -938,6 +973,8 @@ module.exports = {
   SLICE_WALK,
   sliceBoundCheck,
   buildBoundMessageAr,
+  buildBudgetRefusalMessageAr,
+  buildBudgetRemainingClauseAr,
   validateWalk,
   sliceRecord,
   interpretReengagement,

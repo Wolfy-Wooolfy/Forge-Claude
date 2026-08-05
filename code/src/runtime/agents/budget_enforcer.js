@@ -91,4 +91,42 @@ function checkBudget(project_id, estimated_cost_usd, options) {
   return { allow: true, warn: null };
 }
 
-module.exports = { checkBudget };
+// ── budgetStatus (PHASE-56 W-3 — R-5) ─────────────────────────────────────────
+//
+// Reports the SAME numbers checkBudget reads, so the owner can be told what is
+// left before a new MVP slice is derived. Deliberately additive: checkBudget above
+// is not touched by a single character, so the L3 rule at
+// permission/rules/agent_budget_rule.js:87 is provably unaffected by this phase.
+//
+// The spend figure is the cap's own figure: this project's ledger total PLUS the
+// legacy Stage-A sentinel spend that occurred within this project's lifetime
+// (PHASE-55 W-1, R-11(ii)/R-21). Nothing is re-derived here.
+//
+// KNOWN LIMITATION, carried forward verbatim from PHASE-55 R-25 and restated for
+// the owner in docs: the cap counts spend from a project's FIRST ledger activity
+// onward, so ideation turns that precede any build activity are VISIBLE in the
+// ledger but NOT counted against the cap. `remaining_usd` inherits that bound.
+//
+// (project_id, options) → { cap_usd, spent_usd, remaining_usd, pct }
+// Never throws. A project with no vision reads the same defaults checkBudget uses.
+function budgetStatus(project_id, options) {
+  const root = (options && options.root) || process.cwd();
+
+  const caps = _readVisionCaps(project_id, root) || {
+    max_total_usd:         DEFAULT_MAX_TOTAL_USD,
+    max_per_iteration_usd: DEFAULT_MAX_PER_ITERATION_USD
+  };
+
+  const spent = ledger.getTotalCost(project_id, { root }) +
+                _legacySpendSince(project_id, root);
+  const cap   = caps.max_total_usd;
+
+  return {
+    cap_usd:       cap,
+    spent_usd:     Math.round(spent * 100000) / 100000,
+    remaining_usd: cap > 0 ? Math.round((cap - spent) * 100000) / 100000 : Infinity,
+    pct:           cap > 0 ? spent / cap : 0
+  };
+}
+
+module.exports = { checkBudget, budgetStatus };

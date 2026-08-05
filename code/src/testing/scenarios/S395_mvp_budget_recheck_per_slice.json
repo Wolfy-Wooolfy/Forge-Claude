@@ -1,0 +1,25 @@
+{
+  "id": "S395",
+  "name": "budget re-check per slice — the remaining budget is surfaced in plain Arabic before anything is spent, and an at-cap project cannot silently start a new slice (PHASE-56 W-3, R-5)",
+  "description": "PHASE-56 W-3, ruling R-5. budgetStatus is an ADDITIVE export in budget_enforcer.js reusing the SAME numbers the cap itself reads — ledger.getTotalCost plus PHASE-55 W-1's legacy _legacy_stage_a spend under the R-21 first-activity lifetime bound, against the vision's max_total_usd — nothing is re-derived. Asserts: (a) budgetStatus reports cap/spent/remaining/pct and its allow/deny boundary AGREES with checkBudget on the same project, and its spent figure includes a legacy sentinel row booked after the project's first activity; (b) an at-or-over-cap project asking for more work is refused with the numbers inside result.message (R-26), and NOTHING happens — no new loop, no status change, no slice appended, and crucially NO provider call (the agent ledger gains zero rows), so the refusal cannot itself cost the owner money; (c) an under-cap project's slice proposal carries the remaining figure in its message; (d) checkBudget's own verdicts are unchanged for a known-good and a known-over project, so agent_budget_rule.js is provably unaffected.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/mvp_loop_test_helper",
+  "method": "runS395BudgetRecheckPerSlice",
+  "args": [],
+  "cleanup_project": "test_s395_mvp",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "status_reports_all_fields",     "expected": true },
+    { "type": "state_field_equals", "field": "status_agrees_with_checkbudget", "expected": true },
+    { "type": "state_field_equals", "field": "status_includes_legacy_spend",  "expected": true },
+    { "type": "state_field_equals", "field": "over_cap_refused",              "expected": true },
+    { "type": "state_field_equals", "field": "over_cap_message_has_numbers",  "expected": true },
+    { "type": "state_field_equals", "field": "over_cap_no_new_loop",          "expected": true },
+    { "type": "state_field_equals", "field": "over_cap_status_unchanged",     "expected": true },
+    { "type": "state_field_equals", "field": "over_cap_no_slice_appended",    "expected": true },
+    { "type": "state_field_equals", "field": "over_cap_no_provider_call",     "expected": true },
+    { "type": "state_field_equals", "field": "under_cap_message_has_remaining", "expected": true },
+    { "type": "state_field_equals", "field": "checkbudget_verdicts_unchanged", "expected": true }
+  ]
+}

@@ -533,6 +533,12 @@
     "tokens_out": 80,
     "finish_reason": "stop"
   },
+  "mock|mock-reengage-s395|scenario:S395A": {
+    "text": "{\"decision\":\"MORE_WORK\",\"requested_ac_ids\":[\"AC-3\"],\"owner_request\":\"عايز أضيف الحذف كمان\",\"clarification_question\":\"\"}",
+    "tokens_in": 240,
+    "tokens_out": 40,
+    "finish_reason": "stop"
+  },
   "mock|mock-reengage-s392a|scenario:S392A": {
     "text": "{\"decision\":\"MORE_WORK\",\"requested_ac_ids\":[\"AC-3\"],\"owner_request\":\"دلوقتي عايز كمان أقدر أمسح ملاحظة بالـ id بتاعها\",\"clarification_question\":\"\"}",
     "tokens_in": 240,

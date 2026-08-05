@@ -1026,7 +1026,26 @@ function createConversationEngine(options = {}) {
       return r0;
     }
 
-    // ── R-4/R-19: bounds first. No provider call, no loop, no state movement. ──
+    // ── R-5: the budget re-check is the FIRST thing that happens. Before any ──
+    // provider call, before scope derivation, before start_loop. A slice must never
+    // silently begin on a project already at or over its cap, and the refusal itself
+    // must cost nothing — so this runs ahead of everything that could spend.
+    // Numbers come from budget_enforcer.budgetStatus: the cap's OWN figures,
+    // including PHASE-55 W-1 legacy Stage-A spend under the R-21 lifetime bound.
+    const budget = require("../runtime/agents/budget_enforcer").budgetStatus(pid, { root });
+    if (budget.cap_usd > 0 && budget.remaining_usd <= 0) {
+      const rBud = {
+        ok: true, mode: "MVP_BUDGET_EXHAUSTED",
+        cap_usd: budget.cap_usd, spent_usd: budget.spent_usd,
+        remaining_usd: budget.remaining_usd,
+        message: mvpLoop.buildBudgetRefusalMessageAr(budget),
+        project_id: projectId
+      };
+      await persistTurn(projectId, message, rBud);
+      return rBud;
+    }
+
+    // ── R-4/R-19: bounds next. No provider call, no loop, no state movement. ──
     const bound = mvpLoop.sliceBoundCheck(block);
     if (!bound.allowed) {
       const rB = {
@@ -1256,13 +1275,18 @@ function createConversationEngine(options = {}) {
       slice_name: nextScope.slice_name,
       added_acceptance_criteria_ids: interp.requested_ac_ids,
       awaiting: "OWNER_GATE_1",
+      cap_usd: budget.cap_usd, remaining_usd: budget.remaining_usd,
+      // R-5: he is told what is left AT the moment he is asked to approve the plan.
+      // R-26: it must be inside `message` — the stream's done-event drops everything else.
       message: lang === "ar"
         ? "تمام. الشريحة رقم " + nextIndex + " هتضيف: " + addedNames.join("؛ ") +
-          " — مع الإبقاء على كل ما تم بناؤه واعتماده قبل كده، وهيتم اختباره كله من جديد. " +
-          "قبل ما أبدأ التنفيذ محتاج موافقتك الصريحة على الخطة دي."
+          " — مع الإبقاء على كل ما تم بناؤه واعتماده قبل كده، وهيتم اختباره كله من جديد." +
+          mvpLoop.buildBudgetRemainingClauseAr(budget) +
+          " قبل ما أبدأ التنفيذ محتاج موافقتك الصريحة على الخطة دي."
         : "Slice " + nextIndex + " will add: " + addedNames.join("; ") +
-          " — while keeping everything already built and accepted, all of it re-tested. " +
-          "I need your explicit approval of this plan before I start.",
+          " — while keeping everything already built and accepted, all of it re-tested." +
+          mvpLoop.buildBudgetRemainingClauseAr(budget) +
+          " I need your explicit approval of this plan before I start.",
       project_id: projectId
     };
     await persistTurn(projectId, message, rOk);

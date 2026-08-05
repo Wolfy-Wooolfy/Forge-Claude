@@ -1771,7 +1771,121 @@ async function runS394Slice1RegressionAfterSlice2() {
   }
 }
 
+// ── S395 — W-3: budget re-check per slice (R-5) ─────────────────────────────
+
+// A vision with an explicit, tiny cap so "at or over cap" is reachable without
+// spending anything (spend_seam_test_helper precedent).
+async function _writeCappedVision(pid, capUsd) {
+  const md = [
+    "---",
+    "project_id: " + pid,
+    "project_name: " + pid,
+    "domain: test",
+    "vision_version: 1",
+    "vision_locked: true",
+    "vision_locked_at: 2026-08-05T00:00:00.000Z",
+    "locked_by_role: owner",
+    "amendments_history: []",
+    "goals:",
+    "  primary: test",
+    "  secondary: []",
+    "constraints: []",
+    "non_goals: []",
+    "max_total_usd: " + capUsd,
+    "max_per_iteration_usd: " + capUsd,
+    "---",
+    "",
+    "# Project Vision: " + pid,
+    ""
+  ].join("\n");
+  await _w("artifacts/projects/" + pid + "/vision.md", null, md);
+}
+
+async function runS395BudgetRecheckPerSlice() {
+  const out    = {};
+  const eng    = _engine();
+  const ledger = require("../../runtime/agents/cost_ledger");
+  const enforcer = require("../../runtime/agents/budget_enforcer");
+
+  const pid = "test_s395_mvp";
+  const lp  = "lp395";
+
+  // ── (a) budgetStatus reports the numbers, and agrees with checkBudget ──────
+  await _seedAcceptedProject(pid, lp, { model: "mock-reengage-s395" });
+  await _writeCappedVision(pid, 1.0);
+
+  // The project's own first activity, then a legacy sentinel row AFTER it — the
+  // R-21 lifetime bound means this legacy row must count toward this project.
+  ledger.appendEntry({ project_id: pid, provider: "openai", model: "gpt-4o",
+    outcome: "success", cost_usd_estimated: 0.10, cost_usd_actual: 0.10 }, { root: ROOT });
+  const beforeLegacy = enforcer.budgetStatus(pid, { root: ROOT });
+  ledger.appendEntry({ project_id: "_legacy_stage_a", provider: "openai", model: "gpt-4o",
+    outcome: "success", cost_usd_estimated: 0.05, cost_usd_actual: 0.05 }, { root: ROOT });
+  const st1 = enforcer.budgetStatus(pid, { root: ROOT });
+
+  out.status_reports_all_fields =
+    typeof st1.cap_usd === "number" && typeof st1.spent_usd === "number" &&
+    typeof st1.remaining_usd === "number" && typeof st1.pct === "number" &&
+    st1.cap_usd === 1.0;
+  out.status_includes_legacy_spend =
+    Math.abs(st1.spent_usd - (beforeLegacy.spent_usd + 0.05)) < 1e-9 &&
+    Math.abs(st1.spent_usd - 0.15) < 1e-9;
+
+  // Boundary agreement: whatever budgetStatus says is left, checkBudget must allow
+  // a hair under it and refuse a hair over it.
+  const under = enforcer.checkBudget(pid, st1.remaining_usd * 0.5, { root: ROOT });
+  const over  = enforcer.checkBudget(pid, st1.remaining_usd * 2,   { root: ROOT });
+  out.status_agrees_with_checkbudget = under.allow === true && over.allow === false;
+
+  // ── (b) at/over cap: refuse, and spend NOTHING doing it ───────────────────
+  const pidO = "test_s395_mvp";
+  const lpO  = "lp395o";
+  await _seedAcceptedProject(pidO, lpO, { model: "mock-reengage-s395" });
+  await _writeCappedVision(pidO, 0.05);   // already 0.15 booked above ⇒ over cap
+  const stO0    = await _rj("artifacts/projects/" + pidO + "/project_state.json");
+  const rowsPre = ledger.readEntries(null, { root: ROOT }).length;
+
+  const pmO = await eng.processMessage({
+    project_id: pidO, message: "عايز أضيف الحذف كمان", user_language: "ar",
+    mvp_scenario_id: "S395A"
+  });
+  const rowsPost = ledger.readEntries(null, { root: ROOT }).length;
+  const stO1     = await _rj("artifacts/projects/" + pidO + "/project_state.json");
+
+  out.over_cap_refused = pmO.mode === "MVP_BUDGET_EXHAUSTED";
+  out.over_cap_message_has_numbers = typeof pmO.message === "string" &&
+    pmO.message.indexOf("0.05") !== -1 && pmO.message.indexOf("0.15") !== -1;
+  out.over_cap_no_new_loop       = stO1.loop_id === lpO;
+  out.over_cap_status_unchanged  = stO1.mvp_loop.status === "ACCEPTED";
+  out.over_cap_no_slice_appended = stO1.mvp_loop.slices.length === stO0.mvp_loop.slices.length;
+  // The refusal must not itself cost anything: zero new ledger rows.
+  out.over_cap_no_provider_call  = rowsPost === rowsPre;
+
+  // ── (c) under cap: the proposal carries the remaining figure ──────────────
+  const pidU = "test_s395_mvp";
+  const lpU  = "lp395u";
+  await _seedAcceptedProject(pidU, lpU, { model: "mock-reengage-s395" });
+  await _writeCappedVision(pidU, 50.0);
+  const stU = enforcer.budgetStatus(pidU, { root: ROOT });
+  const pmU = await eng.processMessage({
+    project_id: pidU, message: "عايز أضيف الحذف كمان", user_language: "ar",
+    mvp_scenario_id: "S395A"
+  });
+  out.under_cap_message_has_remaining = pmU.mode === "MVP_SLICE_PROPOSED" &&
+    typeof pmU.message === "string" &&
+    pmU.message.indexOf(stU.remaining_usd.toFixed(2)) !== -1;
+
+  // ── (d) checkBudget itself is untouched ──────────────────────────────────
+  const freshOk = enforcer.checkBudget("test_s395_absent_project", 0.01, { root: ROOT });
+  out.checkbudget_verdicts_unchanged =
+    freshOk.allow === true && freshOk.warn === null &&
+    enforcer.checkBudget(pidO, 999, { root: ROOT }).reason === "BUDGET_EXCEEDED";
+
+  return out;
+}
+
 module.exports = {
+  runS395BudgetRecheckPerSlice,
   runS392ReengageInterpretation,
   runS393StrictSupersetInvariant,
   runS394Slice1RegressionAfterSlice2,
