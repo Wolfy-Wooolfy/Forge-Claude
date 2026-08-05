@@ -171,6 +171,14 @@ artifacts/forge/
 # Not real demos; leftovers from earlier debugging.
 # The reference TODO API at artifacts/projects/_reference_todo_api/ IS kept.
 
+# PHASE-56 R-33 — durable rule replacing a procedure. SU helpers create scratch
+# projects named test_<scenario>; on 2026-08-05 nine such files (test_s389_mvp,
+# test_s390_max, test_s390_exhausted) were captured by a non-explicit-path commit.
+# CTO-F-F was a procedure ("stage explicit paths only"), and a procedure that
+# depends on remembering is not a control. This wildcard is the control.
+# NOTE: this does NOT untrack the 69 test_* files already tracked from earlier
+# phases (gitignore never untracks) — those are left exactly as they are.
+artifacts/projects/test_*/
 artifacts/projects/test_pip_debug/
 artifacts/projects/test_pip_debug2/
 artifacts/projects/test_pkg_s48_debug/
