@@ -1121,14 +1121,24 @@ function createConversationEngine(options = {}) {
       excluded_acceptance_criteria_ids: allIds.filter(function (id) {
         return nextIncluded.indexOf(id) === -1;
       }),
-      files: (block.mvp_scope && Array.isArray(block.mvp_scope.files))
-        ? block.mvp_scope.files.slice() : [],
+      // Every file the spec declares. Rationale: the spec gives no criterion→file
+      // mapping, so the only DETERMINISTIC choice that is guaranteed sufficient for
+      // the newly included criteria — and guaranteed not to drop a file the accepted
+      // slice was built from — is the full declared set. It is a superset of the
+      // previous slice's files by construction (those were validated as a subset of
+      // this same list when the slice was derived). Over-inclusion is the safe
+      // direction: the builder regenerates a coherent whole rather than a fragment.
+      files: (Array.isArray(spec.files_to_create) ? spec.files_to_create : [])
+        .map(function (f) { return f && f.path; })
+        .filter(function (p) { return typeof p === "string" && p.length > 0; }),
       rationale: "Slice " + (bound.slice_index + 1) + " grows the accepted slice with: " +
                  (interp.owner_request || interp.requested_ac_ids.join(", "))
     };
-    const scopeCheck = mvpLoop.validateScope(nextScope, spec);
+    // R-20: the provider proposed; the code decides. A scope that does not strictly
+    // grow the accepted one is REJECTED here, never silently widened.
+    const scopeCheck = mvpLoop.validateNextSliceScope(nextScope, block.mvp_scope, spec);
     if (!scopeCheck.valid) {
-      const rv = { ok: false, mode: "BLOCKED", reason: "MVP_INVALID_NEXT_SCOPE",
+      const rv = { ok: false, mode: "BLOCKED", reason: scopeCheck.error_code,
                    detail: scopeCheck.errors, project_id: projectId };
       await persistTurn(projectId, message, rv);
       return rv;

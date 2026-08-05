@@ -1,0 +1,26 @@
+{
+  "id": "S392",
+  "name": "mvp re-engagement interpretation is provider-driven with zero keyword matching — owner wording threaded VERBATIM, and an out-of-spec request fails closed without inventing a criterion (PHASE-56 W-2, R-12/R-22/F-5)",
+  "description": "PHASE-56 W-2. The owner's follow-up is classified ONLY by a provider (PHASE-54 R-8/R-12 pattern carried forward: no String.includes, no regex on owner text). Four legs, all mock-keyed by SCENARIO_TAG. (a) MORE_WORK: the chosen ids come back, the owner's sentence is stored VERBATIM in the append-only slice record, and the reply names the added criteria. (b) NOT_IN_SPEC: the owner clearly asks for more work that NO remaining acceptance criterion covers — Forge refuses in plain Arabic, creates NO loop, appends NO slice, invents NO criterion, and leaves the block in ACCEPTED. (c) NOT_A_BUILD_REQUEST: a non-build turn leaves everything untouched. (d) hardening: a provider proposing an id that was never offered, and a malformed provider payload, are BOTH rejected typed — the code decides, the provider only proposes.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/mvp_loop_test_helper",
+  "method": "runS392ReengageInterpretation",
+  "args": [],
+  "cleanup_project": "test_s392_mvp",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "more_work_ids_returned",        "expected": true },
+    { "type": "state_field_equals", "field": "owner_request_verbatim",        "expected": true },
+    { "type": "state_field_equals", "field": "reply_names_added_criterion",   "expected": true },
+    { "type": "state_field_equals", "field": "not_in_spec_refused",           "expected": true },
+    { "type": "state_field_equals", "field": "not_in_spec_no_loop_created",   "expected": true },
+    { "type": "state_field_equals", "field": "not_in_spec_no_slice_appended", "expected": true },
+    { "type": "state_field_equals", "field": "not_in_spec_status_unchanged",  "expected": true },
+    { "type": "state_field_equals", "field": "not_in_spec_invented_no_ac",    "expected": true },
+    { "type": "state_field_equals", "field": "not_a_build_request_no_change", "expected": true },
+    { "type": "state_field_equals", "field": "unoffered_id_rejected",         "expected": true },
+    { "type": "state_field_equals", "field": "malformed_payload_rejected",    "expected": true },
+    { "type": "state_field_equals", "field": "no_keyword_matching_in_source", "expected": true }
+  ]
+}

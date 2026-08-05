@@ -1483,7 +1483,298 @@ async function runS391SliceWalkDeclaredHopsOnly() {
   return out;
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// PHASE-56 W-2 — S392/S393/S394: provider-driven interpretation, the strict
+// superset invariant, and the executed regression proof.
+// ════════════════════════════════════════════════════════════════════════════
+
+// ── S392 — interpretation is the provider's, the decision is the code's ─────
+
+async function runS392ReengageInterpretation() {
+  const out = {};
+  const pid = "test_s392_mvp";
+  const eng = _engine();
+
+  // (a) MORE_WORK — ids returned, owner sentence stored verbatim.
+  const lpA = "lp392a";
+  const OWNER_SENTENCE = "دلوقتي عايز كمان أقدر أمسح ملاحظة بالـ id بتاعها";
+  await _seedAcceptedProject(pid, lpA, { model: "mock-reengage-s392a" });
+  const pmA = await eng.processMessage({
+    project_id: pid, message: OWNER_SENTENCE, user_language: "ar",
+    mvp_scenario_id: "S392A"
+  });
+  out.more_work_ids_returned =
+    Array.isArray(pmA.added_acceptance_criteria_ids) &&
+    pmA.added_acceptance_criteria_ids.length === 1 &&
+    pmA.added_acceptance_criteria_ids[0] === "AC-3";
+
+  const stA = await _rj("artifacts/projects/" + pid + "/project_state.json");
+  const rec = ((stA && stA.mvp_loop && stA.mvp_loop.slices) || []).slice(-1)[0] || {};
+  out.owner_request_verbatim = rec.owner_request === OWNER_SENTENCE;
+  // R-26: what the owner must see lives in `message`.
+  out.reply_names_added_criterion = typeof pmA.message === "string" &&
+    pmA.message.indexOf("DELETE /notes/:id") !== -1;
+
+  // (b) NOT_IN_SPEC — refuse, invent nothing, create nothing.
+  const lpB = "lp392b";
+  await _seedAcceptedProject(pid, lpB, { model: "mock-reengage-s392b" });
+  const stB0 = await _rj("artifacts/projects/" + pid + "/project_state.json");
+  const pmB = await eng.processMessage({
+    project_id: pid, message: "عايز أضيف تسجيل دخول بكلمة سر", user_language: "ar",
+    mvp_scenario_id: "S392B"
+  });
+  out.not_in_spec_refused = pmB.mode === "MVP_REENGAGE_UNCLEAR" &&
+    pmB.decision === "NOT_IN_SPEC" && typeof pmB.message === "string" && pmB.message.length > 0;
+
+  const stB1 = await _rj("artifacts/projects/" + pid + "/project_state.json");
+  out.not_in_spec_no_loop_created   = stB1.loop_id === lpB;
+  out.not_in_spec_no_slice_appended =
+    stB1.mvp_loop.slices.length === stB0.mvp_loop.slices.length;
+  out.not_in_spec_status_unchanged  = stB1.mvp_loop.status === "ACCEPTED";
+  out.not_in_spec_invented_no_ac =
+    JSON.stringify(stB1.mvp_loop.mvp_scope.acceptance_criteria_ids) ===
+    JSON.stringify(MVP_SCOPE_FIX.acceptance_criteria_ids);
+
+  // (c) NOT_A_BUILD_REQUEST — nothing moves.
+  const lpC = "lp392c";
+  await _seedAcceptedProject(pid, lpC, { model: "mock-reengage-s392c" });
+  const stC0 = await _rj("artifacts/projects/" + pid + "/project_state.json");
+  const pmC = await eng.processMessage({
+    project_id: pid, message: "شكراً، شغل حلو", user_language: "ar",
+    mvp_scenario_id: "S392C"
+  });
+  const stC1 = await _rj("artifacts/projects/" + pid + "/project_state.json");
+  out.not_a_build_request_no_change = pmC.mode === "MVP_REENGAGE_UNCLEAR" &&
+    pmC.decision === "NOT_A_BUILD_REQUEST" &&
+    stC1.loop_id === lpC && stC1.mvp_loop.status === "ACCEPTED" &&
+    stC1.mvp_loop.slices.length === stC0.mvp_loop.slices.length;
+
+  // (d) Hardening — the provider only PROPOSES. Direct unit calls on the engine.
+  const REMAINING = [{ id: "AC-3", description: "DELETE /notes/:id returns 404 when the id does not exist" }];
+  const unoffered = await mvp.interpretReengagement({
+    project_id: pid, message: "x", remaining_acs: REMAINING,
+    provider: "mock", model: "mock-reengage-s392d", scenario_id: "S392D"
+  }, { root: ROOT });
+  out.unoffered_id_rejected = unoffered.ok === false &&
+    unoffered.error_code === "INVALID_REENGAGE" &&
+    typeof unoffered.error_detail === "string" &&
+    unoffered.error_detail.indexOf("AC-9") !== -1;
+
+  const malformed = await mvp.interpretReengagement({
+    project_id: pid, message: "x", remaining_acs: REMAINING,
+    provider: "mock", model: "mock-reengage-s392e", scenario_id: "S392E"
+  }, { root: ROOT });
+  out.malformed_payload_rejected = malformed.ok === false &&
+    (malformed.error_code === "INVALID_REENGAGE" ||
+     malformed.error_code === "INVALID_REENGAGE_JSON");
+
+  // R-12 meta-lock: the re-engagement path must never inspect owner text itself.
+  const src = fsx.readFileSync(pathx.join(ROOT, "code/src/ai_os/mvpLoopEngine.js"), "utf8");
+  const seg = src.slice(src.indexOf("function _buildReengagePrompt"),
+                        src.indexOf("function feedbackEntry"));
+  out.no_keyword_matching_in_source =
+    seg.length > 0 &&
+    seg.indexOf(".includes(") === -1 &&
+    seg.indexOf(".indexOf(message") === -1 &&
+    !/message[^\n]*\.match\(/.test(seg) &&
+    !/\/[^\n\/]+\/[gimsuy]*\.test\(\s*(message|String\(message)/.test(seg);
+
+  return out;
+}
+
+// ── S393 — R-20: the code decides, and it demands STRICT growth ─────────────
+
+async function runS393StrictSupersetInvariant() {
+  const out  = {};
+  const prev = MVP_SCOPE_FIX; // AC-1, AC-2 · 3 files
+
+  const mk = function (acs, excluded, files) {
+    return { slice_name: "next", acceptance_criteria_ids: acs,
+             excluded_acceptance_criteria_ids: excluded,
+             files: files || prev.files.slice(), rationale: "r" };
+  };
+
+  const equal = mvp.validateNextSliceScope(
+    mk(["AC-1", "AC-2"], ["AC-3"]), prev, SPEC_FIXTURE);
+  out.equal_set_rejected = equal.valid === false;
+
+  const dropped = mvp.validateNextSliceScope(
+    mk(["AC-2", "AC-3"], ["AC-1"]), prev, SPEC_FIXTURE);
+  out.dropped_criterion_rejected = dropped.valid === false;
+  out.rejection_is_typed = dropped.error_code === "MVP_SLICE_NOT_SUPERSET" &&
+    equal.error_code === "MVP_SLICE_NOT_SUPERSET";
+  out.rejection_names_offenders = Array.isArray(dropped.errors) &&
+    dropped.errors.join(" ").indexOf("AC-1") !== -1;
+
+  const droppedFile = mvp.validateNextSliceScope(
+    mk(["AC-1", "AC-2", "AC-3"], [], ["src/server.js"]), prev, SPEC_FIXTURE);
+  out.dropped_file_rejected = droppedFile.valid === false &&
+    droppedFile.errors.join(" ").indexOf("src/store.js") !== -1;
+
+  const growth = mvp.validateNextSliceScope(
+    mk(["AC-1", "AC-2", "AC-3"], []), prev, SPEC_FIXTURE);
+  out.genuine_growth_accepted = growth.valid === true;
+
+  // Engine level: the scope the production path actually builds.
+  const pid = "test_s393_mvp";
+  const lp  = "lp393";
+  const eng = _engine();
+  await _seedAcceptedProject(pid, lp, { model: "mock-reengage-s393" });
+  await eng.processMessage({
+    project_id: pid, message: "ضيف الحذف", user_language: "ar",
+    mvp_scenario_id: "S393A"
+  });
+  const st  = await _rj("artifacts/projects/" + pid + "/project_state.json");
+  const now = (st && st.mvp_loop && st.mvp_loop.mvp_scope) || {};
+
+  out.engine_scope_passes_invariant =
+    mvp.validateNextSliceScope(now, prev, SPEC_FIXTURE).valid === true;
+  out.engine_scope_is_cumulative =
+    prev.acceptance_criteria_ids.every(function (id) {
+      return (now.acceptance_criteria_ids || []).indexOf(id) !== -1;
+    }) && (now.acceptance_criteria_ids || []).indexOf("AC-3") !== -1;
+  out.engine_scope_keeps_files =
+    prev.files.every(function (f) { return (now.files || []).indexOf(f) !== -1; });
+  out.engine_scope_partitions_spec =
+    mvp.validateScope(now, SPEC_FIXTURE).valid === true;
+
+  return out;
+}
+
+// ── S394 — the invariant EXERCISED: generate, run, observe ──────────────────
+//
+// The codegen stub is conditioned on the scoped spec it receives — it emits a
+// feature only when that feature's acceptance-criterion id is present in the
+// prompt. So the SCOPE causes the CODE, which is the whole point of R-20/F-4.
+
+const S394_SPEC = {
+  scope: "Notes API — create, list, delete",
+  acceptance_criteria: [
+    { id: "AC-1", description: "create a note" },
+    { id: "AC-2", description: "list notes" },
+    { id: "AC-3", description: "delete a note by id" }
+  ],
+  files_to_create: [{ path: "src/app.js", purpose: "entry point exercising the notes store" }],
+  files_to_modify: []
+};
+
+function _s394Codegen() {
+  return [{
+    match: _isMatPrompt,
+    build: function (prompt) {
+      const lines = ["const notes = [];"];
+      if (prompt.indexOf("AC-1") !== -1) {
+        lines.push("notes.push({ id: 1, text: 'first' }); console.log('CREATE_OK');");
+      }
+      if (prompt.indexOf("AC-2") !== -1) {
+        lines.push("console.log('LIST_OK:' + notes.length);");
+      }
+      if (prompt.indexOf("AC-3") !== -1) {
+        lines.push("const i = notes.findIndex(n => n.id === 1); if (i !== -1) notes.splice(i, 1); console.log('DELETE_OK');");
+      }
+      return JSON.stringify({ files: [{ path: "src/app.js", content: lines.join("\n") + "\n" }] });
+    }
+  }];
+}
+
+function _installS394Stub() {
+  const rules = _s394Codegen();
+  const stub = defineAdapter({
+    id:    "mvp_stub",
+    label: "PHASE-56 S394 spec-conditioned codegen stub",
+    available: function () { return Promise.resolve(true); },
+    invoke: function (input) {
+      const prompt = (input && input.prompt) || "";
+      _stubPrompts.push(prompt);
+      let text = "{}";
+      for (const rule of rules) { if (rule.match(prompt)) { text = rule.build(prompt); break; } }
+      return Promise.resolve(success({
+        text, tokens_in: 10, tokens_out: 10, latency_ms: 0, cost_usd: 0,
+        provider: "mvp_stub", model: (input && input.model) || "mvp-stub",
+        finish_reason: "stop"
+      }, null, false));
+    }
+  });
+  getAdapters().set("mvp_stub", stub);
+}
+
+async function runS394Slice1RegressionAfterSlice2() {
+  const out = {};
+  const pid = "test_s394_mvp";
+  const reg = getDefaultRegistry();
+  const materializer = require("../../runtime/orchestration/materializerEngine");
+
+  const SLICE1 = { slice_name: "create-list", acceptance_criteria_ids: ["AC-1", "AC-2"],
+                   excluded_acceptance_criteria_ids: ["AC-3"],
+                   files: ["src/app.js"], rationale: "slice 1" };
+  const SLICE2 = { slice_name: "create-list-delete", acceptance_criteria_ids: ["AC-1", "AC-2", "AC-3"],
+                   excluded_acceptance_criteria_ids: [],
+                   files: ["src/app.js"], rationale: "slice 2 cumulative" };
+  const SHRUNK = { slice_name: "delete-only", acceptance_criteria_ids: ["AC-3"],
+                   excluded_acceptance_criteria_ids: ["AC-1", "AC-2"],
+                   files: ["src/app.js"], rationale: "the pre-invariant mistake" };
+
+  // shell.run_in_workspace is vision-gated at L3 (agent/shell rules require a locked
+  // vision) — seed one, exactly as every other execution-touching helper does.
+  await _writeVision(pid);
+
+  _stubPrompts = [];
+  _installS394Stub();
+  try {
+    // ── GUARDED: slice 2's cumulative scope ────────────────────────────────
+    const guardedSpec = mvp.scopedSpec(S394_SPEC, SLICE2);
+    out.guarded_scoped_spec_has_slice1_acs =
+      guardedSpec.acceptance_criteria.map(function (a) { return a.id; }).join(",") === "AC-1,AC-2,AC-3";
+
+    await materializer.materialize({
+      project_id: pid,
+      plan: [{ path: "src/app.js", action: "create" }],
+      spec: guardedSpec, design: DESIGN_FIXTURE,
+      provider: "mvp_stub", model: "mvp-stub"
+    }, { root: ROOT });
+
+    const runG = await reg.invoke("shell.run_in_workspace", {
+      project_id: pid, argv: ["node", "src/app.js"]
+    }, { root: ROOT });
+    const outG = (runG && runG.output && (runG.output.stdout || "")) || "";
+    out.guarded_code_really_executed = !!(runG && runG.status === "SUCCESS" && outG.length > 0);
+    out.guarded_slice1_create_works  = outG.indexOf("CREATE_OK") !== -1;
+    out.guarded_slice1_list_works    = outG.indexOf("LIST_OK")   !== -1;
+    out.guarded_slice2_delete_works  = outG.indexOf("DELETE_OK") !== -1;
+
+    // ── CONTROL: the shrunken scope the invariant now forbids ──────────────
+    const controlSpec = mvp.scopedSpec(S394_SPEC, SHRUNK);
+    out.control_scope_drops_slice1_acs =
+      controlSpec.acceptance_criteria.map(function (a) { return a.id; }).join(",") === "AC-3" &&
+      mvp.validateNextSliceScope(SHRUNK, SLICE1, S394_SPEC).valid === false;
+
+    await materializer.materialize({
+      project_id: pid,
+      plan: [{ path: "src/app.js", action: "create" }],
+      spec: controlSpec, design: DESIGN_FIXTURE,
+      provider: "mvp_stub", model: "mvp-stub"
+    }, { root: ROOT });
+
+    const runC = await reg.invoke("shell.run_in_workspace", {
+      project_id: pid, argv: ["node", "src/app.js"]
+    }, { root: ROOT });
+    const outC = (runC && runC.output && (runC.output.stdout || "")) || "";
+    out.control_code_really_executed = !!(runC && runC.status === "SUCCESS");
+    out.control_slice1_create_lost   = outC.indexOf("CREATE_OK") === -1;
+    out.control_slice1_list_lost     = outC.indexOf("LIST_OK")   === -1;
+    out.control_proves_probe_detects =
+      out.guarded_slice1_create_works && out.control_slice1_create_lost;
+
+    return out;
+  } finally {
+    _uninstallStub();
+  }
+}
+
 module.exports = {
+  runS392ReengageInterpretation,
+  runS393StrictSupersetInvariant,
+  runS394Slice1RegressionAfterSlice2,
   runS389ReengagementSeam,
   runS390SliceBounds,
   runS391SliceWalkDeclaredHopsOnly,

@@ -1,0 +1,24 @@
+{
+  "id": "S394",
+  "name": "REGRESSION PROOF — after slice 2 builds, slice 1's accepted functionality still works when the code is EXECUTED; the same probe DETECTS the loss when the scope is shrunk (PHASE-56 W-2, R-20)",
+  "description": "PHASE-56 W-2, ruling R-20: the invariant must be exercised, not merely asserted. Both legs run the REAL materializerEngine and then EXECUTE the generated program with node through the L2 shell.run_in_workspace tool, reading real stdout — no forced verdict. STATED PLAINLY: this does NOT use builtproject.run_scenarios, because that harness's only setup action is start_server and it always polls a port, which would add the known port-bound flake class (PHASE-24 backlog) to the suite; executing the generated program directly is a stronger exercise and adds none. The causal link is real: a prompt-conditioned codegen stub emits an implementation containing exactly the features whose acceptance-criterion ids appear in the scoped spec it is given, so the SCOPE determines the CODE. GUARDED leg: slice 2's cumulative scope regenerates the workspace and running it prints CREATE_OK, LIST_OK (slice 1's accepted criteria) and DELETE_OK (slice 2's) — slice 1 survived the rebuild. CONTROL leg: the same stub fed a SHRUNKEN slice-2-only scoped spec (the pre-invariant behaviour, reached by calling scopedSpec directly and bypassing the production guard) regenerates a program that no longer prints CREATE_OK or LIST_OK — the exact silent deletion F-4 predicted. The control is what makes the guarded leg meaningful: it proves the probe can see the defect the invariant prevents.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/mvp_loop_test_helper",
+  "method": "runS394Slice1RegressionAfterSlice2",
+  "args": [],
+  "cleanup_project": "test_s394_mvp",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "guarded_scoped_spec_has_slice1_acs", "expected": true },
+    { "type": "state_field_equals", "field": "guarded_code_really_executed",       "expected": true },
+    { "type": "state_field_equals", "field": "guarded_slice1_create_works",        "expected": true },
+    { "type": "state_field_equals", "field": "guarded_slice1_list_works",          "expected": true },
+    { "type": "state_field_equals", "field": "guarded_slice2_delete_works",        "expected": true },
+    { "type": "state_field_equals", "field": "control_scope_drops_slice1_acs",     "expected": true },
+    { "type": "state_field_equals", "field": "control_code_really_executed",       "expected": true },
+    { "type": "state_field_equals", "field": "control_slice1_create_lost",         "expected": true },
+    { "type": "state_field_equals", "field": "control_slice1_list_lost",           "expected": true },
+    { "type": "state_field_equals", "field": "control_proves_probe_detects",       "expected": true }
+  ]
+}

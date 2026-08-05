@@ -1,0 +1,24 @@
+{
+  "id": "S393",
+  "name": "slice N's accepted-criteria set is a STRICT SUPERSET of slice N-1's — verified deterministically in code; a shrinking proposal is REJECTED, never silently widened (PHASE-56 W-2, R-20)",
+  "description": "PHASE-56 W-2, ruling R-20. The built workspace is per-PROJECT while the manifest and test plan are per-LOOP, so a slice-2 scoped spec that dropped slice-1's acceptance criteria would make the materializer regenerate the entry file from a specification that no longer describes slice 1 — silently deleting working, owner-accepted functionality. The invariant is therefore enforced by validateNextSliceScope in code and NEVER trusted to the provider. Asserts, at unit level: an equal set is rejected (STRICT superset required), a dropped criterion is rejected, a dropped FILE is rejected, and a genuine growth is accepted; the rejection is typed and names the offending ids. Asserts, at engine level: the scope the engine actually constructs passes the invariant, is cumulative, and carries every slice-1 criterion and file forward.",
+  "type": "module_call",
+  "permission": "WORKSPACE_WRITE",
+  "module": "code/src/testing/helpers/mvp_loop_test_helper",
+  "method": "runS393StrictSupersetInvariant",
+  "args": [],
+  "cleanup_project": "test_s393_mvp",
+  "assertions": [
+    { "type": "status_equals",      "expected": "SUCCESS" },
+    { "type": "state_field_equals", "field": "equal_set_rejected",          "expected": true },
+    { "type": "state_field_equals", "field": "dropped_criterion_rejected",  "expected": true },
+    { "type": "state_field_equals", "field": "dropped_file_rejected",       "expected": true },
+    { "type": "state_field_equals", "field": "rejection_is_typed",          "expected": true },
+    { "type": "state_field_equals", "field": "rejection_names_offenders",   "expected": true },
+    { "type": "state_field_equals", "field": "genuine_growth_accepted",     "expected": true },
+    { "type": "state_field_equals", "field": "engine_scope_passes_invariant", "expected": true },
+    { "type": "state_field_equals", "field": "engine_scope_is_cumulative",  "expected": true },
+    { "type": "state_field_equals", "field": "engine_scope_keeps_files",    "expected": true },
+    { "type": "state_field_equals", "field": "engine_scope_partitions_spec", "expected": true }
+  ]
+}

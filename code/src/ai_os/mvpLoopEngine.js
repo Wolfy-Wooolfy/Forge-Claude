@@ -337,6 +337,56 @@ function validateScope(scope, spec) {
   return { valid: errors.length === 0, errors };
 }
 
+// ── PHASE-56 W-2: the strict-superset invariant (R-20 — BINDING) ──────────────
+//
+// Why this exists, precisely: the built workspace is per-PROJECT
+// (conversationEngine.js `projectRoot`, materializerEngine's write path) while the
+// build manifest and test plan are per-LOOP. Slice N therefore regenerates files
+// that slice N-1 already produced. If slice N's scoped spec dropped slice N-1's
+// acceptance criteria, the materializer would regenerate the entry file from a
+// specification that no longer describes the accepted slice — silently deleting
+// working, owner-accepted functionality. S394 demonstrates that deletion happening
+// on executed code, and demonstrates this check catching it.
+//
+// The provider PROPOSES which criteria to add; this function DECIDES. A shrinking
+// proposal is REJECTED — never silently widened, because silently repairing a bad
+// proposal hides that the interpretation was wrong.
+//
+// (nextScope, prevScope, spec) → { valid:true } | { valid:false, error_code, errors[] }
+function validateNextSliceScope(nextScope, prevScope, spec) {
+  const base = validateScope(nextScope, spec);
+  if (!base.valid) {
+    return { valid: false, error_code: "MVP_INVALID_NEXT_SCOPE", errors: base.errors };
+  }
+
+  const prevAcs = (prevScope && _isStringArray(prevScope.acceptance_criteria_ids))
+    ? prevScope.acceptance_criteria_ids : [];
+  const prevFiles = (prevScope && _isStringArray(prevScope.files)) ? prevScope.files : [];
+  const nextAcs   = nextScope.acceptance_criteria_ids;
+  const nextFiles = nextScope.files;
+  const errors    = [];
+
+  const droppedAcs = prevAcs.filter(function (id) { return nextAcs.indexOf(id) === -1; });
+  if (droppedAcs.length > 0) {
+    errors.push("slice drops already-accepted acceptance criteria: " + droppedAcs.join(", ") +
+                " — that would delete working functionality the owner already approved");
+  }
+  if (droppedAcs.length === 0 && nextAcs.length <= prevAcs.length) {
+    errors.push("slice must add at least one NEW acceptance criterion (strict superset required); " +
+                "previous set had " + prevAcs.length + ", proposed set has " + nextAcs.length);
+  }
+
+  const droppedFiles = prevFiles.filter(function (p) { return nextFiles.indexOf(p) === -1; });
+  if (droppedFiles.length > 0) {
+    errors.push("slice drops files the accepted slice was built from: " + droppedFiles.join(", "));
+  }
+
+  if (errors.length > 0) {
+    return { valid: false, error_code: "MVP_SLICE_NOT_SUPERSET", errors };
+  }
+  return { valid: true };
+}
+
 // ── D2: codegen-side prompt ───────────────────────────────────────────────────
 // SCENARIO_TAG mirrors materializerEngine so the mock adapter can key hermetic
 // SU responses off the tag (Track A / R-3 hermeticity).
@@ -898,6 +948,7 @@ module.exports = {
   assertTransition,
   validateMvpLoopBlock,
   validateScope,
+  validateNextSliceScope,
   deriveScope,
   persistScope,
   scopedSpec,
